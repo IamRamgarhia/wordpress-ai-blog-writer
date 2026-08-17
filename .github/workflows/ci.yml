@@ -14,7 +14,12 @@ jobs:
       - run: composer install --prefer-dist --no-progress
       - run: composer lint
 
-  test:
+  # Syntax-checks every PHP file across the full supported PHP range. This
+  # catches parse errors per version but cannot catch runtime deprecation
+  # notices (e.g. PHP 8.5 notices that phpunit.xml.dist's
+  # convertNoticesToExceptions turns into failures) — the `test` job below
+  # covers that by actually running the suite.
+  lint-syntax:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -29,3 +34,24 @@ jobs:
       - run: composer install --prefer-dist --no-progress
       - name: Lint for syntax errors
         run: find . -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
+
+  # Actually runs the PHPUnit suite against a real WordPress install via
+  # wp-env, on a single PHP configuration (matching .wp-env.json). Not run
+  # across the full PHP matrix — wp-env manages one containerised PHP
+  # version at a time and a multi-version wp-env matrix is out of scope.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+      - run: npm ci
+      - run: composer install --prefer-dist --no-progress
+      - run: npx wp-env start
+      - name: Run PHPUnit inside wp-env
+        run: npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit

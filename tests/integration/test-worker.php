@@ -49,7 +49,7 @@ class Test_Blogcraft_Worker extends WP_UnitTestCase {
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
 	}
 
-	public function test_worker_runs_only_one_stage_per_job_per_tick() {
+	public function test_zero_budget_executes_exactly_one_stage() {
 		$calls = 0;
 
 		Blogcraft_Worker::register_stage(
