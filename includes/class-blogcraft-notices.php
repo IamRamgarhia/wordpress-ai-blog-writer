@@ -103,7 +103,7 @@ class Blogcraft_Notices {
 			add_query_arg(
 				array(
 					'action' => 'blogcraft_dismiss_notice',
-					'notice' => rawurlencode( $notice_id ),
+					'notice' => $notice_id,
 				),
 				admin_url( 'admin-post.php' )
 			),
@@ -119,6 +119,16 @@ class Blogcraft_Notices {
 	 */
 	public static function render_cron_health_notice() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			return;
+		}
+
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( ! ( $screen instanceof WP_Screen ) || false === strpos( $screen->id, Blogcraft_Admin::MENU_SLUG ) ) {
 			return;
 		}
 
