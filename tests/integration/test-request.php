@@ -14,8 +14,8 @@ class Test_Blogcraft_Request extends WP_UnitTestCase {
 
 	public function test_verify_passes_for_capable_user_with_valid_nonce() {
 		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $user_id );
 		Blogcraft_Capabilities::add();
+		wp_set_current_user( $user_id );
 
 		$nonce = wp_create_nonce( 'blogcraft_save' );
 
@@ -24,8 +24,8 @@ class Test_Blogcraft_Request extends WP_UnitTestCase {
 
 	public function test_verify_fails_for_invalid_nonce() {
 		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $user_id );
 		Blogcraft_Capabilities::add();
+		wp_set_current_user( $user_id );
 
 		$this->assertFalse( Blogcraft_Request::verify( 'blogcraft_save', 'bogus-nonce' ) );
 	}

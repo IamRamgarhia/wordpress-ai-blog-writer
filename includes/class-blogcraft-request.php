@@ -24,22 +24,7 @@ class Blogcraft_Request {
 	 * @return bool
 	 */
 	public static function verify( $action, $nonce_value ) {
-		$user = wp_get_current_user();
-		if ( ! $user || ! $user->ID ) {
-			return false;
-		}
-
-		// Check if user has the capability through their roles.
-		$has_capability = false;
-		foreach ( (array) $user->roles as $role_name ) {
-			$role = get_role( $role_name );
-			if ( $role instanceof WP_Role && $role->has_cap( Blogcraft_Capabilities::MANAGE ) ) {
-				$has_capability = true;
-				break;
-			}
-		}
-
-		if ( ! $has_capability ) {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			return false;
 		}
 
