@@ -1,0 +1,24 @@
+<?php
+/**
+ * Activation routine.
+ *
+ * @package Blogcraft
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Runs once when the plugin is activated.
+ */
+class Blogcraft_Activator {
+
+	/**
+	 * Create schema and grant capabilities.
+	 *
+	 * @return void
+	 */
+	public static function activate() {
+		Blogcraft_Migrator::migrate();
+		Blogcraft_Capabilities::add();
+	}
+}

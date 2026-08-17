@@ -27,4 +27,7 @@ require_once BLOGCRAFT_PATH . 'includes/class-blogcraft-autoloader.php';
 
 Blogcraft_Autoloader::register();
 
+register_activation_hook( __FILE__, array( 'Blogcraft_Activator', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Blogcraft_Deactivator', 'deactivate' ) );
+
 Blogcraft::instance()->run();
