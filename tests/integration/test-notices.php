@@ -7,6 +7,11 @@
 
 class Test_Blogcraft_Notices extends WP_UnitTestCase {
 
+	public function tear_down() {
+		Blogcraft_Capabilities::remove();
+		parent::tear_down();
+	}
+
 	public function test_notice_is_not_dismissed_by_default() {
 		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		$this->assertFalse( Blogcraft_Notices::is_dismissed( 'cron_health', $user_id ) );
