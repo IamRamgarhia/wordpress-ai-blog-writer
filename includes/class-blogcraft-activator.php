@@ -20,5 +20,6 @@ class Blogcraft_Activator {
 	public static function activate() {
 		Blogcraft_Migrator::migrate();
 		Blogcraft_Capabilities::add();
+		Blogcraft_Scheduler::schedule();
 	}
 }
