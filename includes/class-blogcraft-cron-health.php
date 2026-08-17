@@ -24,6 +24,11 @@ class Blogcraft_Cron_Health {
 	const HEARTBEAT_OPTION = 'blogcraft_cron_heartbeat';
 
 	/**
+	 * Option storing the activation timestamp.
+	 */
+	const ACTIVATED_OPTION = 'blogcraft_activated_at';
+
+	/**
 	 * Stamp the current time as the last successful run.
 	 *
 	 * @return void
@@ -42,6 +47,28 @@ class Blogcraft_Cron_Health {
 	}
 
 	/**
+	 * Stamp the current time as the activation time.
+	 *
+	 * Used to grant a fresh install a grace period before cron is considered
+	 * stale — a site that was activated moments ago has not had time for
+	 * WP-Cron to run yet, and warning immediately would be wrong.
+	 *
+	 * @return void
+	 */
+	public static function record_activation() {
+		update_option( self::ACTIVATED_OPTION, time(), false );
+	}
+
+	/**
+	 * Timestamp the plugin was activated.
+	 *
+	 * @return int Zero if never recorded.
+	 */
+	public static function activated_at() {
+		return (int) get_option( self::ACTIVATED_OPTION, 0 );
+	}
+
+	/**
 	 * Whether the heartbeat is older than the threshold.
 	 *
 	 * @param int $threshold_seconds Age beyond which cron is considered broken.
@@ -51,7 +78,13 @@ class Blogcraft_Cron_Health {
 		$last = self::last_heartbeat();
 
 		if ( 0 === $last ) {
-			return true;
+			$activated_at = self::activated_at();
+
+			if ( 0 === $activated_at ) {
+				return true;
+			}
+
+			return ( time() - $activated_at ) >= ( 2 * Blogcraft_Scheduler::RECURRENCE_SECONDS );
 		}
 
 		return ( time() - $last ) > $threshold_seconds;

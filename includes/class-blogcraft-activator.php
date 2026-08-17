@@ -21,5 +21,6 @@ class Blogcraft_Activator {
 		Blogcraft_Migrator::migrate();
 		Blogcraft_Capabilities::add();
 		Blogcraft_Scheduler::schedule();
+		Blogcraft_Cron_Health::record_activation();
 	}
 }
