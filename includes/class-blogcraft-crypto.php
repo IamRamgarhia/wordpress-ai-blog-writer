@@ -44,7 +44,7 @@ class Blogcraft_Crypto {
 	 * Encrypt a secret.
 	 *
 	 * @param string $plaintext Value to encrypt.
-	 * @return string Prefixed base64 ciphertext, or '' on empty input.
+	 * @return string Prefixed base64 ciphertext, or '' on empty input or if sodium is not available.
 	 */
 	public static function encrypt( $plaintext ) {
 		if ( '' === $plaintext || ! self::is_available() ) {
@@ -74,7 +74,7 @@ class Blogcraft_Crypto {
 
 		$raw = base64_decode( substr( $ciphertext, strlen( self::PREFIX ) ), true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 
-		if ( false === $raw || strlen( $raw ) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ) {
+		if ( false === $raw || strlen( $raw ) < SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES ) {
 			return '';
 		}
 

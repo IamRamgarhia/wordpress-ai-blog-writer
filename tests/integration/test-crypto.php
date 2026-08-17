@@ -50,4 +50,9 @@ class Test_Blogcraft_Crypto extends WP_UnitTestCase {
 	public function test_mask_of_empty_secret_is_empty() {
 		$this->assertSame( '', Blogcraft_Crypto::mask( '' ) );
 	}
+
+	public function test_decrypt_returns_empty_string_on_ciphertext_shorter_than_mac() {
+		$payload = Blogcraft_Crypto::PREFIX . base64_encode( str_repeat( "\0", SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + 6 ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$this->assertSame( '', Blogcraft_Crypto::decrypt( $payload ) );
+	}
 }
