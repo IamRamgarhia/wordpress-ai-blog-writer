@@ -14,6 +14,8 @@ AI blog writer and content generator. Connect any AI provider with your own API 
 
 Blogcraft writes blog posts for your WordPress site using an AI provider you choose and connect with your own API key.
 
+Source code and issue tracker: https://github.com/IamRamgarhia/blogcraft
+
 Every feature is included. Nothing is locked, nothing expires, and there are no credits or quotas. Your only cost is whatever your chosen AI provider charges — several offer free tiers.
 
 **How it works**

@@ -80,7 +80,27 @@ class Blogcraft_Migrator {
 		dbDelta( $jobs_sql );
 		dbDelta( $log_sql );
 
-		update_option( self::VERSION_OPTION, BLOGCRAFT_DB_VERSION, false );
+		if ( self::table_exists( $jobs ) && self::table_exists( $log ) ) {
+			update_option( self::VERSION_OPTION, BLOGCRAFT_DB_VERSION, false );
+		}
+	}
+
+	/**
+	 * Whether a table exists in the current database.
+	 *
+	 * Used to confirm dbDelta actually created both tables before the schema
+	 * version is recorded — a failed dbDelta must not record itself as
+	 * migrated, or it will never be retried.
+	 *
+	 * @param string $table Fully prefixed table name.
+	 * @return bool
+	 */
+	private static function table_exists( $table ) {
+		global $wpdb;
+
+		return $table === $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table )
+		);
 	}
 
 	/**
