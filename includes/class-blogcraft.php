@@ -56,7 +56,6 @@ class Blogcraft {
 
 		$this->booted = true;
 
-		load_plugin_textdomain( 'blogcraft', false, dirname( plugin_basename( BLOGCRAFT_FILE ) ) . '/languages' );
 		Blogcraft_Scheduler::init();
 
 		if ( is_admin() ) {
