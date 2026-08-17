@@ -30,6 +30,7 @@ class Blogcraft_Worker {
 	 * @param string   $stage    Stage name.
 	 * @param callable $handler  Receives Blogcraft_Job, returns array with
 	 *                           'next' (string|null) and 'payload' (array).
+	 *                           If handler throws any Throwable, the job is failed.
 	 * @return void
 	 */
 	public static function register_stage( $pipeline, $stage, $handler ) {
@@ -91,7 +92,7 @@ class Blogcraft_Worker {
 
 		try {
 			$result = call_user_func( self::$stages[ $key ], $job );
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			Blogcraft_Queue::fail( $job->id, $e->getMessage() );
 
 			return;

@@ -127,4 +127,35 @@ class Test_Blogcraft_Worker extends WP_UnitTestCase {
 	public function test_run_returns_zero_when_queue_is_empty() {
 		$this->assertSame( 0, Blogcraft_Worker::run( 0 ) );
 	}
+
+	public function test_thrown_error_fails_the_job() {
+		Blogcraft_Worker::register_stage(
+			'demo',
+			'boom',
+			static function ( $job ) {
+				throw new TypeError( 'stage exploded with a TypeError' );
+			}
+		);
+
+		Blogcraft_Queue::enqueue( 'demo', 'boom', array() );
+		Blogcraft_Worker::run( 0 );
+
+		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'pending' ) );
+		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'running' ) );
+	}
+
+	public function test_empty_string_next_stage_completes_the_job() {
+		Blogcraft_Worker::register_stage(
+			'demo',
+			'only',
+			static function ( $job ) {
+				return array( 'next' => '', 'payload' => array() );
+			}
+		);
+
+		Blogcraft_Queue::enqueue( 'demo', 'only', array() );
+		Blogcraft_Worker::run();
+
+		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
+	}
 }
