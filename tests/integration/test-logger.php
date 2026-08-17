@@ -56,4 +56,14 @@ class Test_Blogcraft_Logger extends WP_UnitTestCase {
 		Blogcraft_Logger::info( 'only one' );
 		$this->assertSame( 0, Blogcraft_Logger::rotate( 100 ) );
 	}
+
+	public function test_clear_removes_all_rows() {
+		Blogcraft_Logger::info( 'first row' );
+		Blogcraft_Logger::info( 'second row' );
+		$rows = Blogcraft_Logger::recent( 100 );
+		$this->assertCount( 2, $rows );
+		Blogcraft_Logger::clear();
+		$rows = Blogcraft_Logger::recent( 100 );
+		$this->assertCount( 0, $rows );
+	}
 }

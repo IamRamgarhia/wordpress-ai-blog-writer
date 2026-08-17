@@ -19,7 +19,7 @@ class Blogcraft_Logger {
 	/**
 	 * Record an event.
 	 *
-	 * @param string   $level   One of 'info', 'warning', 'error'.
+	 * @param string   $level   One of 'info', 'error'.
 	 * @param string   $message Human-readable message.
 	 * @param array    $context Structured detail.
 	 * @param int|null $job_id  Related job, if any.
@@ -127,6 +127,6 @@ class Blogcraft_Logger {
 		global $wpdb;
 
 		$table = Blogcraft_Migrator::table_name( 'log' );
-		$wpdb->query( "TRUNCATE TABLE {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 }
