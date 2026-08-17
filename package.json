@@ -1,0 +1,12 @@
+{
+  "name": "blogcraft",
+  "private": true,
+  "devDependencies": {
+    "@wordpress/env": "^10.0.0"
+  },
+  "scripts": {
+    "env:start": "wp-env start",
+    "env:stop": "wp-env stop",
+    "test": "wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft vendor/bin/phpunit"
+  }
+}
