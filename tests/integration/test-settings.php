@@ -61,24 +61,40 @@ class Test_Blogcraft_Settings extends WP_UnitTestCase {
 		$this->assertSame( 3, Blogcraft_Settings::get( 'queue_max_attempts' ) );
 	}
 
-	public function test_set_refuses_to_store_empty_ciphertext() {
-		// Simulate encryption failure by storing an empty value in the option first.
-		// If encryption fails and returns '', set() must NOT overwrite with empty string.
-		// We'll test this by checking that a non-empty secret never results in empty ciphertext.
+	public function test_set_rejects_non_empty_secret_when_encryption_fails() {
+		// Unit test the guard logic directly using ReflectionMethod.
+		// Tests that is_encryption_failure() correctly identifies when encryption failed.
 
-		// First set a secret to establish a baseline
+		$reflection = new ReflectionMethod( 'Blogcraft_Settings', 'is_encryption_failure' );
+		$reflection->setAccessible( true );
+
+		// Case 1: Non-empty plaintext, empty ciphertext = encryption failure (guard should block).
+		$result = $reflection->invoke( null, 'sk-real-key', '' );
+		$this->assertTrue( $result, 'Should detect encryption failure: non-empty input, empty output' );
+
+		// Case 2: Non-empty plaintext, non-empty ciphertext = success (guard should allow).
+		$result = $reflection->invoke( null, 'sk-real-key', 'bcv1:abc123' );
+		$this->assertFalse( $result, 'Should not report failure when ciphertext is present' );
+
+		// Case 3: Empty plaintext, empty ciphertext = legitimate clear (guard should allow).
+		$result = $reflection->invoke( null, '', '' );
+		$this->assertFalse( $result, 'Should allow empty plaintext with empty ciphertext' );
+
+		// Case 4: Empty plaintext, non-empty ciphertext = odd but not a failure (guard should allow).
+		$result = $reflection->invoke( null, '', 'bcv1:abc123' );
+		$this->assertFalse( $result, 'Should not report failure when plaintext is empty' );
+	}
+
+	public function test_set_clears_secret_when_value_is_empty() {
+		// Verify that setting a secret to empty string works (legitimate clear path).
 		Blogcraft_Settings::set( 'provider_api_key', 'sk-original-secret' );
-		$original_stored = get_option( 'blogcraft_settings' );
-		$this->assertNotEmpty( $original_stored['provider_api_key'] );
+		$this->assertSame( 'sk-original-secret', Blogcraft_Settings::get( 'provider_api_key' ) );
 
-		// Now, if we somehow simulate encryption returning empty (we'll test the guard logic),
-		// the stored value should remain unchanged.
-		// Since we can't easily mock Blogcraft_Crypto::encrypt() without modifying the class,
-		// we test the observable guarantee: a non-empty secret must never result in empty ciphertext.
+		// Clear the secret.
+		$result = Blogcraft_Settings::set( 'provider_api_key', '' );
+		$this->assertTrue( $result, 'Setting secret to empty should succeed' );
 
-		// Verify: any non-empty secret input must result in non-empty encrypted output being stored.
-		Blogcraft_Settings::set( 'provider_api_key', 'sk-another-secret' );
-		$after_set = get_option( 'blogcraft_settings' );
-		$this->assertNotEmpty( $after_set['provider_api_key'], 'Encryption of non-empty secret must result in non-empty ciphertext' );
+		// After clearing, should return the schema default (empty string).
+		$this->assertSame( '', Blogcraft_Settings::get( 'provider_api_key' ) );
 	}
 }

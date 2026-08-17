@@ -53,6 +53,17 @@ class Blogcraft_Settings {
 	}
 
 	/**
+	 * Whether an encryption attempt failed for a value that should have produced ciphertext.
+	 *
+	 * @param string $value_str Incoming plaintext.
+	 * @param string $encrypted  Result of Blogcraft_Crypto::encrypt().
+	 * @return bool
+	 */
+	private static function is_encryption_failure( $value_str, $encrypted ) {
+		return '' !== $value_str && '' === $encrypted;
+	}
+
+	/**
 	 * Get a setting value, falling back to its schema default.
 	 *
 	 * @param string $key Setting key.
@@ -104,10 +115,7 @@ class Blogcraft_Settings {
 			$value_str = (string) $value;
 			$encrypted = Blogcraft_Crypto::encrypt( $value_str );
 
-			// Guard: If the value is non-empty but encryption resulted in empty,
-			// that indicates an encryption failure (e.g., sodium unavailable).
-			// Do not silently persist an empty ciphertext — return false to signal failure.
-			if ( '' !== $value_str && '' === $encrypted ) {
+			if ( self::is_encryption_failure( $value_str, $encrypted ) ) {
 				return false;
 			}
 
@@ -141,6 +149,9 @@ class Blogcraft_Settings {
 
 	/**
 	 * Every setting resolved to its effective value.
+	 *
+	 * Secrets are returned as plaintext; callers rendering to the UI must mask them
+	 * with Blogcraft_Crypto::mask().
 	 *
 	 * @return array
 	 */
