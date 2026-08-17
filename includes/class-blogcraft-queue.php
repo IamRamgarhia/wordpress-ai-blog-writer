@@ -17,19 +17,51 @@ defined( 'ABSPATH' ) || exit;
 class Blogcraft_Queue {
 
 	/**
+	 * How long a job may sit in 'running' before it is considered stranded.
+	 *
+	 * Comfortably longer than any single stage should take, so a job this
+	 * old is presumed to have survived a PHP fatal, an OOM kill, or a killed
+	 * FPM worker rather than merely being slow.
+	 */
+	const RECLAIM_AFTER_SECONDS = 600;
+
+	/**
+	 * Wpdb format specifier for each column update() may write.
+	 *
+	 * Without this, $wpdb->update() falls back to '%s' for every value,
+	 * which round-trips integer columns like attempts as strings.
+	 *
+	 * @var array
+	 */
+	private static $column_formats = array(
+		'pipeline'     => '%s',
+		'stage'        => '%s',
+		'status'       => '%s',
+		'payload'      => '%s',
+		'attempts'     => '%d',
+		'max_attempts' => '%d',
+		'available_at' => '%s',
+		'locked_at'    => '%s',
+		'lock_token'   => '%s',
+		'last_error'   => '%s',
+		'created_at'   => '%s',
+		'updated_at'   => '%s',
+	);
+
+	/**
 	 * Add a job to the queue.
 	 *
 	 * @param string $pipeline Pipeline name.
 	 * @param string $stage    Starting stage.
 	 * @param array  $payload  Initial payload.
-	 * @return int New job id.
+	 * @return int New job id, or 0 if the insert failed.
 	 */
 	public static function enqueue( $pipeline, $stage, $payload = array() ) {
 		global $wpdb;
 
 		$now = current_time( 'mysql', true );
 
-		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$inserted = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			Blogcraft_Migrator::table_name( 'jobs' ),
 			array(
 				'pipeline'     => (string) $pipeline,
@@ -44,6 +76,13 @@ class Blogcraft_Queue {
 			),
 			array( '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s' )
 		);
+
+		if ( false === $inserted ) {
+			// wpdb bails out before refreshing insert_id on failure, so it
+			// would otherwise still hold the id of the last successful
+			// insert on this connection — a plausible but wrong job id.
+			return 0;
+		}
 
 		return (int) $wpdb->insert_id;
 	}
@@ -197,6 +236,77 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * Return stranded 'running' jobs to the queue.
+	 *
+	 * Claim() locks a row by setting status = 'running' and stamping
+	 * locked_at, but nothing previously read locked_at back — a job that
+	 * survives a PHP fatal error (exceeding max_execution_time, an OOM
+	 * kill, a killed FPM worker) rather than a thrown exception stranded in
+	 * 'running' forever, since Blogcraft_Worker's own try/catch cannot see
+	 * it. This finds jobs locked longer than the cutoff and either requeues
+	 * them as 'pending' or, once they have exhausted their attempts, fails
+	 * them outright.
+	 *
+	 * @param int|null $older_than_seconds Cutoff age; null uses RECLAIM_AFTER_SECONDS.
+	 * @return int Number of jobs reclaimed.
+	 */
+	public static function reclaim_stale( $older_than_seconds = null ) {
+		global $wpdb;
+
+		if ( null === $older_than_seconds ) {
+			$older_than_seconds = self::RECLAIM_AFTER_SECONDS;
+		}
+
+		$table  = Blogcraft_Migrator::table_name( 'jobs' );
+		$cutoff = gmdate( 'Y-m-d H:i:s', time() - (int) $older_than_seconds );
+
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT id, attempts, max_attempts FROM {$table} WHERE status = 'running' AND locked_at < %s", $cutoff ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			ARRAY_A
+		);
+
+		if ( ! is_array( $rows ) || empty( $rows ) ) {
+			return 0;
+		}
+
+		$message = __( 'Job reclaimed after an interrupted run.', 'blogcraft' );
+
+		foreach ( $rows as $row ) {
+			$job_id       = (int) $row['id'];
+			$attempts     = (int) $row['attempts'] + 1;
+			$max_attempts = (int) $row['max_attempts'];
+
+			if ( $attempts >= $max_attempts ) {
+				self::update(
+					$job_id,
+					array(
+						'status'     => 'failed',
+						'attempts'   => $attempts,
+						'last_error' => $message,
+						'lock_token' => null,
+						'locked_at'  => null,
+					)
+				);
+			} else {
+				self::update(
+					$job_id,
+					array(
+						'status'     => 'pending',
+						'attempts'   => $attempts,
+						'last_error' => $message,
+						'lock_token' => null,
+						'locked_at'  => null,
+					)
+				);
+			}
+		}
+
+		Blogcraft_Logger::error( $message, array( 'count' => count( $rows ) ) );
+
+		return count( $rows );
+	}
+
+	/**
 	 * Count jobs in a given status.
 	 *
 	 * @param string $status Status value.
@@ -224,10 +334,18 @@ class Blogcraft_Queue {
 
 		$data['updated_at'] = current_time( 'mysql', true );
 
+		$formats = array();
+
+		foreach ( array_keys( $data ) as $column ) {
+			$formats[] = isset( self::$column_formats[ $column ] ) ? self::$column_formats[ $column ] : '%s';
+		}
+
 		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			Blogcraft_Migrator::table_name( 'jobs' ),
 			$data,
-			array( 'id' => (int) $job_id )
+			array( 'id' => (int) $job_id ),
+			$formats,
+			array( '%d' )
 		);
 	}
 }
