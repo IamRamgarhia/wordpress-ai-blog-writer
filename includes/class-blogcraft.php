@@ -58,5 +58,9 @@ class Blogcraft {
 
 		load_plugin_textdomain( 'blogcraft', false, dirname( plugin_basename( BLOGCRAFT_FILE ) ) . '/languages' );
 		Blogcraft_Scheduler::init();
+
+		if ( is_admin() ) {
+			Blogcraft_Admin::init();
+		}
 	}
 }
