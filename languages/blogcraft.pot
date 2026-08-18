@@ -226,6 +226,182 @@ msgstr ""
 msgid "Frequently asked questions"
 msgstr ""
 
+#: includes/class-blogcraft-blueprint.php:46
+msgid "Conversational"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:47
+msgid "Professional"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:48
+msgid "Friendly"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:49
+msgid "Authoritative"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:50
+msgid "Plain and direct"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:51
+msgid "Witty"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:52
+msgid "Empathetic"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:53
+msgid "Journalistic"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:54
+msgid "Academic"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:55
+msgid "Enthusiastic"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:56
+msgid "Something else — I will describe it"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:67
+msgid "Second person — you"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:68
+msgid "First person plural — we"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:69
+msgid "First person — I"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:70
+msgid "Third person — they"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:84
+msgid "Simple — anyone can follow it"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:85
+msgid "General — a wide audience"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:86
+msgid "Informed — familiar with the subject"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:87
+msgid "Expert — assumes the vocabulary"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:98
+msgid "Answer the question immediately"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:99
+msgid "Open with a hook"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:100
+msgid "Name the problem the reader has"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:101
+msgid "Open with a figure"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:102
+msgid "Open with a short anecdote"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:113
+msgid "Summarise the main points"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:114
+msgid "Give the reader next steps"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:115
+msgid "End on a call to action"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:116
+msgid "No conclusion section"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:127
+msgid "Analogies"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:128
+msgid "Concrete examples"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:129
+msgid "Short anecdotes"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:130
+msgid "Rhetorical questions"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:131
+msgid "Before-and-after contrast"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:132
+msgid "Brief asides"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:143
+msgid "Not specified"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:144
+msgid "Beginners"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:145
+msgid "Enthusiasts"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:146
+msgid "Professionals in the field"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:147
+msgid "People deciding what to buy"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:148
+msgid "Small business owners"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:149
+msgid "Developers"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:150
+msgid "Students"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:151
+msgid "Someone else — I will describe them"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint.php:165
+msgid "Default"
+msgstr ""
+
 #: includes/class-blogcraft-calendar.php:57
 #: includes/class-blogcraft-calendar.php:58
 #: includes/class-blogcraft-calendar.php:96
@@ -904,7 +1080,7 @@ msgstr ""
 msgid "Dismiss this notice"
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:336
+#: includes/class-blogcraft-pipeline.php:389
 msgid "Untitled"
 msgstr ""
 
@@ -1038,6 +1214,67 @@ msgstr ""
 
 #: includes/class-blogcraft-scheduler.php:53
 msgid "Every 5 minutes (Blogcraft)"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:115
+msgid "Length"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:147
+msgid "Sections"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:179
+msgid "Reading ease"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:213
+msgid "Sentence length"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:244
+msgid "Paragraph length"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:270
+msgid "Banned phrases"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:273
+#: includes/class-blogcraft-scorecard.php:301
+msgid "none"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:298
+msgid "Em dashes"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:301
+msgid "allowed"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:331
+msgid "Keyword density"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:359
+msgid "Required terms"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:388
+msgid "Sources cited"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:413
+msgid "Internal links"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:436
+msgid "Passive voice"
+msgstr ""
+
+#: includes/class-blogcraft-scorecard.php:439
+msgid "under 20%"
 msgstr ""
 
 #: includes/class-blogcraft-seo.php:126

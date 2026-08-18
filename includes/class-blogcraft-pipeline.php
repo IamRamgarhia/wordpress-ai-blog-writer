@@ -68,8 +68,28 @@ class Blogcraft_Pipeline {
 				'topic'        => (string) $topic,
 				'status'       => ( 'publish' === $status ) ? 'publish' : 'draft',
 				'instructions' => (string) $instructions,
+				// Snapshot rather than reference: editing a blueprint must not
+				// change the rules a post already part-written is judged by.
+				'blueprint'    => Blogcraft_Blueprint::get(),
 			)
 		);
+	}
+
+	/**
+	 * The blueprint a job is being written to.
+	 *
+	 * Falls back to the current default for jobs queued before blueprints
+	 * existed, so an upgrade does not strand whatever is mid-flight.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	private static function blueprint( $job ) {
+		$stored = isset( $job->payload['blueprint'] ) ? $job->payload['blueprint'] : null;
+
+		return is_array( $stored )
+			? Blogcraft_Blueprint::normalise( $stored )
+			: Blogcraft_Blueprint::get();
 	}
 
 	/**
@@ -186,6 +206,8 @@ class Blogcraft_Pipeline {
 	public static function stage_outline( $job ) {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
+		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+
 		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources, self::instructions( $job ) ) );
 
 		$payload            = $job->payload;
@@ -207,6 +229,8 @@ class Blogcraft_Pipeline {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$outline = isset( $job->payload['outline'] ) ? $job->payload['outline'] : array();
 		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
+		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+
 		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline, $sources, self::instructions( $job ) ), array( 'max_tokens' => 4096 ) );
 
 		$payload            = $job->payload;
@@ -225,13 +249,40 @@ class Blogcraft_Pipeline {
 	 * @return array
 	 */
 	public static function stage_critique( $job ) {
-		$article = isset( $job->payload['article'] ) ? $job->payload['article'] : array();
-		$result  = self::ask( Blogcraft_Prompts::critique( $article ) );
+		$article   = isset( $job->payload['article'] ) ? $job->payload['article'] : array();
+		$blueprint = self::blueprint( $job );
 
+		Blogcraft_Prompts::use_blueprint( $blueprint );
+
+		$result   = self::ask( Blogcraft_Prompts::critique( $article ) );
 		$problems = isset( $result['problems'] ) && is_array( $result['problems'] ) ? $result['problems'] : array();
 
-		$payload             = $job->payload;
-		$payload['problems'] = $problems;
+		// The model's own opinion of its draft is worth having, but it is an
+		// opinion. Measuring the rendered article against the blueprint gives
+		// facts, and a fact the model can act on beats a score it never sees.
+		$assessment = Blogcraft_Scorecard::evaluate(
+			Blogcraft_Blocks::render( $article ),
+			$blueprint
+		);
+
+		foreach ( $assessment['checks'] as $check ) {
+			if ( empty( $check['pass'] ) && '' !== trim( (string) $check['repair'] ) ) {
+				$problems[] = $check['repair'];
+			}
+		}
+
+		$payload                = $job->payload;
+		$payload['problems']    = $problems;
+		$payload['draft_score'] = (int) $assessment['score'];
+
+		Blogcraft_Logger::info(
+			'Draft measured against the blueprint.',
+			array(
+				'score'  => (int) $assessment['score'],
+				'to_fix' => count( $problems ),
+			),
+			(int) $job->id
+		);
 
 		// Nothing to fix means the revise pass would only burn tokens.
 		return array(
@@ -249,7 +300,9 @@ class Blogcraft_Pipeline {
 	public static function stage_revise( $job ) {
 		$article  = isset( $job->payload['article'] ) ? $job->payload['article'] : array();
 		$problems = isset( $job->payload['problems'] ) ? $job->payload['problems'] : array();
-		$revised  = self::ask( Blogcraft_Prompts::revise( $article, $problems ), array( 'max_tokens' => 4096 ) );
+		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+
+		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems ), array( 'max_tokens' => 4096 ) );
 
 		$payload            = $job->payload;
 		$payload['article'] = $revised;

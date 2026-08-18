@@ -16,6 +16,13 @@ defined( 'ABSPATH' ) || exit;
 class Blogcraft_Prompts {
 
 	/**
+	 * Blueprint applied to every prompt, or null for none.
+	 *
+	 * @var array|null
+	 */
+	private static $blueprint = null;
+
+	/**
 	 * Shared system framing for every stage.
 	 *
 	 * @return string
@@ -27,7 +34,50 @@ class Blogcraft_Prompts {
 
 		// The site's own voice, audience and prohibitions ride on every call; without
 		// this the output is indistinguishable from any other tool's.
-		return $base . Blogcraft_Voice::system_prompt();
+		$prompt = $base . Blogcraft_Voice::system_prompt();
+
+		if ( is_array( self::$blueprint ) ) {
+			$rules = Blogcraft_Blueprint::voice_rules( self::$blueprint );
+
+			if ( '' !== $rules ) {
+				$prompt .= '
+
+' . $rules;
+			}
+		}
+
+		return $prompt;
+	}
+
+	/**
+	 * The blueprint every prompt built from now on should obey.
+	 *
+	 * Set by the pipeline from the snapshot on the job, so a blueprint edited
+	 * mid-write never changes the post already being written.
+	 *
+	 * @param array|null $blueprint Blueprint, or null to clear.
+	 * @return void
+	 */
+	public static function use_blueprint( $blueprint ) {
+		self::$blueprint = is_array( $blueprint ) ? $blueprint : null;
+	}
+
+	/**
+	 * The structural rules for the current blueprint, as a prompt block.
+	 *
+	 * @return string Empty when no blueprint is active.
+	 */
+	private static function structure_block() {
+		if ( ! is_array( self::$blueprint ) ) {
+			return '';
+		}
+
+		$rules = Blogcraft_Blueprint::structure_rules( self::$blueprint );
+
+		return ( '' === $rules ) ? '' : '
+
+Rules for this article:
+' . $rules;
 	}
 
 	/**
@@ -50,8 +100,9 @@ class Blogcraft_Prompts {
 			. "- title: compelling, under 65 characters, no colon-subtitle pattern\n"
 			. "- slug: lowercase, hyphenated, no stop words\n"
 			. "- meta_description: under 155 characters, describes what the reader gains\n"
-			. '- sections: 4 to 7 headings that build an argument, not a list of synonyms'
-			. self::extra( $instructions );
+			. '- sections: headings that build an argument, not a list of synonyms'
+			. self::extra( $instructions )
+			. self::structure_block();
 
 		return array(
 			array(
@@ -97,14 +148,15 @@ class Blogcraft_Prompts {
 			. '{"intro":"","key_takeaways":[""],"sections":[{"heading":"","paragraphs":[""]}],"faq":[{"question":"","answer":""}]}' . "\n\n"
 			. "Rules:\n"
 			. "- intro: one paragraph that answers the title's implicit question directly. No throat-clearing.\n"
-			. "- key_takeaways: 3 to 5 specific, useful points. Not a summary of the headings.\n"
-			. "- Each section: 2 to 4 paragraphs. Keep paragraphs to 2 to 3 sentences so they stay readable.\n"
-			. "- faq: 3 to 4 questions a reader would actually search for, with direct answers.\n"
+			. "- key_takeaways: specific, useful points. Not a summary of the headings.\n"
+			. "- Each section: enough paragraphs to cover it properly.\n"
+			. "- faq: questions a reader would actually search for, with direct answers.\n"
 			. '- Plain text only in every field. No markdown, no HTML.
 '
 			. '- Where reference material gives a figure or a fact, use it and name the source in the sentence. '
 			. 'Where it shows what existing coverage already says, add what it leaves out rather than repeating it.'
-			. self::extra( $instructions );
+			. self::extra( $instructions )
+			. self::structure_block();
 
 		return array(
 			array(
@@ -165,7 +217,8 @@ class Blogcraft_Prompts {
 		$user = "Rewrite this draft, fixing every problem listed.\n\nDraft:\n"
 			. wp_json_encode( $article ) . "\n\nProblems to fix:\n" . $list . "\n"
 			. 'Reply with JSON in exactly the same shape as the draft. Keep what works; '
-			. 'change what was criticised. Do not add new sections.';
+			. 'change what was criticised. Do not add new sections.'
+			. self::structure_block();
 
 		return array(
 			array(

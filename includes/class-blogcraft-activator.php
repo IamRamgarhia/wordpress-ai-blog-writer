@@ -19,6 +19,9 @@ class Blogcraft_Activator {
 	 */
 	public static function activate() {
 		Blogcraft_Migrator::migrate();
+
+		// Carry existing voice settings into the default blueprint.
+		Blogcraft_Blueprint::migrate_from_voice();
 		Blogcraft_Capabilities::add();
 		Blogcraft_Scheduler::schedule();
 		Blogcraft_Autopilot::schedule();
