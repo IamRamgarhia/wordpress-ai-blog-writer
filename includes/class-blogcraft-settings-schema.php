@@ -39,6 +39,11 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'provider_type'              => array(
+				'default' => 'openai',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'provider_base_url'          => array(
 				'default' => '',
 				'type'    => 'url',
@@ -48,6 +53,11 @@ class Blogcraft_Settings_Schema {
 				'default' => '',
 				'type'    => 'string',
 				'secret'  => true,
+			),
+			'provider_model'             => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
 			),
 		);
 	}
