@@ -93,6 +93,14 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 == Changelog ==
 
+= 0.11.0 =
+* New "How it writes" screen: 48 controls over voice, structure, search, and sounding human
+* A live Brief panel showing exactly what the model is told, updating as you change anything
+* Per-section instructions for the opening, sections, ending and questions
+
+= 0.10.0 =
+* Every writing control now reaches the model, and measured faults are fed back for rewriting
+
 = 0.9.7 =
 * Weekday checkboxes are no longer squashed together
 
