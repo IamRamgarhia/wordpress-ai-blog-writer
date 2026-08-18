@@ -546,163 +546,175 @@ msgid "One per line. Related phrases worth a mention."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:682
+msgid "Work these out for me"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:683
+msgid "When you name no terms of your own, take them from the pages already covering the subject. Costs nothing extra: it reads the research this post already gathered."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:684
+msgid "Derive the terms from existing coverage"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:688
 #: includes/class-blogcraft-generate.php:683
 msgid "Must appear"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:683
+#: includes/class-blogcraft-blueprint-screen.php:689
 msgid "One per line. Measured — every one of these is checked for, and a missing term is reported back."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:689
+#: includes/class-blogcraft-blueprint-screen.php:695
 #: includes/class-blogcraft-generate.php:689
 msgid "Sources to cite"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:690
+#: includes/class-blogcraft-blueprint-screen.php:696
 msgid "Measured. Outbound links to reputable sources."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:696
+#: includes/class-blogcraft-blueprint-screen.php:702
 msgid "Links to your own posts"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:697
+#: includes/class-blogcraft-blueprint-screen.php:703
 msgid "Added after writing, then counted."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:703
+#: includes/class-blogcraft-blueprint-screen.php:709
 msgid "Title length"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:705
-#: includes/class-blogcraft-blueprint-screen.php:712
+#: includes/class-blogcraft-blueprint-screen.php:711
+#: includes/class-blogcraft-blueprint-screen.php:718
 msgid " characters"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:710
+#: includes/class-blogcraft-blueprint-screen.php:716
 msgid "Description length"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:729
+#: includes/class-blogcraft-blueprint-screen.php:735
 #: includes/class-blogcraft-generate.php:711
 msgid "Devices to use"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:730
+#: includes/class-blogcraft-blueprint-screen.php:736
 msgid "Where they genuinely help. Nothing here is forced into every section."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:739
+#: includes/class-blogcraft-blueprint-screen.php:745
 #: includes/class-blogcraft-generate.php:720
 msgid "Habits"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:741
+#: includes/class-blogcraft-blueprint-screen.php:747
 msgid "Vary sentence length deliberately"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:742
+#: includes/class-blogcraft-blueprint-screen.php:748
 #: includes/class-blogcraft-generate.php:723
 msgid "Allow contractions"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:743
+#: includes/class-blogcraft-blueprint-screen.php:749
 #: includes/class-blogcraft-generate.php:724
 msgid "Allow em dashes"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:747
+#: includes/class-blogcraft-blueprint-screen.php:753
 #: includes/class-blogcraft-generate.php:727
 msgid "Demand"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:749
+#: includes/class-blogcraft-blueprint-screen.php:755
 #: includes/class-blogcraft-generate.php:729
 msgid "First-hand, specific detail"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:750
+#: includes/class-blogcraft-blueprint-screen.php:756
 msgid "A named source for factual claims"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:751
+#: includes/class-blogcraft-blueprint-screen.php:757
 msgid "Concrete figures where they exist"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:755
+#: includes/class-blogcraft-blueprint-screen.php:761
 #: includes/class-blogcraft-generate.php:734
 msgid "Never write"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:756
+#: includes/class-blogcraft-blueprint-screen.php:762
 msgid "One per line. Measured — any of these found in a draft sends it back."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:762
+#: includes/class-blogcraft-blueprint-screen.php:768
 #: includes/class-blogcraft-generate.php:740
 msgid "Never mention"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:763
+#: includes/class-blogcraft-blueprint-screen.php:769
 msgid "One per line. Measured, and weighted heavily. For competitors, brands and claims that must never appear at all."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:769
+#: includes/class-blogcraft-blueprint-screen.php:775
 #: includes/class-blogcraft-generate.php:746
 msgid "Steer clear of"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:770
+#: includes/class-blogcraft-blueprint-screen.php:776
 msgid "One per line. Subjects to avoid even in passing. Sent to the model rather than measured, because a subject is not a single word."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:787
+#: includes/class-blogcraft-blueprint-screen.php:793
 msgid "Instructions for one part of the article only. These are appended to the rules the model already has, so use them for the things that keep coming out wrong."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:790
+#: includes/class-blogcraft-blueprint-screen.php:796
 msgid "The opening"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:792
+#: includes/class-blogcraft-blueprint-screen.php:798
 msgid "Never open with a rhetorical question."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:797
+#: includes/class-blogcraft-blueprint-screen.php:803
 msgid "Every section"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:799
+#: includes/class-blogcraft-blueprint-screen.php:805
 msgid "Open each section with the answer, then explain it."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:804
+#: includes/class-blogcraft-blueprint-screen.php:810
 msgid "The ending"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:806
+#: includes/class-blogcraft-blueprint-screen.php:812
 msgid "No summary of what was just said. End on what to do next."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:811
+#: includes/class-blogcraft-blueprint-screen.php:817
 msgid "The questions"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:813
+#: includes/class-blogcraft-blueprint-screen.php:819
 msgid "Answer in two sentences at most."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:878
+#: includes/class-blogcraft-blueprint-screen.php:884
 msgid "Saved. Every post from now on is written to this brief."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:888
+#: includes/class-blogcraft-blueprint-screen.php:894
 #: includes/class-blogcraft-generate.php:136
 msgid "Not allowed."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:894
+#: includes/class-blogcraft-blueprint-screen.php:900
 #: includes/class-blogcraft-generate.php:142
 msgid "That form has expired. Reload the page."
 msgstr ""
@@ -1731,11 +1743,11 @@ msgid "Dismiss this notice"
 msgstr ""
 
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
-#: includes/class-blogcraft-pipeline.php:554
+#: includes/class-blogcraft-pipeline.php:600
 msgid "%1$s: %2$s, wanted %3$s"
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:602
+#: includes/class-blogcraft-pipeline.php:648
 msgid "Untitled"
 msgstr ""
 

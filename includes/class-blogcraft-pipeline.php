@@ -197,6 +197,32 @@ class Blogcraft_Pipeline {
 		$payload            = $job->payload;
 		$payload['sources'] = $sources;
 
+		// Terms the pages already covering this subject all mention. Derived
+		// from research this stage has already fetched, so it costs nothing
+		// extra, and it only fills in when the user has not named terms of
+		// their own — an explicit list is a decision, not a gap to fill.
+		$blueprint = self::blueprint( $job );
+
+		if ( (bool) $blueprint['auto_terms'] && '' === trim( (string) $blueprint['required_terms'] ) ) {
+			$terms = Blogcraft_Terms::extract( $sources, $topic );
+
+			if ( ! empty( $terms ) ) {
+				$blueprint['required_terms'] = implode(
+					'
+',
+					$terms
+				);
+				$payload['blueprint']        = $blueprint;
+				$payload['auto_terms_found'] = $terms;
+
+				Blogcraft_Logger::info(
+					'Derived the terms this subject is expected to cover.',
+					array( 'terms' => implode( ', ', $terms ) ),
+					(int) $job->id
+				);
+			}
+		}
+
 		return array(
 			'next'    => 'outline',
 			'payload' => $payload,

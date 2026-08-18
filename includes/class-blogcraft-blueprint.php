@@ -202,6 +202,7 @@ class Blogcraft_Blueprint {
 			'density_min'           => array( 'float', 0.5 ),
 			'density_max'           => array( 'float', 2.0 ),
 			'required_terms'        => array( 'list', '' ),
+			'auto_terms'            => array( 'bool', true ),
 			'meta_title_max'        => array( 'int', 60 ),
 			'meta_desc_max'         => array( 'int', 155 ),
 			'internal_links_target' => array( 'int', 3 ),

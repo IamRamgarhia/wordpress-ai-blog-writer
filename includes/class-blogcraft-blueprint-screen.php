@@ -679,6 +679,12 @@ class Blogcraft_Blueprint_Screen {
 		);
 
 		self::row(
+			__( 'Work these out for me', 'blogcraft' ),
+			__( 'When you name no terms of your own, take them from the pages already covering the subject. Costs nothing extra: it reads the research this post already gathered.', 'blogcraft' ),
+			self::toggle( 'auto_terms', $bp['auto_terms'], __( 'Derive the terms from existing coverage', 'blogcraft' ) )
+		);
+
+		self::row(
 			__( 'Must appear', 'blogcraft' ),
 			__( 'One per line. Measured — every one of these is checked for, and a missing term is reported back.', 'blogcraft' ),
 			self::area( 'required_terms', $bp['required_terms'], "ergonomics\nanti-fatigue mat" ),
