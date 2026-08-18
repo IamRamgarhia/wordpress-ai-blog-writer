@@ -1,0 +1,495 @@
+<?php
+/**
+ * Checking measurements against a blueprint.
+ *
+ * @package Blogcraft
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Turns measurements into a score and, more usefully, into repair instructions.
+ *
+ * The plugin already scored drafts and threw the number away: it decided
+ * publish-or-hold and was never shown to the model. That wastes the only
+ * objective signal available. Every failed check here carries a sentence
+ * written for the model — "the introduction runs 340 words against a 180 target;
+ * cut it" — and those sentences are appended to the critique before the revise
+ * stage runs. The same list renders for a human on the review screen, so both
+ * audiences see the identical reasons.
+ *
+ * Weights are deliberately lopsided. Length and structure are cheap to fix and
+ * heavily weighted; passive voice is an indicator and worth almost nothing, so
+ * a draft is never held for it alone.
+ */
+class Blogcraft_Scorecard {
+
+	/**
+	 * Build the full list of checks for a measured draft.
+	 *
+	 * @param array $metrics   Output of Blogcraft_Metrics::measure().
+	 * @param array $blueprint Blueprint the draft was written to.
+	 * @return array List of checks.
+	 */
+	public static function checks( $metrics, $blueprint ) {
+		$checks = array();
+
+		$checks[] = self::word_count( $metrics, $blueprint );
+		$checks[] = self::sections( $metrics, $blueprint );
+		$checks[] = self::reading( $metrics, $blueprint );
+		$checks[] = self::sentences( $metrics, $blueprint );
+		$checks[] = self::paragraphs( $metrics, $blueprint );
+		$checks[] = self::banned( $metrics );
+		$checks[] = self::em_dashes( $metrics, $blueprint );
+
+		if ( '' !== trim( (string) $blueprint['primary_keyword'] ) ) {
+			$checks[] = self::keyword( $metrics, $blueprint );
+		}
+
+		if ( ! empty( $metrics['terms_covered'] ) || ! empty( $metrics['terms_missing'] ) ) {
+			$checks[] = self::terms( $metrics );
+		}
+
+		if ( (int) $blueprint['external_links_target'] > 0 ) {
+			$checks[] = self::external_links( $metrics, $blueprint );
+		}
+
+		if ( (int) $blueprint['internal_links_target'] > 0 ) {
+			$checks[] = self::internal_links( $metrics, $blueprint );
+		}
+
+		$checks[] = self::passive( $metrics );
+
+		return $checks;
+	}
+
+	/**
+	 * Assemble one check.
+	 *
+	 * @param string $key    Machine name.
+	 * @param string $label  Human label.
+	 * @param bool   $pass   Whether it passed.
+	 * @param string $actual What was measured, for display.
+	 * @param string $target What was asked for, for display.
+	 * @param int    $weight Points this check is worth.
+	 * @param string $repair Instruction for the model when it failed.
+	 * @return array
+	 */
+	private static function check( $key, $label, $pass, $actual, $target, $weight, $repair = '' ) {
+		return array(
+			'key'    => $key,
+			'label'  => $label,
+			'pass'   => (bool) $pass,
+			'actual' => $actual,
+			'target' => $target,
+			'weight' => (int) $weight,
+			'repair' => $repair,
+		);
+	}
+
+	/**
+	 * Length against the target band.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function word_count( $metrics, $blueprint ) {
+		$target    = (int) $blueprint['word_target'];
+		$tolerance = (int) $blueprint['word_tolerance'];
+		$low       = (int) round( $target * ( 1 - ( $tolerance / 100 ) ) );
+		$high      = (int) round( $target * ( 1 + ( $tolerance / 100 ) ) );
+		$actual    = (int) $metrics['words'];
+		$pass      = ( $actual >= $low && $actual <= $high );
+
+		$repair = '';
+
+		if ( ! $pass ) {
+			$repair = ( $actual < $low )
+				? sprintf( 'The article is %1$d words and needs to be at least %2$d. Expand the thinnest sections with specifics, not filler.', $actual, $low )
+				: sprintf( 'The article is %1$d words and must come under %2$d. Cut repetition and throat-clearing rather than removing whole sections.', $actual, $high );
+		}
+
+		return self::check(
+			'words',
+			__( 'Length', 'blogcraft' ),
+			$pass,
+			sprintf( '%d', $actual ),
+			sprintf( '%1$d–%2$d', $low, $high ),
+			20,
+			$repair
+		);
+	}
+
+	/**
+	 * Section count against the blueprint.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function sections( $metrics, $blueprint ) {
+		$min    = (int) $blueprint['sections_min'];
+		$max    = (int) $blueprint['sections_max'];
+		$actual = (int) $metrics['h2'];
+		$pass   = ( $actual >= $min && $actual <= $max );
+
+		$repair = '';
+
+		if ( ! $pass ) {
+			$repair = ( $actual < $min )
+				? sprintf( 'There are %1$d main sections; there must be at least %2$d. Split the broadest one, or add a section the subject genuinely needs.', $actual, $min )
+				: sprintf( 'There are %1$d main sections; keep it to %2$d. Merge the ones that overlap.', $actual, $max );
+		}
+
+		return self::check(
+			'sections',
+			__( 'Sections', 'blogcraft' ),
+			$pass,
+			sprintf( '%d', $actual ),
+			sprintf( '%1$d–%2$d', $min, $max ),
+			12,
+			$repair
+		);
+	}
+
+	/**
+	 * Reading ease against the chosen band.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function reading( $metrics, $blueprint ) {
+		list( $low, $high ) = Blogcraft_Blueprint::reading_band( $blueprint );
+
+		$actual = (float) $metrics['reading_ease'];
+		$pass   = ( $actual >= $low && $actual <= $high );
+
+		$repair = '';
+
+		if ( ! $pass ) {
+			$repair = ( $actual < $low )
+				? 'The writing is harder to read than intended. Shorten sentences, prefer common words, and break up any sentence carrying more than one idea.'
+				: 'The writing is simpler than intended for this audience. Use the proper terms for things rather than explaining around them, and allow longer sentences where the idea needs them.';
+		}
+
+		return self::check(
+			'reading',
+			__( 'Reading ease', 'blogcraft' ),
+			$pass,
+			sprintf( '%.1f', $actual ),
+			sprintf( '%1$d–%2$d', $low, $high ),
+			15,
+			$repair
+		);
+	}
+
+	/**
+	 * Sentence length ceiling.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function sentences( $metrics, $blueprint ) {
+		$limit = (int) $blueprint['sentence_max_words'];
+		$long  = isset( $metrics['long_sentences'] ) ? (array) $metrics['long_sentences'] : array();
+		$pass  = empty( $long );
+
+		$repair = '';
+
+		if ( ! $pass ) {
+			$repair = sprintf(
+				'%1$d sentence(s) run past %2$d words. Split them. The first is: "%3$s"',
+				count( $long ),
+				$limit,
+				$long[0]
+			);
+		}
+
+		return self::check(
+			'sentences',
+			__( 'Sentence length', 'blogcraft' ),
+			$pass,
+			sprintf( '%d over', count( $long ) ),
+			sprintf( '%d max', $limit ),
+			8,
+			$repair
+		);
+	}
+
+	/**
+	 * Paragraph length ceiling.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function paragraphs( $metrics, $blueprint ) {
+		// A sentence cap times the sentence limit is the rough word ceiling.
+		$limit  = (int) $blueprint['para_max_sentences'] * (int) $blueprint['sentence_max_words'];
+		$actual = (int) $metrics['longest_para'];
+		$pass   = ( 0 === $actual || $actual <= $limit );
+
+		$repair = $pass ? '' : sprintf(
+			'The longest paragraph is roughly %1$d words, past the %2$d-word ceiling. Break the long ones so no paragraph carries more than %3$d sentences.',
+			$actual,
+			$limit,
+			(int) $blueprint['para_max_sentences']
+		);
+
+		return self::check(
+			'paragraphs',
+			__( 'Paragraph length', 'blogcraft' ),
+			$pass,
+			sprintf( '%d words', $actual ),
+			sprintf( '%d max', $limit ),
+			8,
+			$repair
+		);
+	}
+
+	/**
+	 * Banned phrases.
+	 *
+	 * @param array $metrics Metrics.
+	 * @return array
+	 */
+	private static function banned( $metrics ) {
+		$hits = isset( $metrics['banned_hits'] ) ? (array) $metrics['banned_hits'] : array();
+		$pass = empty( $hits );
+
+		$repair = $pass ? '' : sprintf(
+			'Remove these phrases entirely and rewrite around them: %s.',
+			implode( ', ', $hits )
+		);
+
+		return self::check(
+			'banned',
+			__( 'Banned phrases', 'blogcraft' ),
+			$pass,
+			sprintf( '%d found', count( $hits ) ),
+			__( 'none', 'blogcraft' ),
+			12,
+			$repair
+		);
+	}
+
+	/**
+	 * Em dashes, when the blueprint forbids them.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function em_dashes( $metrics, $blueprint ) {
+		$allowed = (bool) $blueprint['allow_em_dash'];
+		$actual  = (int) $metrics['em_dashes'];
+		$pass    = ( $allowed || 0 === $actual );
+
+		$repair = $pass ? '' : sprintf(
+			'There are %d em dashes. Replace every one with a comma, a full stop, or a rewritten clause.',
+			$actual
+		);
+
+		return self::check(
+			'em_dashes',
+			__( 'Em dashes', 'blogcraft' ),
+			$pass,
+			sprintf( '%d', $actual ),
+			$allowed ? __( 'allowed', 'blogcraft' ) : __( 'none', 'blogcraft' ),
+			5,
+			$repair
+		);
+	}
+
+	/**
+	 * Primary keyword density.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function keyword( $metrics, $blueprint ) {
+		$min    = (float) $blueprint['density_min'];
+		$max    = (float) $blueprint['density_max'];
+		$actual = (float) $metrics['keyword_density'];
+		$phrase = (string) $blueprint['primary_keyword'];
+		$pass   = ( $actual >= $min && $actual <= $max );
+
+		$repair = '';
+
+		if ( ! $pass ) {
+			$repair = ( $actual < $min )
+				? sprintf( 'The phrase "%1$s" appears too rarely (%2$.2f%%). Work it into a heading and a couple of sentences where it reads naturally. Do not force it.', $phrase, $actual )
+				: sprintf( 'The phrase "%1$s" appears too often (%2$.2f%%). Replace most uses with pronouns or natural synonyms.', $phrase, $actual );
+		}
+
+		return self::check(
+			'keyword',
+			__( 'Keyword density', 'blogcraft' ),
+			$pass,
+			sprintf( '%.2f%%', $actual ),
+			sprintf( '%1$.1f–%2$.1f%%', $min, $max ),
+			10,
+			$repair
+		);
+	}
+
+	/**
+	 * Required term coverage.
+	 *
+	 * @param array $metrics Metrics.
+	 * @return array
+	 */
+	private static function terms( $metrics ) {
+		$covered = (array) $metrics['terms_covered'];
+		$missing = (array) $metrics['terms_missing'];
+		$total   = count( $covered ) + count( $missing );
+		$pass    = empty( $missing );
+
+		$repair = $pass ? '' : sprintf(
+			'These terms were asked for and do not appear: %s. Cover each one where the subject genuinely calls for it.',
+			implode( ', ', $missing )
+		);
+
+		return self::check(
+			'terms',
+			__( 'Required terms', 'blogcraft' ),
+			$pass,
+			sprintf( '%1$d of %2$d', count( $covered ), $total ),
+			sprintf( '%d', $total ),
+			10,
+			$repair
+		);
+	}
+
+	/**
+	 * External link count.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function external_links( $metrics, $blueprint ) {
+		$target = (int) $blueprint['external_links_target'];
+		$actual = (int) $metrics['external_links'];
+		$pass   = ( $actual >= $target );
+
+		$repair = $pass ? '' : sprintf(
+			'There are %1$d outbound links and %2$d were asked for. Cite a reputable source for the strongest factual claims.',
+			$actual,
+			$target
+		);
+
+		return self::check(
+			'external_links',
+			__( 'Sources cited', 'blogcraft' ),
+			$pass,
+			sprintf( '%d', $actual ),
+			sprintf( '%d+', $target ),
+			5,
+			$repair
+		);
+	}
+
+	/**
+	 * Internal link count.
+	 *
+	 * @param array $metrics   Metrics.
+	 * @param array $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function internal_links( $metrics, $blueprint ) {
+		$target = (int) $blueprint['internal_links_target'];
+		$actual = (int) $metrics['internal_links'];
+		$pass   = ( $actual >= $target );
+
+		// Internal links are added after writing, so this is reported to the
+		// person rather than asked of the model.
+		return self::check(
+			'internal_links',
+			__( 'Internal links', 'blogcraft' ),
+			$pass,
+			sprintf( '%d', $actual ),
+			sprintf( '%d+', $target ),
+			3,
+			''
+		);
+	}
+
+	/**
+	 * Passive voice share.
+	 *
+	 * @param array $metrics Metrics.
+	 * @return array
+	 */
+	private static function passive( $metrics ) {
+		$actual = (float) $metrics['passive_share'];
+		$pass   = ( $actual <= 20.0 );
+
+		$repair = $pass ? '' : 'Much of the article is in the passive voice. Say who does what.';
+
+		return self::check(
+			'passive',
+			__( 'Passive voice', 'blogcraft' ),
+			$pass,
+			sprintf( '%.0f%%', $actual ),
+			__( 'under 20%', 'blogcraft' ),
+			2,
+			$repair
+		);
+	}
+
+	/**
+	 * Score a draft and return the checks behind the number.
+	 *
+	 * @param string $content   Rendered content.
+	 * @param array  $blueprint Blueprint.
+	 * @return array Keys: score, checks, metrics.
+	 */
+	public static function evaluate( $content, $blueprint ) {
+		$metrics = Blogcraft_Metrics::measure( $content, $blueprint );
+		$checks  = self::checks( $metrics, $blueprint );
+
+		$earned = 0;
+		$total  = 0;
+
+		foreach ( $checks as $check ) {
+			$total += $check['weight'];
+
+			if ( $check['pass'] ) {
+				$earned += $check['weight'];
+			}
+		}
+
+		return array(
+			'score'   => ( $total > 0 ) ? (int) round( ( $earned / $total ) * 100 ) : 100,
+			'checks'  => $checks,
+			'metrics' => $metrics,
+		);
+	}
+
+	/**
+	 * The repair instructions from every failed check, as prompt text.
+	 *
+	 * @param array $checks Checks from evaluate().
+	 * @return string Empty when nothing needs fixing.
+	 */
+	public static function repair_notes( $checks ) {
+		$lines = array();
+
+		foreach ( (array) $checks as $check ) {
+			if ( empty( $check['pass'] ) && '' !== trim( (string) $check['repair'] ) ) {
+				$lines[] = '- ' . $check['repair'];
+			}
+		}
+
+		if ( empty( $lines ) ) {
+			return '';
+		}
+
+		return "These were measured on your draft and must be fixed:\n" . implode( "\n", $lines );
+	}
+}
