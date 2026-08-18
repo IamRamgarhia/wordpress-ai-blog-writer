@@ -335,6 +335,23 @@ class Blogcraft_Connection {
 			__( 'Hold posts scoring below', 'blogcraft' ),
 			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft' )
 		);
+		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Image source', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="image_provider" id="blogcraft_image_provider">';
+		foreach ( Blogcraft_Images::providers() as $id => $label ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $id ),
+				selected( (string) Blogcraft_Settings::get( 'image_provider' ), $id, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+
+		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft' ) );
+		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft' ) );
+
 		self::number_row(
 			'refresh_after_days',
 			__( 'Consider a post stale after', 'blogcraft' ),
@@ -472,6 +489,29 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * Render one masked secret row.
+	 *
+	 * An empty submission always means "leave unchanged", because the field can
+	 * only ever render a mask and treating blank as "clear" would wipe the value
+	 * every time an unrelated field was saved.
+	 *
+	 * @param string $name  Setting key.
+	 * @param string $label Field label.
+	 * @return void
+	 */
+	private static function secret_row( $name, $label ) {
+		$stored = (string) Blogcraft_Settings::get( $name );
+
+		printf(
+			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p></td></tr>',
+			esc_attr( $name ),
+			esc_html( $label ),
+			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $stored ) ),
+			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' )
+		);
+	}
+
+	/**
 	 * Render one number input row.
 	 *
 	 * @param string $name        Setting key.
@@ -504,7 +544,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider' )
 		);
 
 		foreach ( $plain as $key ) {
@@ -530,6 +570,14 @@ class Blogcraft_Connection {
 		// An empty key field means "leave unchanged": the form renders a mask rather
 		// than the real value, so treating blank as "clear" would wipe the stored key
 		// every time an unrelated field was saved.
+		foreach ( array( 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
+			$value = isset( $_POST[ $secret ] ) ? trim( (string) wp_unslash( $_POST[ $secret ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+
+			if ( '' !== $value ) {
+				Blogcraft_Settings::set( $secret, $value );
+			}
+		}
+
 		$research_key = isset( $_POST['research_api_key'] ) ? trim( (string) wp_unslash( $_POST['research_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 		if ( '' !== $research_key ) {
 			Blogcraft_Settings::set( 'research_api_key', $research_key );

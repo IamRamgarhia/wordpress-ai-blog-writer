@@ -104,6 +104,11 @@ class Blogcraft_Generate {
 		echo '<p class="description">' . esc_html__( 'What should the post be about? A sentence works better than a keyword.', 'blogcraft' ) . '</p>';
 		echo '</td></tr>';
 
+		echo '<tr><th scope="row"><label for="blogcraft_instructions">' . esc_html__( 'Extra instructions', 'blogcraft' ) . '</label></th><td>';
+		echo '<textarea class="large-text" name="instructions" id="blogcraft_instructions" rows="2"></textarea>';
+		echo '<p class="description">' . esc_html__( 'Optional. An angle, a target keyword, anything specific to this post. This is what stops every post reading the same.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+
 		echo '<tr><th scope="row"><label for="blogcraft_status">' . esc_html__( 'When finished', 'blogcraft' ) . '</label></th><td>';
 		echo '<select name="status" id="blogcraft_status">';
 		echo '<option value="draft">' . esc_html__( 'Save as draft for review', 'blogcraft' ) . '</option>';
@@ -155,7 +160,8 @@ class Blogcraft_Generate {
 			self::back( false, __( 'Please enter a topic.', 'blogcraft' ) );
 		}
 
-		$job_id = Blogcraft_Pipeline::enqueue_topic( $topic, $status );
+		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions );
 
 		if ( $job_id <= 0 ) {
 			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )

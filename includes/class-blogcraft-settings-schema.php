@@ -69,6 +69,21 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'image_provider'                  => array(
+				'default' => 'pollinations',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'pexels_api_key'                  => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => true,
+			),
+			'pixabay_api_key'                 => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => true,
+			),
 			'refresh_enabled'                 => array(
 				'default' => false,
 				'type'    => 'bool',

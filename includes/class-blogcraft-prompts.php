@@ -35,9 +35,10 @@ class Blogcraft_Prompts {
 	 *
 	 * @param string $topic   Topic to write about.
 	 * @param array  $sources Reference material, possibly empty.
+	 * @param string $instructions Optional guidance for this topic only.
 	 * @return array
 	 */
-	public static function outline( $topic, $sources = array() ) {
+	public static function outline( $topic, $sources = array(), $instructions = '' ) {
 		$reference = Blogcraft_Research::to_prompt_block( $sources );
 		$user      = ( '' === $reference ? '' : $reference . '
 
@@ -49,7 +50,8 @@ class Blogcraft_Prompts {
 			. "- title: compelling, under 65 characters, no colon-subtitle pattern\n"
 			. "- slug: lowercase, hyphenated, no stop words\n"
 			. "- meta_description: under 155 characters, describes what the reader gains\n"
-			. '- sections: 4 to 7 headings that build an argument, not a list of synonyms';
+			. '- sections: 4 to 7 headings that build an argument, not a list of synonyms'
+			. self::extra( $instructions );
 
 		return array(
 			array(
@@ -69,9 +71,10 @@ class Blogcraft_Prompts {
 	 * @param string $topic   Topic.
 	 * @param array  $outline Outline produced by the previous stage.
 	 * @param array  $sources Reference material, possibly empty.
+	 * @param string $instructions Optional guidance for this topic only.
 	 * @return array
 	 */
-	public static function draft( $topic, $outline, $sources = array() ) {
+	public static function draft( $topic, $outline, $sources = array(), $instructions = '' ) {
 		$headings = array();
 
 		if ( ! empty( $outline['sections'] ) && is_array( $outline['sections'] ) ) {
@@ -100,7 +103,8 @@ class Blogcraft_Prompts {
 			. '- Plain text only in every field. No markdown, no HTML.
 '
 			. '- Where reference material gives a figure or a fact, use it and name the source in the sentence. '
-			. 'Where it shows what existing coverage already says, add what it leaves out rather than repeating it.';
+			. 'Where it shows what existing coverage already says, add what it leaves out rather than repeating it.'
+			. self::extra( $instructions );
 
 		return array(
 			array(
@@ -173,6 +177,28 @@ class Blogcraft_Prompts {
 				'content' => $user,
 			),
 		);
+	}
+
+	/**
+	 * Render per-topic guidance as a prompt fragment.
+	 *
+	 * Carrying instructions for this one post is the direct answer to the
+	 * commonest complaint about tools like this, which is that every post reads
+	 * like the same template with a keyword swapped.
+	 *
+	 * @param string $instructions Guidance for this topic only.
+	 * @return string Empty when there is none.
+	 */
+	private static function extra( $instructions ) {
+		$instructions = trim( (string) $instructions );
+
+		if ( '' === $instructions ) {
+			return '';
+		}
+
+		return '
+
+For this post specifically: ' . $instructions;
 	}
 
 	/**

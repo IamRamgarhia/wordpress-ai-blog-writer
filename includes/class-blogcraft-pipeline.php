@@ -40,11 +40,12 @@ class Blogcraft_Pipeline {
 	/**
 	 * Queue a new post for generation.
 	 *
-	 * @param string $topic  Topic to write about.
-	 * @param string $status Post status to create: draft or publish.
+	 * @param string $topic        Topic to write about.
+	 * @param string $status       Post status to create: draft or publish.
+	 * @param string $instructions Optional per-topic guidance.
 	 * @return int Job id, or 0 on failure.
 	 */
-	public static function enqueue_topic( $topic, $status = 'draft' ) {
+	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '' ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
 		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' )
@@ -56,10 +57,21 @@ class Blogcraft_Pipeline {
 			self::NAME,
 			'research',
 			array(
-				'topic'  => (string) $topic,
-				'status' => ( 'publish' === $status ) ? 'publish' : 'draft',
+				'topic'        => (string) $topic,
+				'status'       => ( 'publish' === $status ) ? 'publish' : 'draft',
+				'instructions' => (string) $instructions,
 			)
 		);
+	}
+
+	/**
+	 * Per-topic guidance carried on the job, if any.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return string
+	 */
+	private static function instructions( $job ) {
+		return isset( $job->payload['instructions'] ) ? (string) $job->payload['instructions'] : '';
 	}
 
 	/**
@@ -160,7 +172,7 @@ class Blogcraft_Pipeline {
 	public static function stage_outline( $job ) {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
-		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources ) );
+		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources, self::instructions( $job ) ) );
 
 		$payload            = $job->payload;
 		$payload['outline'] = $outline;
@@ -181,7 +193,7 @@ class Blogcraft_Pipeline {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$outline = isset( $job->payload['outline'] ) ? $job->payload['outline'] : array();
 		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
-		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline, $sources ), array( 'max_tokens' => 4096 ) );
+		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline, $sources, self::instructions( $job ) ), array( 'max_tokens' => 4096 ) );
 
 		$payload            = $job->payload;
 		$payload['article'] = $article;
