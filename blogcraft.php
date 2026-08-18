@@ -3,7 +3,7 @@
  * Plugin Name:       Blogcraft
  * Plugin URI:        https://dicecodes.com/blogcraft
  * Description:       AI blog writer and content generator. Connect any AI provider with your own API key.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Dicecodes
@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BLOGCRAFT_VERSION', '0.1.0' );
+define( 'BLOGCRAFT_VERSION', '0.2.0' );
 define( 'BLOGCRAFT_DB_VERSION', '1' );
 define( 'BLOGCRAFT_FILE', __FILE__ );
 define( 'BLOGCRAFT_PATH', plugin_dir_path( __FILE__ ) );
