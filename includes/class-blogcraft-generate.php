@@ -102,7 +102,7 @@ class Blogcraft_Generate {
 			);
 		}
 
-		if ( null === Blogcraft_Provider_Registry::from_settings() ) {
+		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
 				esc_html__( 'No AI provider is configured yet. Set one up under Blogcraft → Settings first.', 'blogcraft' )
@@ -139,7 +139,7 @@ class Blogcraft_Generate {
 
 		echo '</section>';
 		self::card_open( __( 'Queue', 'blogcraft' ), __( 'Posts are written in the background, one step per run.', 'blogcraft' ) );
-		echo '<ul>';
+		echo '<ul class="blogcraft-stats">';
 		foreach ( array( 'pending', 'running', 'complete', 'failed' ) as $status ) {
 			printf(
 				'<li><span class="blogcraft-stat-value">%2$d</span><span class="blogcraft-stat-label">%1$s</span></li>',

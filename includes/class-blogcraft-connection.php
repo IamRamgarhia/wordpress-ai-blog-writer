@@ -205,7 +205,7 @@ class Blogcraft_Connection {
 		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft' ) . '</p>';
 		echo '</div>';
 
-		self::render_status( $type, $key );
+		self::render_status();
 
 		if ( is_array( $result ) ) {
 			delete_transient( self::RESULT_TRANSIENT . get_current_user_id() );
@@ -428,13 +428,11 @@ class Blogcraft_Connection {
 	/**
 	 * Show what is still missing, read from the real settings.
 	 *
-	 * @param string $type Selected provider type.
-	 * @param string $key  Stored API key.
 	 * @return void
 	 */
-	private static function render_status( $type, $key ) {
+	private static function render_status() {
 		$states = array(
-			__( 'Provider connected', 'blogcraft' ) => ( '' !== $key && '' !== (string) Blogcraft_Settings::get( 'provider_model' ) ),
+			__( 'Provider connected', 'blogcraft' ) => Blogcraft_Provider_Registry::is_configured(),
 			__( 'Voice described', 'blogcraft' )    => Blogcraft_Voice::is_configured(),
 			__( 'Automation on', 'blogcraft' )      => (bool) Blogcraft_Settings::get( 'autopilot_enabled' ),
 		);

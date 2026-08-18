@@ -56,7 +56,7 @@ class Blogcraft_Admin {
 
 		$totals     = Blogcraft_Cost::month_totals();
 		$waiting    = count( Blogcraft_Review::pending_posts() );
-		$configured = null !== Blogcraft_Provider_Registry::from_settings();
+		$configured = Blogcraft_Provider_Registry::is_configured();
 
 		echo '<div class="wrap blogcraft-page">';
 		echo '<div class="blogcraft-head">';

@@ -55,6 +55,29 @@ class Blogcraft_Provider_Registry {
 	}
 
 	/**
+	 * Whether a provider is genuinely usable, not merely selected.
+	 *
+	 * The from_settings() method returns an object whenever a provider type is
+	 * chosen, and
+	 * the type defaults to openai, so it is never null and cannot answer whether
+	 * setup is complete. A provider needs a model, plus either a key or a base URL
+	 * for a local endpoint that needs no key.
+	 *
+	 * @return bool
+	 */
+	public static function is_configured() {
+		if ( '' === trim( (string) Blogcraft_Settings::get( 'provider_model' ) ) ) {
+			return false;
+		}
+
+		$has_key  = '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
+		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) );
+
+		return $has_key || $has_base;
+	}
+
+
+	/**
 	 * Build the provider configured in plugin settings.
 	 *
 	 * @return Blogcraft_Provider|null Null when no provider type is stored, or the
