@@ -1743,11 +1743,11 @@ msgid "Dismiss this notice"
 msgstr ""
 
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
-#: includes/class-blogcraft-pipeline.php:600
+#: includes/class-blogcraft-pipeline.php:621
 msgid "%1$s: %2$s, wanted %3$s"
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:648
+#: includes/class-blogcraft-pipeline.php:669
 msgid "Untitled"
 msgstr ""
 
@@ -1868,7 +1868,7 @@ msgstr ""
 msgid "Provider could not be reached."
 msgstr ""
 
-#: includes/class-blogcraft-queue.php:272
+#: includes/class-blogcraft-queue.php:297
 msgid "Job reclaimed after an interrupted run."
 msgstr ""
 

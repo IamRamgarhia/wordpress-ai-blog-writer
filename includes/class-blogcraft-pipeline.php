@@ -437,6 +437,7 @@ class Blogcraft_Pipeline {
 	 *
 	 * @param Blogcraft_Job $job Current job.
 	 * @return array
+	 * @throws RuntimeException When the provider is rate limiting, so the worker can wait.
 	 */
 	public static function stage_faq( $job ) {
 		$payload   = $job->payload;
@@ -451,16 +452,36 @@ class Blogcraft_Pipeline {
 
 		Blogcraft_Prompts::use_blueprint( $blueprint );
 
-		$result = self::ask(
-			Blogcraft_Prompts::faq(
-				isset( $payload['topic'] ) ? $payload['topic'] : '',
-				self::headings( $payload ),
-				(int) $blueprint['faq_count']
-			),
-			self::draft_options()
-		);
+		// The body is already written by this point. Questions are furniture,
+		// so a failure here publishes the article without them rather than
+		// throwing away everything the job has spent.
+		try {
+			$result = self::ask(
+				Blogcraft_Prompts::faq(
+					isset( $payload['topic'] ) ? $payload['topic'] : '',
+					self::headings( $payload ),
+					(int) $blueprint['faq_count']
+				),
+				self::draft_options()
+			);
 
-		$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
+			$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
+		} catch ( RuntimeException $e ) {
+			// A rate limit still has to reach the worker, which knows to wait
+			// rather than fail. Only genuine content failures are shrugged off.
+			if ( false !== strpos( $e->getMessage(), 'HTTP 429' )
+				|| false !== stripos( $e->getMessage(), 'exceeded your current quota' ) ) {
+				throw $e;
+			}
+
+			$payload['article']['faq'] = array();
+
+			Blogcraft_Logger::error(
+				'The questions could not be written; publishing the article without them.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
 
 		return array(
 			'next'    => 'critique',

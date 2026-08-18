@@ -236,6 +236,31 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * Put a job aside for a while without spending an attempt.
+	 *
+	 * A rate limit is not a failure, it is a wait. Treating it as a failure
+	 * burns all three attempts inside a couple of minutes on a quota that
+	 * resets in hours, and throws away an article that was nearly finished.
+	 *
+	 * @param int    $job_id  Job to defer.
+	 * @param int    $seconds How long to wait.
+	 * @param string $reason  What to show on the Activity screen meanwhile.
+	 * @return void
+	 */
+	public static function defer( $job_id, $seconds, $reason = '' ) {
+		self::update(
+			$job_id,
+			array(
+				'status'       => 'pending',
+				'last_error'   => (string) $reason,
+				'lock_token'   => null,
+				'locked_at'    => null,
+				'available_at' => gmdate( 'Y-m-d H:i:s', time() + max( 60, (int) $seconds ) ),
+			)
+		);
+	}
+
+	/**
 	 * Return stranded 'running' jobs to the queue.
 	 *
 	 * Claim() locks a row by setting status = 'running' and stamping
