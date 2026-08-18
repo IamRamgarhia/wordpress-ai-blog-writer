@@ -13,7 +13,7 @@ import sys
 import zipfile
 
 SRC = 'D:/calude/Wordpress plugin - blog writing'
-ROOTS = ['blogcraft.php', 'uninstall.php', 'readme.txt', 'includes', 'assets']
+ROOTS = ['blogcraft.php', 'uninstall.php', 'readme.txt', 'includes', 'assets', 'languages']
 
 
 def version():
@@ -29,6 +29,8 @@ def files():
         path = os.path.join(SRC, entry)
         if os.path.isfile(path):
             yield path, 'blogcraft/' + entry
+            continue
+        if not os.path.isdir(path):
             continue
         for folder, _, names in os.walk(path):
             for name in sorted(names):

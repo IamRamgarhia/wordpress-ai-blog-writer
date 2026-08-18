@@ -57,6 +57,135 @@ class Blogcraft_Autopilot {
 	}
 
 	/**
+	 * Weekday numbers the user has allowed, 0 for Sunday.
+	 *
+	 * @return array Sorted, de-duplicated integers in 0..6.
+	 */
+	public static function days() {
+		$raw  = (string) Blogcraft_Settings::get( 'autopilot_days' );
+		$days = array();
+
+		foreach ( explode( ',', $raw ) as $piece ) {
+			$piece = trim( $piece );
+
+			if ( '' === $piece || ! ctype_digit( $piece ) ) {
+				continue;
+			}
+
+			$day = (int) $piece;
+
+			if ( $day >= 0 && $day <= 6 ) {
+				$days[ $day ] = $day;
+			}
+		}
+
+		ksort( $days );
+
+		return array_values( $days );
+	}
+
+	/**
+	 * The hour of the day, in the site's timezone, to start from.
+	 *
+	 * @return int 0..23.
+	 */
+	public static function hour() {
+		return max( 0, min( 23, (int) Blogcraft_Settings::get( 'autopilot_hour' ) ) );
+	}
+
+	/**
+	 * Whether now is inside the window the user chose.
+	 *
+	 * Deliberately "at or after the hour" rather than "in that exact hour".
+	 * WP-Cron only fires when someone loads a page, so an exact-hour test would
+	 * silently skip the day on any site quiet between 09:00 and 10:00. The
+	 * per-day cap is what limits volume; this only decides when to start.
+	 *
+	 * @param int|null $now Timestamp to test, defaults to now.
+	 * @return bool
+	 */
+	public static function in_window( $now = null ) {
+		$days = self::days();
+
+		if ( empty( $days ) ) {
+			return false;
+		}
+
+		$now = ( null === $now ) ? time() : (int) $now;
+
+		// wp_date() renders in the site's timezone, which is the one the user
+		// picked their schedule in.
+		$weekday = (int) wp_date( 'w', $now );
+		$hour    = (int) wp_date( 'G', $now );
+
+		return in_array( $weekday, $days, true ) && $hour >= self::hour();
+	}
+
+	/**
+	 * Project when each queued topic will be written.
+	 *
+	 * Nothing is stored: this walks the same rules tick() applies, so the
+	 * calendar cannot drift out of step with what actually happens.
+	 *
+	 * @param int|null $from Timestamp to plan from, defaults to now.
+	 * @return array List of array( topic, timestamp ).
+	 */
+	public static function plan( $from = null ) {
+		$topics = self::topics();
+
+		if ( empty( $topics ) ) {
+			return array();
+		}
+
+		$days = self::days();
+
+		if ( empty( $days ) ) {
+			return array();
+		}
+
+		$from    = ( null === $from ) ? time() : (int) $from;
+		$hour    = self::hour();
+		$per_day = max( 1, (int) Blogcraft_Settings::get( 'autopilot_per_day' ) );
+
+		// Today's allowance is already partly spent.
+		$remaining_today = self::in_window( $from ) ? max( 0, $per_day - self::generated_today() ) : 0;
+
+		$plan   = array();
+		$cursor = $from;
+		$index  = 0;
+		$total  = count( $topics );
+
+		// One iteration per candidate day. Bounded so a pathological setting
+		// cannot spin: 366 days is a year of lookahead, which is far more than
+		// any usable topic list.
+		for ( $offset = 0; $offset <= 366 && $index < $total; $offset++ ) {
+			$day_start = strtotime( wp_date( 'Y-m-d', $cursor ) . ' 00:00:00 ' . wp_timezone_string() );
+
+			if ( false === $day_start ) {
+				break;
+			}
+
+			$slot_time = $day_start + ( $hour * HOUR_IN_SECONDS );
+
+			if ( in_array( (int) wp_date( 'w', $cursor ), $days, true ) ) {
+				$slots = ( 0 === $offset ) ? $remaining_today : $per_day;
+
+				for ( $slot = 0; $slot < $slots && $index < $total; $slot++ ) {
+					$plan[] = array(
+						'topic' => $topics[ $index ],
+						'when'  => ( 0 === $offset && $slot_time < $from ) ? $from : $slot_time,
+					);
+					++$index;
+				}
+			}
+
+			$cursor += DAY_IN_SECONDS;
+		}
+
+		return $plan;
+	}
+
+	/**
 	 * Remaining topics, in order.
 	 *
 	 * @return array
@@ -153,6 +282,10 @@ class Blogcraft_Autopilot {
 	 */
 	public static function tick() {
 		if ( ! Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
+			return false;
+		}
+
+		if ( ! self::in_window() ) {
 			return false;
 		}
 

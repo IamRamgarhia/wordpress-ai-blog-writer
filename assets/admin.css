@@ -364,6 +364,42 @@
 	margin: 8px 0 0;
 }
 
+/* ---------------------------------------------------------- schedule bits. */
+
+.blogcraft-day {
+	display: inline-flex;
+	align-items: center;
+	margin: 0 14px 6px 0;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.blogcraft-day input[type="checkbox"] {
+	margin-right: 6px;
+}
+
+.blogcraft-callout {
+	margin: 0 0 14px;
+	padding: 10px 14px;
+	border-left: 3px solid var(--bc-warn);
+	border-radius: 0 6px 6px 0;
+	background: var(--bc-canvas);
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-ink);
+}
+
+/* The reorder controls are separate forms, so they need to be laid out as a
+   row rather than stacking the way a lone inline form should. */
+.blogcraft-order {
+	white-space: nowrap;
+}
+
+.blogcraft-order .blogcraft-inline-form {
+	display: inline-block;
+	margin: 0 4px 0 0;
+}
+
 @media screen and (max-width: 782px) {
 	.blogcraft-card {
 		padding: 18px 16px 6px 18px;

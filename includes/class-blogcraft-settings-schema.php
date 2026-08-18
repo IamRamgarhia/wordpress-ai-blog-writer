@@ -159,6 +159,19 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			// Weekdays as a comma-separated list, 0 for Sunday through 6 for
+			// Saturday. Weekdays only by default: a blog that also posts at the
+			// weekend reads as automated.
+			'autopilot_days'                  => array(
+				'default' => '1,2,3,4,5',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'autopilot_hour'                  => array(
+				'default' => 9,
+				'type'    => 'int',
+				'secret'  => false,
+			),
 			'voice_niche'                     => array(
 				'default' => '',
 				'type'    => 'textarea',

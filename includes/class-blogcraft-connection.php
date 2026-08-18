@@ -360,8 +360,10 @@ class Blogcraft_Connection {
 		self::textarea_row(
 			'autopilot_topics',
 			__( 'Topic queue', 'blogcraft' ),
-			__( 'One topic per line. Each is used once, then removed from this list.', 'blogcraft' )
+			__( 'One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written.', 'blogcraft' )
 		);
+		self::weekday_row();
+		self::hour_row();
 		self::number_row(
 			'quality_threshold',
 			__( 'Hold posts scoring below', 'blogcraft' ),
@@ -498,6 +500,74 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * Render the weekday picker.
+	 *
+	 * Checkboxes rather than a free-text list: the stored value is a numeric
+	 * CSV, and asking anyone to type "1,2,3,4,5" for weekdays is how a setting
+	 * ends up wrong without ever looking wrong.
+	 *
+	 * @return void
+	 */
+	private static function weekday_row() {
+		$chosen = Blogcraft_Autopilot::days();
+		$names  = Blogcraft_Calendar::weekday_names();
+		$start  = (int) get_option( 'start_of_week', 1 );
+
+		echo '<tr><th scope="row">' . esc_html__( 'Write on', 'blogcraft' ) . '</th><td>';
+		echo '<fieldset>';
+		printf(
+			'<legend class="screen-reader-text">%s</legend>',
+			esc_html__( 'Days of the week to write on', 'blogcraft' )
+		);
+
+		for ( $offset = 0; $offset <= 6; $offset++ ) {
+			$day = ( $start + $offset ) % 7;
+
+			printf(
+				'<label class="blogcraft-day"><input type="checkbox" name="autopilot_days[]" value="%1$d"%2$s /> %3$s</label>',
+				(int) $day,
+				checked( in_array( $day, $chosen, true ), true, false ),
+				esc_html( isset( $names[ $day ] ) ? $names[ $day ] : (string) $day )
+			);
+		}
+
+		echo '</fieldset>';
+		echo '<p class="description">' . esc_html__( 'In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
+	 * Render the start-hour picker.
+	 *
+	 * @return void
+	 */
+	private static function hour_row() {
+		$chosen = Blogcraft_Autopilot::hour();
+		$format = (string) get_option( 'time_format', 'H:i' );
+		$today  = strtotime( wp_date( 'Y-m-d' ) . ' 00:00:00 ' . wp_timezone_string() );
+
+		echo '<tr><th scope="row"><label for="blogcraft_autopilot_hour">' . esc_html__( 'Starting at', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="autopilot_hour" id="blogcraft_autopilot_hour">';
+
+		for ( $hour = 0; $hour <= 23; $hour++ ) {
+			printf(
+				'<option value="%1$d"%2$s>%3$s</option>',
+				(int) $hour,
+				selected( $chosen, $hour, false ),
+				esc_html(
+					false === $today
+						? sprintf( '%02d:00', $hour )
+						: wp_date( $format, $today + ( $hour * HOUR_IN_SECONDS ) )
+				)
+			);
+		}
+
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+	}
+
+	/**
 	 * Render one text input row.
 	 *
 	 * @param string $name        Setting key.
@@ -608,6 +678,28 @@ class Blogcraft_Connection {
 		if ( isset( $_POST['autopilot_per_day'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			Blogcraft_Settings::set( 'autopilot_per_day', (int) $_POST['autopilot_per_day'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
+
+		if ( isset( $_POST['autopilot_hour'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'autopilot_hour', max( 0, min( 23, (int) $_POST['autopilot_hour'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		// Checkboxes post an array, and post nothing at all when none are ticked.
+		// Storing an empty string is correct there: no days means no automatic
+		// writing, which is exactly what unticking every box asks for.
+		$days = array();
+
+		if ( isset( $_POST['autopilot_days'] ) && is_array( $_POST['autopilot_days'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			foreach ( wp_unslash( $_POST['autopilot_days'] ) as $day ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+				$day = (int) $day;
+
+				if ( $day >= 0 && $day <= 6 ) {
+					$days[ $day ] = $day;
+				}
+			}
+		}
+
+		ksort( $days );
+		Blogcraft_Settings::set( 'autopilot_days', implode( ',', $days ) );
 
 		// An unchecked checkbox posts nothing, so absence means false.
 		foreach ( array_keys( self::toggle_fields() ) as $toggle ) {
