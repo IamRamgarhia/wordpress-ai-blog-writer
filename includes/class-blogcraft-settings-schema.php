@@ -59,6 +59,51 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			'voice_niche'                     => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'voice_audience'                  => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'voice_tone'                      => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'voice_point_of_view'             => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'voice_reading_level'             => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'voice_style_rules'               => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'voice_banned_words'              => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'voice_banned_topics'             => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'voice_experience'                => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
 			'monthly_token_cap'               => array(
 				'default' => 0,
 				'type'    => 'int',

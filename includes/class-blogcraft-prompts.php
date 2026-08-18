@@ -21,9 +21,13 @@ class Blogcraft_Prompts {
 	 * @return string
 	 */
 	private static function base_system() {
-		return 'You are an experienced blog writer. You write clearly and specifically, '
+		$base = 'You are an experienced blog writer. You write clearly and specifically, '
 			. 'avoid filler and cliche, and never pad. '
 			. 'You always reply with valid JSON and nothing else — no prose before or after, no code fences.';
+
+		// The site's own voice, audience and prohibitions ride on every call; without
+		// this the output is indistinguishable from any other tool's.
+		return $base . Blogcraft_Voice::system_prompt();
 	}
 
 	/**

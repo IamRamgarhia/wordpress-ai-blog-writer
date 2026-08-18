@@ -91,6 +91,35 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * Short voice fields.
+	 *
+	 * @return array
+	 */
+	private static function voice_text_fields() {
+		return array(
+			'voice_tone'          => __( 'Tone', 'blogcraft' ),
+			'voice_point_of_view' => __( 'Point of view', 'blogcraft' ),
+			'voice_reading_level' => __( 'Reading level', 'blogcraft' ),
+		);
+	}
+
+	/**
+	 * Long-form voice fields, with the hint shown beneath each.
+	 *
+	 * @return array
+	 */
+	private static function voice_area_fields() {
+		return array(
+			'voice_niche'         => array( __( 'What this blog is about', 'blogcraft' ), __( 'One or two sentences. The more specific, the less generic the writing.', 'blogcraft' ) ),
+			'voice_audience'      => array( __( 'Who you write for', 'blogcraft' ), __( 'Who is reading, and what they already know.', 'blogcraft' ) ),
+			'voice_style_rules'   => array( __( 'Style rules', 'blogcraft' ), __( 'One per line. For example: no em dashes. Short paragraphs. Never open with a question.', 'blogcraft' ) ),
+			'voice_banned_words'  => array( __( 'Extra banned words', 'blogcraft' ), __( 'One per line. A list of common AI tells is already blocked by default.', 'blogcraft' ) ),
+			'voice_banned_topics' => array( __( 'Never write about', 'blogcraft' ), __( 'One per line. Competitors, off-limits claims, anything legally sensitive.', 'blogcraft' ) ),
+			'voice_experience'    => array( __( 'Your own experience', 'blogcraft' ), __( 'Anecdotes, opinions or data only you have. This is what AI writing structurally lacks.', 'blogcraft' ) ),
+		);
+	}
+
+	/**
 	 * Render the settings page.
 	 *
 	 * @return void
@@ -160,6 +189,20 @@ class Blogcraft_Connection {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
+
+		echo '<h2>' . esc_html__( 'Voice', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Everything here is sent with every request, so posts sound like your site rather than a template.', 'blogcraft' ) . '</p>';
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		foreach ( self::voice_area_fields() as $name => $meta ) {
+			self::textarea_row( $name, $meta[0], $meta[1] );
+		}
+
+		foreach ( self::voice_text_fields() as $name => $label ) {
+			self::text_row( $name, $label );
+		}
+
+		echo '</tbody></table>';
 		submit_button( __( 'Save settings', 'blogcraft' ) );
 		echo '</form>';
 
@@ -187,6 +230,24 @@ class Blogcraft_Connection {
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( (string) Blogcraft_Settings::get( $name ) )
+		);
+	}
+
+	/**
+	 * Render one textarea row with a description.
+	 *
+	 * @param string $name        Setting key.
+	 * @param string $label       Field label.
+	 * @param string $description Hint shown beneath.
+	 * @return void
+	 */
+	private static function textarea_row( $name, $label, $description = '' ) {
+		printf(
+			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><textarea name="%1$s" id="blogcraft_%1$s" rows="3" class="large-text">%3$s</textarea><p class="description">%4$s</p></td></tr>',
+			esc_attr( $name ),
+			esc_html( $label ),
+			esc_textarea( (string) Blogcraft_Settings::get( $name ) ),
+			esc_html( $description )
 		);
 	}
 
@@ -219,6 +280,8 @@ class Blogcraft_Connection {
 		$plain = array_merge(
 			array_keys( self::common_fields() ),
 			array_keys( self::custom_fields() ),
+			array_keys( self::voice_text_fields() ),
+			array_keys( self::voice_area_fields() ),
 			array( 'provider_type', 'provider_request_template' )
 		);
 
