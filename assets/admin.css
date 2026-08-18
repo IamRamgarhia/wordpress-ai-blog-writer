@@ -1,0 +1,245 @@
+/**
+ * Blogcraft admin styling.
+ *
+ * No web fonts and no external assets: WordPress.org Guideline 8 forbids CDN
+ * requests, so this uses the system stack WordPress already loads and ships
+ * every byte locally.
+ */
+
+.blogcraft-page {
+	--bc-ink: #1d2327;
+	--bc-muted: #646970;
+	--bc-line: #dcdcde;
+	--bc-surface: #fff;
+	--bc-canvas: #f6f7f7;
+	--bc-accent: #3858e9;
+	--bc-accent-soft: #f0f2fd;
+	--bc-ok: #007017;
+	--bc-warn: #8a6116;
+
+	max-width: 900px;
+}
+
+/* ---------------------------------------------------------------- header. */
+
+.blogcraft-head {
+	margin: 8px 0 20px;
+}
+
+.blogcraft-head h1 {
+	margin: 0 0 4px;
+	font-size: 23px;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	color: var(--bc-ink);
+}
+
+.blogcraft-head p {
+	margin: 0;
+	font-size: 14px;
+	color: var(--bc-muted);
+}
+
+/* -------------------------------------------------------- setup progress. */
+
+.blogcraft-status {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 0 24px;
+	padding: 0;
+	list-style: none;
+}
+
+.blogcraft-status li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 7px 14px 7px 12px;
+	border: 1px solid var(--bc-line);
+	border-radius: 999px;
+	background: var(--bc-surface);
+	font-size: 13px;
+	line-height: 1.3;
+	color: var(--bc-muted);
+}
+
+.blogcraft-status li::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--bc-line);
+	flex: none;
+}
+
+.blogcraft-status .is-done {
+	border-color: rgba(0, 112, 23, 0.32);
+	color: var(--bc-ok);
+}
+
+.blogcraft-status .is-done::before {
+	background: var(--bc-ok);
+}
+
+/* ----------------------------------------------------------------- cards. */
+
+.blogcraft-card {
+	position: relative;
+	margin: 0 0 18px;
+	padding: 22px 24px 8px 26px;
+	border: 1px solid var(--bc-line);
+	border-radius: 10px;
+	background: var(--bc-surface);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* The accent rule is the one flourish; everything else stays quiet. */
+.blogcraft-card::before {
+	content: "";
+	position: absolute;
+	top: 18px;
+	bottom: 18px;
+	left: 0;
+	width: 3px;
+	border-radius: 0 3px 3px 0;
+	background: var(--bc-accent);
+	opacity: 0.85;
+}
+
+.blogcraft-card > header {
+	margin-bottom: 4px;
+}
+
+.blogcraft-step {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--bc-accent);
+}
+
+.blogcraft-card h2 {
+	margin: 0 0 4px;
+	padding: 0;
+	font-size: 17px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--bc-ink);
+}
+
+.blogcraft-card > header p {
+	margin: 0;
+	max-width: 62ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-muted);
+}
+
+/* ---------------------------------------------------------------- fields. */
+
+.blogcraft-card .form-table {
+	margin-top: 6px;
+}
+
+.blogcraft-card .form-table th {
+	width: 190px;
+	padding: 14px 16px 14px 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--bc-ink);
+}
+
+.blogcraft-card .form-table td {
+	padding: 12px 0;
+}
+
+.blogcraft-card input[type="text"],
+.blogcraft-card input[type="password"],
+.blogcraft-card input[type="number"],
+.blogcraft-card select,
+.blogcraft-card textarea {
+	border-radius: 6px;
+	border-color: var(--bc-line);
+}
+
+.blogcraft-card input[type="text"]:focus,
+.blogcraft-card input[type="password"]:focus,
+.blogcraft-card input[type="number"]:focus,
+.blogcraft-card select:focus,
+.blogcraft-card textarea:focus {
+	border-color: var(--bc-accent);
+	box-shadow: 0 0 0 2px var(--bc-accent-soft);
+	outline: 2px solid transparent;
+}
+
+.blogcraft-card .description {
+	max-width: 62ch;
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: var(--bc-muted);
+}
+
+.blogcraft-card label > input[type="checkbox"] {
+	margin-right: 8px;
+}
+
+/* A checkbox labels itself, so its header cell would be empty — hide only that
+   row's header, never the whole table's, or neighbouring fields lose their
+   labels too. */
+.blogcraft-toggle-row th {
+	display: none;
+}
+
+.blogcraft-toggle-row td {
+	padding: 7px 0;
+}
+
+.blogcraft-toggle-row label {
+	font-size: 13.5px;
+	color: var(--bc-ink);
+}
+
+/* -------------------------------------------------------------- footings. */
+
+.blogcraft-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin: 22px 0 4px;
+}
+
+.blogcraft-actions .button {
+	border-radius: 6px;
+}
+
+.blogcraft-hint {
+	margin: 0;
+	font-size: 12.5px;
+	color: var(--bc-muted);
+}
+
+.blogcraft-page .notice {
+	margin: 0 0 18px;
+	border-radius: 8px;
+}
+
+/* Shown only when the custom provider is selected. */
+.blogcraft-custom-only[hidden] {
+	display: none;
+}
+
+@media screen and (max-width: 782px) {
+	.blogcraft-card {
+		padding: 18px 16px 6px 18px;
+	}
+
+	.blogcraft-card .form-table th {
+		width: auto;
+		padding-bottom: 4px;
+	}
+}

@@ -43,8 +43,39 @@ class Blogcraft_Connection {
 	 */
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 20 );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
+	}
+
+	/**
+	 * Load styling and behaviour on Blogcraft screens only.
+	 *
+	 * Everything is served from the plugin directory: Guideline 8 forbids CDN
+	 * requests, so there are no web fonts and no external assets.
+	 *
+	 * @param string $hook Current admin page hook.
+	 * @return void
+	 */
+	public static function enqueue( $hook ) {
+		if ( false === strpos( (string) $hook, Blogcraft_Admin::MENU_SLUG ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.css',
+			array(),
+			BLOGCRAFT_VERSION
+		);
+
+		wp_enqueue_script(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.js',
+			array(),
+			BLOGCRAFT_VERSION,
+			true
+		);
 	}
 
 	/**
@@ -142,8 +173,10 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function checkbox_row( $name, $label ) {
+		// The label belongs beside the checkbox, not also in the header cell —
+		// printing it in both renders the text twice.
 		printf(
-			'<tr><th scope="row">%2$s</th><td><label><input type="checkbox" name="%1$s" id="blogcraft_%1$s" value="1"%3$s /> %2$s</label></td></tr>',
+			'<tr class="blogcraft-toggle-row"><th scope="row"></th><td><label for="blogcraft_%1$s"><input type="checkbox" name="%1$s" id="blogcraft_%1$s" value="1"%3$s /> %2$s</label></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			checked( (bool) Blogcraft_Settings::get( $name ), true, false )
@@ -164,8 +197,13 @@ class Blogcraft_Connection {
 		$key    = (string) Blogcraft_Settings::get( 'provider_api_key' );
 		$result = get_transient( self::RESULT_TRANSIENT . get_current_user_id() );
 
-		echo '<div class="wrap">';
+		echo '<div class="wrap blogcraft-page">';
+		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'blogcraft' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft' ) . '</p>';
+		echo '</div>';
+
+		self::render_status( $type, $key );
 
 		if ( is_array( $result ) ) {
 			delete_transient( self::RESULT_TRANSIENT . get_current_user_id() );
@@ -179,6 +217,8 @@ class Blogcraft_Connection {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
+
+		self::open_card( '01', __( 'Connect a provider', 'blogcraft' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'blogcraft' ) );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft' ) . '</label></th><td>';
@@ -199,19 +239,19 @@ class Blogcraft_Connection {
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
 		printf(
-			'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="off" placeholder="%s" />',
+			'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
 			esc_attr( '' === $key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $key ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
 		echo '</td></tr>';
 
-		self::number_row( 'monthly_token_cap', __( 'Monthly token cap (0 = unlimited)', 'blogcraft' ) );
+		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'blogcraft' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'blogcraft' ) );
 
 		foreach ( self::custom_fields() as $name => $label ) {
-			self::text_row( $name, $label );
+			self::text_row( $name, $label, 'blogcraft-custom-only' );
 		}
 
-		echo '<tr><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'blogcraft' ) . '</label></th><td>';
 		printf(
 			'<textarea name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
 			esc_textarea( (string) Blogcraft_Settings::get( 'provider_request_template' ) )
@@ -221,8 +261,8 @@ class Blogcraft_Connection {
 
 		echo '</tbody></table>';
 
-		echo '<h2>' . esc_html__( 'Voice', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Everything here is sent with every request, so posts sound like your site rather than a template.', 'blogcraft' ) . '</p>';
+		self::close_card();
+		self::open_card( '02', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ) );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::voice_area_fields() as $name => $meta ) {
@@ -235,7 +275,8 @@ class Blogcraft_Connection {
 
 		echo '</tbody></table>';
 
-		echo '<h2>' . esc_html__( 'Automation', 'blogcraft' ) . '</h2>';
+		self::close_card();
+		self::open_card( '03', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ) );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -247,7 +288,7 @@ class Blogcraft_Connection {
 			__( 'Topic queue', 'blogcraft' ),
 			__( 'One topic per line. Each is used once, then removed from this list.', 'blogcraft' )
 		);
-		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ) );
+		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Publishing unreviewed posts at volume is what search engines penalise.', 'blogcraft' ) );
 
 		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft' ) . '</label></th><td>';
 		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
@@ -266,33 +307,97 @@ class Blogcraft_Connection {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
-		submit_button( __( 'Save settings', 'blogcraft' ) );
+		echo '<div class="blogcraft-actions">';
+		submit_button( __( 'Save settings', 'blogcraft' ), 'primary', 'submit', false );
+		echo '</div>';
+		self::close_card();
 		echo '</form>';
 
-		echo '<hr />';
-		echo '<h2>' . esc_html__( 'Test connection', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Sends one very short request to confirm the provider is reachable.', 'blogcraft' ) . '</p>';
+		self::open_card( '04', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ) );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
-		submit_button( __( 'Test connection', 'blogcraft' ), 'secondary' );
-		echo '</form>';
+		echo '<div class="blogcraft-actions">';
+		submit_button( __( 'Test connection', 'blogcraft' ), 'secondary', 'submit', false );
+		echo '<p class="blogcraft-hint">' . esc_html__( 'Save your settings first.', 'blogcraft' ) . '</p>';
 		echo '</div>';
+		echo '</form>';
+		self::close_card();
+		echo '</div>';
+	}
+
+	/**
+	 * Open a numbered card.
+	 *
+	 * The numbering is not decoration: setup genuinely runs in this order, since
+	 * nothing generates without a provider and automation only makes sense once
+	 * the writing looks right.
+	 *
+	 * @param string $step        Step number.
+	 * @param string $title       Card title.
+	 * @param string $description One line on what the card is for.
+	 * @return void
+	 */
+	private static function open_card( $step, $title, $description ) {
+		printf(
+			'<section class="blogcraft-card"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p></header>',
+			esc_html( $step ),
+			esc_html( $title ),
+			esc_html( $description )
+		);
+	}
+
+	/**
+	 * Close the current card.
+	 *
+	 * @return void
+	 */
+	private static function close_card() {
+		echo '</section>';
+	}
+
+	/**
+	 * Show what is still missing, read from the real settings.
+	 *
+	 * @param string $type Selected provider type.
+	 * @param string $key  Stored API key.
+	 * @return void
+	 */
+	private static function render_status( $type, $key ) {
+		$states = array(
+			__( 'Provider connected', 'blogcraft' ) => ( '' !== $key && '' !== (string) Blogcraft_Settings::get( 'provider_model' ) ),
+			__( 'Voice described', 'blogcraft' )    => Blogcraft_Voice::is_configured(),
+			__( 'Automation on', 'blogcraft' )      => (bool) Blogcraft_Settings::get( 'autopilot_enabled' ),
+		);
+
+		echo '<ul class="blogcraft-status">';
+
+		foreach ( $states as $label => $done ) {
+			printf(
+				'<li class="%1$s">%2$s</li>',
+				$done ? 'is-done' : '',
+				esc_html( $label )
+			);
+		}
+
+		echo '</ul>';
 	}
 
 	/**
 	 * Render one text input row.
 	 *
-	 * @param string $name  Setting key.
-	 * @param string $label Field label.
+	 * @param string $name      Setting key.
+	 * @param string $label     Field label.
+	 * @param string $row_class Optional class for the row.
 	 * @return void
 	 */
-	private static function text_row( $name, $label ) {
+	private static function text_row( $name, $label, $row_class = '' ) {
 		printf(
-			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" /></td></tr>',
+			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" autocomplete="off" spellcheck="false" /></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
-			esc_attr( (string) Blogcraft_Settings::get( $name ) )
+			esc_attr( (string) Blogcraft_Settings::get( $name ) ),
+			esc_attr( $row_class )
 		);
 	}
 
@@ -317,16 +422,18 @@ class Blogcraft_Connection {
 	/**
 	 * Render one number input row.
 	 *
-	 * @param string $name  Setting key.
-	 * @param string $label Field label.
+	 * @param string $name        Setting key.
+	 * @param string $label       Field label.
+	 * @param string $description Hint shown beneath.
 	 * @return void
 	 */
-	private static function number_row( $name, $label ) {
+	private static function number_row( $name, $label, $description = '' ) {
 		printf(
-			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="number" min="0" class="small-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" /></td></tr>',
+			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="number" min="0" class="small-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" /><p class="description">%4$s</p></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
-			esc_attr( (string) Blogcraft_Settings::get( $name ) )
+			esc_attr( (string) Blogcraft_Settings::get( $name ) ),
+			esc_html( $description )
 		);
 	}
 
