@@ -549,6 +549,7 @@ class Blogcraft_Connection {
 			'test'       => array( __( 'Check it works', 'blogcraft' ), __( 'One short live request', 'blogcraft' ) ),
 		);
 
+		echo '<div class="bc-jump-col">';
 		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'blogcraft' ) . '">';
 		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft' ) );
 
@@ -573,6 +574,8 @@ class Blogcraft_Connection {
 			'<button type="submit" form="blogcraft-settings-form" class="bc-jump-save">%s</button>',
 			esc_html__( 'Save settings', 'blogcraft' )
 		);
+
+		echo '</div>';
 	}
 
 	/**

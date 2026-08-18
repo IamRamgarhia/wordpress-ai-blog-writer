@@ -582,9 +582,14 @@ a.bc-nav-item:hover {
 	min-width: 0;
 }
 
-.bc-jump {
+/* The rail and its save button share one grid cell; without this the button
+   becomes a third grid item and wraps to a row of its own below the form. */
+.bc-jump-col {
 	position: sticky;
 	top: 46px;
+}
+
+.bc-jump {
 	display: flex;
 	flex-direction: column;
 	gap: 1px;
@@ -690,8 +695,11 @@ a.bc-nav-item:hover {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.bc-jump {
+	.bc-jump-col {
 		position: static;
+	}
+
+	.bc-jump {
 		flex-direction: row;
 		flex-wrap: wrap;
 		align-items: center;
