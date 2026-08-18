@@ -517,7 +517,7 @@ class Blogcraft_Connection {
 		$start  = (int) get_option( 'start_of_week', 1 );
 
 		echo '<tr><th scope="row">' . esc_html__( 'Write on', 'blogcraft' ) . '</th><td>';
-		echo '<fieldset>';
+		echo '<fieldset class="blogcraft-days">';
 		printf(
 			'<legend class="screen-reader-text">%s</legend>',
 			esc_html__( 'Days of the week to write on', 'blogcraft' )

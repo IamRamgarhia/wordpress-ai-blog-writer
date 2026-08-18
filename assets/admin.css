@@ -366,10 +366,18 @@
 
 /* ---------------------------------------------------------- schedule bits. */
 
+/* Core's forms.css sets `.form-table td fieldset label { margin: ... !important }`,
+   which silently wins over any margin set here. Spacing the labels from the
+   container with gap sidesteps that entirely. */
+.blogcraft-days {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 20px;
+}
+
 .blogcraft-day {
 	display: inline-flex;
 	align-items: center;
-	margin: 0 14px 6px 0;
 	font-size: 13px;
 	white-space: nowrap;
 }
