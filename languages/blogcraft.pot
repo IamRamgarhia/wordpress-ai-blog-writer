@@ -143,7 +143,7 @@ msgid "Set one up"
 msgstr ""
 
 #: includes/class-blogcraft-admin.php:77
-#: includes/class-blogcraft-generate.php:141
+#: includes/class-blogcraft-generate.php:144
 msgid "Queue"
 msgstr ""
 
@@ -163,7 +163,9 @@ msgstr ""
 msgid "Finished"
 msgstr ""
 
+#. translators: %s: the value the blueprint asked for.
 #: includes/class-blogcraft-admin.php:87
+#: includes/class-blogcraft-review.php:224
 msgid "Failed"
 msgstr ""
 
@@ -278,8 +280,10 @@ msgstr ""
 msgid "Exactly what the model is told. Updates as you change anything above."
 msgstr ""
 
+#. translators: %d: word target from the blueprint.
 #: includes/class-blogcraft-blueprint-screen.php:451
 #: includes/class-blogcraft-connection.php:163
+#: includes/class-blogcraft-generate.php:256
 msgid "Tone"
 msgstr ""
 
@@ -368,7 +372,9 @@ msgstr ""
 msgid "One per line. Product names, your brand, anything that gets mangled."
 msgstr ""
 
+#. translators: %s: the target phrase from the blueprint.
 #: includes/class-blogcraft-blueprint-screen.php:553
+#: includes/class-blogcraft-generate.php:242
 #: includes/class-blogcraft-scorecard.php:115
 msgid "Length"
 msgstr ""
@@ -471,6 +477,7 @@ msgid "How many questions"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:652
+#: includes/class-blogcraft-generate.php:226
 msgid "Target phrase"
 msgstr ""
 
@@ -507,6 +514,7 @@ msgid "One per line. Related phrases worth a mention."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:680
+#: includes/class-blogcraft-generate.php:273
 msgid "Must appear"
 msgstr ""
 
@@ -910,7 +918,7 @@ msgid "Removed."
 msgstr ""
 
 #: includes/class-blogcraft-calendar.php:331
-#: includes/class-blogcraft-review.php:237
+#: includes/class-blogcraft-review.php:297
 msgid "Unknown action."
 msgstr ""
 
@@ -1357,100 +1365,130 @@ msgstr ""
 msgid "Reviewing drafts is strongly recommended."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:137
+#: includes/class-blogcraft-generate.php:140
 msgid "Queue this post"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:141
+#: includes/class-blogcraft-generate.php:144
 msgid "Posts are written in the background, one step per run."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:152
+#: includes/class-blogcraft-generate.php:155
 msgid "A step runs on its own every few minutes. Run one by hand if you would rather not wait."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:156
+#: includes/class-blogcraft-generate.php:159
 msgid "Run the queue now"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:160
+#: includes/class-blogcraft-generate.php:163
 msgid "Add many at once"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:160
+#: includes/class-blogcraft-generate.php:163
 msgid "One topic per line, or paste a CSV column."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:166
+#: includes/class-blogcraft-generate.php:169
 msgid "Topics, one per line"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:168
+#: includes/class-blogcraft-generate.php:171
 msgid "One topic per line, or paste a CSV column"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:169
+#: includes/class-blogcraft-generate.php:172
 msgid "Repeats are skipped, whether the post already exists or is only queued. Duplicates within the list you paste are caught too."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:170
+#: includes/class-blogcraft-generate.php:173
 msgid "Queue all of these"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:174
+#: includes/class-blogcraft-generate.php:177
 msgid "Undo a batch"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:174
+#: includes/class-blogcraft-generate.php:177
 msgid "Only touches posts Blogcraft created. Anything you wrote is left alone."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:175
+#: includes/class-blogcraft-generate.php:178
 msgid "Move recently generated posts to the trash?"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:178
+#: includes/class-blogcraft-generate.php:181
 msgid "Trash the last 24 hours"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:213
+#: includes/class-blogcraft-generate.php:216
+msgid "Change the brief for this one post"
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:221
+msgid "Leave anything blank to use what Blogcraft, How it writes already says."
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:232
+msgid "No phrase is set in the brief."
+msgstr ""
+
+#. translators: %s: the target phrase from the blueprint.
+#: includes/class-blogcraft-generate.php:235
+msgid "The brief says \"%s\"."
+msgstr ""
+
+#. translators: %d: word target from the blueprint.
+#: includes/class-blogcraft-generate.php:249
+msgid "Words. The brief says %d."
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:260
+msgid "Use the brief"
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:277
+msgid "One per line. Each is checked for on the finished draft."
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:331
 msgid "Please enter a topic."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:229
+#: includes/class-blogcraft-generate.php:348
 msgid "Skipped: too similar to a post you already have about \"%s\"."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:235
+#: includes/class-blogcraft-generate.php:354
 msgid "The topic could not be queued."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:238
+#: includes/class-blogcraft-generate.php:357
 msgid "Queued. The post will be written in the background."
 msgstr ""
 
 #. translators: %d: number of pipeline steps that ran.
-#: includes/class-blogcraft-generate.php:258
+#: includes/class-blogcraft-generate.php:377
 msgid "%d step ran."
 msgid_plural "%d steps ran."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of pipeline steps that ran.
-#: includes/class-blogcraft-generate.php:267
+#: includes/class-blogcraft-generate.php:386
 msgid "Something went wrong. Blogcraft → Activity has the reason."
 msgstr ""
 
 #. translators: 1: number queued, 2: number skipped as duplicates.
-#: includes/class-blogcraft-generate.php:310
+#: includes/class-blogcraft-generate.php:429
 msgid "%1$d queued, %2$d skipped as too similar to a post you have or one already waiting."
 msgstr ""
 
 #. translators: %d: number of posts moved to the trash.
-#: includes/class-blogcraft-generate.php:353
+#: includes/class-blogcraft-generate.php:472
 msgid "%d post moved to the trash."
 msgid_plural "%d posts moved to the trash."
 msgstr[0] ""
@@ -1485,7 +1523,12 @@ msgstr ""
 msgid "Dismiss this notice"
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:389
+#. translators: 1: check name. 2: measured value. 3: the value asked for.
+#: includes/class-blogcraft-pipeline.php:377
+msgid "%1$s: %2$s, wanted %3$s"
+msgstr ""
+
+#: includes/class-blogcraft-pipeline.php:425
 msgid "Untitled"
 msgstr ""
 
@@ -1589,31 +1632,46 @@ msgid "Everything generated so far cleared the quality bar."
 msgstr ""
 
 #. translators: %d: quality score out of 100.
-#: includes/class-blogcraft-review.php:145
+#: includes/class-blogcraft-review.php:146
 msgid "Scored %d of 100"
 msgstr ""
 
-#: includes/class-blogcraft-review.php:168
+#: includes/class-blogcraft-review.php:174
 msgid "Read it"
 msgstr ""
 
-#: includes/class-blogcraft-review.php:171
+#: includes/class-blogcraft-review.php:177
 msgid "Approve and publish"
 msgstr ""
 
-#: includes/class-blogcraft-review.php:172
+#: includes/class-blogcraft-review.php:178
 msgid "Move to trash"
 msgstr ""
 
-#: includes/class-blogcraft-review.php:217
+#. translators: %s: the value the blueprint asked for.
+#: includes/class-blogcraft-review.php:220
+msgid "wanted %s"
+msgstr ""
+
+#. translators: %s: the value the blueprint asked for.
+#: includes/class-blogcraft-review.php:224
+msgid "Passed"
+msgstr ""
+
+#. translators: %s: the value the blueprint asked for.
+#: includes/class-blogcraft-review.php:233
+msgid "These were measured on the finished draft. The model was told about each one and rewrote once before this."
+msgstr ""
+
+#: includes/class-blogcraft-review.php:277
 msgid "That post is no longer waiting for review."
 msgstr ""
 
-#: includes/class-blogcraft-review.php:228
+#: includes/class-blogcraft-review.php:288
 msgid "Published."
 msgstr ""
 
-#: includes/class-blogcraft-review.php:234
+#: includes/class-blogcraft-review.php:294
 msgid "Moved to trash."
 msgstr ""
 

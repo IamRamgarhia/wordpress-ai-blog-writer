@@ -135,6 +135,7 @@ class Blogcraft_Review {
 	private static function render_entry( $post ) {
 		$score   = (int) get_post_meta( $post->ID, '_blogcraft_quality', true );
 		$reasons = get_post_meta( $post->ID, '_blogcraft_quality_reasons', true );
+		$checks  = get_post_meta( $post->ID, '_blogcraft_checks', true );
 
 		echo '<section class="blogcraft-card"><header>';
 		printf(
@@ -150,7 +151,12 @@ class Blogcraft_Review {
 		printf( '<h2>%s</h2>', esc_html( get_the_title( $post ) ) );
 		echo '</header>';
 
-		if ( is_array( $reasons ) && ! empty( $reasons ) ) {
+		// The scorecard says what was measured and what was asked for, which is
+		// what someone needs to decide whether to publish anyway. Fall back to
+		// the plain reason list for posts written before checks were recorded.
+		if ( is_array( $checks ) && ! empty( $checks ) ) {
+			self::render_checks( $checks );
+		} elseif ( is_array( $reasons ) && ! empty( $reasons ) ) {
 			echo '<ul class="blogcraft-reasons">';
 
 			foreach ( $reasons as $reason ) {
@@ -173,6 +179,60 @@ class Blogcraft_Review {
 
 		echo '</div>';
 		echo '</section>';
+	}
+
+	/**
+	 * Render the measured checks behind a score.
+	 *
+	 * Failures first: the reason a post is being held is the thing worth
+	 * reading, and a list that opens with eight passes buries it.
+	 *
+	 * @param array $checks Stored checks.
+	 * @return void
+	 */
+	private static function render_checks( $checks ) {
+		$failed = array();
+		$passed = array();
+
+		foreach ( $checks as $check ) {
+			if ( ! is_array( $check ) || ! isset( $check['label'] ) ) {
+				continue;
+			}
+
+			if ( empty( $check['pass'] ) ) {
+				$failed[] = $check;
+			} else {
+				$passed[] = $check;
+			}
+		}
+
+		echo '<ul class="blogcraft-checks">';
+
+		foreach ( array_merge( $failed, $passed ) as $check ) {
+			printf(
+				'<li class="%1$s"><span class="blogcraft-check-mark" aria-hidden="true"></span><span class="blogcraft-check-label">%2$s</span><span class="blogcraft-check-figures"><span class="blogcraft-check-actual">%3$s</span> <span class="blogcraft-check-target">%4$s</span></span><span class="screen-reader-text">%5$s</span></li>',
+				empty( $check['pass'] ) ? 'is-failed' : 'is-passed',
+				esc_html( (string) $check['label'] ),
+				esc_html( (string) $check['actual'] ),
+				esc_html(
+					sprintf(
+						/* translators: %s: the value the blueprint asked for. */
+						__( 'wanted %s', 'blogcraft' ),
+						(string) $check['target']
+					)
+				),
+				esc_html( empty( $check['pass'] ) ? __( 'Failed', 'blogcraft' ) : __( 'Passed', 'blogcraft' ) )
+			);
+		}
+
+		echo '</ul>';
+
+		if ( ! empty( $failed ) ) {
+			printf(
+				'<p class="blogcraft-hint">%s</p>',
+				esc_html__( 'These were measured on the finished draft. The model was told about each one and rewrote once before this.', 'blogcraft' )
+			);
+		}
 	}
 
 	/**

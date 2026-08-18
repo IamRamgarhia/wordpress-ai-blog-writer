@@ -43,9 +43,10 @@ class Blogcraft_Pipeline {
 	 * @param string $topic        Topic to write about.
 	 * @param string $status       Post status to create: draft or publish.
 	 * @param string $instructions Optional per-topic guidance.
+	 * @param array  $overrides    Blueprint fields to change for this post only.
 	 * @return int Job id, or 0 on failure.
 	 */
-	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '' ) {
+	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array() ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
 		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' ) ) {
@@ -70,7 +71,10 @@ class Blogcraft_Pipeline {
 				'instructions' => (string) $instructions,
 				// Snapshot rather than reference: editing a blueprint must not
 				// change the rules a post already part-written is judged by.
-				'blueprint'    => Blogcraft_Blueprint::get(),
+				'blueprint'    => Blogcraft_Blueprint::with_overrides(
+					Blogcraft_Blueprint::get(),
+					is_array( $overrides ) ? $overrides : array()
+				),
 			)
 		);
 	}
@@ -357,9 +361,41 @@ class Blogcraft_Pipeline {
 			);
 		}
 
-		$assessment              = Blogcraft_Verify::score( $article );
-		$payload['quality']      = $assessment;
-		$payload['needs_review'] = $assessment['score'] < (int) Blogcraft_Settings::get( 'quality_threshold' );
+		// Score against the blueprint rather than the old generic heuristic, so
+		// the number that decides publish-or-hold is the same one measured
+		// during critique, against the rules this post was actually written to.
+		$blueprint  = self::blueprint( $job );
+		$scorecard  = Blogcraft_Scorecard::evaluate( Blogcraft_Blocks::render( $article ), $blueprint );
+		$assessment = Blogcraft_Verify::score( $article );
+
+		$reasons = array();
+
+		foreach ( $scorecard['checks'] as $check ) {
+			if ( empty( $check['pass'] ) ) {
+				$reasons[] = sprintf(
+					/* translators: 1: check name. 2: measured value. 3: the value asked for. */
+					__( '%1$s: %2$s, wanted %3$s', 'blogcraft' ),
+					$check['label'],
+					$check['actual'],
+					$check['target']
+				);
+			}
+		}
+
+		// Keep whatever the older link and structure checks flagged; they cover
+		// things the scorecard does not measure.
+		if ( ! empty( $assessment['reasons'] ) ) {
+			$reasons = array_merge( $reasons, (array) $assessment['reasons'] );
+		}
+
+		$payload['quality'] = array(
+			'score'   => (int) $scorecard['score'],
+			'reasons' => $reasons,
+		);
+
+		$payload['checks']       = $scorecard['checks'];
+		$payload['metrics']      = $scorecard['metrics'];
+		$payload['needs_review'] = $scorecard['score'] < (int) Blogcraft_Settings::get( 'quality_threshold' );
 
 		return array(
 			'next'    => 'publish',
@@ -442,6 +478,14 @@ class Blogcraft_Pipeline {
 		if ( isset( $payload['quality'] ) ) {
 			update_post_meta( $post_id, '_blogcraft_quality', (int) $payload['quality']['score'] );
 			update_post_meta( $post_id, '_blogcraft_quality_reasons', (array) $payload['quality']['reasons'] );
+
+			if ( ! empty( $payload['checks'] ) ) {
+				update_post_meta( $post_id, '_blogcraft_checks', (array) $payload['checks'] );
+			}
+
+			if ( ! empty( $payload['metrics'] ) ) {
+				update_post_meta( $post_id, '_blogcraft_metrics', (array) $payload['metrics'] );
+			}
 		}
 
 		// A missing image must never fail a finished post, so this is best-effort.

@@ -134,6 +134,9 @@ class Blogcraft_Generate {
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
+
+		self::render_overrides();
+
 		submit_button( __( 'Queue this post', 'blogcraft' ) );
 		echo '</form>';
 
@@ -196,6 +199,121 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * Per-post overrides of the blueprint.
+	 *
+	 * Folded away because the common case is a topic and nothing else, and a
+	 * screen that opens with nine optional fields makes the simple path look
+	 * complicated. Blank means "use the brief", never "set to nothing".
+	 *
+	 * @return void
+	 */
+	private static function render_overrides() {
+		$blueprint = Blogcraft_Blueprint::get();
+
+		echo '<details class="blogcraft-overrides">';
+		printf(
+			'<summary>%s</summary>',
+			esc_html__( 'Change the brief for this one post', 'blogcraft' )
+		);
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'Leave anything blank to use what Blogcraft, How it writes already says.', 'blogcraft' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		echo '<tr><th scope="row"><label for="blogcraft_o_keyword">' . esc_html__( 'Target phrase', 'blogcraft' ) . '</label></th><td>';
+		echo '<input type="text" class="regular-text" name="o_primary_keyword" id="blogcraft_o_keyword" value="" autocomplete="off" />';
+		printf(
+			'<p class="description">%s</p>',
+			esc_html(
+				'' === trim( (string) $blueprint['primary_keyword'] )
+					? __( 'No phrase is set in the brief.', 'blogcraft' )
+					: sprintf(
+						/* translators: %s: the target phrase from the blueprint. */
+						__( 'The brief says "%s".', 'blogcraft' ),
+						(string) $blueprint['primary_keyword']
+					)
+			)
+		);
+		echo '</td></tr>';
+
+		echo '<tr><th scope="row"><label for="blogcraft_o_words">' . esc_html__( 'Length', 'blogcraft' ) . '</label></th><td>';
+		echo '<input type="number" min="0" step="50" class="small-text" name="o_word_target" id="blogcraft_o_words" value="" />';
+		printf(
+			'<p class="description">%s</p>',
+			esc_html(
+				sprintf(
+					/* translators: %d: word target from the blueprint. */
+					__( 'Words. The brief says %d.', 'blogcraft' ),
+					(int) $blueprint['word_target']
+				)
+			)
+		);
+		echo '</td></tr>';
+
+		echo '<tr><th scope="row"><label for="blogcraft_o_tone">' . esc_html__( 'Tone', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="o_tone" id="blogcraft_o_tone">';
+		printf(
+			'<option value="">%s</option>',
+			esc_html__( 'Use the brief', 'blogcraft' )
+		);
+
+		foreach ( Blogcraft_Blueprint::tones() as $value => $label ) {
+			if ( 'custom' === $value ) {
+				continue;
+			}
+
+			printf( '<option value="%1$s">%2$s</option>', esc_attr( $value ), esc_html( $label ) );
+		}
+
+		echo '</select></td></tr>';
+
+		echo '<tr><th scope="row"><label for="blogcraft_o_terms">' . esc_html__( 'Must appear', 'blogcraft' ) . '</label></th><td>';
+		echo '<textarea class="large-text" name="o_required_terms" id="blogcraft_o_terms" rows="3"></textarea>';
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'One per line. Each is checked for on the finished draft.', 'blogcraft' )
+		);
+		echo '</td></tr>';
+
+		echo '</tbody></table>';
+		echo '</details>';
+	}
+
+	/**
+	 * Read blueprint overrides out of the submitted form.
+	 *
+	 * @param array $source Unslashed request data.
+	 * @return array Sparse field values.
+	 */
+	private static function overrides_from( $source ) {
+		$out = array();
+
+		$map = array(
+			'o_primary_keyword' => 'primary_keyword',
+			'o_word_target'     => 'word_target',
+			'o_tone'            => 'tone',
+			'o_required_terms'  => 'required_terms',
+		);
+
+		foreach ( $map as $field => $key ) {
+			if ( ! isset( $source[ $field ] ) || is_array( $source[ $field ] ) ) {
+				continue;
+			}
+
+			$value = trim( (string) $source[ $field ] );
+
+			if ( '' !== $value ) {
+				$out[ $key ] = $value;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Queue a submitted topic.
 	 *
 	 * @return void
@@ -214,7 +332,8 @@ class Blogcraft_Generate {
 		}
 
 		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions );
+		$overrides    = self::overrides_from( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
+		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides );
 
 		if ( $job_id <= 0 ) {
 			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )
