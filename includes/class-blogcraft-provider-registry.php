@@ -55,6 +55,30 @@ class Blogcraft_Provider_Registry {
 	}
 
 	/**
+	 * Where each provider type talks by default.
+	 *
+	 * Without these a user who supplies only a key and a model gets a request
+	 * to a relative path and an error reading "A valid URL was not provided",
+	 * which says nothing about what to do. The three hosted providers have one
+	 * obvious address each; the custom adapter deliberately has none, because
+	 * choosing the address is the entire point of picking it.
+	 *
+	 * @param string $type Provider type id.
+	 * @return string Empty when the type has no sensible default.
+	 */
+	public static function default_base_url( $type ) {
+		$defaults = array(
+			'openai'    => 'https://api.openai.com/v1',
+			'gemini'    => 'https://generativelanguage.googleapis.com/v1beta',
+			'anthropic' => 'https://api.anthropic.com/v1',
+		);
+
+		$type = (string) $type;
+
+		return isset( $defaults[ $type ] ) ? $defaults[ $type ] : '';
+	}
+
+	/**
 	 * Whether a provider is genuinely usable, not merely selected.
 	 *
 	 * The from_settings() method returns an object whenever a provider type is
@@ -70,8 +94,11 @@ class Blogcraft_Provider_Registry {
 			return false;
 		}
 
+		$type = (string) Blogcraft_Settings::get( 'provider_type' );
+
 		$has_key  = '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
-		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) );
+		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) )
+			|| '' !== self::default_base_url( $type );
 
 		return $has_key || $has_base;
 	}
@@ -90,7 +117,11 @@ class Blogcraft_Provider_Registry {
 			return null;
 		}
 
-		$base_url = Blogcraft_Settings::get( 'provider_base_url' );
+		$base_url = trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) );
+
+		if ( '' === $base_url ) {
+			$base_url = self::default_base_url( $type );
+		}
 
 		$config = array(
 			// Adapters disagree on the config key for the request target:

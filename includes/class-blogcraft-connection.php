@@ -103,13 +103,39 @@ class Blogcraft_Connection {
 		return array(
 			'provider_base_url' => array(
 				__( 'Base URL', 'blogcraft' ),
-				__( 'Leave blank to use the provider default. Set it to point at a proxy, a local model, or any OpenAI-compatible service — for example http://localhost:11434/v1 for Ollama.', 'blogcraft' ),
+				self::base_url_hint(),
 			),
 			'provider_model'    => array(
 				__( 'Model', 'blogcraft' ),
 				__( 'The model id exactly as your provider writes it, such as gpt-4o-mini, gemini-2.0-flash, claude-sonnet-4-5 or llama3.1. Nothing runs until this is filled in.', 'blogcraft' ),
 			),
 		);
+	}
+
+	/**
+	 * Explain what leaving the base URL blank will actually do.
+	 *
+	 * Naming the address the plugin falls back to is the difference between a
+	 * field someone can leave alone with confidence and one they guess at.
+	 *
+	 * @return string
+	 */
+	private static function base_url_hint() {
+		$default = Blogcraft_Provider_Registry::default_base_url(
+			(string) Blogcraft_Settings::get( 'provider_type' )
+		);
+
+		$local = __( 'Point it at a proxy, a self-hosted model, or any compatible service — http://localhost:11434/v1 for Ollama, for example.', 'blogcraft' );
+
+		if ( '' === $default ) {
+			return __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ) . ' ' . $local;
+		}
+
+		return sprintf(
+			/* translators: %s: default API address for the selected provider. */
+			__( 'Leave blank to use %s.', 'blogcraft' ),
+			$default
+		) . ' ' . $local;
 	}
 
 	/**

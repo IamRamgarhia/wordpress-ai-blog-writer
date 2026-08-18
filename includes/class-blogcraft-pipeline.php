@@ -101,6 +101,12 @@ class Blogcraft_Pipeline {
 			throw new RuntimeException( 'Monthly token cap reached; generation paused.' );
 		}
 
+		// from_settings() returns an object as soon as a type is chosen, and the
+		// type defaults to openai, so this alone never catches an empty setup.
+		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
+			throw new RuntimeException( 'No AI provider is set up yet. Add a model and an API key under Blogcraft, Settings.' );
+		}
+
 		$provider = Blogcraft_Provider_Registry::from_settings();
 
 		if ( null === $provider ) {

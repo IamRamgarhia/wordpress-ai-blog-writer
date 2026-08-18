@@ -360,8 +360,8 @@
 }
 
 .blogcraft-inline-form {
-	display: inline-block;
-	margin: 6px 0 0;
+	display: block;
+	margin: 8px 0 0;
 }
 
 @media screen and (max-width: 782px) {
