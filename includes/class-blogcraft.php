@@ -58,6 +58,7 @@ class Blogcraft {
 
 		Blogcraft_Scheduler::init();
 		Blogcraft_Pipeline::register();
+		Blogcraft_Refresh::register();
 		Blogcraft_Seo::init();
 		Blogcraft_Autopilot::init();
 

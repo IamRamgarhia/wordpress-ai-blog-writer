@@ -163,6 +163,7 @@ class Blogcraft_Connection {
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
+			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
 		);
 	}
 
@@ -333,6 +334,11 @@ class Blogcraft_Connection {
 			'quality_threshold',
 			__( 'Hold posts scoring below', 'blogcraft' ),
 			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft' )
+		);
+		self::number_row(
+			'refresh_after_days',
+			__( 'Consider a post stale after', 'blogcraft' ),
+			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'blogcraft' )
 		);
 		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Publishing unreviewed posts at volume is what search engines penalise.', 'blogcraft' ) );
 

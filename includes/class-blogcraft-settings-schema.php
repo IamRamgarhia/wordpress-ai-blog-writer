@@ -69,6 +69,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'refresh_enabled'                 => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'refresh_after_days'              => array(
+				'default' => 180,
+				'type'    => 'int',
+				'secret'  => false,
+			),
 			'research_provider'               => array(
 				'default' => 'none',
 				'type'    => 'string',

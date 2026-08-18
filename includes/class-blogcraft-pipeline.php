@@ -63,6 +63,20 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * Run one provider call from another pipeline.
+	 *
+	 * The refresh pipeline needs the same cap check, cost accounting and JSON
+	 * recovery as generation, and duplicating them would let the two drift.
+	 *
+	 * @param array $messages Chat messages.
+	 * @param array $options  Provider options.
+	 * @return array Parsed payload.
+	 */
+	public static function ask_model( $messages, $options = array() ) {
+		return self::ask( $messages, $options );
+	}
+
+	/**
 	 * Run one provider call and return the parsed JSON.
 	 *
 	 * @param array $messages Chat messages.

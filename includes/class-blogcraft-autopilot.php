@@ -96,6 +96,39 @@ class Blogcraft_Autopilot {
 	}
 
 	/**
+	 * Queue the oldest stale post for a rewrite, if refreshing is on.
+	 *
+	 * @return bool Whether anything was queued.
+	 */
+	private static function maybe_refresh() {
+		if ( ! Blogcraft_Settings::get( 'refresh_enabled' ) ) {
+			return false;
+		}
+
+		$stale = Blogcraft_Refresh::find_stale( null, 1 );
+
+		if ( empty( $stale ) ) {
+			return false;
+		}
+
+		$job_id = Blogcraft_Refresh::enqueue_post( $stale[0]->ID );
+
+		if ( $job_id <= 0 ) {
+			return false;
+		}
+
+		self::increment_today();
+
+		Blogcraft_Logger::info(
+			'Autopilot queued a refresh.',
+			array( 'post_id' => (int) $stale[0]->ID ),
+			(int) $job_id
+		);
+
+		return true;
+	}
+
+	/**
 	 * Remove a topic from the stored list once it has been queued.
 	 *
 	 * @param string $topic Topic to drop.
@@ -138,7 +171,8 @@ class Blogcraft_Autopilot {
 		$topics = self::topics();
 
 		if ( empty( $topics ) ) {
-			return false;
+			// Nothing new to write is the right moment to improve something old.
+			return self::maybe_refresh();
 		}
 
 		$topic  = $topics[0];
