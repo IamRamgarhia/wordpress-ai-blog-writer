@@ -117,7 +117,7 @@ class Blogcraft_Connection {
 			),
 			'provider_model'    => array(
 				__( 'Model', 'blogcraft' ),
-				__( 'The model id exactly as your provider writes it, such as gpt-4o-mini, gemini-2.0-flash, claude-sonnet-4-5 or llama3.1. Nothing runs until this is filled in.', 'blogcraft' ),
+				__( 'The model id exactly as your provider writes it. Model names get retired regularly, so take the current one from the provider list linked below rather than copying an example. Nothing runs until this is filled in.', 'blogcraft' ),
 			),
 		);
 	}
@@ -809,6 +809,8 @@ class Blogcraft_Connection {
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		Blogcraft_Request::verify_or_die( self::SAVE_ACTION, $nonce );
 
+		$was_usable = Blogcraft_Provider_Registry::is_configured();
+
 		$plain = array_merge(
 			array_keys( self::common_fields() ),
 			array_keys( self::custom_fields() ),
@@ -880,7 +882,7 @@ class Blogcraft_Connection {
 			Blogcraft_Settings::set( 'provider_api_key', $submitted_key );
 		}
 
-		self::redirect_back( true, self::save_message( '' !== $submitted_key ) );
+		self::redirect_back( true, self::save_message( '' !== $submitted_key, $was_usable ) );
 	}
 
 	/**
@@ -895,12 +897,18 @@ class Blogcraft_Connection {
 	 * field does not spend a request every time.
 	 *
 	 * @param bool $key_changed Whether a new key was submitted.
+	 * @param bool $was_usable  Whether the setup already worked before this save.
 	 * @return string
 	 */
-	private static function save_message( $key_changed ) {
+	private static function save_message( $key_changed, $was_usable ) {
 		$saved = __( 'Settings saved.', 'blogcraft' );
 
-		if ( ! $key_changed ) {
+		// Check on a new key, and on the save that first completes the setup.
+		// Someone who pastes a key one day and adds the model the next never
+		// submits both at once, and that is exactly when they need telling.
+		$now_usable = Blogcraft_Provider_Registry::is_configured();
+
+		if ( ! $key_changed && ! ( $now_usable && ! $was_usable ) ) {
 			return $saved;
 		}
 

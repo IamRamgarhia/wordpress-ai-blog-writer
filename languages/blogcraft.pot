@@ -1018,7 +1018,7 @@ msgid "Model"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:120
-msgid "The model id exactly as your provider writes it, such as gpt-4o-mini, gemini-2.0-flash, claude-sonnet-4-5 or llama3.1. Nothing runs until this is filled in."
+msgid "The model id exactly as your provider writes it. Model names get retired regularly, so take the current one from the provider list linked below rather than copying an example. Nothing runs until this is filled in."
 msgstr ""
 
 #. translators: %s: provider name, such as OpenAI.
@@ -1168,13 +1168,13 @@ msgstr ""
 
 #: includes/class-blogcraft-connection.php:339
 #: includes/class-blogcraft-connection.php:389
-#: includes/class-blogcraft-connection.php:776
+#: includes/class-blogcraft-connection.php:779
 msgid "Not set"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:341
 #: includes/class-blogcraft-connection.php:391
-#: includes/class-blogcraft-connection.php:777
+#: includes/class-blogcraft-connection.php:780
 msgid "Leave blank to keep the saved key."
 msgstr ""
 
@@ -1306,7 +1306,7 @@ msgid "Drafts are safer. Nothing goes live until you have read it."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:478
-#: includes/class-blogcraft-connection.php:574
+#: includes/class-blogcraft-connection.php:575
 msgid "Save settings"
 msgstr ""
 
@@ -1347,113 +1347,113 @@ msgstr ""
 msgid "One short live request"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:552
+#: includes/class-blogcraft-connection.php:553
 msgid "Sections on this page"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:553
+#: includes/class-blogcraft-connection.php:554
 msgid "On this page"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:590
+#: includes/class-blogcraft-connection.php:593
 msgid "Provider connected"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:595
+#: includes/class-blogcraft-connection.php:598
 msgid "Voice described"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:596
+#: includes/class-blogcraft-connection.php:599
 msgid "Voice not described"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:601
+#: includes/class-blogcraft-connection.php:604
 msgid "Automation on"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:603
+#: includes/class-blogcraft-connection.php:606
 msgid "Automation has no days"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:604
+#: includes/class-blogcraft-connection.php:607
 msgid "Automation off"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:635
+#: includes/class-blogcraft-connection.php:638
 msgid "Model name missing"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:639
+#: includes/class-blogcraft-connection.php:642
 msgid "API key missing"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:642
+#: includes/class-blogcraft-connection.php:645
 msgid "No provider yet"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:659
+#: includes/class-blogcraft-connection.php:662
 msgid "Write on"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:663
+#: includes/class-blogcraft-connection.php:666
 msgid "Days of the week to write on"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:682
+#: includes/class-blogcraft-connection.php:685
 msgid "Automatic writing is switched on, but no days are ticked, so nothing will ever be written. Choose at least one day."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:685
+#: includes/class-blogcraft-connection.php:688
 msgid "In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:699
+#: includes/class-blogcraft-connection.php:702
 msgid "Starting at"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:716
+#: includes/class-blogcraft-connection.php:719
 msgid "The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:898
+#: includes/class-blogcraft-connection.php:904
 msgid "Settings saved."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:905
+#: includes/class-blogcraft-connection.php:916
 msgid "Add a model name before it can write anything."
 msgstr ""
 
 #. translators: %s: reason the provider gave.
-#: includes/class-blogcraft-connection.php:919
+#: includes/class-blogcraft-connection.php:930
 msgid "The key did not work: %s"
 msgstr ""
 
 #. translators: %s: reason the provider gave.
-#: includes/class-blogcraft-connection.php:924
+#: includes/class-blogcraft-connection.php:935
 msgid "The key works."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:943
+#: includes/class-blogcraft-connection.php:954
 msgid "Fill in a model and an API key first, then save, then test."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:950
+#: includes/class-blogcraft-connection.php:961
 msgid "No provider is configured yet."
 msgstr ""
 
 #. translators: %s: error reported by the provider.
-#: includes/class-blogcraft-connection.php:960
+#: includes/class-blogcraft-connection.php:971
 msgid "Connection failed: %s"
 msgstr ""
 
 #. translators: %d: number of models the provider reported.
-#: includes/class-blogcraft-connection.php:972
+#: includes/class-blogcraft-connection.php:983
 msgid "Connection succeeded. %d model available."
 msgid_plural "Connection succeeded. %d models available."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-blogcraft-connection.php:997
+#: includes/class-blogcraft-connection.php:1008
 msgid "the provider gave no reason."
 msgstr ""
 
