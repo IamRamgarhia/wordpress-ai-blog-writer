@@ -325,8 +325,7 @@ class Blogcraft_Seo {
 
 		foreach ( $graphs as $entry ) {
 			printf(
-				'<script type="application/ld+json">%s</script>' . '
-',
+				'<script type="application/ld+json">%s</script>',
 				wp_json_encode( $entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
 		}
