@@ -158,6 +158,21 @@ class Blogcraft_Generate {
 		$job_id = Blogcraft_Pipeline::enqueue_topic( $topic, $status );
 
 		if ( $job_id <= 0 ) {
+			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )
+				? Blogcraft_Backlinks::find_duplicate( $topic )
+				: '';
+
+			if ( '' !== $clash ) {
+				self::back(
+					false,
+					sprintf(
+						/* translators: %s: the existing topic this one duplicates. */
+						__( 'Skipped: too similar to a post you already have about "%s".', 'blogcraft' ),
+						$clash
+					)
+				);
+			}
+
 			self::back( false, __( 'The topic could not be queued.', 'blogcraft' ) );
 		}
 

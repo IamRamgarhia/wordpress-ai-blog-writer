@@ -126,9 +126,11 @@ class Blogcraft_Connection {
 	 */
 	private static function toggle_fields() {
 		return array(
-			'images_enabled'         => __( 'Generate a featured image', 'blogcraft' ),
-			'internal_links_enabled' => __( 'Add links to your existing posts', 'blogcraft' ),
-			'autopilot_enabled'      => __( 'Write posts automatically on a schedule', 'blogcraft' ),
+			'images_enabled'          => __( 'Generate a featured image', 'blogcraft' ),
+			'internal_links_enabled'  => __( 'Add links to your existing posts', 'blogcraft' ),
+			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
+			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
+			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
 		);
 	}
 

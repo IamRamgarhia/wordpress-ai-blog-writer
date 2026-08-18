@@ -69,6 +69,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'backlinks_enabled'               => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'duplicate_check_enabled'         => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'autopilot_enabled'               => array(
 				'default' => false,
 				'type'    => 'bool',

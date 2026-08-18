@@ -43,6 +43,13 @@ class Blogcraft_Pipeline {
 	 * @return int Job id, or 0 on failure.
 	 */
 	public static function enqueue_topic( $topic, $status = 'draft' ) {
+		// Near-identical posts are what search engines treat as scaled content
+		// abuse, so a repeat is refused before it costs any tokens.
+		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' )
+			&& '' !== Blogcraft_Backlinks::find_duplicate( $topic ) ) {
+			return 0;
+		}
+
 		return Blogcraft_Queue::enqueue(
 			self::NAME,
 			'outline',
@@ -243,6 +250,14 @@ class Blogcraft_Pipeline {
 			isset( $payload['topic'] ) ? (string) $payload['topic'] : ''
 		);
 		update_post_meta( $post_id, '_blogcraft_topic', isset( $payload['topic'] ) ? (string) $payload['topic'] : '' );
+
+		// Point older related posts at this one. Every competing tool links only
+		// forward, leaving existing content unaware the new post exists.
+		Blogcraft_Backlinks::link_back(
+			(int) $post_id,
+			isset( $payload['topic'] ) ? (string) $payload['topic'] : $title,
+			3
+		);
 
 		Blogcraft_Logger::info(
 			'Generated post created.',
