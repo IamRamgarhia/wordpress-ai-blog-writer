@@ -226,6 +226,26 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * Options for the calls that write prose.
+	 *
+	 * Deliberately empty. Capping output tokens looks like a sensible economy
+	 * and is the opposite on a reasoning model: the thinking budget is drawn
+	 * from the same allowance, so a low cap is spent before any answer is
+	 * emitted and the reply comes back empty or cut off. Measured on Gemini
+	 * 3.6 Flash, where the outline call carried no cap and parsed every time
+	 * while every capped call failed to return usable JSON.
+	 *
+	 * Length is controlled by the blueprint and enforced by the scorer, which
+	 * is a better lever anyway: it counts words rather than tokens, and it can
+	 * ask for a rewrite instead of truncating mid-sentence.
+	 *
+	 * @return array
+	 */
+	private static function draft_options() {
+		return array();
+	}
+
+	/**
 	 * The headings the outline settled on.
 	 *
 	 * @param array $payload Job payload.
@@ -306,7 +326,7 @@ class Blogcraft_Pipeline {
 				(int) round( (int) $blueprint['word_target'] * 0.08 ),
 				(bool) $blueprint['takeaways'] ? (int) $blueprint['takeaways_count'] : 0
 			),
-			array( 'max_tokens' => 1200 )
+			self::draft_options()
 		);
 
 		$payload['article'] = array(
@@ -368,7 +388,7 @@ class Blogcraft_Pipeline {
 				self::instructions( $job ),
 				self::section_budget( $blueprint, count( $headings ) )
 			),
-			array( 'max_tokens' => 2048 )
+			self::draft_options()
 		);
 
 		$paragraphs = isset( $result['paragraphs'] ) ? (array) $result['paragraphs'] : array();
@@ -411,7 +431,7 @@ class Blogcraft_Pipeline {
 				self::headings( $payload ),
 				(int) $blueprint['faq_count']
 			),
-			array( 'max_tokens' => 1500 )
+			self::draft_options()
 		);
 
 		$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
@@ -483,7 +503,7 @@ class Blogcraft_Pipeline {
 		$problems = isset( $job->payload['problems'] ) ? $job->payload['problems'] : array();
 		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
 
-		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems ), array( 'max_tokens' => 4096 ) );
+		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems ), self::draft_options() );
 
 		$payload            = $job->payload;
 		$payload['article'] = $revised;
