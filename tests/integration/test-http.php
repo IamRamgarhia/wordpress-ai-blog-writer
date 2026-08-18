@@ -11,6 +11,7 @@ class Test_Blogcraft_Http extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
+		Blogcraft_Migrator::migrate();
 		$this->requests = array();
 	}
 
@@ -132,6 +133,24 @@ class Test_Blogcraft_Http extends WP_UnitTestCase {
 		$result = Blogcraft_Http::post_json( 'https://example.test/v1', array() );
 		$this->assertNotSame( '', $result['error'] );
 		$this->assertSame( array(), $result['body'] );
+	}
+
+	public function test_bare_scalar_json_body_is_reported_as_error() {
+		$this->fake_http( array( array( 'code' => 200, 'body' => '42' ) ) );
+		$result = Blogcraft_Http::post_json( 'https://example.test/v1', array() );
+		$this->assertNotSame( '', $result['error'] );
+		$this->assertSame( array(), $result['body'] );
+	}
+
+	public function test_retry_delay_clamps_a_large_retry_after() {
+		$method = new ReflectionMethod( Blogcraft_Http::class, 'retry_delay' );
+		$method->setAccessible( true );
+
+		$this->assertSame( Blogcraft_Http::MAX_RETRY_AFTER_SECONDS, $method->invoke( null, '99999999', 1 ) );
+		$this->assertSame( 2, $method->invoke( null, '2', 1 ) );
+		$this->assertSame( 1, $method->invoke( null, '', 1 ) );
+		$this->assertSame( 2, $method->invoke( null, '', 2 ) );
+		$this->assertSame( 1, $method->invoke( null, 'not-a-number', 1 ) );
 	}
 
 	public function test_response_object_reports_error_state() {

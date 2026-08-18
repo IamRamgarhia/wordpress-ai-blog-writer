@@ -27,6 +27,20 @@ class Blogcraft_Http {
 	const MAX_ATTEMPTS = 3;
 
 	/**
+	 * Upper bound on an honoured Retry-After delay, in seconds.
+	 *
+	 * Longer than any legitimate per-attempt backoff, but short enough that
+	 * MAX_ATTEMPTS worth of retries stay well inside a normal PHP execution
+	 * limit. Without this cap a malformed or hostile Retry-After value (e.g.
+	 * 99999999) would block the calling thread for that long — and since this
+	 * class is called from cron and worker contexts, that hangs a queue tick
+	 * rather than just one request.
+	 *
+	 * @var int
+	 */
+	const MAX_RETRY_AFTER_SECONDS = 30;
+
+	/**
 	 * POST a JSON body and decode a JSON response.
 	 *
 	 * @param string $url     Target URL.
@@ -101,8 +115,8 @@ class Blogcraft_Http {
 			$code     = (int) wp_remote_retrieve_response_code( $response );
 			$body_raw = wp_remote_retrieve_body( $response );
 			$decoded  = json_decode( $body_raw, true );
-			$body_ok  = ( null !== $decoded || 'null' === trim( (string) $body_raw ) );
-			$body     = $body_ok && is_array( $decoded ) ? $decoded : array();
+			$body_ok  = is_array( $decoded );
+			$body     = $body_ok ? $decoded : array();
 
 			if ( $code >= 200 && $code < 300 ) {
 				if ( ! $body_ok ) {
@@ -166,15 +180,30 @@ class Blogcraft_Http {
 			? self::header_value( $headers, 'retry-after' )
 			: '';
 
-		if ( is_numeric( $retry_after ) ) {
-			$seconds = max( 0, (int) $retry_after );
-		} else {
-			$seconds = $attempt; // 1s after the first attempt, 2s after the second.
-		}
+		$seconds = self::retry_delay( $retry_after, $attempt );
 
 		if ( $seconds > 0 ) {
 			sleep( $seconds );
 		}
+	}
+
+	/**
+	 * Work out how long to wait before the next attempt.
+	 *
+	 * A numeric Retry-After value is honoured but clamped to
+	 * MAX_RETRY_AFTER_SECONDS. Anything else (absent, non-numeric) falls back
+	 * to a fixed 1s, 2s progression keyed off the attempt just completed.
+	 *
+	 * @param string|int $retry_after Raw Retry-After header value, or '' when absent.
+	 * @param int        $attempt     Attempt number just completed (1-indexed).
+	 * @return int Seconds to wait, never negative.
+	 */
+	private static function retry_delay( $retry_after, $attempt ) {
+		if ( is_numeric( $retry_after ) ) {
+			return min( self::MAX_RETRY_AFTER_SECONDS, max( 0, (int) $retry_after ) );
+		}
+
+		return $attempt; // 1s after the first attempt, 2s after the second.
 	}
 
 	/**
