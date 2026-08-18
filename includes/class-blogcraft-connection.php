@@ -480,9 +480,12 @@ class Blogcraft_Connection {
 				'no'   => __( 'Voice not described', 'blogcraft' ),
 			),
 			array(
-				'done' => (bool) Blogcraft_Settings::get( 'autopilot_enabled' ),
+				'done' => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
+					&& array() !== Blogcraft_Autopilot::days(),
 				'yes'  => __( 'Automation on', 'blogcraft' ),
-				'no'   => __( 'Automation off', 'blogcraft' ),
+				'no'   => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
+					? __( 'Automation has no days', 'blogcraft' )
+					: __( 'Automation off', 'blogcraft' ),
 			),
 		);
 
@@ -532,6 +535,13 @@ class Blogcraft_Connection {
 		}
 
 		echo '</fieldset>';
+
+		// Automation switched on with no days chosen looks configured and does
+		// nothing at all, which is the worst of both.
+		if ( empty( $chosen ) && Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
+			echo '<p class="blogcraft-callout">' . esc_html__( 'Automatic writing is switched on, but no days are ticked, so nothing will ever be written. Choose at least one day.', 'blogcraft' ) . '</p>';
+		}
+
 		echo '<p class="description">' . esc_html__( 'In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog.', 'blogcraft' ) . '</p>';
 		echo '</td></tr>';
 	}
@@ -740,6 +750,16 @@ class Blogcraft_Connection {
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		Blogcraft_Request::verify_or_die( self::TEST_ACTION, $nonce );
 
+		// Testing with nothing filled in spends a round trip to be told what we
+		// already know, and returns the provider's own wording for it, which
+		// talks about Authorization headers this plugin sets for you.
+		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
+			self::redirect_back(
+				false,
+				__( 'Fill in a model and an API key first, then save, then test.', 'blogcraft' )
+			);
+		}
+
 		$provider = Blogcraft_Provider_Registry::from_settings();
 
 		if ( null === $provider ) {
@@ -754,7 +774,7 @@ class Blogcraft_Connection {
 				sprintf(
 					/* translators: %s: error reported by the provider. */
 					__( 'Connection failed: %s', 'blogcraft' ),
-					(string) $probe['error']
+					self::shorten( (string) $probe['error'] )
 				)
 			);
 		}
@@ -774,6 +794,34 @@ class Blogcraft_Connection {
 				count( $models )
 			)
 		);
+	}
+
+	/**
+	 * Trim a provider's error down to something a person will read.
+	 *
+	 * Providers answer a bad key with several sentences of setup advice aimed
+	 * at someone writing raw HTTP. The first sentence carries the meaning; the
+	 * rest describes work this plugin already does.
+	 *
+	 * @param string $error Raw error text.
+	 * @return string
+	 */
+	private static function shorten( $error ) {
+		$error = trim( preg_replace( '/\s+/', ' ', $error ) );
+
+		if ( '' === $error ) {
+			return __( 'the provider gave no reason.', 'blogcraft' );
+		}
+
+		if ( preg_match( '/^(.{20,180}?[.!?])\s/u', $error, $matches ) ) {
+			return $matches[1];
+		}
+
+		if ( strlen( $error ) > 200 ) {
+			return substr( $error, 0, 200 ) . '…';
+		}
+
+		return $error;
 	}
 
 	/**

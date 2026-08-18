@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.9.5
+Stable tag: 0.9.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,12 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.9.6 =
+* Repeated topics in one pasted list are no longer queued twice
+* Automation switched on with no days chosen now says so instead of doing nothing quietly
+* The connection test asks for a key rather than spending a request to be told there isn't one
+* Activity lists each job's topic, and the dashboard links a failure to its reason
 
 = 0.9.5 =
 * Accessibility: the bulk topic field is labelled, and repeated row buttons now name the topic or job they act on

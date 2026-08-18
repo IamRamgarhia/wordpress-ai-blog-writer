@@ -48,9 +48,17 @@ class Blogcraft_Pipeline {
 	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '' ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
-		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' )
-			&& '' !== Blogcraft_Backlinks::find_duplicate( $topic ) ) {
-			return 0;
+		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' ) ) {
+			if ( '' !== Blogcraft_Backlinks::find_duplicate( $topic ) ) {
+				return 0;
+			}
+
+			// Also against what is already waiting. Nothing has been published
+			// yet at this point, so the check above cannot see a repeat that
+			// arrived in the same pasted list.
+			if ( '' !== Blogcraft_Backlinks::find_queued_duplicate( $topic ) ) {
+				return 0;
+			}
 		}
 
 		return Blogcraft_Queue::enqueue(

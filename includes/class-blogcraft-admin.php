@@ -97,6 +97,30 @@ class Blogcraft_Admin {
 
 		echo '</ul>';
 
+		// A failure count with no route to the reason is a dead end, and this is
+		// the first screen anyone lands on.
+		$failed = (int) Blogcraft_Queue::count_by_status( 'failed' );
+
+		if ( $failed > 0 ) {
+			printf(
+				'<p class="blogcraft-callout">%1$s <a href="%2$s">%3$s</a></p>',
+				esc_html(
+					sprintf(
+						/* translators: %d: number of failed jobs. */
+						_n(
+							'%d post could not be written.',
+							'%d posts could not be written.',
+							$failed,
+							'blogcraft'
+						),
+						$failed
+					)
+				),
+				esc_url( admin_url( 'admin.php?page=blogcraft-activity' ) ),
+				esc_html__( 'See why, and try again', 'blogcraft' )
+			);
+		}
+
 		echo '<div class="blogcraft-actions">';
 		printf(
 			'<a class="button button-primary" href="%s">%s</a>',

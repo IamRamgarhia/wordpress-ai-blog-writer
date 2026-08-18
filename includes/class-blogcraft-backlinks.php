@@ -233,6 +233,23 @@ class Blogcraft_Backlinks {
 	}
 
 	/**
+	 * Whether a topic repeats one already sitting in the queue.
+	 *
+	 * @param string $topic     Candidate topic.
+	 * @param float  $threshold Similarity above which it counts as a repeat.
+	 * @return string The clashing topic, or '' when the candidate is fresh.
+	 */
+	public static function find_queued_duplicate( $topic, $threshold = 0.7 ) {
+		foreach ( Blogcraft_Queue::pending_topics() as $queued ) {
+			if ( self::similarity( $topic, $queued ) >= $threshold ) {
+				return $queued;
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Whether a topic closely repeats something already generated.
 	 *
 	 * Repetitive near-identical posts are precisely what search engines treat as

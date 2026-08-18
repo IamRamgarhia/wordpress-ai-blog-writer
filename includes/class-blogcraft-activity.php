@@ -143,6 +143,7 @@ class Blogcraft_Activity {
 
 		echo '<table class="widefat striped blogcraft-table"><thead><tr>';
 		echo '<th scope="col">' . esc_html__( 'Job', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
 		echo '<th scope="col">' . esc_html__( 'Step', 'blogcraft' ) . '</th>';
 		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
 		echo '<th scope="col">' . esc_html__( 'Tries', 'blogcraft' ) . '</th>';
@@ -156,6 +157,7 @@ class Blogcraft_Activity {
 
 			echo '<tr>';
 			printf( '<td>%d</td>', (int) $job['id'] );
+			printf( '<td>%s</td>', esc_html( self::topic_of( $job ) ) );
 			printf( '<td>%s</td>', esc_html( str_replace( '_', ' ', (string) $job['stage'] ) ) );
 			printf(
 				'<td><span class="blogcraft-badge is-%1$s">%2$s</span></td>',
@@ -184,6 +186,36 @@ class Blogcraft_Activity {
 
 		echo '</tbody></table>';
 		echo '</section>';
+	}
+
+	/**
+	 * What a job is about.
+	 *
+	 * A list of numbered rows all reading "research" tells you nothing about
+	 * which post is stuck.
+	 *
+	 * @param array $job Job row.
+	 * @return string
+	 */
+	private static function topic_of( $job ) {
+		$payload = isset( $job['payload'] ) ? json_decode( (string) $job['payload'], true ) : null;
+
+		if ( ! is_array( $payload ) ) {
+			return '—';
+		}
+
+		if ( ! empty( $payload['topic'] ) ) {
+			return (string) $payload['topic'];
+		}
+
+		// A refresh job carries the post it is rewriting rather than a topic.
+		if ( ! empty( $payload['post_id'] ) ) {
+			$title = get_the_title( (int) $payload['post_id'] );
+
+			return ( '' === $title ) ? '—' : $title;
+		}
+
+		return '—';
 	}
 
 	/**

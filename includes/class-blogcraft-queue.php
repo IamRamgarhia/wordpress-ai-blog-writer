@@ -323,6 +323,38 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * Topics on jobs that have not finished yet.
+	 *
+	 * The duplicate check only ever compared a new topic against published
+	 * posts, so pasting a list with the same line twice queued it twice, and
+	 * nothing had been published yet to catch it. Two jobs then wrote two posts
+	 * on one subject, which is the exact outcome the check exists to prevent.
+	 *
+	 * @return array Topic strings.
+	 */
+	public static function pending_topics() {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$rows = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT payload FROM {$table} WHERE status IN ('pending', 'running')" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		$topics = array();
+
+		foreach ( (array) $rows as $payload ) {
+			$decoded = json_decode( (string) $payload, true );
+
+			if ( is_array( $decoded ) && ! empty( $decoded['topic'] ) ) {
+				$topics[] = (string) $decoded['topic'];
+			}
+		}
+
+		return $topics;
+	}
+
+	/**
 	 * How many jobs are currently carrying an error.
 	 *
 	 * A failing job goes back to pending on its backoff, so a plain step count
@@ -395,7 +427,7 @@ class Blogcraft_Queue {
 
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT id, pipeline, stage, status, attempts, max_attempts, last_error, available_at, created_at, updated_at FROM {$table} ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT id, pipeline, stage, status, attempts, max_attempts, last_error, payload, available_at, created_at, updated_at FROM {$table} ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				(int) $limit
 			),
 			ARRAY_A

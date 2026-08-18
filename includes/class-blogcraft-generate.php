@@ -166,7 +166,7 @@ class Blogcraft_Generate {
 			esc_html__( 'Topics, one per line', 'blogcraft' )
 		);
 		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="6" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
-		echo '<p class="description">' . esc_html__( 'Anything already covered by an existing post is skipped rather than queued twice.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Repeats are skipped, whether the post already exists or is only queued. Duplicates within the list you paste are caught too.', 'blogcraft' ) . '</p>';
 		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', true );
 		echo '</form>';
 
@@ -307,7 +307,7 @@ class Blogcraft_Generate {
 			true,
 			sprintf(
 				/* translators: 1: number queued, 2: number skipped as duplicates. */
-				__( '%1$d queued, %2$d skipped as too similar to existing posts.', 'blogcraft' ),
+				__( '%1$d queued, %2$d skipped as too similar to a post you have or one already waiting.', 'blogcraft' ),
 				$queued,
 				$skipped
 			)
