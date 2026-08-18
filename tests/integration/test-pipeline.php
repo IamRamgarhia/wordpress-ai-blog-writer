@@ -30,6 +30,43 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		Blogcraft_Settings::set( 'provider_api_key', 'test-key' );
 		Blogcraft_Settings::set( 'provider_model', 'test-model' );
 		Blogcraft_Settings::set( 'monthly_token_cap', 0 );
+
+		$this->use_permissive_blueprint();
+	}
+
+	/**
+	 * Install a blueprint the short fixtures in this file can actually satisfy.
+	 *
+	 * The scorecard feeds measured faults into the critique, so a draft that
+	 * misses a target is sent to revise. Fixtures here are three sentences long
+	 * and would fail a 1200-word target every time, which would make every test
+	 * in this file exercise the revise path whether it meant to or not.
+	 *
+	 * These tests are about the pipeline's control flow, not about scoring, so
+	 * the targets are relaxed to let each one test what it says it tests. The
+	 * scoring behaviour has its own tests.
+	 *
+	 * @return void
+	 */
+	private function use_permissive_blueprint() {
+		$blueprint = Blogcraft_Blueprint::defaults();
+
+		$blueprint['word_target']           = 20;
+		$blueprint['word_tolerance']        = 60;
+		$blueprint['sections_min']          = 1;
+		$blueprint['sections_max']          = 12;
+		$blueprint['sentence_max_words']    = 60;
+		$blueprint['para_max_sentences']    = 12;
+		$blueprint['reading_level']         = 'simple';
+		$blueprint['external_links_target'] = 0;
+		$blueprint['internal_links_target'] = 0;
+		$blueprint['takeaways']             = false;
+		$blueprint['faq']                   = false;
+		$blueprint['banned_phrases']        = '';
+		$blueprint['required_terms']        = '';
+		$blueprint['primary_keyword']       = '';
+
+		Blogcraft_Blueprint::save( Blogcraft_Blueprint::DEFAULT_SLUG, $blueprint );
 	}
 
 	public function tear_down() {
@@ -37,6 +74,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		Blogcraft_Worker::reset_stages();
 		Blogcraft_Cost::reset();
 		delete_option( 'blogcraft_settings' );
+		delete_option( Blogcraft_Blueprint::OPTION );
 		parent::tear_down();
 	}
 
