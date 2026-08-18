@@ -1,0 +1,554 @@
+/**
+ * The blueprint editor.
+ *
+ * Treated as an editorial brief rather than a settings form. Two type roles
+ * carry the meaning: the interface sans for what a person is asking for, and a
+ * monospace for anything a machine will later measure. That distinction is the
+ * whole idea, so it is applied consistently and nowhere decoratively.
+ *
+ * No web fonts and no external assets: Guideline 8 forbids CDN requests, so the
+ * personality comes from role separation and spacing rather than a typeface
+ * nobody is allowed to download.
+ */
+
+.blogcraft-blueprint {
+	--bp-ink: #16181d;
+	--bp-graphite: #5b616e;
+	--bp-faint: #8b909b;
+	--bp-line: #e2e4e9;
+	--bp-hair: #eef0f3;
+	--bp-paper: #fff;
+	--bp-wash: #f7f8fa;
+	--bp-accent: #4338ca;
+	--bp-accent-soft: #eef0fd;
+	--bp-measure: #92400e;
+	--bp-measure-soft: #fdf6ec;
+
+	max-width: 1500px;
+	margin-right: 20px;
+}
+
+.blogcraft-blueprint * {
+	box-sizing: border-box;
+}
+
+.bc-mono,
+.bc-value,
+.bc-brief-body {
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+	font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------------- top bar. */
+
+.bc-bar {
+	position: sticky;
+	top: 32px;
+	z-index: 20;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+	margin: 0 0 20px;
+	padding: 18px 22px;
+	border: 1px solid var(--bp-line);
+	border-radius: 14px;
+	background: var(--bp-paper);
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.05), 0 8px 24px -16px rgba(22, 24, 29, 0.35);
+}
+
+.bc-bar-text h1 {
+	margin: 0 0 4px;
+	padding: 0;
+	font-size: 24px;
+	font-weight: 650;
+	letter-spacing: -0.02em;
+	color: var(--bp-ink);
+}
+
+.bc-bar-text p {
+	margin: 0;
+	max-width: 64ch;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bp-graphite);
+}
+
+.bc-save {
+	flex: none;
+	padding: 10px 20px;
+	border: 0;
+	border-radius: 9px;
+	background: var(--bp-accent);
+	color: #fff;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 120ms ease, transform 120ms ease;
+}
+
+.bc-save:hover {
+	background: #3730a3;
+}
+
+.bc-save:active {
+	transform: translateY(1px);
+}
+
+.bc-save:focus-visible {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------- layout. */
+
+.bc-shell {
+	display: grid;
+	grid-template-columns: 168px minmax(0, 1fr) minmax(300px, 400px);
+	gap: 20px;
+	align-items: start;
+}
+
+/* ----------------------------------------------------------------- rail. */
+
+.bc-rail {
+	position: sticky;
+	top: 148px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.bc-rail-item {
+	padding: 9px 12px;
+	border: 0;
+	border-left: 2px solid transparent;
+	border-radius: 0 7px 7px 0;
+	background: none;
+	font-size: 13.5px;
+	font-weight: 500;
+	text-align: left;
+	color: var(--bp-graphite);
+	cursor: pointer;
+	transition: background 120ms ease, color 120ms ease;
+}
+
+.bc-rail-item:hover {
+	background: var(--bp-hair);
+	color: var(--bp-ink);
+}
+
+.bc-rail-item.is-active {
+	border-left-color: var(--bp-accent);
+	background: var(--bp-accent-soft);
+	color: var(--bp-accent);
+	font-weight: 620;
+}
+
+.bc-rail-item:focus-visible {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: -2px;
+}
+
+/* ---------------------------------------------------------------- panes. */
+
+.bc-pane {
+	padding: 6px 26px 10px;
+	border: 1px solid var(--bp-line);
+	border-radius: 14px;
+	background: var(--bp-paper);
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
+}
+
+.bc-pane[hidden] {
+	display: none;
+}
+
+.bc-note {
+	margin: 20px 0 0;
+	max-width: 68ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bp-graphite);
+}
+
+.bc-row {
+	display: grid;
+	grid-template-columns: 190px minmax(0, 1fr);
+	gap: 20px;
+	padding: 18px 0;
+	border-bottom: 1px solid var(--bp-hair);
+}
+
+.bc-row:last-child {
+	border-bottom: 0;
+}
+
+.bc-label {
+	padding-top: 7px;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--bp-ink);
+}
+
+.bc-control {
+	min-width: 0;
+}
+
+.bc-hint {
+	margin: 8px 0 0;
+	max-width: 58ch;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--bp-graphite);
+}
+
+/* ------------------------------------------------------------- controls. */
+
+.bc-text,
+.bc-area,
+.bc-select {
+	width: 100%;
+	max-width: 460px;
+	padding: 8px 11px;
+	border: 1px solid var(--bp-line);
+	border-radius: 8px;
+	background: var(--bp-paper);
+	font-size: 13.5px;
+	color: var(--bp-ink);
+}
+
+.bc-area {
+	line-height: 1.55;
+	resize: vertical;
+}
+
+.bc-text:focus,
+.bc-area:focus,
+.bc-select:focus {
+	border-color: var(--bp-accent);
+	outline: 0;
+	box-shadow: 0 0 0 3px var(--bp-accent-soft);
+}
+
+/* Segmented control: radios drawn as a single joined strip. */
+
+.bc-seg {
+	display: inline-flex;
+	flex-wrap: wrap;
+	padding: 3px;
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	background: var(--bp-wash);
+}
+
+.bc-seg input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.bc-seg label {
+	padding: 7px 14px;
+	border-radius: 7px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--bp-graphite);
+	cursor: pointer;
+	transition: background 120ms ease, color 120ms ease;
+}
+
+.bc-seg label:hover {
+	color: var(--bp-ink);
+}
+
+.bc-seg input:checked + label {
+	background: var(--bp-paper);
+	color: var(--bp-ink);
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.12);
+}
+
+.bc-seg input:focus-visible + label {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 1px;
+}
+
+/* Slider: the read-out is monospace because the number is measured. */
+
+.bc-slider {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	max-width: 460px;
+}
+
+.bc-slider input[type="range"] {
+	flex: 1;
+	min-width: 0;
+	height: 4px;
+	margin: 0;
+	appearance: none;
+	border-radius: 999px;
+	background: var(--bp-line);
+	cursor: pointer;
+}
+
+.bc-slider input[type="range"]::-webkit-slider-thumb {
+	appearance: none;
+	width: 17px;
+	height: 17px;
+	border: 2px solid var(--bp-paper);
+	border-radius: 50%;
+	background: var(--bp-accent);
+	box-shadow: 0 1px 4px rgba(22, 24, 29, 0.3);
+}
+
+.bc-slider input[type="range"]::-moz-range-thumb {
+	width: 15px;
+	height: 15px;
+	border: 2px solid var(--bp-paper);
+	border-radius: 50%;
+	background: var(--bp-accent);
+}
+
+.bc-slider input[type="range"]:focus-visible {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 4px;
+}
+
+.bc-value {
+	flex: none;
+	min-width: 96px;
+	padding: 4px 9px;
+	border: 1px solid var(--bp-line);
+	border-radius: 7px;
+	background: var(--bp-measure-soft);
+	font-size: 12.5px;
+	font-weight: 600;
+	text-align: center;
+	color: var(--bp-measure);
+}
+
+/* Toggle. */
+
+.bc-toggle {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 11px;
+	font-size: 13.5px;
+	color: var(--bp-ink);
+	cursor: pointer;
+}
+
+.bc-toggle:last-child {
+	margin-bottom: 0;
+}
+
+.bc-toggle input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.bc-track {
+	position: relative;
+	flex: none;
+	width: 38px;
+	height: 22px;
+	border-radius: 999px;
+	background: #cdd1d8;
+	transition: background 140ms ease;
+}
+
+.bc-track::after {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 3px rgba(22, 24, 29, 0.3);
+	transition: transform 140ms ease;
+}
+
+.bc-toggle input:checked + .bc-track {
+	background: var(--bp-accent);
+}
+
+.bc-toggle input:checked + .bc-track::after {
+	transform: translateX(16px);
+}
+
+.bc-toggle input:focus-visible + .bc-track {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 3px;
+}
+
+/* Chips. */
+
+.bc-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.bc-chips input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.bc-chips label {
+	padding: 7px 14px;
+	border: 1px solid var(--bp-line);
+	border-radius: 999px;
+	background: var(--bp-paper);
+	font-size: 13px;
+	color: var(--bp-graphite);
+	cursor: pointer;
+	transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.bc-chips label:hover {
+	border-color: var(--bp-faint);
+	color: var(--bp-ink);
+}
+
+.bc-chips input:checked + label {
+	border-color: var(--bp-accent);
+	background: var(--bp-accent-soft);
+	color: var(--bp-accent);
+	font-weight: 600;
+}
+
+.bc-chips input:focus-visible + label {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- brief. */
+
+.bc-brief {
+	position: sticky;
+	top: 148px;
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100vh - 190px);
+	border: 1px solid var(--bp-line);
+	border-radius: 14px;
+	background: var(--bp-paper);
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
+	overflow: hidden;
+}
+
+.bc-brief-head {
+	padding: 16px 18px 13px;
+	border-bottom: 1px solid var(--bp-hair);
+	background: linear-gradient(var(--bp-paper), var(--bp-wash));
+}
+
+.bc-brief-head h2 {
+	margin: 0 0 3px;
+	padding: 0;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--bp-accent);
+}
+
+.bc-brief-head p {
+	margin: 0;
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--bp-graphite);
+}
+
+.bc-brief-body {
+	margin: 0;
+	padding: 16px 18px 20px;
+	font-size: 12px;
+	line-height: 1.75;
+	color: var(--bp-ink);
+	white-space: pre-wrap;
+	word-break: break-word;
+	overflow-y: auto;
+	transition: opacity 140ms ease;
+}
+
+.bc-brief-body.is-stale {
+	opacity: 0.45;
+}
+
+/* -------------------------------------------------------------- narrow. */
+
+@media screen and (max-width: 1280px) {
+	.bc-shell {
+		grid-template-columns: 150px minmax(0, 1fr);
+	}
+
+	.bc-brief {
+		position: static;
+		grid-column: 1 / -1;
+		max-height: 420px;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.blogcraft-blueprint {
+		margin-right: 0;
+	}
+
+	.bc-bar {
+		position: static;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 14px;
+	}
+
+	.bc-save {
+		width: 100%;
+	}
+
+	.bc-shell {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.bc-rail {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.bc-rail-item {
+		border-left: 0;
+		border-radius: 999px;
+		border: 1px solid var(--bp-line);
+	}
+
+	.bc-rail-item.is-active {
+		border-color: var(--bp-accent);
+	}
+
+	.bc-row {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 8px;
+	}
+
+	.bc-label {
+		padding-top: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blogcraft-blueprint *,
+	.blogcraft-blueprint *::after {
+		transition: none !important;
+	}
+}

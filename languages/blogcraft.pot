@@ -18,6 +18,7 @@ msgstr ""
 
 #: includes/class-blogcraft-activity.php:76
 #: includes/class-blogcraft-admin.php:54
+#: includes/class-blogcraft-blueprint-screen.php:128
 #: includes/class-blogcraft-calendar.php:91
 #: includes/class-blogcraft-connection.php:227
 #: includes/class-blogcraft-generate.php:85
@@ -219,11 +220,423 @@ msgid "Related reading"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:38
+#: includes/class-blogcraft-blueprint-screen.php:611
 msgid "Key takeaways"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:65
 msgid "Frequently asked questions"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:82
+msgid "The brief could not be refreshed. Save to see it applied."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:95
+#: includes/class-blogcraft-blueprint-screen.php:96
+#: includes/class-blogcraft-blueprint-screen.php:178
+msgid "How it writes"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:113
+msgid "Voice"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:114
+msgid "Structure"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:115
+msgid "Search"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:116
+msgid "Sounding human"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:117
+msgid "Section briefs"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:179
+msgid "The brief every post is written to. Anything shown in monospace is measured on the finished draft, not merely requested."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:183
+msgid "Save changes"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:194
+msgid "Blueprint sections"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:221
+msgid "The brief"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:222
+msgid "Exactly what the model is told. Updates as you change anything above."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:451
+#: includes/class-blogcraft-connection.php:163
+msgid "Tone"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:452
+msgid "Pick the closest, or describe your own."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:458
+msgid "Describe the tone"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:459
+msgid "Used only when the tone above is set to something else."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:460
+msgid "Dry, a little sceptical, never breathless"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:465
+msgid "Who is speaking"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:471
+msgid "Who is reading"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:478
+msgid "Describe the reader"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:479
+msgid "What they already know, and what they are trying to do."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:480
+msgid "People setting up a first home office on a budget"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:485
+msgid "Formality"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:486
+msgid "1 is a message to a friend. 5 is a white paper."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:492
+#: includes/class-blogcraft-connection.php:165
+msgid "Reading level"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:493
+msgid "Measured on the finished draft as a Flesch Reading Ease band."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:499
+msgid "Spelling"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:504
+msgid "American"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:505
+msgid "British"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:512
+msgid "Language"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:513
+msgid "Leave blank to write in English."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:514
+msgid "Spanish"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:519
+msgid "Spell these exactly"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:520
+msgid "One per line. Product names, your brand, anything that gets mangled."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:553
+#: includes/class-blogcraft-scorecard.php:115
+msgid "Length"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:554
+msgid "Measured. A draft outside the tolerance below is sent back to be rewritten."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:555
+#: includes/class-blogcraft-blueprint-screen.php:583
+msgid " words"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:560
+msgid "Tolerance"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:561
+msgid "How far either side of the target is acceptable."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:567
+msgid "Fewest sections"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:574
+msgid "Most sections"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:575
+msgid "Measured on the finished draft."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:581
+msgid "Longest sentence"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:582
+msgid "Measured. Every sentence over this is reported back for splitting."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:588
+msgid "Longest paragraph"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:589
+msgid "Measured."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:590
+msgid " sentences"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:595
+msgid "How it opens"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:602
+msgid "How it ends"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:609
+msgid "Include"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:612
+msgid "Questions and answers"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:613
+msgid "Table of contents"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:617
+msgid "Allow"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:619
+msgid "Bulleted lists"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:620
+msgid "Tables"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:621
+msgid "Sub-subheadings"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:622
+msgid "Bold key phrases"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:626
+msgid "How many takeaways"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:633
+msgid "How many questions"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:652
+msgid "Target phrase"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:653
+msgid "Leave blank to let each topic speak for itself. Overridden per post."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:654
+msgid "standing desk"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:659
+msgid "Least often"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:660
+msgid "Measured as a share of all words."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:666
+msgid "Most often"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:667
+msgid "Measured. Above this reads as keyword stuffing."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:673
+msgid "Also cover"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:674
+msgid "One per line. Related phrases worth a mention."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:680
+msgid "Must appear"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:681
+msgid "One per line. Measured — every one of these is checked for, and a missing term is reported back."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:687
+msgid "Sources to cite"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:688
+msgid "Measured. Outbound links to reputable sources."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:694
+msgid "Links to your own posts"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:695
+msgid "Added after writing, then counted."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:701
+msgid "Title length"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:703
+#: includes/class-blogcraft-blueprint-screen.php:710
+msgid " characters"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:708
+msgid "Description length"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:727
+msgid "Devices to use"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:728
+msgid "Where they genuinely help. Nothing here is forced into every section."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:737
+msgid "Habits"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:739
+msgid "Vary sentence length deliberately"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:740
+msgid "Allow contractions"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:741
+msgid "Allow em dashes"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:745
+msgid "Demand"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:747
+msgid "First-hand, specific detail"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:748
+msgid "A named source for factual claims"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:749
+msgid "Concrete figures where they exist"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:753
+msgid "Never write"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:754
+msgid "One per line. Measured — any of these found in a draft sends it back."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:771
+msgid "Instructions for one part of the article only. These are appended to the rules the model already has, so use them for the things that keep coming out wrong."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:774
+msgid "The opening"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:776
+msgid "Never open with a rhetorical question."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:781
+msgid "Every section"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:783
+msgid "Open each section with the answer, then explain it."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:788
+msgid "The ending"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:790
+msgid "No summary of what was just said. End on what to do next."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:795
+msgid "The questions"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:797
+msgid "Answer in two sentences at most."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:862
+msgid "Saved. Every post from now on is written to this brief."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:872
+msgid "Not allowed."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:878
+msgid "That form has expired. Reload the page."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint.php:46
@@ -564,16 +977,8 @@ msgstr ""
 msgid "Completion tokens path"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:163
-msgid "Tone"
-msgstr ""
-
 #: includes/class-blogcraft-connection.php:164
 msgid "Point of view"
-msgstr ""
-
-#: includes/class-blogcraft-connection.php:165
-msgid "Reading level"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:176
@@ -1214,10 +1619,6 @@ msgstr ""
 
 #: includes/class-blogcraft-scheduler.php:53
 msgid "Every 5 minutes (Blogcraft)"
-msgstr ""
-
-#: includes/class-blogcraft-scorecard.php:115
-msgid "Length"
 msgstr ""
 
 #: includes/class-blogcraft-scorecard.php:147
