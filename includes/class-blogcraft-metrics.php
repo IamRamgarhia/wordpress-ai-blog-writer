@@ -293,6 +293,86 @@ class Blogcraft_Metrics {
 	}
 
 	/**
+	 * Images carrying no usable alt text.
+	 *
+	 * Alt text is published accessibility guidance and a documented image
+	 * search signal, and it is the kind of thing that silently goes missing
+	 * because nothing ever looks.
+	 *
+	 * @param string $content Post content.
+	 * @return int
+	 */
+	public static function images_without_alt( $content ) {
+		preg_match_all( '/<img[^>]*>/i', (string) $content, $matches );
+
+		$missing = 0;
+
+		foreach ( ( isset( $matches[0] ) ? $matches[0] : array() ) as $tag ) {
+			if ( ! preg_match( '/alt\s*=\s*("[^"]*"|\'[^\']*\')/i', $tag, $alt ) || '' === trim( substr( $alt[1], 1, -1 ) ) ) {
+				++$missing;
+			}
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * Whether headings descend in order.
+	 *
+	 * An H3 before any H2, or a jump from H2 straight to H4, gives a parser a
+	 * structure that does not match what a reader sees.
+	 *
+	 * @param string $content Post content.
+	 * @return bool
+	 */
+	public static function heading_order_ok( $content ) {
+		preg_match_all( '/<h([1-6])/i', (string) $content, $matches );
+
+		$previous = 2;
+
+		foreach ( ( isset( $matches[1] ) ? $matches[1] : array() ) as $level ) {
+			$level = (int) $level;
+
+			// Descending more than one step at a time is the skip that matters.
+			if ( $level > $previous + 1 ) {
+				return false;
+			}
+
+			$previous = $level;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Words in the thinnest section of the article.
+	 *
+	 * A total that passes can still hide one forty-word section, and a thin
+	 * section is exactly what reads as padding.
+	 *
+	 * @param string $content Post content.
+	 * @return int Zero when there are no sections to measure.
+	 */
+	public static function thinnest_section( $content ) {
+		$parts = preg_split( '/<h2/i', (string) $content );
+
+		if ( ! is_array( $parts ) || count( $parts ) < 2 ) {
+			return 0;
+		}
+
+		// The first chunk is everything before the first heading.
+		array_shift( $parts );
+
+		$counts = array();
+
+		foreach ( $parts as $part ) {
+			$counts[] = count( self::words( self::plain_text( '<h2' . $part ) ) );
+		}
+
+		return empty( $counts ) ? 0 : min( $counts );
+	}
+
+	/**
 	 * Links in the content, split by whether they point at this site.
 	 *
 	 * @param string $content Post content.
@@ -379,6 +459,9 @@ class Blogcraft_Metrics {
 			'internal_links'  => $links['internal'],
 			'external_links'  => $links['external'],
 			'em_dashes'       => substr_count( (string) $content, '—' ),
+			'images_no_alt'   => self::images_without_alt( $content ),
+			'heading_order'   => self::heading_order_ok( $content ),
+			'thinnest'        => self::thinnest_section( $content ),
 			'keyword_density' => self::density( $text, (string) $blueprint['primary_keyword'] ),
 			'banned_hits'     => $banned,
 			'negative_hits'   => $negative,
