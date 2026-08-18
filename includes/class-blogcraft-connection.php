@@ -159,6 +159,7 @@ class Blogcraft_Connection {
 		return array(
 			'images_enabled'          => __( 'Generate a featured image', 'blogcraft' ),
 			'internal_links_enabled'  => __( 'Add links to your existing posts', 'blogcraft' ),
+			'verify_links_enabled'    => __( 'Check that links resolve before publishing', 'blogcraft' ),
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
@@ -287,6 +288,11 @@ class Blogcraft_Connection {
 			'autopilot_topics',
 			__( 'Topic queue', 'blogcraft' ),
 			__( 'One topic per line. Each is used once, then removed from this list.', 'blogcraft' )
+		);
+		self::number_row(
+			'quality_threshold',
+			__( 'Hold posts scoring below', 'blogcraft' ),
+			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft' )
 		);
 		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Publishing unreviewed posts at volume is what search engines penalise.', 'blogcraft' ) );
 

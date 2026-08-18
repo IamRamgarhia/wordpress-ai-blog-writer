@@ -32,6 +32,7 @@ class Blogcraft_Pipeline {
 		Blogcraft_Worker::register_stage( self::NAME, 'draft', array( __CLASS__, 'stage_draft' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'critique', array( __CLASS__, 'stage_critique' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'revise', array( __CLASS__, 'stage_revise' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'verify', array( __CLASS__, 'stage_verify' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'publish', array( __CLASS__, 'stage_publish' ) );
 	}
 
@@ -158,7 +159,7 @@ class Blogcraft_Pipeline {
 
 		// Nothing to fix means the revise pass would only burn tokens.
 		return array(
-			'next'    => empty( $problems ) ? 'publish' : 'revise',
+			'next'    => empty( $problems ) ? 'verify' : 'revise',
 			'payload' => $payload,
 		);
 	}
@@ -176,6 +177,60 @@ class Blogcraft_Pipeline {
 
 		$payload            = $job->payload;
 		$payload['article'] = $revised;
+
+		return array(
+			'next'    => 'verify',
+			'payload' => $payload,
+		);
+	}
+
+	/**
+	 * Decide the status a finished post should take.
+	 *
+	 * @param array $payload Job payload.
+	 * @return string
+	 */
+	private static function resolve_status( $payload ) {
+		// A draft that failed the quality bar is held for review even when the
+		// user asked for immediate publication.
+		if ( ! empty( $payload['needs_review'] ) ) {
+			return 'pending';
+		}
+
+		return ( isset( $payload['status'] ) && 'publish' === $payload['status'] ) ? 'publish' : 'draft';
+	}
+
+	/**
+	 * Check the draft before it becomes a post.
+	 *
+	 * A draft that scores below the threshold is still published as a post, but
+	 * forced to pending review regardless of what the user asked for. Silently
+	 * discarding the work would waste the tokens already spent; publishing it
+	 * unreviewed is what search engines penalise.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_verify( $job ) {
+		$payload = $job->payload;
+		$article = isset( $payload['article'] ) ? $payload['article'] : array();
+
+		$links = Blogcraft_Verify::check_links( $article );
+
+		if ( ! empty( $links['dead'] ) ) {
+			$article            = Blogcraft_Verify::strip_dead_links( $article, $links['dead'] );
+			$payload['article'] = $article;
+
+			Blogcraft_Logger::info(
+				'Removed links that did not resolve.',
+				array( 'count' => count( $links['dead'] ) ),
+				(int) $job->id
+			);
+		}
+
+		$assessment              = Blogcraft_Verify::score( $article );
+		$payload['quality']      = $assessment;
+		$payload['needs_review'] = $assessment['score'] < (int) Blogcraft_Settings::get( 'quality_threshold' );
 
 		return array(
 			'next'    => 'publish',
@@ -223,7 +278,7 @@ class Blogcraft_Pipeline {
 		$postarr = array(
 			'post_title'   => $title,
 			'post_content' => $content,
-			'post_status'  => ( isset( $payload['status'] ) && 'publish' === $payload['status'] ) ? 'publish' : 'draft',
+			'post_status'  => self::resolve_status( $payload ),
 			'post_type'    => 'post',
 		);
 
@@ -242,6 +297,11 @@ class Blogcraft_Pipeline {
 		}
 
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		if ( isset( $payload['quality'] ) ) {
+			update_post_meta( $post_id, '_blogcraft_quality', (int) $payload['quality']['score'] );
+			update_post_meta( $post_id, '_blogcraft_quality_reasons', (array) $payload['quality']['reasons'] );
+		}
 
 		// A missing image must never fail a finished post, so this is best-effort.
 		Blogcraft_Images::attach_featured(

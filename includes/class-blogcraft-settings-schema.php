@@ -69,6 +69,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'quality_threshold'               => array(
+				'default' => 60,
+				'type'    => 'int',
+				'secret'  => false,
+			),
+			'verify_links_enabled'            => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'backlinks_enabled'               => array(
 				'default' => true,
 				'type'    => 'bool',
