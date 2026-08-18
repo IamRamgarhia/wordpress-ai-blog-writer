@@ -93,6 +93,18 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 == Changelog ==
 
+= 0.9.3 =
+* Every provider now has a default API address, so a key and a model are enough
+* An empty setup says so instead of failing on a request that could not work
+
+= 0.9.2 =
+* New Activity screen showing recent jobs, why any of them stopped, and the event log
+* Failed jobs can be tried again from there
+* Running the queue by hand reports a failure as a failure
+
+= 0.9.1 =
+* The setup warning now appears when no provider is connected
+
 = 0.9.0 =
 * Optional image beneath each section
 * Consistent card layout across every screen
