@@ -608,7 +608,7 @@ a.bc-nav-item:hover {
 	display: flex;
 	align-items: baseline;
 	gap: 9px;
-	padding: 7px 9px;
+	padding: 8px 9px;
 	border-radius: 7px;
 	font-size: 13px;
 	text-decoration: none;
@@ -620,6 +620,55 @@ a.bc-nav-item:hover {
 .bc-jump-item:focus-visible {
 	background: var(--bc-accent-soft);
 	color: var(--bc-accent);
+}
+
+/* Whichever section is on screen, so the rail answers "where am I" as well
+   as "where can I go". */
+.bc-jump-item.is-current {
+	background: var(--bc-accent-soft);
+	color: var(--bc-accent);
+	font-weight: 600;
+}
+
+.bc-jump-text {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.bc-jump-sub {
+	font-size: 11.5px;
+	font-weight: 400;
+	color: var(--bc-muted);
+}
+
+.bc-jump-item.is-current .bc-jump-sub {
+	color: var(--bc-accent);
+	opacity: 0.75;
+}
+
+.bc-jump-save {
+	width: 100%;
+	margin-top: 12px;
+	padding: 10px 16px;
+	border: 0;
+	border-radius: 8px;
+	background: var(--bc-accent);
+	color: #fff;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 120ms ease;
+}
+
+.bc-jump-save:hover {
+	background: #2c47c4;
+}
+
+.bc-jump-save:focus-visible {
+	outline: 2px solid var(--bc-accent);
+	outline-offset: 3px;
 }
 
 /* The numbering is real: setup runs in this order, since nothing generates

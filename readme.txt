@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.14.0
+Stable tag: 0.15.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.15.0 =
+* Saving a key now checks it works and says so, instead of only saying "saved"
+* Settings tells you which single thing is missing rather than "no provider yet"
+* Save moved into the sticky rail, which now highlights the section you are in
 
 = 0.14.0 =
 * Terms that must never appear, and subjects to steer clear of, on both the brief and each post

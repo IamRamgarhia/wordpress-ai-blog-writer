@@ -70,3 +70,68 @@
 	sync();
 	syncHelp();
 }() );
+
+/**
+ * Highlight whichever settings section is on screen.
+ *
+ * The rail already answered "where can I go"; this makes it answer "where am
+ * I" too, which is the part that stops a long form feeling like one wall.
+ *
+ * IntersectionObserver rather than a scroll handler: it does not run on every
+ * frame, and it degrades to a rail that still works as plain anchors when the
+ * browser lacks it.
+ */
+( function () {
+	'use strict';
+
+	var items = document.querySelectorAll( '.bc-jump-item[data-target]' );
+
+	if ( ! items.length || ! window.IntersectionObserver ) {
+		return;
+	}
+
+	var byId = {};
+	var cards = [];
+	var i;
+
+	for ( i = 0; i < items.length; i++ ) {
+		var id = items[ i ].getAttribute( 'data-target' );
+		var card = document.getElementById( id );
+
+		if ( card ) {
+			byId[ id ] = items[ i ];
+			cards.push( card );
+		}
+	}
+
+	function mark( id ) {
+		for ( var key in byId ) {
+			if ( Object.prototype.hasOwnProperty.call( byId, key ) ) {
+				byId[ key ].classList.toggle( 'is-current', key === id );
+			}
+		}
+	}
+
+	var observer = new window.IntersectionObserver(
+		function ( entries ) {
+			var best = null;
+
+			for ( var e = 0; e < entries.length; e++ ) {
+				if ( entries[ e ].isIntersecting ) {
+					if ( ! best || entries[ e ].boundingClientRect.top < best.boundingClientRect.top ) {
+						best = entries[ e ];
+					}
+				}
+			}
+
+			if ( best ) {
+				mark( best.target.id );
+			}
+		},
+		{ rootMargin: '-80px 0px -60% 0px' }
+	);
+
+	for ( i = 0; i < cards.length; i++ ) {
+		observer.observe( cards[ i ] );
+	}
+}() );

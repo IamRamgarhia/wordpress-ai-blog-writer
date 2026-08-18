@@ -310,7 +310,7 @@ class Blogcraft_Connection {
 			);
 		}
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<form method="post" id="blogcraft-settings-form" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
 
@@ -542,11 +542,11 @@ class Blogcraft_Connection {
 	 */
 	private static function render_jump() {
 		$sections = array(
-			'provider'   => __( 'Connect a provider', 'blogcraft' ),
-			'research'   => __( 'Research', 'blogcraft' ),
-			'voice'      => __( 'Describe your voice', 'blogcraft' ),
-			'automation' => __( 'Automation', 'blogcraft' ),
-			'test'       => __( 'Check it works', 'blogcraft' ),
+			'provider'   => array( __( 'Connect a provider', 'blogcraft' ), __( 'Key, model, spending cap', 'blogcraft' ) ),
+			'research'   => array( __( 'Research', 'blogcraft' ), __( 'Where facts come from', 'blogcraft' ) ),
+			'voice'      => array( __( 'Describe your voice', 'blogcraft' ), __( 'Subject, reader, style', 'blogcraft' ) ),
+			'automation' => array( __( 'Automation', 'blogcraft' ), __( 'Schedule, images, links, quality', 'blogcraft' ) ),
+			'test'       => array( __( 'Check it works', 'blogcraft' ), __( 'One short live request', 'blogcraft' ) ),
 		);
 
 		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'blogcraft' ) . '">';
@@ -554,17 +554,25 @@ class Blogcraft_Connection {
 
 		$step = 1;
 
-		foreach ( $sections as $slug => $label ) {
+		foreach ( $sections as $slug => $parts ) {
 			printf(
-				'<a class="bc-jump-item" href="#bc-card-%1$s"><span class="bc-jump-step">%2$02d</span>%3$s</a>',
+				'<a class="bc-jump-item" href="#bc-card-%1$s" data-target="bc-card-%1$s"><span class="bc-jump-step">%2$02d</span><span class="bc-jump-text"><span class="bc-jump-label">%3$s</span><span class="bc-jump-sub">%4$s</span></span></a>',
 				esc_attr( $slug ),
 				(int) $step,
-				esc_html( $label )
+				esc_html( $parts[0] ),
+				esc_html( $parts[1] )
 			);
 			++$step;
 		}
 
 		echo '</nav>';
+
+		// The rail sits outside the form so it can stay put while the page
+		// scrolls, so the button names the form it belongs to.
+		printf(
+			'<button type="submit" form="blogcraft-settings-form" class="bc-jump-save">%s</button>',
+			esc_html__( 'Save settings', 'blogcraft' )
+		);
 	}
 
 	/**
@@ -580,7 +588,7 @@ class Blogcraft_Connection {
 			array(
 				'done' => Blogcraft_Provider_Registry::is_configured(),
 				'yes'  => __( 'Provider connected', 'blogcraft' ),
-				'no'   => __( 'No provider yet', 'blogcraft' ),
+				'no'   => self::missing_label(),
 			),
 			array(
 				'done' => Blogcraft_Voice::is_configured(),
@@ -608,6 +616,30 @@ class Blogcraft_Connection {
 		}
 
 		echo '</ul>';
+	}
+
+	/**
+	 * Name the one thing still missing from the provider setup.
+	 *
+	 * "No provider yet" is true but unhelpful when the key is saved and only
+	 * the model name is blank: it sends someone back to re-check a key that was
+	 * never the problem.
+	 *
+	 * @return string
+	 */
+	private static function missing_label() {
+		$has_key   = '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
+		$has_model = '' !== trim( (string) Blogcraft_Settings::get( 'provider_model' ) );
+
+		if ( $has_key && ! $has_model ) {
+			return __( 'Model name missing', 'blogcraft' );
+		}
+
+		if ( ! $has_key && $has_model ) {
+			return __( 'API key missing', 'blogcraft' );
+		}
+
+		return __( 'No provider yet', 'blogcraft' );
 	}
 
 	/**
@@ -845,7 +877,51 @@ class Blogcraft_Connection {
 			Blogcraft_Settings::set( 'provider_api_key', $submitted_key );
 		}
 
-		self::redirect_back( true, __( 'Settings saved.', 'blogcraft' ) );
+		self::redirect_back( true, self::save_message( '' !== $submitted_key ) );
+	}
+
+	/**
+	 * Confirm the saved setup actually works, and say so in the save notice.
+	 *
+	 * Saving a key and being told "Settings saved" teaches nothing: the key is
+	 * only ever exercised on the next generation run, which happens on a cron
+	 * tick nobody watches. A wrong key then looks like a plugin that quietly
+	 * does nothing. One short request at save time turns that into an answer.
+	 *
+	 * Only runs when a key was actually submitted, so saving an unrelated
+	 * field does not spend a request every time.
+	 *
+	 * @param bool $key_changed Whether a new key was submitted.
+	 * @return string
+	 */
+	private static function save_message( $key_changed ) {
+		$saved = __( 'Settings saved.', 'blogcraft' );
+
+		if ( ! $key_changed ) {
+			return $saved;
+		}
+
+		if ( '' === trim( (string) Blogcraft_Settings::get( 'provider_model' ) ) ) {
+			return $saved . ' ' . __( 'Add a model name before it can write anything.', 'blogcraft' );
+		}
+
+		$provider = Blogcraft_Provider_Registry::from_settings();
+
+		if ( null === $provider ) {
+			return $saved;
+		}
+
+		$probe = Blogcraft_Provider_Registry::probe( $provider );
+
+		if ( empty( $probe['reachable'] ) ) {
+			return $saved . ' ' . sprintf(
+				/* translators: %s: reason the provider gave. */
+				__( 'The key did not work: %s', 'blogcraft' ),
+				self::shorten( (string) $probe['error'] )
+			);
+		}
+
+		return $saved . ' ' . __( 'The key works.', 'blogcraft' );
 	}
 
 	/**
