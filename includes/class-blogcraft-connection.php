@@ -263,7 +263,47 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '02', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ) );
+
+		self::open_card(
+			'02',
+			__( 'Research', 'blogcraft' ),
+			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft' )
+		);
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="research_provider" id="blogcraft_research_provider">';
+		foreach ( Blogcraft_Research::providers() as $id => $label ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $id ),
+				selected( (string) Blogcraft_Settings::get( 'research_provider' ), $id, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</select></td></tr>';
+
+		self::text_row( 'research_base_url', __( 'SearXNG URL', 'blogcraft' ) );
+
+		echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'blogcraft' ) . '</label></th><td>';
+		$research_key = (string) Blogcraft_Settings::get( 'research_api_key' );
+		printf(
+			'<input type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
+			esc_attr( '' === $research_key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $research_key ) )
+		);
+		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+
+		self::textarea_row(
+			'research_urls',
+			__( 'Always read these URLs', 'blogcraft' ),
+			__( 'One per line. Read for every post, whether or not a search provider is set.', 'blogcraft' )
+		);
+
+		echo '</tbody></table>';
+		self::close_card();
+
+		self::open_card( '03', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ) );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::voice_area_fields() as $name => $meta ) {
@@ -277,7 +317,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '03', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ) );
+		self::open_card( '04', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ) );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -319,7 +359,7 @@ class Blogcraft_Connection {
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '04', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ) );
+		self::open_card( '05', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ) );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
@@ -458,7 +498,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls' )
 		);
 
 		foreach ( $plain as $key ) {
@@ -484,6 +524,11 @@ class Blogcraft_Connection {
 		// An empty key field means "leave unchanged": the form renders a mask rather
 		// than the real value, so treating blank as "clear" would wipe the stored key
 		// every time an unrelated field was saved.
+		$research_key = isset( $_POST['research_api_key'] ) ? trim( (string) wp_unslash( $_POST['research_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		if ( '' !== $research_key ) {
+			Blogcraft_Settings::set( 'research_api_key', $research_key );
+		}
+
 		$submitted_key = isset( $_POST['provider_api_key'] ) ? trim( (string) wp_unslash( $_POST['provider_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 		if ( '' !== $submitted_key ) {
 			Blogcraft_Settings::set( 'provider_api_key', $submitted_key );

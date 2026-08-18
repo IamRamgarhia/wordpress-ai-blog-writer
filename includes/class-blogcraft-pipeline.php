@@ -28,6 +28,7 @@ class Blogcraft_Pipeline {
 	 * @return void
 	 */
 	public static function register() {
+		Blogcraft_Worker::register_stage( self::NAME, 'research', array( __CLASS__, 'stage_research' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'outline', array( __CLASS__, 'stage_outline' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'draft', array( __CLASS__, 'stage_draft' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'critique', array( __CLASS__, 'stage_critique' ) );
@@ -53,7 +54,7 @@ class Blogcraft_Pipeline {
 
 		return Blogcraft_Queue::enqueue(
 			self::NAME,
-			'outline',
+			'research',
 			array(
 				'topic'  => (string) $topic,
 				'status' => ( 'publish' === $status ) ? 'publish' : 'draft',
@@ -104,6 +105,39 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * Gather source material before anything is written.
+	 *
+	 * This stage never fails the job. With no search provider configured it
+	 * falls back to the site's own coverage, and with nothing at all it passes
+	 * an empty set through so the post is still written, just unaided.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_research( $job ) {
+		$topic   = isset( $job->payload['topic'] ) ? (string) $job->payload['topic'] : '';
+		$sources = array();
+
+		try {
+			$sources = Blogcraft_Research::gather( $topic );
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error(
+				'Research failed; writing without sources.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
+
+		$payload            = $job->payload;
+		$payload['sources'] = $sources;
+
+		return array(
+			'next'    => 'outline',
+			'payload' => $payload,
+		);
+	}
+
+	/**
 	 * Plan the post.
 	 *
 	 * @param Blogcraft_Job $job Current job.
@@ -111,7 +145,8 @@ class Blogcraft_Pipeline {
 	 */
 	public static function stage_outline( $job ) {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
-		$outline = self::ask( Blogcraft_Prompts::outline( $topic ) );
+		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
+		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources ) );
 
 		$payload            = $job->payload;
 		$payload['outline'] = $outline;
@@ -131,7 +166,8 @@ class Blogcraft_Pipeline {
 	public static function stage_draft( $job ) {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$outline = isset( $job->payload['outline'] ) ? $job->payload['outline'] : array();
-		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline ), array( 'max_tokens' => 4096 ) );
+		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
+		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline, $sources ), array( 'max_tokens' => 4096 ) );
 
 		$payload            = $job->payload;
 		$payload['article'] = $article;

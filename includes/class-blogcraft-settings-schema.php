@@ -69,6 +69,26 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'research_provider'               => array(
+				'default' => 'none',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'research_api_key'                => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => true,
+			),
+			'research_base_url'               => array(
+				'default' => '',
+				'type'    => 'url',
+				'secret'  => false,
+			),
+			'research_urls'                   => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
 			'quality_threshold'               => array(
 				'default' => 60,
 				'type'    => 'int',

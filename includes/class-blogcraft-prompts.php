@@ -33,11 +33,16 @@ class Blogcraft_Prompts {
 	/**
 	 * Messages asking for an article outline.
 	 *
-	 * @param string $topic Topic to write about.
+	 * @param string $topic   Topic to write about.
+	 * @param array  $sources Reference material, possibly empty.
 	 * @return array
 	 */
-	public static function outline( $topic ) {
-		$user = "Plan a blog post about: {$topic}\n\n"
+	public static function outline( $topic, $sources = array() ) {
+		$reference = Blogcraft_Research::to_prompt_block( $sources );
+		$user      = ( '' === $reference ? '' : $reference . '
+
+' )
+			. "Plan a blog post about: {$topic}\n\n"
 			. "Reply with JSON of exactly this shape:\n"
 			. '{"title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"
 			. "Rules:\n"
@@ -63,9 +68,10 @@ class Blogcraft_Prompts {
 	 *
 	 * @param string $topic   Topic.
 	 * @param array  $outline Outline produced by the previous stage.
+	 * @param array  $sources Reference material, possibly empty.
 	 * @return array
 	 */
-	public static function draft( $topic, $outline ) {
+	public static function draft( $topic, $outline, $sources = array() ) {
 		$headings = array();
 
 		if ( ! empty( $outline['sections'] ) && is_array( $outline['sections'] ) ) {
@@ -76,7 +82,12 @@ class Blogcraft_Prompts {
 			}
 		}
 
-		$user = "Write the blog post.\n\nTopic: {$topic}\n"
+		$reference = Blogcraft_Research::to_prompt_block( $sources );
+
+		$user = ( '' === $reference ? '' : $reference . '
+
+' )
+			. "Write the blog post.\n\nTopic: {$topic}\n"
 			. 'Title: ' . ( isset( $outline['title'] ) ? $outline['title'] : $topic ) . "\n"
 			. "Sections:\n" . implode( "\n", $headings ) . "\n\n"
 			. "Reply with JSON of exactly this shape:\n"
@@ -86,7 +97,10 @@ class Blogcraft_Prompts {
 			. "- key_takeaways: 3 to 5 specific, useful points. Not a summary of the headings.\n"
 			. "- Each section: 2 to 4 paragraphs. Keep paragraphs to 2 to 3 sentences so they stay readable.\n"
 			. "- faq: 3 to 4 questions a reader would actually search for, with direct answers.\n"
-			. '- Plain text only in every field. No markdown, no HTML.';
+			. '- Plain text only in every field. No markdown, no HTML.
+'
+			. '- Where reference material gives a figure or a fact, use it and name the source in the sentence. '
+			. 'Where it shows what existing coverage already says, add what it leaves out rather than repeating it.';
 
 		return array(
 			array(
