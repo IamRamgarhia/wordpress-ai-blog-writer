@@ -220,6 +220,31 @@ class Test_Blogcraft_Provider_Gemini_Anthropic extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'gm-test-key', $response->error );
 	}
 
+	/**
+	 * Regression test for the key-in-URL log leak: a failed Gemini request
+	 * carries the API key in its query string, and Blogcraft_Http used to log
+	 * the raw request URL on every failure. This drives a real failing
+	 * request through the real Blogcraft_Http -> Blogcraft_Logger path (no
+	 * mocking of the logger itself) and inspects what actually landed in the
+	 * log table, because a unit test on the redaction helper alone would not
+	 * catch a call site that forgot to use it.
+	 */
+	public function test_gemini_failed_request_does_not_leak_api_key_into_log_table() {
+		$body = wp_json_encode( array( 'error' => array( 'message' => 'API key not valid' ) ) );
+		$this->fake_http( array( array( 'code' => 400, 'body' => $body ) ) );
+		$provider = $this->make_gemini( array( 'api_key' => 'SECRET-LIVE-KEY' ) );
+		$response = $provider->complete( array( array( 'role' => 'user', 'content' => 'hi' ) ) );
+
+		$this->assertTrue( $response->is_error() );
+
+		$rows = Blogcraft_Logger::recent( 10 );
+		$this->assertNotEmpty( $rows, 'Expected the failed request to have logged something.' );
+
+		foreach ( $rows as $row ) {
+			$this->assertStringNotContainsString( 'SECRET-LIVE-KEY', wp_json_encode( $row ) );
+		}
+	}
+
 	public function test_gemini_unexpected_shape_produces_error_not_empty_success() {
 		$body = wp_json_encode( array( 'unexpected' => 'shape' ) );
 		$this->fake_http( array( array( 'code' => 200, 'body' => $body ) ) );

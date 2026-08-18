@@ -169,4 +169,47 @@ class Test_Blogcraft_Http extends WP_UnitTestCase {
 		$r->completion_tokens = 5;
 		$this->assertSame( 15, $r->total_tokens() );
 	}
+
+	public function test_redact_url_strips_query_string_and_credential() {
+		$method = new ReflectionMethod( Blogcraft_Http::class, 'redact_url' );
+		$method->setAccessible( true );
+
+		$redacted = $method->invoke( null, 'https://x.test/v1/models/m:generateContent?key=SECRET123' );
+
+		$this->assertStringNotContainsString( 'SECRET123', $redacted );
+		$this->assertStringContainsString( 'x.test', $redacted );
+		$this->assertStringContainsString( '/v1/models/m:generateContent', $redacted );
+	}
+
+	public function test_redact_url_leaves_a_url_without_a_query_string_materially_unchanged() {
+		$method = new ReflectionMethod( Blogcraft_Http::class, 'redact_url' );
+		$method->setAccessible( true );
+
+		$redacted = $method->invoke( null, 'https://example.test/v1/chat/completions' );
+
+		$this->assertSame( 'https://example.test/v1/chat/completions', $redacted );
+	}
+
+	public function test_redact_url_drops_userinfo() {
+		$method = new ReflectionMethod( Blogcraft_Http::class, 'redact_url' );
+		$method->setAccessible( true );
+
+		$redacted = $method->invoke( null, 'https://user:SECRETPASS@example.test/v1' );
+
+		$this->assertStringNotContainsString( 'SECRETPASS', $redacted );
+		$this->assertStringNotContainsString( 'user', $redacted );
+		$this->assertSame( 'https://example.test/v1', $redacted );
+	}
+
+	public function test_failed_request_logs_a_redacted_url_not_the_query_string() {
+		$this->fake_http( array( array( 'code' => 400, 'body' => '{"error":{"message":"bad"}}' ) ) );
+		Blogcraft_Http::post_json( 'https://example.test/v1?key=SECRET456', array() );
+
+		$rows = Blogcraft_Logger::recent( 5 );
+		$this->assertNotEmpty( $rows );
+
+		foreach ( $rows as $row ) {
+			$this->assertStringNotContainsString( 'SECRET456', wp_json_encode( $row ) );
+		}
+	}
 }

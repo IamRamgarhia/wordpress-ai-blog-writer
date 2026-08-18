@@ -99,7 +99,7 @@ class Blogcraft_Http {
 				Blogcraft_Logger::error(
 					'HTTP request failed',
 					array(
-						'url'  => $url,
+						'url'  => self::redact_url( $url ),
 						'code' => $code,
 					)
 				);
@@ -143,7 +143,7 @@ class Blogcraft_Http {
 			Blogcraft_Logger::error(
 				'HTTP request failed',
 				array(
-					'url'  => $url,
+					'url'  => self::redact_url( $url ),
 					'code' => $code,
 				)
 			);
@@ -223,5 +223,46 @@ class Blogcraft_Http {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Strip credentials from a URL before it is logged.
+	 *
+	 * Some providers authenticate by query string rather than header — Gemini
+	 * passes the API key as ?key=... — so a raw URL in a log row would leak the
+	 * user's credential into a table any administrator can read. Only the scheme,
+	 * host and path are ever recorded; no query parameter is safe to assume
+	 * harmless, because a custom provider may name its credential anything (and
+	 * userinfo, e.g. https://user:pass@host/, is dropped for the same reason).
+	 *
+	 * @param string $url Full request URL.
+	 * @return string Scheme, host and path only.
+	 */
+	private static function redact_url( $url ) {
+		$parts = wp_parse_url( (string) $url );
+
+		if ( ! is_array( $parts ) ) {
+			return '';
+		}
+
+		$redacted = '';
+
+		if ( ! empty( $parts['scheme'] ) ) {
+			$redacted .= $parts['scheme'] . '://';
+		}
+
+		if ( ! empty( $parts['host'] ) ) {
+			$redacted .= $parts['host'];
+		}
+
+		if ( ! empty( $parts['port'] ) ) {
+			$redacted .= ':' . $parts['port'];
+		}
+
+		if ( ! empty( $parts['path'] ) ) {
+			$redacted .= $parts['path'];
+		}
+
+		return $redacted;
 	}
 }
