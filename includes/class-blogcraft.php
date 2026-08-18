@@ -57,10 +57,12 @@ class Blogcraft {
 		$this->booted = true;
 
 		Blogcraft_Scheduler::init();
+		Blogcraft_Pipeline::register();
 
 		if ( is_admin() ) {
 			Blogcraft_Admin::init();
 			Blogcraft_Connection::init();
+			Blogcraft_Generate::init();
 		}
 	}
 }

@@ -1,0 +1,200 @@
+<?php
+/**
+ * Prompt construction and model-output parsing.
+ *
+ * @package Blogcraft
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Builds the messages sent at each pipeline stage, and parses what comes back.
+ *
+ * Prompts live in one class so a later phase can expose them for editing without
+ * hunting through stage handlers.
+ */
+class Blogcraft_Prompts {
+
+	/**
+	 * Shared system framing for every stage.
+	 *
+	 * @return string
+	 */
+	private static function base_system() {
+		return 'You are an experienced blog writer. You write clearly and specifically, '
+			. 'avoid filler and cliche, and never pad. '
+			. 'You always reply with valid JSON and nothing else — no prose before or after, no code fences.';
+	}
+
+	/**
+	 * Messages asking for an article outline.
+	 *
+	 * @param string $topic Topic to write about.
+	 * @return array
+	 */
+	public static function outline( $topic ) {
+		$user = "Plan a blog post about: {$topic}\n\n"
+			. "Reply with JSON of exactly this shape:\n"
+			. '{"title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"
+			. "Rules:\n"
+			. "- title: compelling, under 65 characters, no colon-subtitle pattern\n"
+			. "- slug: lowercase, hyphenated, no stop words\n"
+			. "- meta_description: under 155 characters, describes what the reader gains\n"
+			. '- sections: 4 to 7 headings that build an argument, not a list of synonyms';
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Messages asking for the full draft.
+	 *
+	 * @param string $topic   Topic.
+	 * @param array  $outline Outline produced by the previous stage.
+	 * @return array
+	 */
+	public static function draft( $topic, $outline ) {
+		$headings = array();
+
+		if ( ! empty( $outline['sections'] ) && is_array( $outline['sections'] ) ) {
+			foreach ( $outline['sections'] as $section ) {
+				if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+					$headings[] = '- ' . $section['heading'];
+				}
+			}
+		}
+
+		$user = "Write the blog post.\n\nTopic: {$topic}\n"
+			. 'Title: ' . ( isset( $outline['title'] ) ? $outline['title'] : $topic ) . "\n"
+			. "Sections:\n" . implode( "\n", $headings ) . "\n\n"
+			. "Reply with JSON of exactly this shape:\n"
+			. '{"intro":"","key_takeaways":[""],"sections":[{"heading":"","paragraphs":[""]}],"faq":[{"question":"","answer":""}]}' . "\n\n"
+			. "Rules:\n"
+			. "- intro: one paragraph that answers the title's implicit question directly. No throat-clearing.\n"
+			. "- key_takeaways: 3 to 5 specific, useful points. Not a summary of the headings.\n"
+			. "- Each section: 2 to 4 paragraphs. Keep paragraphs to 2 to 3 sentences so they stay readable.\n"
+			. "- faq: 3 to 4 questions a reader would actually search for, with direct answers.\n"
+			. '- Plain text only in every field. No markdown, no HTML.';
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Messages asking the model to critique its own draft.
+	 *
+	 * @param array $article Draft article.
+	 * @return array
+	 */
+	public static function critique( $article ) {
+		$user = "Critique this draft honestly. Be specific and terse.\n\n"
+			. wp_json_encode( $article ) . "\n\n"
+			. "Reply with JSON of exactly this shape:\n"
+			. '{"problems":[""]}' . "\n\n"
+			. 'Look for: vague claims that say nothing, repetition between sections, filler sentences, '
+			. 'cliche openings, paragraphs that restate their own heading, and any place a specific '
+			. 'example or number would be worth more than the sentence that is there. '
+			. 'If a section is genuinely fine, do not invent a problem for it.';
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Messages asking the model to apply its own critique.
+	 *
+	 * @param array $article  Draft article.
+	 * @param array $problems Problems raised by the critique stage.
+	 * @return array
+	 */
+	public static function revise( $article, $problems ) {
+		$list = '';
+
+		foreach ( (array) $problems as $problem ) {
+			if ( is_scalar( $problem ) ) {
+				$list .= '- ' . $problem . "\n";
+			}
+		}
+
+		$user = "Rewrite this draft, fixing every problem listed.\n\nDraft:\n"
+			. wp_json_encode( $article ) . "\n\nProblems to fix:\n" . $list . "\n"
+			. 'Reply with JSON in exactly the same shape as the draft. Keep what works; '
+			. 'change what was criticised. Do not add new sections.';
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Pull a JSON object out of a model response.
+	 *
+	 * Models frequently ignore "no code fences" and wrap the payload, or add a
+	 * sentence before it. Rather than failing the whole generation on that, this
+	 * strips fences and falls back to the outermost brace pair.
+	 *
+	 * @param string $text Raw model output.
+	 * @return array Empty array when nothing parseable is found.
+	 */
+	public static function extract_json( $text ) {
+		$text = trim( (string) $text );
+
+		if ( '' === $text ) {
+			return array();
+		}
+
+		// Strip a leading ```json / ``` fence and its closing pair.
+		$text = preg_replace( '/^```[a-zA-Z]*\s*/', '', $text );
+		$text = preg_replace( '/\s*```$/', '', $text );
+		$text = trim( (string) $text );
+
+		$decoded = json_decode( $text, true );
+
+		if ( is_array( $decoded ) ) {
+			return $decoded;
+		}
+
+		// Fall back to the outermost brace pair, for responses wrapped in prose.
+		$start = strpos( $text, '{' );
+		$end   = strrpos( $text, '}' );
+
+		if ( false === $start || false === $end || $end <= $start ) {
+			return array();
+		}
+
+		$decoded = json_decode( substr( $text, $start, $end - $start + 1 ), true );
+
+		return is_array( $decoded ) ? $decoded : array();
+	}
+}
