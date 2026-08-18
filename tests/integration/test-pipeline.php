@@ -79,6 +79,31 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A body long enough to satisfy the lowest word target a blueprint permits.
+	 *
+	 * normalise() floors word_target at 200 and caps tolerance at 60 percent, so
+	 * the most forgiving band possible still demands 80 words. Fixtures shorter
+	 * than that fail the length check, which sends every draft to revise and
+	 * makes tests about control flow accidentally depend on scoring.
+	 *
+	 * @return string
+	 */
+	private function long_body() {
+		return 'Cold water pulls fewer bitter compounds from the grounds than hot water does. '
+			. 'That is the whole trick, and it is why the result tastes rounder. '
+			. 'You need a coarse grind, a clean jar, and patience. '
+			. 'Fill the jar with grounds and cold water. '
+			. 'Leave it on the counter or in the fridge. '
+			. 'Strain it through a filter when the time is up. '
+			. 'The result keeps for about a week in a sealed bottle. '
+			. 'Dilute it to taste, because the concentrate is strong. '
+			. 'Most people use one part coffee to two parts water. '
+			. 'Start there and adjust it until it suits you. '
+			. 'A cheap jar works as well as any special brewer. '
+			. 'The grind matters far more than the equipment does.';
+	}
+
+	/**
 	 * Queue OpenAI-shaped responses whose content is the given JSON payloads.
 	 *
 	 * @param array $payloads Ordered array of arrays to encode as message content.
@@ -228,7 +253,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 					'sections'      => array(
 						array(
 							'heading'    => 'The chemistry',
-							'paragraphs' => array( 'Low temperature changes which compounds dissolve.' ),
+							'paragraphs' => array( $this->long_body() ),
 						),
 					),
 					'faq'           => array(
@@ -244,7 +269,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 					'sections' => array(
 						array(
 							'heading'    => 'The chemistry',
-							'paragraphs' => array( 'Low temperature changes which compounds dissolve.' ),
+							'paragraphs' => array( $this->long_body() ),
 						),
 					),
 				),
@@ -253,8 +278,8 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'Cold brew coffee', 'draft' );
 
-		// One stage per tick: outline, draft, critique, revise, publish.
-		for ( $i = 0; $i < 5; $i++ ) {
+		// One stage per tick: research, outline, draft, critique, revise, verify, publish.
+		for ( $i = 0; $i < 7; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 
@@ -287,7 +312,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 					'sections' => array(
 						array(
 							'heading'    => 'Only section',
-							'paragraphs' => array( 'Already good.' ),
+							'paragraphs' => array( $this->long_body() ),
 						),
 					),
 				),
@@ -297,8 +322,8 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'Anything', 'draft' );
 
-		// outline, draft, critique, publish — four ticks, no revise.
-		for ( $i = 0; $i < 4; $i++ ) {
+		// research, outline, draft, critique, verify, publish. No revise.
+		for ( $i = 0; $i < 6; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 
@@ -313,6 +338,10 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		);
 
 		Blogcraft_Pipeline::enqueue_topic( 'Anything', 'draft' );
+
+		// Research runs first and never calls the provider, so the second tick
+		// is the earliest any tokens can have been spent.
+		Blogcraft_Worker::run( 0 );
 		Blogcraft_Worker::run( 0 );
 
 		$totals = Blogcraft_Cost::month_totals();
