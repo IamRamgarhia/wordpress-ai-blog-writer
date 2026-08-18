@@ -76,7 +76,7 @@ class Blogcraft_Pipeline {
 		$response = $provider->complete( $messages, $options );
 
 		if ( $response->is_error() ) {
-			throw new RuntimeException( $response->error );
+			throw new RuntimeException( esc_html( $response->error ) );
 		}
 
 		Blogcraft_Cost::record(

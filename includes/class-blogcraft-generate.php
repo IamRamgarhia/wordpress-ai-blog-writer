@@ -147,8 +147,9 @@ class Blogcraft_Generate {
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		Blogcraft_Request::verify_or_die( self::QUEUE_ACTION, $nonce );
 
-		$topic  = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : '';
-		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : 'draft';
+		// Verified above by Blogcraft_Request::verify_or_die(), which PHPCS cannot follow statically.
+		$topic  = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : 'draft'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' === $topic ) {
 			self::back( false, __( 'Please enter a topic.', 'blogcraft' ) );
