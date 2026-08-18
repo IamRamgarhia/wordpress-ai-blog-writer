@@ -47,6 +47,9 @@ class Blogcraft_Settings {
 				return (bool) $value;
 			case 'url':
 				return esc_url_raw( trim( (string) $value ) );
+			case 'textarea':
+				// Preserves newlines; sanitize_text_field() would flatten a JSON template onto one line.
+				return sanitize_textarea_field( (string) $value );
 			default:
 				return sanitize_text_field( trim( (string) $value ) );
 		}

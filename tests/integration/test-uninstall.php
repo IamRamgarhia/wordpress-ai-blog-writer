@@ -52,4 +52,15 @@ class Test_Blogcraft_Uninstall extends WP_UnitTestCase {
 
 		$this->assertFalse( Blogcraft_Scheduler::is_scheduled() );
 	}
+
+	public function test_cleanup_removes_usage_options() {
+		Blogcraft_Activator::activate();
+		Blogcraft_Cost::record( 'openai', 'gpt-4', 10, 10 );
+
+		require_once dirname( dirname( __DIR__ ) ) . '/uninstall.php';
+		blogcraft_uninstall_cleanup();
+
+		$this->assertFalse( get_option( Blogcraft_Cost::OPTION ) );
+		$this->assertSame( 0, Blogcraft_Cost::month_totals()['requests'] );
+	}
 }

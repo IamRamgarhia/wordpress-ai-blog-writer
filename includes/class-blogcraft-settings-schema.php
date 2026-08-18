@@ -24,37 +24,72 @@ class Blogcraft_Settings_Schema {
 	 */
 	public static function all() {
 		return array(
-			'queue_max_attempts'         => array(
+			'queue_max_attempts'              => array(
 				'default' => 3,
 				'type'    => 'int',
 				'secret'  => false,
 			),
-			'queue_time_budget'          => array(
+			'queue_time_budget'               => array(
 				'default' => 20,
 				'type'    => 'int',
 				'secret'  => false,
 			),
-			'cron_health_notice_enabled' => array(
+			'cron_health_notice_enabled'      => array(
 				'default' => true,
 				'type'    => 'bool',
 				'secret'  => false,
 			),
-			'provider_type'              => array(
+			'provider_type'                   => array(
 				'default' => 'openai',
 				'type'    => 'string',
 				'secret'  => false,
 			),
-			'provider_base_url'          => array(
+			'provider_base_url'               => array(
 				'default' => '',
 				'type'    => 'url',
 				'secret'  => false,
 			),
-			'provider_api_key'           => array(
+			'provider_api_key'                => array(
 				'default' => '',
 				'type'    => 'string',
 				'secret'  => true,
 			),
-			'provider_model'             => array(
+			'provider_model'                  => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'monthly_token_cap'               => array(
+				'default' => 0,
+				'type'    => 'int',
+				'secret'  => false,
+			),
+			'provider_auth_header'            => array(
+				'default' => 'Authorization',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'provider_auth_prefix'            => array(
+				'default' => 'Bearer ',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'provider_request_template'       => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'provider_text_path'              => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'provider_prompt_tokens_path'     => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'provider_completion_tokens_path' => array(
 				'default' => '',
 				'type'    => 'string',
 				'secret'  => false,

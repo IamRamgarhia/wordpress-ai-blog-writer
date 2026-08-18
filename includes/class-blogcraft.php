@@ -60,6 +60,7 @@ class Blogcraft {
 
 		if ( is_admin() ) {
 			Blogcraft_Admin::init();
+			Blogcraft_Connection::init();
 		}
 	}
 }

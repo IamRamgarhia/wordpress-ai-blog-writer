@@ -91,12 +91,27 @@ class Blogcraft_Provider_Registry {
 	 * provider that succeeds means later providers in the list are never
 	 * called.
 	 *
+	 * When the monthly token cap has been reached, this returns an error
+	 * response immediately without calling any provider at all — the cap
+	 * exists to prevent spend, not to report on it after the fact. On a
+	 * successful completion, usage is recorded via Blogcraft_Cost.
+	 *
 	 * @param Blogcraft_Provider[] $providers Providers to try, in order.
 	 * @param array                $messages  Ordered array of array( 'role' => ..., 'content' => ... ).
 	 * @param array                $options   Passed through to each provider's complete().
 	 * @return Blogcraft_Provider_Response
 	 */
 	public static function complete_with_fallback( array $providers, $messages, $options = array() ) {
+		if ( Blogcraft_Cost::over_cap() ) {
+			$response        = new Blogcraft_Provider_Response();
+			$response->error = sprintf(
+				/* translators: %d: configured monthly token cap. */
+				__( 'Monthly token cap of %d tokens has been reached; no request was sent.', 'blogcraft' ),
+				(int) Blogcraft_Settings::get( 'monthly_token_cap' )
+			);
+			return $response;
+		}
+
 		$last        = new Blogcraft_Provider_Response();
 		$last->error = __( 'No providers were configured.', 'blogcraft' );
 
@@ -108,6 +123,7 @@ class Blogcraft_Provider_Registry {
 			$response = $provider->complete( $messages, $options );
 
 			if ( ! $response->is_error() ) {
+				Blogcraft_Cost::record( $provider->id(), $response->model, $response->prompt_tokens, $response->completion_tokens );
 				return $response;
 			}
 
@@ -115,5 +131,70 @@ class Blogcraft_Provider_Registry {
 		}
 
 		return $last;
+	}
+
+	/**
+	 * Probe a provider for reachability, available models, and capabilities.
+	 *
+	 * Tries list_models() first; a non-empty result means the provider is
+	 * reachable. When it returns empty, falls back to a minimal live
+	 * completion (a single short message, max_tokens of 1) and treats a
+	 * non-error response as reachable — Anthropic has no discovery endpoint
+	 * and would otherwise always look unreachable. Never throws; the error
+	 * field carries only the provider's own message, never its configuration.
+	 *
+	 * @param Blogcraft_Provider $provider Provider to probe.
+	 * @return array array( 'reachable' => bool, 'models' => array, 'capabilities' => array, 'error' => string ).
+	 */
+	public static function probe( Blogcraft_Provider $provider ) {
+		$result = array(
+			'reachable'    => false,
+			'models'       => array(),
+			'capabilities' => array(),
+			'error'        => '',
+		);
+
+		try {
+			$result['capabilities'] = $provider->capabilities();
+		} catch ( Throwable $e ) {
+			$result['capabilities'] = array();
+		}
+
+		$models = array();
+		try {
+			$models = $provider->list_models();
+		} catch ( Throwable $e ) {
+			$models = array();
+		}
+
+		if ( is_array( $models ) && ! empty( $models ) ) {
+			$result['models']    = $models;
+			$result['reachable'] = true;
+			return $result;
+		}
+
+		$probe_message = array(
+			array(
+				'role'    => 'user',
+				'content' => 'ping',
+			),
+		);
+
+		try {
+			$response = $provider->complete( $probe_message, array( 'max_tokens' => 1 ) );
+		} catch ( Throwable $e ) {
+			$response = null;
+		}
+
+		if ( $response instanceof Blogcraft_Provider_Response && ! $response->is_error() ) {
+			$result['reachable'] = true;
+			return $result;
+		}
+
+		$result['error'] = ( $response instanceof Blogcraft_Provider_Response && '' !== $response->error )
+			? $response->error
+			: __( 'Provider could not be reached.', 'blogcraft' );
+
+		return $result;
 	}
 }

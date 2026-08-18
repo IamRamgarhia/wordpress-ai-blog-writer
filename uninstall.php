@@ -32,6 +32,7 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_option( 'blogcraft_settings' );
 		delete_option( 'blogcraft_cron_heartbeat' );
 		delete_option( 'blogcraft_activated_at' );
+		delete_option( 'blogcraft_cost' );
 
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 	}
