@@ -200,9 +200,8 @@ class Test_Blogcraft_Provider_Openai extends WP_UnitTestCase {
 
 	public function test_error_message_body_produces_error_without_throwing() {
 		// A 200 status carrying an application-level error object exercises the
-		// "body contains error.message" precedence branch in isolation, since a
-		// non-2xx status would already carry a non-empty Blogcraft_Http error
-		// (a higher-precedence branch covered by test_http_level_error_takes_precedence_over_body_error_message).
+		// "body contains error.message" precedence branch with no status prefix,
+		// since 200 is not a failure status.
 		$body = wp_json_encode( array( 'error' => array( 'message' => 'invalid key' ) ) );
 		$this->fake_http( array( array( 'code' => 200, 'body' => $body ) ) );
 		$provider = $this->make_provider();
@@ -212,14 +211,31 @@ class Test_Blogcraft_Provider_Openai extends WP_UnitTestCase {
 		$this->assertSame( 'invalid key', $response->error );
 	}
 
-	public function test_http_level_error_takes_precedence_over_body_error_message() {
+	public function test_body_error_message_wins_over_generic_http_error() {
+		// A 401 with a parseable error body must surface the provider's own
+		// message (prefixed with the status), not Blogcraft_Http's generic
+		// "Request failed with HTTP 401." — the provider's message is what a
+		// user actually needs to diagnose e.g. a bad API key.
 		$body = wp_json_encode( array( 'error' => array( 'message' => 'invalid key' ) ) );
 		$this->fake_http( array( array( 'code' => 401, 'body' => $body ) ) );
 		$provider = $this->make_provider();
 		$response = $provider->complete( array( array( 'role' => 'user', 'content' => 'hi' ) ) );
 
 		$this->assertTrue( $response->is_error() );
-		$this->assertStringContainsString( '401', $response->error );
+		$this->assertSame( 'HTTP 401: invalid key', $response->error );
+	}
+
+	public function test_non_2xx_without_parseable_error_body_falls_through_to_http_error() {
+		// A reverse proxy in front of a self-hosted runtime (e.g. Ollama) can
+		// return a non-2xx status with an HTML body instead of JSON. With no
+		// error.message to extract, this must fall through to Blogcraft_Http's
+		// generic error rather than silently succeeding.
+		$this->fake_http( array( array( 'code' => 502, 'body' => '<html><body>Bad Gateway</body></html>' ) ) );
+		$provider = $this->make_provider();
+		$response = $provider->complete( array( array( 'role' => 'user', 'content' => 'hi' ) ) );
+
+		$this->assertTrue( $response->is_error() );
+		$this->assertNotSame( '', $response->error );
 	}
 
 	public function test_unexpected_shape_200_produces_error_not_empty_success() {

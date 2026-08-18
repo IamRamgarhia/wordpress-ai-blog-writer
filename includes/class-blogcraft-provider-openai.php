@@ -65,14 +65,14 @@ class Blogcraft_Provider_Openai extends Blogcraft_Provider {
 
 		$result = Blogcraft_Http::post_json( $this->endpoint( 'chat/completions' ), $body, $this->headers() );
 
-		if ( '' !== $result['error'] ) {
-			$response->error = $result['error'];
+		$api_error = $this->extract_error_message( $result['body'] );
+		if ( '' !== $api_error ) {
+			$response->error = $this->format_api_error( $api_error, $result['code'] );
 			return $response;
 		}
 
-		$api_error = $this->extract_error_message( $result['body'] );
-		if ( '' !== $api_error ) {
-			$response->error = $api_error;
+		if ( '' !== $result['error'] ) {
+			$response->error = $result['error'];
 			return $response;
 		}
 
@@ -183,5 +183,29 @@ class Blogcraft_Provider_Openai extends Blogcraft_Provider {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Prefix a provider-supplied error message with the HTTP status, when the
+	 * status is a non-2xx failure, so the user gets both the category and the
+	 * diagnosis (e.g. "HTTP 401: Incorrect API key provided").
+	 *
+	 * @param string $message API-supplied error message.
+	 * @param int    $code    HTTP status code, 0 when unavailable (transport failure).
+	 * @return string
+	 */
+	private function format_api_error( $message, $code ) {
+		$code = (int) $code;
+
+		if ( $code > 0 && ( $code < 200 || $code >= 300 ) ) {
+			return sprintf(
+				/* translators: 1: HTTP status code, 2: error message reported by the provider. */
+				__( 'HTTP %1$d: %2$s', 'blogcraft' ),
+				$code,
+				$message
+			);
+		}
+
+		return $message;
 	}
 }
