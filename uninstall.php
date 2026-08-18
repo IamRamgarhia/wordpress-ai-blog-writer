@@ -21,6 +21,10 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 			Blogcraft_Scheduler::unschedule();
 		}
 
+		if ( class_exists( 'Blogcraft_Autopilot' ) ) {
+			Blogcraft_Autopilot::unschedule();
+		}
+
 		if ( class_exists( 'Blogcraft_Capabilities' ) ) {
 			Blogcraft_Capabilities::remove();
 		}
@@ -33,6 +37,7 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_option( 'blogcraft_cron_heartbeat' );
 		delete_option( 'blogcraft_activated_at' );
 		delete_option( 'blogcraft_cost' );
+		delete_option( 'blogcraft_autopilot_counter' );
 
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 	}

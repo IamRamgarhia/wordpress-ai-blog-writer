@@ -204,6 +204,15 @@ class Blogcraft_Pipeline {
 			throw new RuntimeException( 'The generated article was empty.' );
 		}
 
+		// Link targets come from the site's real posts, never from the model, which
+		// would confidently invent URLs that 404.
+		if ( Blogcraft_Settings::get( 'internal_links_enabled' ) ) {
+			$topic_for_links = isset( $payload['topic'] ) ? (string) $payload['topic'] : $title;
+			$content        .= Blogcraft_Seo::render_related_block(
+				Blogcraft_Seo::related_posts( $topic_for_links, 4 )
+			);
+		}
+
 		$postarr = array(
 			'post_title'   => $title,
 			'post_content' => $content,
@@ -226,6 +235,13 @@ class Blogcraft_Pipeline {
 		}
 
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		// A missing image must never fail a finished post, so this is best-effort.
+		Blogcraft_Images::attach_featured(
+			(int) $post_id,
+			$title,
+			isset( $payload['topic'] ) ? (string) $payload['topic'] : ''
+		);
 		update_post_meta( $post_id, '_blogcraft_topic', isset( $payload['topic'] ) ? (string) $payload['topic'] : '' );
 
 		Blogcraft_Logger::info(

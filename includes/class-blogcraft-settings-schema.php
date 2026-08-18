@@ -59,6 +59,36 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			'images_enabled'                  => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'internal_links_enabled'          => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'autopilot_enabled'               => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'autopilot_topics'                => array(
+				'default' => '',
+				'type'    => 'textarea',
+				'secret'  => false,
+			),
+			'autopilot_per_day'               => array(
+				'default' => 1,
+				'type'    => 'int',
+				'secret'  => false,
+			),
+			'autopilot_status'                => array(
+				'default' => 'draft',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'voice_niche'                     => array(
 				'default' => '',
 				'type'    => 'textarea',

@@ -120,6 +120,35 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * Boolean feature toggles.
+	 *
+	 * @return array
+	 */
+	private static function toggle_fields() {
+		return array(
+			'images_enabled'         => __( 'Generate a featured image', 'blogcraft' ),
+			'internal_links_enabled' => __( 'Add links to your existing posts', 'blogcraft' ),
+			'autopilot_enabled'      => __( 'Write posts automatically on a schedule', 'blogcraft' ),
+		);
+	}
+
+	/**
+	 * Render one checkbox row.
+	 *
+	 * @param string $name  Setting key.
+	 * @param string $label Field label.
+	 * @return void
+	 */
+	private static function checkbox_row( $name, $label ) {
+		printf(
+			'<tr><th scope="row">%2$s</th><td><label><input type="checkbox" name="%1$s" id="blogcraft_%1$s" value="1"%3$s /> %2$s</label></td></tr>',
+			esc_attr( $name ),
+			esc_html( $label ),
+			checked( (bool) Blogcraft_Settings::get( $name ), true, false )
+		);
+	}
+
+	/**
 	 * Render the settings page.
 	 *
 	 * @return void
@@ -203,6 +232,38 @@ class Blogcraft_Connection {
 		}
 
 		echo '</tbody></table>';
+
+		echo '<h2>' . esc_html__( 'Automation', 'blogcraft' ) . '</h2>';
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		foreach ( self::toggle_fields() as $name => $label ) {
+			self::checkbox_row( $name, $label );
+		}
+
+		self::textarea_row(
+			'autopilot_topics',
+			__( 'Topic queue', 'blogcraft' ),
+			__( 'One topic per line. Each is used once, then removed from this list.', 'blogcraft' )
+		);
+		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ) );
+
+		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
+		printf(
+			'<option value="draft"%s>%s</option>',
+			selected( 'publish' !== Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
+			esc_html__( 'Saved as drafts for review', 'blogcraft' )
+		);
+		printf(
+			'<option value="publish"%s>%s</option>',
+			selected( 'publish' === Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
+			esc_html__( 'Published immediately', 'blogcraft' )
+		);
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Publishing unreviewed posts at volume is what search engines penalise. Drafts are safer.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+
+		echo '</tbody></table>';
 		submit_button( __( 'Save settings', 'blogcraft' ) );
 		echo '</form>';
 
@@ -282,7 +343,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status' )
 		);
 
 		foreach ( $plain as $key ) {
@@ -294,6 +355,15 @@ class Blogcraft_Connection {
 
 		if ( isset( $_POST['monthly_token_cap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			Blogcraft_Settings::set( 'monthly_token_cap', (int) $_POST['monthly_token_cap'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		if ( isset( $_POST['autopilot_per_day'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'autopilot_per_day', (int) $_POST['autopilot_per_day'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		// An unchecked checkbox posts nothing, so absence means false.
+		foreach ( array_keys( self::toggle_fields() ) as $toggle ) {
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
 		// An empty key field means "leave unchanged": the form renders a mask rather
