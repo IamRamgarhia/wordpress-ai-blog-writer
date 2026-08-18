@@ -1731,11 +1731,11 @@ msgid "Dismiss this notice"
 msgstr ""
 
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
-#: includes/class-blogcraft-pipeline.php:377
+#: includes/class-blogcraft-pipeline.php:554
 msgid "%1$s: %2$s, wanted %3$s"
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:425
+#: includes/class-blogcraft-pipeline.php:602
 msgid "Untitled"
 msgstr ""
 

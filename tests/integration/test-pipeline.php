@@ -241,29 +241,31 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 	public function test_full_pipeline_creates_a_draft_post() {
 		$this->fake_completions(
 			array(
+				// outline
 				array(
-					'title'            => 'How Cold Brew Works',
-					'slug'             => 'how-cold-brew-works',
-					'meta_description' => 'What actually happens during a long steep.',
-					'sections'         => array( array( 'heading' => 'The chemistry' ) ),
+					'title'    => 'How Cold Brew Works',
+					'slug'     => 'how-cold-brew-works',
+					'sections' => array( array( 'heading' => 'The chemistry' ) ),
 				),
+				// draft: the opening only
 				array(
-					'intro'         => 'Cold brew is a slow extraction.',
-					'key_takeaways' => array( 'Time replaces heat' ),
-					'sections'      => array(
-						array(
-							'heading'    => 'The chemistry',
-							'paragraphs' => array( $this->long_body() ),
-						),
-					),
-					'faq'           => array(
+					'intro'         => 'Cold brew trades heat for time.',
+					'key_takeaways' => array( 'Steep for twelve hours.' ),
+				),
+				// section
+				array( 'paragraphs' => array( $this->long_body() ) ),
+				// faq
+				array(
+					'faq' => array(
 						array(
 							'question' => 'How long?',
 							'answer'   => 'Twelve to eighteen hours.',
 						),
 					),
 				),
+				// critique
 				array( 'problems' => array( 'The intro is vague.' ) ),
+				// revise
 				array(
 					'intro'    => 'Cold brew trades heat for time, and that changes the flavour.',
 					'sections' => array(
@@ -278,8 +280,8 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'Cold brew coffee', 'draft' );
 
-		// One stage per tick: research, outline, draft, critique, revise, verify, publish.
-		for ( $i = 0; $i < 7; $i++ ) {
+		// research, outline, draft, section, faq, critique, revise, verify, publish.
+		for ( $i = 0; $i < 9; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 
@@ -308,22 +310,17 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 					'slug'     => 'clean-draft',
 					'sections' => array( array( 'heading' => 'Only section' ) ),
 				),
-				array(
-					'sections' => array(
-						array(
-							'heading'    => 'Only section',
-							'paragraphs' => array( $this->long_body() ),
-						),
-					),
-				),
+				array( 'intro' => 'Already good.' ),
+				array( 'paragraphs' => array( $this->long_body() ) ),
 				array( 'problems' => array() ),
 			)
 		);
 
 		Blogcraft_Pipeline::enqueue_topic( 'Anything', 'draft' );
 
-		// research, outline, draft, critique, verify, publish. No revise.
-		for ( $i = 0; $i < 6; $i++ ) {
+		// research, outline, draft, section, faq, critique, verify, publish.
+		// The blueprint has no takeaways and no questions, so faq costs no call.
+		for ( $i = 0; $i < 8; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 

@@ -171,6 +171,154 @@ Rules for this article:
 	}
 
 	/**
+	 * Messages asking only for the opening of an article.
+	 *
+	 * Split out from the body because asking for a whole article in one strict
+	 * JSON turn is what truncates: the response hits the token ceiling mid-string,
+	 * json_decode fails, and the entire job dies having spent every token it was
+	 * going to spend. Small turns cannot truncate.
+	 *
+	 * @param string $topic        Topic.
+	 * @param array  $outline      Outline from the previous stage.
+	 * @param array  $sources      Reference material, possibly empty.
+	 * @param string $instructions Guidance for this topic only.
+	 * @param int    $words        Word budget for the introduction.
+	 * @param int    $takeaways    How many takeaways to write, zero for none.
+	 * @return array
+	 */
+	public static function intro( $topic, $outline, $sources = array(), $instructions = '', $words = 120, $takeaways = 4 ) {
+		$headings = array();
+
+		if ( ! empty( $outline['sections'] ) && is_array( $outline['sections'] ) ) {
+			foreach ( $outline['sections'] as $section ) {
+				if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+					$headings[] = '- ' . $section['heading'];
+				}
+			}
+		}
+
+		$reference = Blogcraft_Research::to_prompt_block( $sources );
+
+		$shape = ( $takeaways > 0 )
+			? '{"intro":"","key_takeaways":[""]}'
+			: '{"intro":""}';
+
+		$user = ( '' === $reference ? '' : $reference . "\n\n" )
+			. "Write only the opening of this article. The sections come later.\n\n"
+			. "Topic: {$topic}\n"
+			. 'Title: ' . ( isset( $outline['title'] ) ? $outline['title'] : $topic ) . "\n"
+			. "Sections that will follow:\n" . implode( "\n", $headings ) . "\n\n"
+			. "Reply with JSON of exactly this shape:\n" . $shape . "\n\n"
+			. "Rules:\n"
+			. sprintf( "- intro: about %d words, answering the title's implicit question directly. No throat-clearing.\n", (int) $words )
+			. ( $takeaways > 0
+				? sprintf( "- key_takeaways: exactly %d specific, useful points. Not a summary of the headings.\n", (int) $takeaways )
+				: '' )
+			. '- Plain text only in every field. No markdown, no HTML.'
+			. self::extra( $instructions )
+			. self::structure_block();
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Messages asking for one section of an article.
+	 *
+	 * Carries what has been written so far as headings only, not full text: the
+	 * model needs to know what it has already covered so it does not repeat
+	 * itself, and sending the whole article back on every call would grow the
+	 * prompt quadratically for no extra benefit.
+	 *
+	 * @param string $topic        Topic.
+	 * @param string $heading      Heading for this section.
+	 * @param array  $covered      Headings already written.
+	 * @param array  $remaining    Headings still to come.
+	 * @param array  $sources      Reference material, possibly empty.
+	 * @param string $instructions Guidance for this topic only.
+	 * @param int    $words        Word budget for this section.
+	 * @return array
+	 */
+	public static function section( $topic, $heading, $covered, $remaining, $sources = array(), $instructions = '', $words = 200 ) {
+		$reference = Blogcraft_Research::to_prompt_block( $sources );
+
+		$context = '';
+
+		if ( ! empty( $covered ) ) {
+			$context .= "Already written, so do not repeat it:\n- " . implode( "\n- ", $covered ) . "\n\n";
+		}
+
+		if ( ! empty( $remaining ) ) {
+			$context .= "Still to come, so leave these alone:\n- " . implode( "\n- ", $remaining ) . "\n\n";
+		}
+
+		$user = ( '' === $reference ? '' : $reference . "\n\n" )
+			. "Write one section of an article about: {$topic}\n\n"
+			. $context
+			. "The section to write now is: {$heading}\n\n"
+			. "Reply with JSON of exactly this shape:\n"
+			. '{"paragraphs":[""]}' . "\n\n"
+			. "Rules:\n"
+			. sprintf( "- About %d words across however many paragraphs it needs.\n", (int) $words )
+			. "- Open with the substance, not a restatement of the heading.\n"
+			. "- Be specific. A number, an example or a named thing beats an adjective.\n"
+			. '- Plain text only. No markdown, no HTML, no heading text.'
+			. self::extra( $instructions )
+			. self::structure_block();
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
+	 * Messages asking for the questions and answers.
+	 *
+	 * @param string $topic   Topic.
+	 * @param array  $covered Headings already written.
+	 * @param int    $count   How many questions.
+	 * @return array
+	 */
+	public static function faq( $topic, $covered, $count = 4 ) {
+		$user = "Write the questions and answers for an article about: {$topic}\n\n"
+			. ( empty( $covered ) ? '' : "The article already covers:\n- " . implode( "\n- ", $covered ) . "\n\n" )
+			. "Reply with JSON of exactly this shape:\n"
+			. '{"faq":[{"question":"","answer":""}]}' . "\n\n"
+			. "Rules:\n"
+			. sprintf( "- Exactly %d questions a reader would actually search for.\n", (int) $count )
+			. "- Do not ask anything the article already answers in full.\n"
+			. "- Answers of two or three sentences.\n"
+			. '- Plain text only. No markdown, no HTML.'
+			. self::structure_block();
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
 	 * Messages asking the model to critique its own draft.
 	 *
 	 * @param array $article Draft article.

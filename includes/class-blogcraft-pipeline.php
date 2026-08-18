@@ -31,6 +31,8 @@ class Blogcraft_Pipeline {
 		Blogcraft_Worker::register_stage( self::NAME, 'research', array( __CLASS__, 'stage_research' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'outline', array( __CLASS__, 'stage_outline' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'draft', array( __CLASS__, 'stage_draft' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'section', array( __CLASS__, 'stage_section' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'faq', array( __CLASS__, 'stage_faq' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'critique', array( __CLASS__, 'stage_critique' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'revise', array( __CLASS__, 'stage_revise' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'verify', array( __CLASS__, 'stage_verify' ) );
@@ -224,27 +226,202 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
-	 * Write the first draft.
+	 * The headings the outline settled on.
+	 *
+	 * @param array $payload Job payload.
+	 * @return array
+	 */
+	private static function headings( $payload ) {
+		$outline = isset( $payload['outline'] ) ? $payload['outline'] : array();
+		$out     = array();
+
+		if ( ! empty( $outline['sections'] ) && is_array( $outline['sections'] ) ) {
+			foreach ( $outline['sections'] as $section ) {
+				if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+					$out[] = (string) $section['heading'];
+				}
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * How many words each section should carry.
+	 *
+	 * The furniture is subtracted first so the sections divide what is actually
+	 * left, rather than the target pretending the takeaways and questions cost
+	 * nothing.
+	 *
+	 * @param array $blueprint Blueprint.
+	 * @param int   $sections  Number of sections.
+	 * @return int
+	 */
+	private static function section_budget( $blueprint, $sections ) {
+		$total = (int) $blueprint['word_target'];
+		$intro = (int) round( $total * 0.08 );
+		$extra = 0;
+
+		if ( (bool) $blueprint['takeaways'] ) {
+			$extra += (int) $blueprint['takeaways_count'] * 18;
+		}
+
+		if ( (bool) $blueprint['faq'] ) {
+			$extra += (int) $blueprint['faq_count'] * 45;
+		}
+
+		$body = max( 120, $total - $intro - $extra );
+
+		return ( $sections > 0 ) ? max( 90, (int) round( $body / $sections ) ) : $body;
+	}
+
+	/**
+	 * Write the opening.
+	 *
+	 * The article used to be written in a single JSON turn, which is what makes
+	 * long posts fail: the response hits the token ceiling part way through, the
+	 * JSON will not parse, and the job dies having spent everything it was going
+	 * to spend. Each stage below asks for one small piece instead, and a small
+	 * piece cannot truncate.
 	 *
 	 * @param Blogcraft_Job $job Current job.
 	 * @return array
 	 */
 	public static function stage_draft( $job ) {
-		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
-		$outline = isset( $job->payload['outline'] ) ? $job->payload['outline'] : array();
-		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
-		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+		$payload   = $job->payload;
+		$blueprint = self::blueprint( $job );
 
-		$article = self::ask( Blogcraft_Prompts::draft( $topic, $outline, $sources, self::instructions( $job ) ), array( 'max_tokens' => 4096 ) );
+		Blogcraft_Prompts::use_blueprint( $blueprint );
 
-		$payload            = $job->payload;
-		$payload['article'] = $article;
+		$topic   = isset( $payload['topic'] ) ? $payload['topic'] : '';
+		$outline = isset( $payload['outline'] ) ? $payload['outline'] : array();
+		$sources = isset( $payload['sources'] ) ? (array) $payload['sources'] : array();
+
+		$opening = self::ask(
+			Blogcraft_Prompts::intro(
+				$topic,
+				$outline,
+				$sources,
+				self::instructions( $job ),
+				(int) round( (int) $blueprint['word_target'] * 0.08 ),
+				(bool) $blueprint['takeaways'] ? (int) $blueprint['takeaways_count'] : 0
+			),
+			array( 'max_tokens' => 1200 )
+		);
+
+		$payload['article'] = array(
+			'intro'         => isset( $opening['intro'] ) ? (string) $opening['intro'] : '',
+			'key_takeaways' => isset( $opening['key_takeaways'] ) ? (array) $opening['key_takeaways'] : array(),
+			'sections'      => array(),
+			'faq'           => array(),
+		);
+
+		$payload['section_index'] = 0;
+
+		// A model that returned no usable headings would otherwise loop forever
+		// on a section stage with nothing to write.
+		$next = empty( self::headings( $payload ) ) ? 'faq' : 'section';
+
+		return array(
+			'next'    => $next,
+			'payload' => $payload,
+		);
+	}
+
+	/**
+	 * Write one section, then come back for the next.
+	 *
+	 * Returning its own name as the next stage keeps one provider call per tick,
+	 * which is the same guarantee the rest of the pipeline relies on: no single
+	 * request has to outlive PHP's execution limit however long the article is.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_section( $job ) {
+		$payload   = $job->payload;
+		$blueprint = self::blueprint( $job );
+
+		Blogcraft_Prompts::use_blueprint( $blueprint );
+
+		$headings = self::headings( $payload );
+		$index    = isset( $payload['section_index'] ) ? (int) $payload['section_index'] : 0;
+
+		if ( ! isset( $headings[ $index ] ) ) {
+			$payload['section_index'] = count( $headings );
+
+			return array(
+				'next'    => 'faq',
+				'payload' => $payload,
+			);
+		}
+
+		$heading = $headings[ $index ];
+
+		$result = self::ask(
+			Blogcraft_Prompts::section(
+				isset( $payload['topic'] ) ? $payload['topic'] : '',
+				$heading,
+				array_slice( $headings, 0, $index ),
+				array_slice( $headings, $index + 1 ),
+				isset( $payload['sources'] ) ? (array) $payload['sources'] : array(),
+				self::instructions( $job ),
+				self::section_budget( $blueprint, count( $headings ) )
+			),
+			array( 'max_tokens' => 2048 )
+		);
+
+		$paragraphs = isset( $result['paragraphs'] ) ? (array) $result['paragraphs'] : array();
+
+		$payload['article']['sections'][] = array(
+			'heading'    => $heading,
+			'paragraphs' => $paragraphs,
+		);
+
+		$payload['section_index'] = $index + 1;
+
+		return array(
+			'next'    => ( $payload['section_index'] < count( $headings ) ) ? 'section' : 'faq',
+			'payload' => $payload,
+		);
+	}
+
+	/**
+	 * Write the questions and answers, when the blueprint wants them.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_faq( $job ) {
+		$payload   = $job->payload;
+		$blueprint = self::blueprint( $job );
+
+		if ( ! (bool) $blueprint['faq'] ) {
+			return array(
+				'next'    => 'critique',
+				'payload' => $payload,
+			);
+		}
+
+		Blogcraft_Prompts::use_blueprint( $blueprint );
+
+		$result = self::ask(
+			Blogcraft_Prompts::faq(
+				isset( $payload['topic'] ) ? $payload['topic'] : '',
+				self::headings( $payload ),
+				(int) $blueprint['faq_count']
+			),
+			array( 'max_tokens' => 1500 )
+		);
+
+		$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
 
 		return array(
 			'next'    => 'critique',
 			'payload' => $payload,
 		);
 	}
+
 
 	/**
 	 * Critique the draft.
