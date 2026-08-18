@@ -360,6 +360,12 @@ class Blogcraft_Pipeline {
 
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
 
+		$faq_schema = Blogcraft_Seo::build_faq_schema( $article );
+
+		if ( ! empty( $faq_schema ) ) {
+			update_post_meta( (int) $post_id, '_blogcraft_faq_schema', $faq_schema );
+		}
+
 		Blogcraft_Seo::write_seo_meta(
 			(int) $post_id,
 			$title,

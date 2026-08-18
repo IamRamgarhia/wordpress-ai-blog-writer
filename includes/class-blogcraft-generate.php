@@ -32,6 +32,16 @@ class Blogcraft_Generate {
 	const RUN_ACTION = 'blogcraft_run_queue_now';
 
 	/**
+	 * Nonce action for bulk topic import.
+	 */
+	const BULK_ACTION = 'blogcraft_bulk_topics';
+
+	/**
+	 * Nonce action for rolling a batch back.
+	 */
+	const ROLLBACK_ACTION = 'blogcraft_rollback';
+
+	/**
 	 * Transient prefix holding the last notice for one user.
 	 */
 	const NOTICE_TRANSIENT = 'blogcraft_write_notice_';
@@ -45,6 +55,8 @@ class Blogcraft_Generate {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 15 );
 		add_action( 'admin_post_blogcraft_queue_topic', array( __CLASS__, 'handle_queue' ) );
 		add_action( 'admin_post_blogcraft_run_queue_now', array( __CLASS__, 'handle_run_now' ) );
+		add_action( 'admin_post_blogcraft_bulk_topics', array( __CLASS__, 'handle_bulk' ) );
+		add_action( 'admin_post_blogcraft_rollback', array( __CLASS__, 'handle_rollback' ) );
 	}
 
 	/**
@@ -134,6 +146,23 @@ class Blogcraft_Generate {
 		echo '</ul>';
 
 		echo '<p>' . esc_html__( 'Queued posts are written in the background, one step at a time. You can also run a step now.', 'blogcraft' ) . '</p>';
+
+		echo '<h2>' . esc_html__( 'Add many at once', 'blogcraft' ) . '</h2>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
+		Blogcraft_Request::nonce_field( self::BULK_ACTION );
+		echo '<textarea class="large-text code" name="topics" rows="6" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
+		echo '<p class="description">' . esc_html__( 'Anything already covered by an existing post is skipped rather than queued twice.', 'blogcraft' ) . '</p>';
+		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', true );
+		echo '</form>';
+
+		echo '<h2>' . esc_html__( 'Undo a batch', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Moves generated posts from the last 24 hours to the trash. Only touches posts Blogcraft created; anything you wrote is left alone.', 'blogcraft' ) . '</p>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft' ) ) . "'" ) . ');">';
+		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
+		Blogcraft_Request::nonce_field( self::ROLLBACK_ACTION );
+		submit_button( __( 'Trash the last 24 hours', 'blogcraft' ), 'delete', 'submit', false );
+		echo '</form>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
 		Blogcraft_Request::nonce_field( self::RUN_ACTION );
@@ -203,6 +232,91 @@ class Blogcraft_Generate {
 				/* translators: %d: number of pipeline steps that ran. */
 				_n( '%d step ran.', '%d steps ran.', $executed, 'blogcraft' ),
 				$executed
+			)
+		);
+	}
+
+	/**
+	 * Queue many topics at once.
+	 *
+	 * @return void
+	 */
+	public static function handle_bulk() {
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::BULK_ACTION, $nonce );
+
+		$raw     = isset( $_POST['topics'] ) ? sanitize_textarea_field( wp_unslash( $_POST['topics'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$queued  = 0;
+		$skipped = 0;
+
+		foreach ( preg_split(
+			'/[
+]+/',
+			$raw
+		) as $line ) {
+			// A pasted CSV column brings its commas with it; the first field is the topic.
+			$topic = trim( (string) strtok( trim( (string) $line ), ',' ) );
+
+			if ( '' === $topic ) {
+				continue;
+			}
+
+			if ( Blogcraft_Pipeline::enqueue_topic( $topic ) > 0 ) {
+				++$queued;
+			} else {
+				++$skipped;
+			}
+		}
+
+		self::back(
+			true,
+			sprintf(
+				/* translators: 1: number queued, 2: number skipped as duplicates. */
+				__( '%1$d queued, %2$d skipped as too similar to existing posts.', 'blogcraft' ),
+				$queued,
+				$skipped
+			)
+		);
+	}
+
+	/**
+	 * Trash generated posts from the last day.
+	 *
+	 * @return void
+	 */
+	public static function handle_rollback() {
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::ROLLBACK_ACTION, $nonce );
+
+		// The generated-by-Blogcraft meta is the guard that keeps this away from
+		// anything a human wrote.
+		$posts = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => array( 'publish', 'draft', 'pending' ),
+				'posts_per_page' => 100,
+				'no_found_rows'  => true,
+				'meta_key'       => '_blogcraft_generated', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'date_query'     => array(
+					array( 'after' => '24 hours ago' ),
+				),
+			)
+		);
+
+		$trashed = 0;
+
+		foreach ( $posts as $post ) {
+			if ( wp_trash_post( $post->ID ) ) {
+				++$trashed;
+			}
+		}
+
+		self::back(
+			true,
+			sprintf(
+				/* translators: %d: number of posts moved to the trash. */
+				_n( '%d post moved to the trash.', '%d posts moved to the trash.', $trashed, 'blogcraft' ),
+				$trashed
 			)
 		);
 	}

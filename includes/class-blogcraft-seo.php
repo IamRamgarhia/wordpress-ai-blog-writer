@@ -200,6 +200,45 @@ class Blogcraft_Seo {
 	}
 
 	/**
+	 * Build FAQPage structured data from an article's FAQ entries.
+	 *
+	 * @param array $article Article structure.
+	 * @return array Empty when the article has no usable FAQ.
+	 */
+	public static function build_faq_schema( $article ) {
+		if ( empty( $article['faq'] ) || ! is_array( $article['faq'] ) ) {
+			return array();
+		}
+
+		$entities = array();
+
+		foreach ( $article['faq'] as $entry ) {
+			if ( ! is_array( $entry ) || empty( $entry['question'] ) || empty( $entry['answer'] ) ) {
+				continue;
+			}
+
+			$entities[] = array(
+				'@type'          => 'Question',
+				'name'           => wp_strip_all_tags( (string) $entry['question'] ),
+				'acceptedAnswer' => array(
+					'@type' => 'Answer',
+					'text'  => wp_strip_all_tags( (string) $entry['answer'] ),
+				),
+			);
+		}
+
+		if ( empty( $entities ) ) {
+			return array();
+		}
+
+		return array(
+			'@context'   => 'https://schema.org',
+			'@type'      => 'FAQPage',
+			'mainEntity' => $entities,
+		);
+	}
+
+	/**
 	 * Build a table of contents from an article's own headings.
 	 *
 	 * Anchors are not emitted: WordPress does not add heading ids by default, so
@@ -277,10 +316,20 @@ class Blogcraft_Seo {
 			return;
 		}
 
-		printf(
-			'<script type="application/ld+json">%s</script>' . "\n",
-			wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		);
+		$graphs = array( $graph );
+		$faq    = get_post_meta( $post_id, '_blogcraft_faq_schema', true );
+
+		if ( is_array( $faq ) && ! empty( $faq ) ) {
+			$graphs[] = $faq;
+		}
+
+		foreach ( $graphs as $entry ) {
+			printf(
+				'<script type="application/ld+json">%s</script>' . '
+',
+				wp_json_encode( $entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+		}
 	}
 
 	/**
