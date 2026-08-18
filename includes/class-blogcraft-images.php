@@ -173,6 +173,149 @@ class Blogcraft_Images {
 	}
 
 	/**
+	 * Build an image block for an attachment.
+	 *
+	 * @param int    $attachment_id Attachment to render.
+	 * @param string $alt           Alt text.
+	 * @return string Block markup, empty when the attachment has no URL.
+	 */
+	public static function image_block( $attachment_id, $alt ) {
+		$url = wp_get_attachment_image_url( (int) $attachment_id, 'large' );
+
+		if ( ! $url ) {
+			return '';
+		}
+
+		return sprintf(
+			"<!-- wp:image {\"id\":%1$d,\"sizeSlug\":\"large\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"%2$s\" alt=\"%3$s\" class=\"wp-image-%1$d\"/></figure>\n<!-- /wp:image -->\n\n",
+			(int) $attachment_id,
+			esc_url( $url ),
+			esc_attr( $alt )
+		);
+	}
+
+	/**
+	 * Sideload one image and return its attachment id.
+	 *
+	 * @param int    $post_id Post to attach to.
+	 * @param string $prompt  What the image should show.
+	 * @param string $alt     Alt text.
+	 * @return int Attachment id, or 0 on any failure.
+	 */
+	private static function sideload( $post_id, $prompt, $alt ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$tmp = download_url( self::resolve_url( $prompt ), 45 );
+
+		if ( is_wp_error( $tmp ) ) {
+			return 0;
+		}
+
+		$attachment_id = media_handle_sideload(
+			array(
+				'name'     => self::filename_for( $alt ),
+				'tmp_name' => $tmp,
+			),
+			(int) $post_id,
+			wp_strip_all_tags( $alt )
+		);
+
+		if ( is_wp_error( $attachment_id ) ) {
+			if ( file_exists( $tmp ) ) {
+				wp_delete_file( $tmp );
+			}
+
+			return 0;
+		}
+
+		update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_strip_all_tags( $alt ) );
+
+		return (int) $attachment_id;
+	}
+
+	/**
+	 * Add one image beneath each section heading.
+	 *
+	 * Runs after the post exists so each attachment has a parent, and updates
+	 * the content once rather than per image. A failure at any point leaves the
+	 * post exactly as it was: an illustrated post is nice, a broken one is not.
+	 *
+	 * @param int   $post_id Post to illustrate.
+	 * @param array $article Article structure.
+	 * @param int   $limit   Most images to add.
+	 * @return int Number added.
+	 */
+	public static function add_section_images( $post_id, $article, $limit = 3 ) {
+		if ( ! Blogcraft_Settings::get( 'images_per_section' ) ) {
+			return 0;
+		}
+
+		if ( empty( $article['sections'] ) || ! is_array( $article['sections'] ) ) {
+			return 0;
+		}
+
+		$post = get_post( (int) $post_id );
+
+		if ( ! $post ) {
+			return 0;
+		}
+
+		$content = (string) $post->post_content;
+		$added   = 0;
+
+		foreach ( $article['sections'] as $section ) {
+			if ( $added >= (int) $limit ) {
+				break;
+			}
+
+			if ( ! is_array( $section ) || empty( $section['heading'] ) ) {
+				continue;
+			}
+
+			$heading = (string) $section['heading'];
+			$marker  = '<h2>' . esc_html( $heading ) . "</h2>\n<!-- /wp:heading -->";
+
+			if ( false === strpos( $content, $marker ) ) {
+				continue;
+			}
+
+			$attachment_id = self::sideload( (int) $post_id, $heading, $heading );
+
+			if ( 0 === $attachment_id ) {
+				continue;
+			}
+
+			$block = self::image_block( $attachment_id, $heading );
+
+			if ( '' === $block ) {
+				continue;
+			}
+
+			$content = str_replace(
+				$marker,
+				$marker . '
+
+' . $block,
+				$content
+			);
+			++$added;
+		}
+
+		if ( $added > 0 ) {
+			wp_update_post(
+				array(
+					'ID'           => (int) $post_id,
+					'post_content' => $content,
+				)
+			);
+		}
+
+		return $added;
+	}
+
+	/**
 	 * Attach a generated featured image to a post.
 	 *
 	 * @param int    $post_id Post to attach to.

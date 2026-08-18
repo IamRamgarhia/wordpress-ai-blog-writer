@@ -87,8 +87,11 @@ class Blogcraft_Generate {
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
 
-		echo '<div class="wrap">';
+		echo '<div class="wrap blogcraft-page">';
+		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Write a post', 'blogcraft' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site.', 'blogcraft' ) . '</p>';
+		echo '</div>';
 
 		if ( is_array( $notice ) ) {
 			delete_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
@@ -106,6 +109,7 @@ class Blogcraft_Generate {
 			);
 		}
 
+		self::card_open( __( 'One post', 'blogcraft' ), __( 'The extra instructions field is what stops every post reading the same.', 'blogcraft' ) );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_queue_topic" />';
 		Blogcraft_Request::nonce_field( self::QUEUE_ACTION );
@@ -133,12 +137,12 @@ class Blogcraft_Generate {
 		submit_button( __( 'Queue this post', 'blogcraft' ) );
 		echo '</form>';
 
-		echo '<hr />';
-		echo '<h2>' . esc_html__( 'Queue', 'blogcraft' ) . '</h2>';
+		echo '</section>';
+		self::card_open( __( 'Queue', 'blogcraft' ), __( 'Posts are written in the background, one step per run.', 'blogcraft' ) );
 		echo '<ul>';
 		foreach ( array( 'pending', 'running', 'complete', 'failed' ) as $status ) {
 			printf(
-				'<li>%1$s: %2$d</li>',
+				'<li><span class="blogcraft-stat-value">%2$d</span><span class="blogcraft-stat-label">%1$s</span></li>',
 				esc_html( $status ),
 				(int) Blogcraft_Queue::count_by_status( $status )
 			);
@@ -147,7 +151,8 @@ class Blogcraft_Generate {
 
 		echo '<p>' . esc_html__( 'Queued posts are written in the background, one step at a time. You can also run a step now.', 'blogcraft' ) . '</p>';
 
-		echo '<h2>' . esc_html__( 'Add many at once', 'blogcraft' ) . '</h2>';
+		echo '</section>';
+		self::card_open( __( 'Add many at once', 'blogcraft' ), __( 'One topic per line, or paste a CSV column.', 'blogcraft' ) );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
 		Blogcraft_Request::nonce_field( self::BULK_ACTION );
@@ -156,7 +161,8 @@ class Blogcraft_Generate {
 		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', true );
 		echo '</form>';
 
-		echo '<h2>' . esc_html__( 'Undo a batch', 'blogcraft' ) . '</h2>';
+		echo '</section>';
+		self::card_open( __( 'Undo a batch', 'blogcraft' ), __( 'Only touches posts Blogcraft created. Anything you wrote is left alone.', 'blogcraft' ) );
 		echo '<p>' . esc_html__( 'Moves generated posts from the last 24 hours to the trash. Only touches posts Blogcraft created; anything you wrote is left alone.', 'blogcraft' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft' ) ) . "'" ) . ');">';
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
@@ -169,6 +175,21 @@ class Blogcraft_Generate {
 		submit_button( __( 'Run the queue now', 'blogcraft' ), 'secondary' );
 		echo '</form>';
 		echo '</div>';
+	}
+
+	/**
+	 * Open a card section.
+	 *
+	 * @param string $title       Card title.
+	 * @param string $description One line on what it is for.
+	 * @return void
+	 */
+	private static function card_open( $title, $description ) {
+		printf(
+			'<section class="blogcraft-card"><header><h2>%1$s</h2><p>%2$s</p></header>',
+			esc_html( $title ),
+			esc_html( $description )
+		);
 	}
 
 	/**

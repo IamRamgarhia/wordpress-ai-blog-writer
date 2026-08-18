@@ -54,25 +54,97 @@ class Blogcraft_Admin {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft' ) );
 		}
 
-		$statuses = array(
-			'pending'  => __( 'Pending', 'blogcraft' ),
-			'running'  => __( 'Running', 'blogcraft' ),
-			'complete' => __( 'Complete', 'blogcraft' ),
+		$totals     = Blogcraft_Cost::month_totals();
+		$waiting    = count( Blogcraft_Review::pending_posts() );
+		$configured = null !== Blogcraft_Provider_Registry::from_settings();
+
+		echo '<div class="wrap blogcraft-page">';
+		echo '<div class="blogcraft-head">';
+		echo '<h1>' . esc_html__( 'Blogcraft', 'blogcraft' ) . '</h1>';
+		echo '<p>' . esc_html__( 'What is queued, what is waiting on you, and what it has cost.', 'blogcraft' ) . '</p>';
+		echo '</div>';
+
+		if ( ! $configured ) {
+			printf(
+				'<div class="notice notice-warning"><p>%s <a href="%s">%s</a></p></div>',
+				esc_html__( 'No AI provider is connected yet.', 'blogcraft' ),
+				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Connection::PAGE_SLUG ) ),
+				esc_html__( 'Set one up', 'blogcraft' )
+			);
+		}
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'Queue', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Each post moves through seven steps, one per run, so no single request has to finish the whole pipeline.', 'blogcraft' ) . '</p>';
+		echo '</header>';
+
+		echo '<ul class="blogcraft-stats">';
+
+		$states = array(
+			'pending'  => __( 'Waiting', 'blogcraft' ),
+			'running'  => __( 'In progress', 'blogcraft' ),
+			'complete' => __( 'Finished', 'blogcraft' ),
 			'failed'   => __( 'Failed', 'blogcraft' ),
 		);
 
-		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( 'Blogcraft', 'blogcraft' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Queue status', 'blogcraft' ) . '</p>';
-		echo '<ul>';
-		foreach ( $statuses as $status => $label ) {
+		foreach ( $states as $state => $label ) {
 			printf(
-				'<li>%1$s: %2$d</li>',
-				esc_html( $label ),
-				(int) Blogcraft_Queue::count_by_status( $status )
+				'<li><span class="blogcraft-stat-value">%1$d</span><span class="blogcraft-stat-label">%2$s</span></li>',
+				(int) Blogcraft_Queue::count_by_status( $state ),
+				esc_html( $label )
 			);
 		}
+
 		echo '</ul>';
+
+		echo '<div class="blogcraft-actions">';
+		printf(
+			'<a class="button button-primary" href="%s">%s</a>',
+			esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
+			esc_html__( 'Write a post', 'blogcraft' )
+		);
+
+		if ( $waiting > 0 ) {
+			printf(
+				'<a class="button" href="%s">%s</a>',
+				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Review::PAGE_SLUG ) ),
+				esc_html(
+					sprintf(
+						/* translators: %d: number of posts waiting for review. */
+						_n( '%d post needs review', '%d posts need review', $waiting, 'blogcraft' ),
+						$waiting
+					)
+				)
+			);
+		}
+
+		echo '</div>';
+		echo '</section>';
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'This month', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Tokens are billed by your provider, not by us. A monthly cap is available in Settings.', 'blogcraft' ) . '</p>';
+		echo '</header>';
+
+		echo '<ul class="blogcraft-stats">';
+		printf(
+			'<li><span class="blogcraft-stat-value">%1$s</span><span class="blogcraft-stat-label">%2$s</span></li>',
+			esc_html( number_format_i18n( $totals['requests'] ) ),
+			esc_html__( 'Requests', 'blogcraft' )
+		);
+		printf(
+			'<li><span class="blogcraft-stat-value">%1$s</span><span class="blogcraft-stat-label">%2$s</span></li>',
+			esc_html( number_format_i18n( $totals['prompt'] ) ),
+			esc_html__( 'Prompt tokens', 'blogcraft' )
+		);
+		printf(
+			'<li><span class="blogcraft-stat-value">%1$s</span><span class="blogcraft-stat-label">%2$s</span></li>',
+			esc_html( number_format_i18n( $totals['completion'] ) ),
+			esc_html__( 'Completion tokens', 'blogcraft' )
+		);
+		echo '</ul>';
+		echo '</section>';
+
 		echo '</div>';
 	}
 }

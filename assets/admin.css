@@ -203,6 +203,43 @@
 	color: var(--bc-ink);
 }
 
+/* Counts read faster as tiles than as a bulleted list. */
+.blogcraft-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 10px 0 4px;
+	padding: 0;
+	list-style: none;
+}
+
+.blogcraft-stats li {
+	flex: 1 1 120px;
+	margin: 0;
+	padding: 14px 16px;
+	border: 1px solid var(--bc-line);
+	border-radius: 8px;
+	background: var(--bc-canvas);
+}
+
+.blogcraft-stat-value {
+	display: block;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: var(--bc-ink);
+	font-variant-numeric: tabular-nums;
+}
+
+.blogcraft-stat-label {
+	display: block;
+	margin-top: 2px;
+	font-size: 12.5px;
+	color: var(--bc-muted);
+	text-transform: capitalize;
+}
+
 /* Findings that cost a draft its score. */
 .blogcraft-reasons {
 	margin: 4px 0 0;

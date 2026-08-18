@@ -378,6 +378,8 @@ class Blogcraft_Pipeline {
 		}
 
 		// A missing image must never fail a finished post, so this is best-effort.
+		Blogcraft_Images::add_section_images( (int) $post_id, $article, 3 );
+
 		Blogcraft_Images::attach_featured(
 			(int) $post_id,
 			$title,

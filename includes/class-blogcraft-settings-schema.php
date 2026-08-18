@@ -69,6 +69,11 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			'images_per_section'              => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'image_provider'                  => array(
 				'default' => 'pollinations',
 				'type'    => 'string',
