@@ -260,7 +260,7 @@ class Blogcraft_Pipeline {
 			$title = sanitize_text_field( isset( $payload['topic'] ) ? (string) $payload['topic'] : __( 'Untitled', 'blogcraft' ) );
 		}
 
-		$content = Blogcraft_Blocks::render( $article );
+		$content = Blogcraft_Seo::render_toc( $article ) . Blogcraft_Blocks::render( $article );
 
 		if ( '' === $content ) {
 			throw new RuntimeException( 'The generated article was empty.' );
@@ -297,6 +297,12 @@ class Blogcraft_Pipeline {
 		}
 
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		Blogcraft_Seo::write_seo_meta(
+			(int) $post_id,
+			$title,
+			isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : ''
+		);
 
 		if ( isset( $payload['quality'] ) ) {
 			update_post_meta( $post_id, '_blogcraft_quality', (int) $payload['quality']['score'] );

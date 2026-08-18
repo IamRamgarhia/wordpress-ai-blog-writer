@@ -128,6 +128,110 @@ class Blogcraft_Seo {
 	}
 
 	/**
+	 * Meta keys used by the SEO plugins that store their fields as post meta.
+	 *
+	 * All In One SEO is absent deliberately: it keeps titles and descriptions in
+	 * its own table rather than post meta, so writing meta would silently do
+	 * nothing. Better to leave its fields visibly unset than to appear filled.
+	 *
+	 * @return array Plugin id => array( title key, description key ).
+	 */
+	public static function seo_meta_keys() {
+		return array(
+			'yoast'    => array( '_yoast_wpseo_title', '_yoast_wpseo_metadesc' ),
+			'rankmath' => array( 'rank_math_title', 'rank_math_description' ),
+			'seopress' => array( '_seopress_titles_title', '_seopress_titles_desc' ),
+		);
+	}
+
+	/**
+	 * Which supported SEO plugin is active, if any.
+	 *
+	 * @return string One of yoast, rankmath, seopress, aioseo, or '' for none.
+	 */
+	public static function active_seo_plugin() {
+		if ( defined( 'WPSEO_VERSION' ) ) {
+			return 'yoast';
+		}
+
+		if ( defined( 'RANK_MATH_VERSION' ) ) {
+			return 'rankmath';
+		}
+
+		if ( defined( 'SEOPRESS_VERSION' ) ) {
+			return 'seopress';
+		}
+
+		if ( defined( 'AIOSEO_VERSION' ) ) {
+			return 'aioseo';
+		}
+
+		return '';
+	}
+
+	/**
+	 * Fill the active SEO plugin's title and description fields.
+	 *
+	 * @param int    $post_id     Post to write to.
+	 * @param string $title       SEO title.
+	 * @param string $description Meta description.
+	 * @return bool Whether anything was written.
+	 */
+	public static function write_seo_meta( $post_id, $title, $description ) {
+		$plugin = self::active_seo_plugin();
+		$keys   = self::seo_meta_keys();
+
+		if ( '' === $plugin || ! isset( $keys[ $plugin ] ) ) {
+			return false;
+		}
+
+		$title       = sanitize_text_field( (string) $title );
+		$description = sanitize_text_field( (string) $description );
+
+		if ( '' !== $title ) {
+			update_post_meta( (int) $post_id, $keys[ $plugin ][0], $title );
+		}
+
+		if ( '' !== $description ) {
+			update_post_meta( (int) $post_id, $keys[ $plugin ][1], $description );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Build a table of contents from an article's own headings.
+	 *
+	 * Anchors are not emitted: WordPress does not add heading ids by default, so
+	 * linking to them would produce links that go nowhere. This is a readable
+	 * outline, which is what a reader uses it for.
+	 *
+	 * @param array $article Article structure.
+	 * @param int   $minimum Fewest sections worth a contents list.
+	 * @return string Block markup, empty when not worth rendering.
+	 */
+	public static function render_toc( $article, $minimum = 4 ) {
+		if ( empty( $article['sections'] ) || ! is_array( $article['sections'] ) ) {
+			return '';
+		}
+
+		$headings = array();
+
+		foreach ( $article['sections'] as $section ) {
+			if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+				$headings[] = (string) $section['heading'];
+			}
+		}
+
+		if ( count( $headings ) < $minimum ) {
+			return '';
+		}
+
+		return Blogcraft_Blocks::heading( __( 'What is covered', 'blogcraft' ), 2 )
+			. Blogcraft_Blocks::unordered_list( $headings );
+	}
+
+	/**
 	 * Whether another plugin already outputs Article schema.
 	 *
 	 * Emitting a second competing graph is worse than emitting none, so this
