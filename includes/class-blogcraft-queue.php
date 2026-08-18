@@ -323,6 +323,88 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * How many jobs are currently carrying an error.
+	 *
+	 * A failing job goes back to pending on its backoff, so a plain step count
+	 * reads as success when nothing actually worked.
+	 *
+	 * @return int
+	 */
+	public static function count_with_errors() {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT COUNT(*) FROM {$table} WHERE last_error IS NOT NULL AND last_error != ''" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+	}
+
+	/**
+	 * Put an exhausted job back in the pending pool.
+	 *
+	 * Resets the attempt counter, because the reason a job ran out of attempts
+	 * is nearly always something the user has since changed — a corrected model
+	 * id, a fresh key — and making them delete and retype the topic to get one
+	 * more try would be the wrong trade.
+	 *
+	 * @param int $job_id Job to revive.
+	 * @return bool Whether a failed job was found and requeued.
+	 */
+	public static function requeue( $job_id ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$status = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT status FROM {$table} WHERE id = %d", $job_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		if ( 'failed' !== $status ) {
+			return false;
+		}
+
+		self::update(
+			$job_id,
+			array(
+				'status'       => 'pending',
+				'attempts'     => 0,
+				'last_error'   => null,
+				'lock_token'   => null,
+				'locked_at'    => null,
+				'available_at' => current_time( 'mysql', true ),
+			)
+		);
+
+		return true;
+	}
+
+	/**
+	 * The newest jobs, whatever their status.
+	 *
+	 * Feeds the Activity screen. A job that keeps failing is otherwise invisible:
+	 * it drops back to pending on its backoff and the counts look idle.
+	 *
+	 * @param int $limit Maximum rows.
+	 * @return array Rows as associative arrays, newest first.
+	 */
+	public static function recent_jobs( $limit = 25 ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT id, pipeline, stage, status, attempts, max_attempts, last_error, available_at, created_at, updated_at FROM {$table} ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				(int) $limit
+			),
+			ARRAY_A
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Apply an update to one job, always stamping updated_at.
 	 *
 	 * @param int   $job_id Job id.

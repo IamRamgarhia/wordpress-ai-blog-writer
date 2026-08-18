@@ -101,8 +101,14 @@ class Blogcraft_Connection {
 	 */
 	private static function common_fields() {
 		return array(
-			'provider_base_url' => __( 'Base URL', 'blogcraft' ),
-			'provider_model'    => __( 'Model', 'blogcraft' ),
+			'provider_base_url' => array(
+				__( 'Base URL', 'blogcraft' ),
+				__( 'Leave blank to use the provider default. Set it to point at a proxy, a local model, or any OpenAI-compatible service — for example http://localhost:11434/v1 for Ollama.', 'blogcraft' ),
+			),
+			'provider_model'    => array(
+				__( 'Model', 'blogcraft' ),
+				__( 'The model id exactly as your provider writes it, such as gpt-4o-mini, gemini-2.0-flash, claude-sonnet-4-5 or llama3.1. Nothing runs until this is filled in.', 'blogcraft' ),
+			),
 		);
 	}
 
@@ -141,7 +147,7 @@ class Blogcraft_Connection {
 	 */
 	private static function voice_area_fields() {
 		return array(
-			'voice_niche'         => array( __( 'What this blog is about', 'blogcraft' ), __( 'One or two sentences. The more specific, the less generic the writing.', 'blogcraft' ) ),
+			'voice_niche'         => array( __( 'What this blog is about', 'blogcraft' ), __( 'One or two sentences on the subject and the angle.', 'blogcraft' ) ),
 			'voice_audience'      => array( __( 'Who you write for', 'blogcraft' ), __( 'Who is reading, and what they already know.', 'blogcraft' ) ),
 			'voice_style_rules'   => array( __( 'Style rules', 'blogcraft' ), __( 'One per line. For example: no em dashes. Short paragraphs. Never open with a question.', 'blogcraft' ) ),
 			'voice_banned_words'  => array( __( 'Extra banned words', 'blogcraft' ), __( 'One per line. A list of common AI tells is already blocked by default.', 'blogcraft' ) ),
@@ -235,8 +241,8 @@ class Blogcraft_Connection {
 		}
 		echo '</select></td></tr>';
 
-		foreach ( self::common_fields() as $name => $label ) {
-			self::text_row( $name, $label );
+		foreach ( self::common_fields() as $name => $field ) {
+			self::text_row( $name, $field[0], '', $field[1] );
 		}
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
@@ -357,7 +363,7 @@ class Blogcraft_Connection {
 			__( 'Consider a post stale after', 'blogcraft' ),
 			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'blogcraft' )
 		);
-		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Publishing unreviewed posts at volume is what search engines penalise.', 'blogcraft' ) );
+		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Volume without review is what search engines penalise.', 'blogcraft' ) );
 
 		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft' ) . '</label></th><td>';
 		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
@@ -372,7 +378,7 @@ class Blogcraft_Connection {
 			esc_html__( 'Published immediately', 'blogcraft' )
 		);
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Publishing unreviewed posts at volume is what search engines penalise. Drafts are safer.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Drafts are safer. Nothing goes live until you have read it.', 'blogcraft' ) . '</p>';
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
@@ -431,19 +437,34 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function render_status() {
+		// Each state carries both wordings. A grey dot beside "Provider connected"
+		// reads as a claim that it is connected, so the label has to change too:
+		// colour alone is not something every reader can act on.
 		$states = array(
-			__( 'Provider connected', 'blogcraft' ) => Blogcraft_Provider_Registry::is_configured(),
-			__( 'Voice described', 'blogcraft' )    => Blogcraft_Voice::is_configured(),
-			__( 'Automation on', 'blogcraft' )      => (bool) Blogcraft_Settings::get( 'autopilot_enabled' ),
+			array(
+				'done' => Blogcraft_Provider_Registry::is_configured(),
+				'yes'  => __( 'Provider connected', 'blogcraft' ),
+				'no'   => __( 'No provider yet', 'blogcraft' ),
+			),
+			array(
+				'done' => Blogcraft_Voice::is_configured(),
+				'yes'  => __( 'Voice described', 'blogcraft' ),
+				'no'   => __( 'Voice not described', 'blogcraft' ),
+			),
+			array(
+				'done' => (bool) Blogcraft_Settings::get( 'autopilot_enabled' ),
+				'yes'  => __( 'Automation on', 'blogcraft' ),
+				'no'   => __( 'Automation off', 'blogcraft' ),
+			),
 		);
 
 		echo '<ul class="blogcraft-status">';
 
-		foreach ( $states as $label => $done ) {
+		foreach ( $states as $state ) {
 			printf(
 				'<li class="%1$s">%2$s</li>',
-				$done ? 'is-done' : '',
-				esc_html( $label )
+				$state['done'] ? 'is-done' : '',
+				esc_html( $state['done'] ? $state['yes'] : $state['no'] )
 			);
 		}
 
@@ -453,18 +474,20 @@ class Blogcraft_Connection {
 	/**
 	 * Render one text input row.
 	 *
-	 * @param string $name      Setting key.
-	 * @param string $label     Field label.
-	 * @param string $row_class Optional class for the row.
+	 * @param string $name        Setting key.
+	 * @param string $label       Field label.
+	 * @param string $row_class   Optional class for the row.
+	 * @param string $description Optional hint shown beneath.
 	 * @return void
 	 */
-	private static function text_row( $name, $label, $row_class = '' ) {
+	private static function text_row( $name, $label, $row_class = '', $description = '' ) {
 		printf(
-			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" autocomplete="off" spellcheck="false" /></td></tr>',
+			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" autocomplete="off" spellcheck="false" />%5$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( (string) Blogcraft_Settings::get( $name ) ),
-			esc_attr( $row_class )
+			esc_attr( $row_class ),
+			'' === $description ? '' : '<p class="description">' . esc_html( $description ) . '</p>'
 		);
 	}
 

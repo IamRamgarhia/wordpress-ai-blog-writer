@@ -109,7 +109,7 @@ class Blogcraft_Generate {
 			);
 		}
 
-		self::card_open( __( 'One post', 'blogcraft' ), __( 'The extra instructions field is what stops every post reading the same.', 'blogcraft' ) );
+		self::card_open( __( 'One post', 'blogcraft' ), __( 'Queue a single topic, with anything specific you want for this one.', 'blogcraft' ) );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_queue_topic" />';
 		Blogcraft_Request::nonce_field( self::QUEUE_ACTION );
@@ -149,7 +149,12 @@ class Blogcraft_Generate {
 		}
 		echo '</ul>';
 
-		echo '<p>' . esc_html__( 'Queued posts are written in the background, one step at a time. You can also run a step now.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'A step runs on its own every few minutes. Run one by hand if you would rather not wait.', 'blogcraft' ) . '</p>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
+		Blogcraft_Request::nonce_field( self::RUN_ACTION );
+		submit_button( __( 'Run the queue now', 'blogcraft' ), 'secondary' );
+		echo '</form>';
 
 		echo '</section>';
 		self::card_open( __( 'Add many at once', 'blogcraft' ), __( 'One topic per line, or paste a CSV column.', 'blogcraft' ) );
@@ -163,16 +168,10 @@ class Blogcraft_Generate {
 
 		echo '</section>';
 		self::card_open( __( 'Undo a batch', 'blogcraft' ), __( 'Only touches posts Blogcraft created. Anything you wrote is left alone.', 'blogcraft' ) );
-		echo '<p>' . esc_html__( 'Moves generated posts from the last 24 hours to the trash. Only touches posts Blogcraft created; anything you wrote is left alone.', 'blogcraft' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft' ) ) . "'" ) . ');">';
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
 		Blogcraft_Request::nonce_field( self::ROLLBACK_ACTION );
 		submit_button( __( 'Trash the last 24 hours', 'blogcraft' ), 'delete', 'submit', false );
-		echo '</form>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
-		Blogcraft_Request::nonce_field( self::RUN_ACTION );
-		submit_button( __( 'Run the queue now', 'blogcraft' ), 'secondary' );
 		echo '</form>';
 		echo '</div>';
 	}
@@ -245,16 +244,27 @@ class Blogcraft_Generate {
 		Blogcraft_Request::verify_or_die( self::RUN_ACTION, $nonce );
 
 		Blogcraft_Queue::reclaim_stale();
-		$executed = Blogcraft_Worker::run();
 
-		self::back(
-			true,
-			sprintf(
-				/* translators: %d: number of pipeline steps that ran. */
-				_n( '%d step ran.', '%d steps ran.', $executed, 'blogcraft' ),
-				$executed
-			)
+		$before   = Blogcraft_Queue::count_with_errors();
+		$executed = Blogcraft_Worker::run();
+		$after    = Blogcraft_Queue::count_with_errors();
+
+		$message = sprintf(
+			/* translators: %d: number of pipeline steps that ran. */
+			_n( '%d step ran.', '%d steps ran.', $executed, 'blogcraft' ),
+			$executed
 		);
+
+		// Steps that ran and failed still count as steps, so saying only how
+		// many ran would report a broken setup as a success.
+		if ( $after > $before ) {
+			self::back(
+				false,
+				$message . ' ' . __( 'Something went wrong. Blogcraft → Activity has the reason.', 'blogcraft' )
+			);
+		}
+
+		self::back( true, $message );
 	}
 
 	/**

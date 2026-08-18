@@ -288,6 +288,82 @@
 	display: none;
 }
 
+/* ------------------------------------------------------ activity tables. */
+
+.blogcraft-table {
+	margin: 6px 0 18px;
+	border: 1px solid var(--bc-line);
+	border-radius: 8px;
+	border-collapse: separate;
+	border-spacing: 0;
+	overflow: hidden;
+}
+
+.blogcraft-table th,
+.blogcraft-table td {
+	padding: 10px 12px;
+	font-size: 13px;
+	vertical-align: top;
+}
+
+.blogcraft-table thead th {
+	font-weight: 600;
+	color: var(--bc-muted);
+	text-transform: uppercase;
+	font-size: 11px;
+	letter-spacing: 0.06em;
+}
+
+.blogcraft-badge {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: 999px;
+	background: var(--bc-canvas);
+	border: 1px solid var(--bc-line);
+	font-size: 11.5px;
+	font-weight: 600;
+	text-transform: capitalize;
+	color: var(--bc-muted);
+	white-space: nowrap;
+}
+
+.blogcraft-badge.is-complete,
+.blogcraft-badge.is-info {
+	border-color: rgba(0, 112, 23, 0.32);
+	color: var(--bc-ok);
+}
+
+.blogcraft-badge.is-failed,
+.blogcraft-badge.is-error {
+	border-color: rgba(179, 33, 33, 0.32);
+	color: #b32121;
+}
+
+.blogcraft-badge.is-running {
+	border-color: rgba(56, 88, 233, 0.32);
+	color: var(--bc-accent);
+}
+
+.blogcraft-error {
+	color: #b32121;
+}
+
+/* Context is diagnostic detail, so it stays legible but never competes with
+   the message it belongs to. */
+.blogcraft-context {
+	display: inline-block;
+	margin-top: 3px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--bc-muted);
+	word-break: break-word;
+}
+
+.blogcraft-inline-form {
+	display: inline-block;
+	margin: 6px 0 0;
+}
+
 @media screen and (max-width: 782px) {
 	.blogcraft-card {
 		padding: 18px 16px 6px 18px;
@@ -296,5 +372,12 @@
 	.blogcraft-card .form-table th {
 		width: auto;
 		padding-bottom: 4px;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.blogcraft-table {
+		display: block;
+		overflow-x: auto;
 	}
 }

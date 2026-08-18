@@ -68,6 +68,7 @@ class Blogcraft {
 			Blogcraft_Connection::init();
 			Blogcraft_Generate::init();
 			Blogcraft_Review::init();
+			Blogcraft_Activity::init();
 		}
 	}
 }
