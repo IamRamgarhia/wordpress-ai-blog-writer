@@ -161,7 +161,11 @@ class Blogcraft_Generate {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
 		Blogcraft_Request::nonce_field( self::BULK_ACTION );
-		echo '<textarea class="large-text code" name="topics" rows="6" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
+		printf(
+			'<label for="blogcraft_topics" class="screen-reader-text">%s</label>',
+			esc_html__( 'Topics, one per line', 'blogcraft' )
+		);
+		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="6" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
 		echo '<p class="description">' . esc_html__( 'Anything already covered by an existing post is skipped rather than queued twice.', 'blogcraft' ) . '</p>';
 		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', true );
 		echo '</form>';

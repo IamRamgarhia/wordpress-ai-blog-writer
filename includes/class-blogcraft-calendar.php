@@ -230,15 +230,18 @@ class Blogcraft_Calendar {
 
 			echo '<td class="blogcraft-order">';
 
+			$topic = (string) $entry['topic'];
+			$last  = count( $plan ) - 1;
+
 			if ( $index > 0 ) {
-				self::move_button( $index, 'up', __( 'Move up', 'blogcraft' ) );
+				self::move_button( $index, 'up', __( 'Move up', 'blogcraft' ), $topic );
 			}
 
-			if ( $index < count( $plan ) - 1 ) {
-				self::move_button( $index, 'down', __( 'Move down', 'blogcraft' ) );
+			if ( $index < $last ) {
+				self::move_button( $index, 'down', __( 'Move down', 'blogcraft' ), $topic );
 			}
 
-			self::move_button( $index, 'remove', __( 'Remove', 'blogcraft' ) );
+			self::move_button( $index, 'remove', __( 'Remove', 'blogcraft' ), $topic );
 
 			echo '</td>';
 			echo '</tr>';
@@ -273,16 +276,25 @@ class Blogcraft_Calendar {
 	 * @param int    $index Position in the topic list.
 	 * @param string $verb  up, down or remove.
 	 * @param string $label Button label.
+	 * @param string $topic Topic the button acts on, for the accessible name.
 	 * @return void
 	 */
-	private static function move_button( $index, $verb, $label ) {
+	private static function move_button( $index, $verb, $label, $topic ) {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="blogcraft-inline-form">';
 		echo '<input type="hidden" name="action" value="blogcraft_move_topic" />';
 		printf( '<input type="hidden" name="index" value="%d" />', (int) $index );
 		printf( '<input type="hidden" name="verb" value="%s" />', esc_attr( $verb ) );
 		Blogcraft_Request::nonce_field( self::MOVE_ACTION );
 		printf(
-			'<button type="submit" class="button button-small">%s</button>',
+			'<button type="submit" class="button button-small" aria-label="%1$s">%2$s</button>',
+			esc_attr(
+				sprintf(
+					/* translators: 1: button action such as Move up. 2: the topic it applies to. */
+					__( '%1$s: %2$s', 'blogcraft' ),
+					$label,
+					$topic
+				)
+			),
 			esc_html( $label )
 		);
 		echo '</form>';

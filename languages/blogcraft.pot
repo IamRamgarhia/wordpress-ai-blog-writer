@@ -42,7 +42,7 @@ msgid "Nothing has been queued yet."
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:145
-#: includes/class-blogcraft-activity.php:230
+#: includes/class-blogcraft-activity.php:237
 msgid "Job"
 msgstr ""
 
@@ -66,47 +66,54 @@ msgstr ""
 msgid "Last problem"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:202
+#. translators: %d: job number.
+#: includes/class-blogcraft-activity.php:205
+msgid "Try job %d again"
+msgstr ""
+
+#. translators: %d: job number.
+#: includes/class-blogcraft-activity.php:209
 msgid "Try again"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:216
+#. translators: %d: job number.
+#: includes/class-blogcraft-activity.php:223
 msgid "Event log"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:217
+#: includes/class-blogcraft-activity.php:224
 msgid "The newest hundred entries. Older ones are trimmed automatically. API keys are never recorded here."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:221
+#: includes/class-blogcraft-activity.php:228
 msgid "Nothing logged yet."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:228
+#: includes/class-blogcraft-activity.php:235
 msgid "When"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:229
+#: includes/class-blogcraft-activity.php:236
 msgid "Level"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:231
+#: includes/class-blogcraft-activity.php:238
 msgid "What happened"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:263
+#: includes/class-blogcraft-activity.php:270
 msgid "Clear the log"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:307
+#: includes/class-blogcraft-activity.php:314
 msgid "Log cleared."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:323
+#: includes/class-blogcraft-activity.php:330
 msgid "Queued again. It will run on the next step."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:326
+#: includes/class-blogcraft-activity.php:333
 msgid "That job could not be queued again."
 msgstr ""
 
@@ -268,43 +275,48 @@ msgstr ""
 msgid "Order"
 msgstr ""
 
-#: includes/class-blogcraft-calendar.php:234
+#: includes/class-blogcraft-calendar.php:237
 msgid "Move up"
 msgstr ""
 
-#: includes/class-blogcraft-calendar.php:238
+#: includes/class-blogcraft-calendar.php:241
 msgid "Move down"
 msgstr ""
 
-#: includes/class-blogcraft-calendar.php:241
+#: includes/class-blogcraft-calendar.php:244
 msgid "Remove"
 msgstr ""
 
 #. translators: %d: number of topics with no projected date.
-#: includes/class-blogcraft-calendar.php:255
+#: includes/class-blogcraft-calendar.php:258
 msgid "%d further topic is queued beyond the year shown here."
 msgid_plural "%d further topics are queued beyond the year shown here."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-blogcraft-calendar.php:307
-msgid "That topic is no longer in the queue."
-msgstr ""
-
-#: includes/class-blogcraft-calendar.php:313
-msgid "Removed."
+#. translators: 1: button action such as Move up. 2: the topic it applies to.
+#: includes/class-blogcraft-calendar.php:293
+msgid "%1$s: %2$s"
 msgstr ""
 
 #: includes/class-blogcraft-calendar.php:319
+msgid "That topic is no longer in the queue."
+msgstr ""
+
+#: includes/class-blogcraft-calendar.php:325
+msgid "Removed."
+msgstr ""
+
+#: includes/class-blogcraft-calendar.php:331
 #: includes/class-blogcraft-review.php:237
 msgid "Unknown action."
 msgstr ""
 
-#: includes/class-blogcraft-calendar.php:323
+#: includes/class-blogcraft-calendar.php:335
 msgid "That topic is already at the end of the queue."
 msgstr ""
 
-#: includes/class-blogcraft-calendar.php:331
+#: includes/class-blogcraft-calendar.php:343
 msgid "Moved."
 msgstr ""
 
@@ -759,72 +771,76 @@ msgstr ""
 msgid "One topic per line, or paste a CSV column."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:164
+#: includes/class-blogcraft-generate.php:166
+msgid "Topics, one per line"
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:168
 msgid "One topic per line, or paste a CSV column"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:165
+#: includes/class-blogcraft-generate.php:169
 msgid "Anything already covered by an existing post is skipped rather than queued twice."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:166
+#: includes/class-blogcraft-generate.php:170
 msgid "Queue all of these"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:170
+#: includes/class-blogcraft-generate.php:174
 msgid "Undo a batch"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:170
+#: includes/class-blogcraft-generate.php:174
 msgid "Only touches posts Blogcraft created. Anything you wrote is left alone."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:171
+#: includes/class-blogcraft-generate.php:175
 msgid "Move recently generated posts to the trash?"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:174
+#: includes/class-blogcraft-generate.php:178
 msgid "Trash the last 24 hours"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:209
+#: includes/class-blogcraft-generate.php:213
 msgid "Please enter a topic."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:225
+#: includes/class-blogcraft-generate.php:229
 msgid "Skipped: too similar to a post you already have about \"%s\"."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:231
+#: includes/class-blogcraft-generate.php:235
 msgid "The topic could not be queued."
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:234
+#: includes/class-blogcraft-generate.php:238
 msgid "Queued. The post will be written in the background."
 msgstr ""
 
 #. translators: %d: number of pipeline steps that ran.
-#: includes/class-blogcraft-generate.php:254
+#: includes/class-blogcraft-generate.php:258
 msgid "%d step ran."
 msgid_plural "%d steps ran."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of pipeline steps that ran.
-#: includes/class-blogcraft-generate.php:263
+#: includes/class-blogcraft-generate.php:267
 msgid "Something went wrong. Blogcraft → Activity has the reason."
 msgstr ""
 
 #. translators: 1: number queued, 2: number skipped as duplicates.
-#: includes/class-blogcraft-generate.php:306
+#: includes/class-blogcraft-generate.php:310
 msgid "%1$d queued, %2$d skipped as too similar to existing posts."
 msgstr ""
 
 #. translators: %d: number of posts moved to the trash.
-#: includes/class-blogcraft-generate.php:349
+#: includes/class-blogcraft-generate.php:353
 msgid "%d post moved to the trash."
 msgid_plural "%d posts moved to the trash."
 msgstr[0] ""

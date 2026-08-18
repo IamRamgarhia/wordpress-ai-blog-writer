@@ -198,7 +198,14 @@ class Blogcraft_Activity {
 		printf( '<input type="hidden" name="job_id" value="%d" />', (int) $job_id );
 		Blogcraft_Request::nonce_field( self::RETRY_ACTION );
 		printf(
-			'<button type="submit" class="button button-small">%s</button>',
+			'<button type="submit" class="button button-small" aria-label="%1$s">%2$s</button>',
+			esc_attr(
+				sprintf(
+					/* translators: %d: job number. */
+					__( 'Try job %d again', 'blogcraft' ),
+					(int) $job_id
+				)
+			),
 			esc_html__( 'Try again', 'blogcraft' )
 		);
 		echo '</form>';
