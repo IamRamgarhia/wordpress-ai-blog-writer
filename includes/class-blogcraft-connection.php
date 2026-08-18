@@ -298,6 +298,9 @@ class Blogcraft_Connection {
 
 		self::render_status();
 
+		echo '<div class="bc-settings-shell">';
+		echo '<div class="bc-settings-main">';
+
 		if ( is_array( $result ) ) {
 			delete_transient( self::RESULT_TRANSIENT . get_current_user_id() );
 			printf(
@@ -311,7 +314,7 @@ class Blogcraft_Connection {
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
 
-		self::open_card( '01', __( 'Connect a provider', 'blogcraft' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'blogcraft' ) );
+		self::open_card( '01', __( 'Connect a provider', 'blogcraft' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'blogcraft' ), 'provider' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft' ) . '</label></th><td>';
@@ -360,7 +363,8 @@ class Blogcraft_Connection {
 		self::open_card(
 			'02',
 			__( 'Research', 'blogcraft' ),
-			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft' )
+			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft' ),
+			'research'
 		);
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -396,7 +400,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 		self::close_card();
 
-		self::open_card( '03', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ) );
+		self::open_card( '03', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ), 'voice' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::voice_area_fields() as $name => $meta ) {
@@ -410,7 +414,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '04', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ) );
+		self::open_card( '04', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ), 'automation' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -476,7 +480,7 @@ class Blogcraft_Connection {
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '05', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ) );
+		self::open_card( '05', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
@@ -486,6 +490,11 @@ class Blogcraft_Connection {
 		echo '</div>';
 		echo '</form>';
 		self::close_card();
+
+		echo '</div>';
+		self::render_jump();
+		echo '</div>';
+
 		echo '</div>';
 	}
 
@@ -499,14 +508,16 @@ class Blogcraft_Connection {
 	 * @param string $step        Step number.
 	 * @param string $title       Card title.
 	 * @param string $description One line on what the card is for.
+	 * @param string $slug        Anchor slug, so the rail can link to it.
 	 * @return void
 	 */
-	private static function open_card( $step, $title, $description ) {
+	private static function open_card( $step, $title, $description, $slug = '' ) {
 		printf(
-			'<section class="blogcraft-card"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p></header>',
+			'<section class="blogcraft-card" id="%4$s"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p></header>',
 			esc_html( $step ),
 			esc_html( $title ),
-			esc_html( $description )
+			esc_html( $description ),
+			esc_attr( '' === $slug ? '' : 'bc-card-' . $slug )
 		);
 	}
 
@@ -517,6 +528,43 @@ class Blogcraft_Connection {
 	 */
 	private static function close_card() {
 		echo '</section>';
+	}
+
+	/**
+	 * Jump links to each section of this screen.
+	 *
+	 * Settings runs to five long cards, and the space to the right of them was
+	 * empty on any normal monitor. Plain anchors rather than script: they work
+	 * before JavaScript loads, survive it failing, and can be opened in a new
+	 * tab or bookmarked, which a click handler cannot.
+	 *
+	 * @return void
+	 */
+	private static function render_jump() {
+		$sections = array(
+			'provider'   => __( 'Connect a provider', 'blogcraft' ),
+			'research'   => __( 'Research', 'blogcraft' ),
+			'voice'      => __( 'Describe your voice', 'blogcraft' ),
+			'automation' => __( 'Automation', 'blogcraft' ),
+			'test'       => __( 'Check it works', 'blogcraft' ),
+		);
+
+		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'blogcraft' ) . '">';
+		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft' ) );
+
+		$step = 1;
+
+		foreach ( $sections as $slug => $label ) {
+			printf(
+				'<a class="bc-jump-item" href="#bc-card-%1$s"><span class="bc-jump-step">%2$02d</span>%3$s</a>',
+				esc_attr( $slug ),
+				(int) $step,
+				esc_html( $label )
+			);
+			++$step;
+		}
+
+		echo '</nav>';
 	}
 
 	/**

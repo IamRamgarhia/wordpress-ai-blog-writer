@@ -325,6 +325,8 @@ class Blogcraft_Generate {
 				'required_terms',
 				'external_links_target',
 				'banned_phrases',
+				'negative_keywords',
+				'avoid_subjects',
 			),
 			'toggle' => array(
 				'takeaways',
@@ -731,8 +733,20 @@ class Blogcraft_Generate {
 			Blogcraft_Controls::row(
 				__( 'Never write', 'blogcraft' ),
 				__( 'One per line. Measured.', 'blogcraft' ),
-				Blogcraft_Controls::area( 'o_banned_phrases', $bp['banned_phrases'], "delve into\nin today's fast-paced world", 4 ),
+				Blogcraft_Controls::area( 'o_banned_phrases', $bp['banned_phrases'], "delve into\nin today's fast-paced world", 3 ),
 				'bc_o_banned_phrases'
+			),
+			Blogcraft_Controls::row(
+				__( 'Never mention', 'blogcraft' ),
+				__( 'One per line. Competitors, brands, claims that must not appear at all. Measured, weighted heavily.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_negative_keywords', $bp['negative_keywords'], __( "a competitor's name", 'blogcraft' ), 3 ),
+				'bc_o_negative_keywords'
+			),
+			Blogcraft_Controls::row(
+				__( 'Steer clear of', 'blogcraft' ),
+				__( 'One per line. Subjects to avoid even in passing.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_avoid_subjects', $bp['avoid_subjects'], __( 'medical advice', 'blogcraft' ), 3 ),
+				'bc_o_avoid_subjects'
 			),
 		);
 

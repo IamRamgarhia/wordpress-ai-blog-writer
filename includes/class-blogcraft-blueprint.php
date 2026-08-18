@@ -174,6 +174,8 @@ class Blogcraft_Blueprint {
 			'locale_spelling'       => array( 'choice', 'us' ),
 			'brand_terms'           => array( 'list', '' ),
 			'banned_phrases'        => array( 'list', '' ),
+			'negative_keywords'     => array( 'list', '' ),
+			'avoid_subjects'        => array( 'list', '' ),
 
 			// Structure.
 			'word_target'           => array( 'int', 1200 ),
@@ -541,6 +543,20 @@ class Blogcraft_Blueprint {
 
 		if ( ! empty( $banned ) ) {
 			$lines[] = 'Never use these words or phrases: ' . implode( '; ', $banned ) . '.';
+		}
+
+		$negative = self::list_of( $blueprint, 'negative_keywords' );
+
+		if ( ! empty( $negative ) ) {
+			$lines[] = 'These must not appear anywhere, in any form: ' . implode( '; ', $negative )
+				. '. Do not name them, hint at them, or work around them.';
+		}
+
+		$avoid = self::list_of( $blueprint, 'avoid_subjects' );
+
+		if ( ! empty( $avoid ) ) {
+			$lines[] = 'Do not cover these subjects, even in passing: ' . implode( '; ', $avoid )
+				. '. If the topic seems to require one, write around it.';
 		}
 
 		$devices = self::chosen( $blueprint, 'literary_devices' );

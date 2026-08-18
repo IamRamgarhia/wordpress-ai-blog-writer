@@ -569,6 +569,91 @@ a.bc-nav-item:hover {
 	margin-right: 14px;
 }
 
+/* ------------------------------------------------- settings jump links. */
+
+.bc-settings-shell {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 232px;
+	gap: 24px;
+	align-items: start;
+}
+
+.bc-settings-main {
+	min-width: 0;
+}
+
+.bc-jump {
+	position: sticky;
+	top: 46px;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	padding: 14px;
+	border: 1px solid var(--bc-line);
+	border-radius: 10px;
+	background: var(--bc-surface);
+}
+
+.bc-jump-title {
+	margin: 0 0 8px;
+	padding: 0;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--bc-muted);
+}
+
+.bc-jump-item {
+	display: flex;
+	align-items: baseline;
+	gap: 9px;
+	padding: 7px 9px;
+	border-radius: 7px;
+	font-size: 13px;
+	text-decoration: none;
+	color: var(--bc-ink);
+	transition: background 120ms ease;
+}
+
+.bc-jump-item:hover,
+.bc-jump-item:focus-visible {
+	background: var(--bc-accent-soft);
+	color: var(--bc-accent);
+}
+
+/* The numbering is real: setup runs in this order, since nothing generates
+   without a provider and automation only makes sense once writing looks right. */
+.bc-jump-step {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--bc-muted);
+}
+
+/* Anchored cards must not land under the sticky admin bar. */
+.blogcraft-card[id] {
+	scroll-margin-top: 46px;
+}
+
+@media screen and (max-width: 1100px) {
+	.bc-settings-shell {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.bc-jump {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.bc-jump-title {
+		width: 100%;
+		margin-bottom: 4px;
+	}
+}
+
 @media screen and (max-width: 782px) {
 	.blogcraft-card {
 		padding: 18px 16px 6px 18px;

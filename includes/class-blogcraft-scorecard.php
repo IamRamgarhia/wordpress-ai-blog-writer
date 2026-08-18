@@ -40,6 +40,7 @@ class Blogcraft_Scorecard {
 		$checks[] = self::sentences( $metrics, $blueprint );
 		$checks[] = self::paragraphs( $metrics, $blueprint );
 		$checks[] = self::banned( $metrics );
+		$checks[] = self::negative( $metrics );
 		$checks[] = self::em_dashes( $metrics, $blueprint );
 
 		if ( '' !== trim( (string) $blueprint['primary_keyword'] ) ) {
@@ -272,6 +273,36 @@ class Blogcraft_Scorecard {
 			sprintf( '%d found', count( $hits ) ),
 			__( 'none', 'blogcraft' ),
 			12,
+			$repair
+		);
+	}
+
+	/**
+	 * Terms that were told never to appear.
+	 *
+	 * Weighted heavily. A banned phrase is a style slip; a negative keyword is
+	 * usually a competitor, a legal risk or a claim the site must not make, and
+	 * publishing one is a different order of mistake.
+	 *
+	 * @param array $metrics Metrics.
+	 * @return array
+	 */
+	private static function negative( $metrics ) {
+		$hits = isset( $metrics['negative_hits'] ) ? (array) $metrics['negative_hits'] : array();
+		$pass = empty( $hits );
+
+		$repair = $pass ? '' : sprintf(
+			'These must not appear at all. Remove every mention and rewrite the sentences around them: %s.',
+			implode( ', ', $hits )
+		);
+
+		return self::check(
+			'negative',
+			__( 'Excluded terms', 'blogcraft' ),
+			$pass,
+			sprintf( '%d found', count( $hits ) ),
+			__( 'none', 'blogcraft' ),
+			18,
 			$repair
 		);
 	}

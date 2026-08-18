@@ -758,6 +758,20 @@ class Blogcraft_Blueprint_Screen {
 			'bc_banned_phrases'
 		);
 
+		self::row(
+			__( 'Never mention', 'blogcraft' ),
+			__( 'One per line. Measured, and weighted heavily. For competitors, brands and claims that must never appear at all.', 'blogcraft' ),
+			self::area( 'negative_keywords', $bp['negative_keywords'], "a competitor's name\nguaranteed results", 4 ),
+			'bc_negative_keywords'
+		);
+
+		self::row(
+			__( 'Steer clear of', 'blogcraft' ),
+			__( 'One per line. Subjects to avoid even in passing. Sent to the model rather than measured, because a subject is not a single word.', 'blogcraft' ),
+			self::area( 'avoid_subjects', $bp['avoid_subjects'], "medical advice\npolitics\nprice comparisons", 4 ),
+			'bc_avoid_subjects'
+		);
+
 		echo '</section>';
 	}
 

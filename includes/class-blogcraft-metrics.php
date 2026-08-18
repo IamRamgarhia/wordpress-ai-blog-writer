@@ -356,6 +356,14 @@ class Blogcraft_Metrics {
 
 		$required = self::term_coverage( $text, Blogcraft_Blueprint::list_of( $blueprint, 'required_terms' ) );
 
+		$negative = array();
+
+		foreach ( Blogcraft_Blueprint::list_of( $blueprint, 'negative_keywords' ) as $term ) {
+			if ( self::phrase_count( $text, $term ) > 0 ) {
+				$negative[] = $term;
+			}
+		}
+
 		return array(
 			'words'           => count( $words ),
 			'sentences'       => count( self::sentences( $text ) ),
@@ -373,6 +381,7 @@ class Blogcraft_Metrics {
 			'em_dashes'       => substr_count( (string) $content, '—' ),
 			'keyword_density' => self::density( $text, (string) $blueprint['primary_keyword'] ),
 			'banned_hits'     => $banned,
+			'negative_hits'   => $negative,
 			'terms_covered'   => $required['covered'],
 			'terms_missing'   => $required['missing'],
 		);
