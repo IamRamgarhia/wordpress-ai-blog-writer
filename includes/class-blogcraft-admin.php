@@ -59,6 +59,7 @@ class Blogcraft_Admin {
 		$configured = Blogcraft_Provider_Registry::is_configured();
 
 		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Blogcraft', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'What is queued, what is waiting on you, and what it has cost.', 'blogcraft' ) . '</p>';

@@ -79,6 +79,59 @@ class Blogcraft_Provider_Registry {
 	}
 
 	/**
+	 * Where to get an API key for each provider.
+	 *
+	 * The commonest place to get stuck is not the plugin at all: it is finding
+	 * the page that issues a key. Every provider buries it somewhere different.
+	 *
+	 * @param string $type Provider type id.
+	 * @return array Keys: label, key_url, docs_url. Empty strings when unknown.
+	 */
+	public static function help( $type ) {
+		$map = array(
+			'openai'    => array(
+				'label'    => 'OpenAI',
+				'key_url'  => 'https://platform.openai.com/api-keys',
+				'docs_url' => 'https://platform.openai.com/docs/models',
+			),
+			'gemini'    => array(
+				'label'    => 'Google AI Studio',
+				'key_url'  => 'https://aistudio.google.com/app/apikey',
+				'docs_url' => 'https://ai.google.dev/gemini-api/docs/models',
+			),
+			'anthropic' => array(
+				'label'    => 'Anthropic Console',
+				'key_url'  => 'https://console.anthropic.com/settings/keys',
+				'docs_url' => 'https://docs.anthropic.com/en/docs/about-claude/models',
+			),
+			'custom'    => array(
+				'label'    => '',
+				'key_url'  => '',
+				'docs_url' => '',
+			),
+		);
+
+		$type = (string) $type;
+
+		return isset( $map[ $type ] ) ? $map[ $type ] : $map['custom'];
+	}
+
+	/**
+	 * The same, for every provider at once, for the front end to switch between.
+	 *
+	 * @return array
+	 */
+	public static function help_map() {
+		$out = array();
+
+		foreach ( array_keys( self::types() ) as $type ) {
+			$out[ $type ] = self::help( $type );
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Whether a provider is genuinely usable, not merely selected.
 	 *
 	 * The from_settings() method returns an object whenever a provider type is

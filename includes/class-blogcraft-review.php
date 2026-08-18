@@ -95,6 +95,7 @@ class Blogcraft_Review {
 		$posts  = self::pending_posts();
 
 		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Needs review', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Posts held back because they scored below your quality threshold.', 'blogcraft' ) . '</p>';

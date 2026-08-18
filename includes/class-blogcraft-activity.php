@@ -77,6 +77,7 @@ class Blogcraft_Activity {
 		}
 
 		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Activity', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'What the plugin has been doing, and why anything stopped.', 'blogcraft' ) . '</p>';

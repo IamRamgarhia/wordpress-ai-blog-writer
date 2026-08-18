@@ -11,7 +11,8 @@
  * nobody is allowed to download.
  */
 
-.blogcraft-blueprint {
+.blogcraft-blueprint,
+.blogcraft-page.blogcraft-compose-page {
 	--bp-ink: #16181d;
 	--bp-graphite: #5b616e;
 	--bp-faint: #8b909b;
@@ -28,7 +29,8 @@
 	margin-right: 20px;
 }
 
-.blogcraft-blueprint * {
+.blogcraft-blueprint *,
+.blogcraft-compose-page .bc-compose * {
 	box-sizing: border-box;
 }
 
@@ -483,6 +485,233 @@
 
 .bc-brief-body.is-stale {
 	opacity: 0.45;
+}
+
+/* ------------------------------------------------------------- composer. */
+
+.bc-compose {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+	gap: 20px;
+	align-items: start;
+	margin: 0 0 18px;
+}
+
+.bc-compose-main {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	min-width: 0;
+}
+
+.bc-pane-topic {
+	padding-top: 4px;
+}
+
+.bc-text-lead {
+	max-width: none;
+	padding: 11px 13px;
+	font-size: 15px;
+}
+
+.bc-clash {
+	margin: 9px 0 0;
+	padding: 9px 13px;
+	border-left: 3px solid var(--bp-measure);
+	border-radius: 0 7px 7px 0;
+	background: var(--bp-measure-soft);
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--bp-ink);
+}
+
+.bc-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3px;
+	padding: 4px;
+	border: 1px solid var(--bp-line);
+	border-radius: 10px;
+	background: var(--bp-wash);
+}
+
+.bc-tab {
+	padding: 8px 15px;
+	border: 0;
+	border-radius: 7px;
+	background: none;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--bp-graphite);
+	cursor: pointer;
+	transition: background 120ms ease, color 120ms ease;
+}
+
+.bc-tab:hover {
+	color: var(--bp-ink);
+}
+
+.bc-tab.is-active {
+	background: var(--bp-paper);
+	color: var(--bp-ink);
+	font-weight: 620;
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.12);
+}
+
+.bc-tab:focus-visible {
+	outline: 2px solid var(--bp-accent);
+	outline-offset: 1px;
+}
+
+.bc-compose-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin: 0 0 26px;
+}
+
+/* ------------------------------------------------------------- outcome. */
+
+.bc-outcome {
+	position: sticky;
+	top: 60px;
+	border: 1px solid var(--bp-line);
+	border-radius: 14px;
+	background: var(--bp-paper);
+	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
+	overflow: hidden;
+}
+
+.bc-outcome-head {
+	padding: 15px 18px 12px;
+	border-bottom: 1px solid var(--bp-hair);
+	background: linear-gradient(var(--bp-paper), var(--bp-wash));
+}
+
+.bc-outcome-head h2 {
+	margin: 0 0 3px;
+	padding: 0;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--bp-accent);
+}
+
+.bc-outcome-head p {
+	margin: 0;
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--bp-graphite);
+}
+
+.bc-outcome-body {
+	padding: 14px 18px 18px;
+	transition: opacity 140ms ease;
+}
+
+.bc-outcome-body.is-stale {
+	opacity: 0.45;
+}
+
+.bc-shape {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: none;
+}
+
+.bc-shape li {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 0;
+	padding: 7px 0 7px 12px;
+	border-left: 2px solid var(--bp-line);
+	font-size: 13px;
+}
+
+/* Sections are the article; the furniture around them reads quieter. */
+.bc-shape .bc-shape-section {
+	border-left-color: var(--bp-accent);
+}
+
+.bc-shape-label {
+	font-weight: 600;
+	color: var(--bp-ink);
+}
+
+.bc-shape-toc .bc-shape-label,
+.bc-shape-image .bc-shape-label,
+.bc-shape-related .bc-shape-label {
+	font-weight: 500;
+	color: var(--bp-graphite);
+}
+
+.bc-shape-note {
+	flex: 1;
+	min-width: 0;
+	font-size: 12px;
+	color: var(--bp-faint);
+}
+
+.bc-shape-words {
+	margin-left: auto;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 11.5px;
+	font-variant-numeric: tabular-nums;
+	color: var(--bp-measure);
+	white-space: nowrap;
+}
+
+.bc-outcome-figures {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 16px 0 0;
+}
+
+.bc-outcome-figures > div {
+	padding: 10px 12px;
+	border: 1px solid var(--bp-line);
+	border-radius: 9px;
+	background: var(--bp-wash);
+}
+
+.bc-figure {
+	display: block;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 19px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--bp-ink);
+}
+
+.bc-figure-label {
+	display: block;
+	margin-top: 2px;
+	font-size: 11.5px;
+	color: var(--bp-graphite);
+}
+
+.bc-warn {
+	margin: 12px 0 0;
+	padding: 9px 12px;
+	border-left: 3px solid var(--bp-measure);
+	border-radius: 0 7px 7px 0;
+	background: var(--bp-measure-soft);
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--bp-ink);
+}
+
+@media screen and (max-width: 1100px) {
+	.bc-compose {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.bc-outcome {
+		position: static;
+	}
 }
 
 /* -------------------------------------------------------------- narrow. */

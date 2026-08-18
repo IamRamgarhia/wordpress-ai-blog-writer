@@ -76,6 +76,16 @@ class Blogcraft_Connection {
 			BLOGCRAFT_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'blogcraft-admin',
+			'blogcraftProviders',
+			array(
+				'help'    => Blogcraft_Provider_Registry::help_map(),
+				/* translators: %s: provider name, such as OpenAI. */
+				'keyText' => __( 'Get a key from %s', 'blogcraft' ),
+			)
+		);
 	}
 
 	/**
@@ -110,6 +120,54 @@ class Blogcraft_Connection {
 				__( 'The model id exactly as your provider writes it, such as gpt-4o-mini, gemini-2.0-flash, claude-sonnet-4-5 or llama3.1. Nothing runs until this is filled in.', 'blogcraft' ),
 			),
 		);
+	}
+
+	/**
+	 * Where to get a key for the chosen provider.
+	 *
+	 * Finding the page that issues a key is the commonest place to get stuck,
+	 * and it is somewhere different for every provider. The link is swapped by
+	 * script when the provider changes, and rendered server-side first so it is
+	 * right before any script runs.
+	 *
+	 * @param string $type Provider type.
+	 * @return void
+	 */
+	private static function render_provider_help( $type ) {
+		$help = Blogcraft_Provider_Registry::help( $type );
+
+		echo '<p class="blogcraft-provider-help" id="blogcraft-provider-help"';
+
+		if ( '' === $help['key_url'] ) {
+			echo ' hidden';
+		}
+
+		echo '>';
+
+		printf(
+			'<a href="%1$s" target="_blank" rel="noopener noreferrer" data-role="key">%2$s</a>',
+			esc_url( $help['key_url'] ),
+			esc_html(
+				sprintf(
+					/* translators: %s: provider name, such as OpenAI. */
+					__( 'Get a key from %s', 'blogcraft' ),
+					$help['label']
+				)
+			)
+		);
+
+		printf(
+			' <a href="%1$s" target="_blank" rel="noopener noreferrer" data-role="docs">%2$s</a>',
+			esc_url( $help['docs_url'] ),
+			esc_html__( 'See their model names', 'blogcraft' )
+		);
+
+		printf(
+			'<span class="screen-reader-text"> %s</span>',
+			esc_html__( '(opens in a new tab)', 'blogcraft' )
+		);
+
+		echo '</p>';
 	}
 
 	/**
@@ -232,6 +290,7 @@ class Blogcraft_Connection {
 		$result = get_transient( self::RESULT_TRANSIENT . get_current_user_id() );
 
 		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft' ) . '</p>';
@@ -277,6 +336,7 @@ class Blogcraft_Connection {
 			esc_attr( '' === $key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $key ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		self::render_provider_help( $type );
 		echo '</td></tr>';
 
 		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'blogcraft' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'blogcraft' ) );

@@ -92,6 +92,7 @@ class Blogcraft_Calendar {
 		}
 
 		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Calendar', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Your topic queue, against the schedule it will run on.', 'blogcraft' ) . '</p>';

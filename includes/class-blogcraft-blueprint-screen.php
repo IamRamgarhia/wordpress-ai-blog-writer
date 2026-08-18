@@ -132,6 +132,8 @@ class Blogcraft_Blueprint_Screen {
 
 		echo '<div class="wrap blogcraft-page blogcraft-blueprint">';
 
+		Blogcraft_Nav::render();
+
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
 
 		if ( is_array( $notice ) ) {

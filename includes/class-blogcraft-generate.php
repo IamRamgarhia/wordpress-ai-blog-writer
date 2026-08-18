@@ -57,6 +57,113 @@ class Blogcraft_Generate {
 		add_action( 'admin_post_blogcraft_run_queue_now', array( __CLASS__, 'handle_run_now' ) );
 		add_action( 'admin_post_blogcraft_bulk_topics', array( __CLASS__, 'handle_bulk' ) );
 		add_action( 'admin_post_blogcraft_rollback', array( __CLASS__, 'handle_rollback' ) );
+		add_action( 'wp_ajax_blogcraft_preview_post', array( __CLASS__, 'handle_preview' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+	}
+
+	/**
+	 * Load the composer's styling and behaviour, on this screen only.
+	 *
+	 * @param string $hook Current admin page hook.
+	 * @return void
+	 */
+	public static function enqueue( $hook ) {
+		if ( false === strpos( (string) $hook, self::PAGE_SLUG ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'blogcraft-blueprint',
+			BLOGCRAFT_URL . 'assets/blueprint.css',
+			array(),
+			BLOGCRAFT_VERSION
+		);
+
+		wp_enqueue_script(
+			'blogcraft-compose',
+			BLOGCRAFT_URL . 'assets/compose.js',
+			array(),
+			BLOGCRAFT_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'blogcraft-compose',
+			'blogcraftCompose',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			)
+		);
+	}
+
+	/**
+	 * The outcome panel, reduced to markup that cannot carry script.
+	 *
+	 * Everything in outcome_html() is escaped as it is built, so this changes
+	 * nothing today. It exists so that the front end can keep inserting the
+	 * response as markup without that being one careless future edit away from
+	 * an injection: the allowlist below has no script, no event attributes and
+	 * no href, so there is nothing to exploit even if an unescaped value slips
+	 * in upstream.
+	 *
+	 * @param array $blueprint Blueprint to describe.
+	 * @return string
+	 */
+	private static function safe_outcome( $blueprint ) {
+		return wp_kses(
+			self::outcome_html( $blueprint ),
+			array(
+				'ol'   => array( 'class' => array() ),
+				'li'   => array( 'class' => array() ),
+				'div'  => array( 'class' => array() ),
+				'p'    => array( 'class' => array() ),
+				'span' => array( 'class' => array() ),
+			)
+		);
+	}
+
+	/**
+	 * Recompute the outcome panel for an unsaved brief.
+	 *
+	 * Rendered server-side for the same reason the blueprint brief is: the panel
+	 * claims to predict what will actually be produced, and a second copy of that
+	 * arithmetic in script would drift from the one the pipeline uses.
+	 *
+	 * @return void
+	 */
+	public static function handle_preview() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+		}
+
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+		}
+
+		$raw = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is sanitised by type in Blogcraft_Blueprint::normalise().
+
+		$blueprint = Blogcraft_Blueprint::with_overrides(
+			Blogcraft_Blueprint::get(),
+			self::overrides_from( $raw )
+		);
+
+		$topic = isset( $raw['topic'] ) && ! is_array( $raw['topic'] ) ? sanitize_text_field( (string) $raw['topic'] ) : '';
+		$clash = Blogcraft_Preview::clash( $topic );
+
+		wp_send_json_success(
+			array(
+				'outcome' => self::safe_outcome( $blueprint ),
+				'clash'   => ( '' === $clash )
+					? ''
+					: sprintf(
+						/* translators: %s: the clashing topic. */
+						__( 'This looks like a repeat of "%s". Queueing it anyway is allowed, but near-identical posts are what search engines penalise.', 'blogcraft' ),
+						$clash
+					),
+			)
+		);
 	}
 
 	/**
@@ -87,7 +194,8 @@ class Blogcraft_Generate {
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
 
-		echo '<div class="wrap blogcraft-page">';
+		echo '<div class="wrap blogcraft-page blogcraft-compose-page">';
+		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Write a post', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site.', 'blogcraft' ) . '</p>';
@@ -109,38 +217,21 @@ class Blogcraft_Generate {
 			);
 		}
 
-		self::card_open( __( 'One post', 'blogcraft' ), __( 'Queue a single topic, with anything specific you want for this one.', 'blogcraft' ) );
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" id="blogcraft-compose">';
 		echo '<input type="hidden" name="action" value="blogcraft_queue_topic" />';
+		echo '<input type="hidden" name="bc_compose" value="1" />';
 		Blogcraft_Request::nonce_field( self::QUEUE_ACTION );
-		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="blogcraft_topic">' . esc_html__( 'Topic', 'blogcraft' ) . '</label></th><td>';
-		echo '<input type="text" class="large-text" name="topic" id="blogcraft_topic" value="" required />';
-		echo '<p class="description">' . esc_html__( 'What should the post be about? A sentence works better than a keyword.', 'blogcraft' ) . '</p>';
-		echo '</td></tr>';
+		self::render_composer();
 
-		echo '<tr><th scope="row"><label for="blogcraft_instructions">' . esc_html__( 'Extra instructions', 'blogcraft' ) . '</label></th><td>';
-		echo '<textarea class="large-text" name="instructions" id="blogcraft_instructions" rows="2"></textarea>';
-		echo '<p class="description">' . esc_html__( 'Optional. An angle, a target keyword, anything specific to this post. This is what stops every post reading the same.', 'blogcraft' ) . '</p>';
-		echo '</td></tr>';
-
-		echo '<tr><th scope="row"><label for="blogcraft_status">' . esc_html__( 'When finished', 'blogcraft' ) . '</label></th><td>';
-		echo '<select name="status" id="blogcraft_status">';
-		echo '<option value="draft">' . esc_html__( 'Save as draft for review', 'blogcraft' ) . '</option>';
-		echo '<option value="publish">' . esc_html__( 'Publish immediately', 'blogcraft' ) . '</option>';
-		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Reviewing drafts is strongly recommended.', 'blogcraft' ) . '</p>';
-		echo '</td></tr>';
-
-		echo '</tbody></table>';
-
-		self::render_overrides();
-
-		submit_button( __( 'Queue this post', 'blogcraft' ) );
+		echo '<div class="bc-compose-actions">';
+		printf(
+			'<button type="submit" class="bc-save">%s</button>',
+			esc_html__( 'Queue this post', 'blogcraft' )
+		);
+		echo '</div>';
 		echo '</form>';
 
-		echo '</section>';
 		self::card_open( __( 'Queue', 'blogcraft' ), __( 'Posts are written in the background, one step per run.', 'blogcraft' ) );
 		echo '<ul class="blogcraft-stats">';
 		foreach ( array( 'pending', 'running', 'complete', 'failed' ) as $status ) {
@@ -199,106 +290,78 @@ class Blogcraft_Generate {
 	}
 
 	/**
-	 * Per-post overrides of the blueprint.
-	 *
-	 * Folded away because the common case is a topic and nothing else, and a
-	 * screen that opens with nine optional fields makes the simple path look
-	 * complicated. Blank means "use the brief", never "set to nothing".
-	 *
-	 * @return void
-	 */
-	private static function render_overrides() {
-		$blueprint = Blogcraft_Blueprint::get();
-
-		echo '<details class="blogcraft-overrides">';
-		printf(
-			'<summary>%s</summary>',
-			esc_html__( 'Change the brief for this one post', 'blogcraft' )
-		);
-
-		printf(
-			'<p class="description">%s</p>',
-			esc_html__( 'Leave anything blank to use what Blogcraft, How it writes already says.', 'blogcraft' )
-		);
-
-		echo '<table class="form-table" role="presentation"><tbody>';
-
-		echo '<tr><th scope="row"><label for="blogcraft_o_keyword">' . esc_html__( 'Target phrase', 'blogcraft' ) . '</label></th><td>';
-		echo '<input type="text" class="regular-text" name="o_primary_keyword" id="blogcraft_o_keyword" value="" autocomplete="off" />';
-		printf(
-			'<p class="description">%s</p>',
-			esc_html(
-				'' === trim( (string) $blueprint['primary_keyword'] )
-					? __( 'No phrase is set in the brief.', 'blogcraft' )
-					: sprintf(
-						/* translators: %s: the target phrase from the blueprint. */
-						__( 'The brief says "%s".', 'blogcraft' ),
-						(string) $blueprint['primary_keyword']
-					)
-			)
-		);
-		echo '</td></tr>';
-
-		echo '<tr><th scope="row"><label for="blogcraft_o_words">' . esc_html__( 'Length', 'blogcraft' ) . '</label></th><td>';
-		echo '<input type="number" min="0" step="50" class="small-text" name="o_word_target" id="blogcraft_o_words" value="" />';
-		printf(
-			'<p class="description">%s</p>',
-			esc_html(
-				sprintf(
-					/* translators: %d: word target from the blueprint. */
-					__( 'Words. The brief says %d.', 'blogcraft' ),
-					(int) $blueprint['word_target']
-				)
-			)
-		);
-		echo '</td></tr>';
-
-		echo '<tr><th scope="row"><label for="blogcraft_o_tone">' . esc_html__( 'Tone', 'blogcraft' ) . '</label></th><td>';
-		echo '<select name="o_tone" id="blogcraft_o_tone">';
-		printf(
-			'<option value="">%s</option>',
-			esc_html__( 'Use the brief', 'blogcraft' )
-		);
-
-		foreach ( Blogcraft_Blueprint::tones() as $value => $label ) {
-			if ( 'custom' === $value ) {
-				continue;
-			}
-
-			printf( '<option value="%1$s">%2$s</option>', esc_attr( $value ), esc_html( $label ) );
-		}
-
-		echo '</select></td></tr>';
-
-		echo '<tr><th scope="row"><label for="blogcraft_o_terms">' . esc_html__( 'Must appear', 'blogcraft' ) . '</label></th><td>';
-		echo '<textarea class="large-text" name="o_required_terms" id="blogcraft_o_terms" rows="3"></textarea>';
-		printf(
-			'<p class="description">%s</p>',
-			esc_html__( 'One per line. Each is checked for on the finished draft.', 'blogcraft' )
-		);
-		echo '</td></tr>';
-
-		echo '</tbody></table>';
-		echo '</details>';
-	}
-
-	/**
 	 * Read blueprint overrides out of the submitted form.
 	 *
 	 * @param array $source Unslashed request data.
 	 * @return array Sparse field values.
 	 */
-	private static function overrides_from( $source ) {
-		$out = array();
-
-		$map = array(
-			'o_primary_keyword' => 'primary_keyword',
-			'o_word_target'     => 'word_target',
-			'o_tone'            => 'tone',
-			'o_required_terms'  => 'required_terms',
+	/**
+	 * The blueprint fields the composer lets a post override.
+	 *
+	 * Named explicitly rather than inferred from the request. Toggles post
+	 * nothing when switched off, so without a known list there is no way to
+	 * tell "the user turned the FAQ off" from "the field was never rendered",
+	 * and one of those must not silently become the other.
+	 *
+	 * @return array Keys: text, toggle, multi.
+	 */
+	private static function override_fields() {
+		return array(
+			'text'   => array(
+				'word_target',
+				'sections_min',
+				'sections_max',
+				'intro_style',
+				'conclusion_style',
+				'tone',
+				'tone_custom',
+				'point_of_view',
+				'audience',
+				'audience_custom',
+				'reading_level',
+				'sentence_max_words',
+				'primary_keyword',
+				'secondary_keywords',
+				'required_terms',
+				'external_links_target',
+				'banned_phrases',
+			),
+			'toggle' => array(
+				'takeaways',
+				'faq',
+				'toc',
+				'tables',
+				'lists',
+				'sentence_variety',
+				'allow_contractions',
+				'allow_em_dash',
+				'require_experience',
+				'require_citations',
+				'require_statistics',
+			),
+			'multi'  => array( 'literary_devices' ),
 		);
+	}
 
-		foreach ( $map as $field => $key ) {
+	/**
+	 * Read this post's brief out of the submitted form.
+	 *
+	 * @param array $source Unslashed request data.
+	 * @return array Sparse blueprint field values.
+	 */
+	private static function overrides_from( $source ) {
+		$fields = self::override_fields();
+		$out    = array();
+
+		// Only treat this as an override submission when the composer was the
+		// thing that posted, so the bulk form cannot blank the brief.
+		if ( ! isset( $source['bc_compose'] ) ) {
+			return $out;
+		}
+
+		foreach ( $fields['text'] as $key ) {
+			$field = 'o_' . $key;
+
 			if ( ! isset( $source[ $field ] ) || is_array( $source[ $field ] ) ) {
 				continue;
 			}
@@ -310,8 +373,478 @@ class Blogcraft_Generate {
 			}
 		}
 
+		// A toggle absent from the post means the user switched it off.
+		foreach ( $fields['toggle'] as $key ) {
+			$out[ $key ] = isset( $source[ 'o_' . $key ] );
+		}
+
+		foreach ( $fields['multi'] as $key ) {
+			$field  = 'o_' . $key;
+			$chosen = isset( $source[ $field ] ) && is_array( $source[ $field ] ) ? $source[ $field ] : array();
+			$clean  = array();
+
+			foreach ( $chosen as $value ) {
+				$value = sanitize_key( (string) $value );
+
+				if ( '' !== $value ) {
+					$clean[] = $value;
+				}
+			}
+
+			$out[ $key ] = implode( ',', $clean );
+		}
+
 		return $out;
 	}
+
+	/*
+	 * Blogcraft_Controls escapes every value as it builds its markup, and
+	 * outcome_html() does the same. PHPCS cannot follow a string across a method
+	 * boundary, so it reads every echo below as raw output. Scoped off here
+	 * rather than annotated a dozen times, which would bury the one place that
+	 * genuinely needs reading.
+	 */
+	// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+
+	/**
+	 * The composer: topic, the full brief for this post, and what it will produce.
+	 *
+	 * This is where the work happens, so everything needed to decide "queue this
+	 * or change something first" is on one screen. The panel on the right is the
+	 * point: it shows the shape of the post, how the word budget divides, what
+	 * the run will roughly cost, and whether the topic clashes with something
+	 * already written — all before a token is spent.
+	 *
+	 * @return void
+	 */
+	private static function render_composer() {
+		$blueprint = Blogcraft_Blueprint::get();
+
+		echo '<div class="bc-compose">';
+		echo '<div class="bc-compose-main">';
+
+		self::render_topic();
+		self::render_brief_tabs( $blueprint );
+
+		echo '</div>';
+
+		self::render_outcome( $blueprint );
+
+		echo '</div>';
+	}
+
+	/**
+	 * The topic field and the things that belong beside it.
+	 *
+	 * @return void
+	 */
+	private static function render_topic() {
+		echo '<section class="bc-pane bc-pane-topic">';
+
+		echo Blogcraft_Controls::row(
+			__( 'Topic', 'blogcraft' ),
+			__( 'A sentence works better than a keyword. Say what the post should actually answer.', 'blogcraft' ),
+			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'blogcraft' ) . '" /><p class="bc-clash" id="bc-clash" hidden></p>',
+			'bc_topic'
+		);
+
+		echo Blogcraft_Controls::row(
+			__( 'Angle for this post', 'blogcraft' ),
+			__( 'Anything true of this one post only. This is what stops every post reading the same.', 'blogcraft' ),
+			Blogcraft_Controls::area( 'instructions', '', __( 'Compare three price brackets and say which is worth it.', 'blogcraft' ), 2 ),
+			'bc_instructions'
+		);
+
+		echo Blogcraft_Controls::row(
+			__( 'When it is finished', 'blogcraft' ),
+			'',
+			Blogcraft_Controls::segmented(
+				'status',
+				array(
+					'draft'   => __( 'Save as a draft', 'blogcraft' ),
+					'publish' => __( 'Publish it', 'blogcraft' ),
+				),
+				'draft'
+			)
+		);
+
+		echo '</section>';
+	}
+
+	/**
+	 * The full brief for this post, grouped behind tabs.
+	 *
+	 * Every field is prefixed so it overrides the saved blueprint for this post
+	 * alone. Defaults are pre-filled from the blueprint rather than left blank,
+	 * because a screen of empty fields hides what will actually happen.
+	 *
+	 * @param array $bp Resolved blueprint.
+	 * @return void
+	 */
+	private static function render_brief_tabs( $bp ) {
+		echo '<div class="bc-tabs" role="tablist">';
+
+		$tabs = array(
+			'shape' => __( 'Shape', 'blogcraft' ),
+			'voice' => __( 'Voice', 'blogcraft' ),
+			'seo'   => __( 'Search', 'blogcraft' ),
+			'human' => __( 'Sounding human', 'blogcraft' ),
+		);
+
+		$first = true;
+
+		foreach ( $tabs as $slug => $label ) {
+			printf(
+				'<button type="button" class="bc-tab%1$s" data-tab="%2$s" role="tab" aria-selected="%3$s">%4$s</button>',
+				$first ? ' is-active' : '',
+				esc_attr( $slug ),
+				$first ? 'true' : 'false',
+				esc_html( $label )
+			);
+			$first = false;
+		}
+
+		echo '</div>';
+
+		self::tab_shape( $bp );
+		self::tab_voice( $bp );
+		self::tab_seo( $bp );
+		self::tab_human( $bp );
+	}
+
+	/**
+	 * Open one tab panel.
+	 *
+	 * @param string $slug   Tab slug.
+	 * @param bool   $active Whether it starts visible.
+	 * @return void
+	 */
+	private static function tab_open( $slug, $active = false ) {
+		printf(
+			'<section class="bc-pane bc-tabpanel%1$s" data-tab="%2$s" role="tabpanel"%3$s>',
+			$active ? ' is-active' : '',
+			esc_attr( $slug ),
+			$active ? '' : ' hidden'
+		);
+	}
+
+	/**
+	 * Structure controls for this post.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function tab_shape( $bp ) {
+		self::tab_open( 'shape', true );
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Length', 'blogcraft' ),
+				__( 'Measured on the finished draft.', 'blogcraft' ),
+				Blogcraft_Controls::slider( 'o_word_target', 300, 4000, 50, $bp['word_target'], __( ' words', 'blogcraft' ) ),
+				'bc_o_word_target'
+			),
+			Blogcraft_Controls::row(
+				__( 'Fewest sections', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::slider( 'o_sections_min', 1, 12, 1, $bp['sections_min'] ),
+				'bc_o_sections_min'
+			),
+			Blogcraft_Controls::row(
+				__( 'Most sections', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::slider( 'o_sections_max', 1, 15, 1, $bp['sections_max'] ),
+				'bc_o_sections_max'
+			),
+			Blogcraft_Controls::row(
+				__( 'How it opens', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_intro_style', Blogcraft_Blueprint::intro_styles(), $bp['intro_style'] ),
+				'bc_o_intro_style'
+			),
+			Blogcraft_Controls::row(
+				__( 'How it ends', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_conclusion_style', Blogcraft_Blueprint::conclusion_styles(), $bp['conclusion_style'] ),
+				'bc_o_conclusion_style'
+			),
+			Blogcraft_Controls::row(
+				__( 'Include', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::toggle( 'o_takeaways', $bp['takeaways'], __( 'Key takeaways', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_faq', $bp['faq'], __( 'Questions and answers', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_toc', $bp['toc'], __( 'Table of contents', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_tables', $bp['tables'], __( 'Tables', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_lists', $bp['lists'], __( 'Bulleted lists', 'blogcraft' ) )
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
+	 * Voice controls for this post.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function tab_voice( $bp ) {
+		self::tab_open( 'voice' );
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Tone', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_tone', Blogcraft_Blueprint::tones(), $bp['tone'] ),
+				'bc_o_tone'
+			),
+			Blogcraft_Controls::row(
+				__( 'Describe the tone', 'blogcraft' ),
+				__( 'Used only when the tone above is set to something else.', 'blogcraft' ),
+				Blogcraft_Controls::text( 'o_tone_custom', $bp['tone_custom'], __( 'Dry, a little sceptical', 'blogcraft' ) ),
+				'bc_o_tone_custom'
+			),
+			Blogcraft_Controls::row(
+				__( 'Who is speaking', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::segmented( 'o_point_of_view', Blogcraft_Blueprint::points_of_view(), $bp['point_of_view'] )
+			),
+			Blogcraft_Controls::row(
+				__( 'Who is reading', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_audience', Blogcraft_Blueprint::audiences(), $bp['audience'] ),
+				'bc_o_audience'
+			),
+			Blogcraft_Controls::row(
+				__( 'Describe the reader', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::text( 'o_audience_custom', $bp['audience_custom'], __( 'People setting up a first home office', 'blogcraft' ) ),
+				'bc_o_audience_custom'
+			),
+			Blogcraft_Controls::row(
+				__( 'Reading level', 'blogcraft' ),
+				__( 'Measured as a Flesch Reading Ease band.', 'blogcraft' ),
+				Blogcraft_Controls::select( 'o_reading_level', self::reading_labels(), $bp['reading_level'] ),
+				'bc_o_reading_level'
+			),
+			Blogcraft_Controls::row(
+				__( 'Longest sentence', 'blogcraft' ),
+				__( 'Measured.', 'blogcraft' ),
+				Blogcraft_Controls::slider( 'o_sentence_max_words', 12, 50, 1, $bp['sentence_max_words'], __( ' words', 'blogcraft' ) ),
+				'bc_o_sentence_max_words'
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
+	 * Reading level labels, without their bands.
+	 *
+	 * @return array
+	 */
+	private static function reading_labels() {
+		$out = array();
+
+		foreach ( Blogcraft_Blueprint::reading_levels() as $key => $spec ) {
+			$out[ $key ] = $spec[0];
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Search controls for this post.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function tab_seo( $bp ) {
+		self::tab_open( 'seo' );
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Target phrase', 'blogcraft' ),
+				__( 'Measured. Leave blank to let the topic speak for itself.', 'blogcraft' ),
+				Blogcraft_Controls::text( 'o_primary_keyword', $bp['primary_keyword'], __( 'standing desk', 'blogcraft' ) ),
+				'bc_o_primary_keyword'
+			),
+			Blogcraft_Controls::row(
+				__( 'Also cover', 'blogcraft' ),
+				__( 'One per line.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_secondary_keywords', $bp['secondary_keywords'], "adjustable desk\nsit stand desk" ),
+				'bc_o_secondary_keywords'
+			),
+			Blogcraft_Controls::row(
+				__( 'Must appear', 'blogcraft' ),
+				__( 'One per line. Measured — a missing term is reported back and rewritten.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_required_terms', $bp['required_terms'], "ergonomics\nanti-fatigue mat" ),
+				'bc_o_required_terms'
+			),
+			Blogcraft_Controls::row(
+				__( 'Sources to cite', 'blogcraft' ),
+				__( 'Measured.', 'blogcraft' ),
+				Blogcraft_Controls::slider( 'o_external_links_target', 0, 10, 1, $bp['external_links_target'] ),
+				'bc_o_external_links_target'
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
+	 * Authenticity controls for this post.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function tab_human( $bp ) {
+		self::tab_open( 'human' );
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Devices to use', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::chips(
+					'o_literary_devices',
+					Blogcraft_Blueprint::literary_devices(),
+					Blogcraft_Blueprint::chosen( $bp, 'literary_devices' )
+				)
+			),
+			Blogcraft_Controls::row(
+				__( 'Habits', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::toggle( 'o_sentence_variety', $bp['sentence_variety'], __( 'Vary sentence length', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_allow_contractions', $bp['allow_contractions'], __( 'Allow contractions', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_allow_em_dash', $bp['allow_em_dash'], __( 'Allow em dashes', 'blogcraft' ) )
+			),
+			Blogcraft_Controls::row(
+				__( 'Demand', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::toggle( 'o_require_experience', $bp['require_experience'], __( 'First-hand, specific detail', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_require_citations', $bp['require_citations'], __( 'A named source for claims', 'blogcraft' ) )
+				. Blogcraft_Controls::toggle( 'o_require_statistics', $bp['require_statistics'], __( 'Concrete figures', 'blogcraft' ) )
+			),
+			Blogcraft_Controls::row(
+				__( 'Never write', 'blogcraft' ),
+				__( 'One per line. Measured.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_banned_phrases', $bp['banned_phrases'], "delve into\nin today's fast-paced world", 4 ),
+				'bc_o_banned_phrases'
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
+	 * What this post will come out as.
+	 *
+	 * @param array $blueprint Blueprint.
+	 * @return void
+	 */
+	private static function render_outcome( $blueprint ) {
+		echo '<aside class="bc-outcome" aria-labelledby="bc-outcome-title">';
+		echo '<div class="bc-outcome-head">';
+		echo '<h2 id="bc-outcome-title">' . esc_html__( 'What you will get', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'The shape of the post, not its words. Updates as you change anything.', 'blogcraft' ) . '</p>';
+		echo '</div>';
+
+		printf(
+			'<div class="bc-outcome-body" id="bc-outcome-body" aria-live="polite">%s</div>',
+			self::outcome_html( $blueprint )
+		);
+
+		echo '</aside>';
+	}
+
+	/**
+	 * Render the predicted shape, budget and cost.
+	 *
+	 * @param array $blueprint Blueprint.
+	 * @return string
+	 */
+	public static function outcome_html( $blueprint ) {
+		$shape    = Blogcraft_Preview::shape( $blueprint );
+		$warnings = Blogcraft_Preview::warnings( $blueprint, $shape );
+		$tokens   = Blogcraft_Preview::tokens( $blueprint );
+
+		$out = '<ol class="bc-shape">';
+
+		foreach ( $shape as $block ) {
+			$words = ( $block['words'] > 0 )
+				? sprintf(
+					'<span class="bc-shape-words">%s</span>',
+					esc_html(
+						sprintf(
+							/* translators: %d: approximate word count. */
+							__( '~%d words', 'blogcraft' ),
+							(int) $block['words']
+						)
+					)
+				)
+				: '';
+
+			$note = ( '' === $block['note'] )
+				? ''
+				: sprintf( '<span class="bc-shape-note">%s</span>', esc_html( $block['note'] ) );
+
+			$out .= sprintf(
+				'<li class="bc-shape-%1$s"><span class="bc-shape-label">%2$s</span>%3$s%4$s</li>',
+				esc_attr( $block['type'] ),
+				esc_html( $block['label'] ),
+				$note,
+				$words
+			);
+		}
+
+		$out .= '</ol>';
+
+		$out .= '<div class="bc-outcome-figures">';
+		$out .= sprintf(
+			'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
+			esc_html( number_format_i18n( (int) $blueprint['word_target'] ) ),
+			esc_html__( 'Words', 'blogcraft' )
+		);
+		$out .= sprintf(
+			'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
+			esc_html( self::compact( $tokens['total'] ) ),
+			esc_html__( 'Tokens, roughly', 'blogcraft' )
+		);
+		$out .= '</div>';
+
+		$out .= sprintf(
+			'<p class="bc-hint">%s</p>',
+			esc_html__( 'Token estimates are deliberately generous. Your provider bills you, not us.', 'blogcraft' )
+		);
+
+		foreach ( $warnings as $warning ) {
+			$out .= sprintf( '<p class="bc-warn">%s</p>', esc_html( $warning ) );
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Shorten a large number for display.
+	 *
+	 * @param int $value Number.
+	 * @return string
+	 */
+	private static function compact( $value ) {
+		$value = (int) $value;
+
+		if ( $value < 1000 ) {
+			return (string) $value;
+		}
+
+		return number_format_i18n( $value / 1000, 1 ) . 'k';
+	}
+
+	// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	/**
 	 * Queue a submitted topic.
