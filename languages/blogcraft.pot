@@ -2026,6 +2026,34 @@ msgstr ""
 msgid "What is covered"
 msgstr ""
 
+#: includes/class-blogcraft-structure.php:155
+msgid "Image alt text"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:158
+msgid "none missing"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:167
+msgid "Heading order"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:169
+msgid "in order"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:169
+msgid "a level is skipped"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:170
+msgid "no skipped levels"
+msgstr ""
+
+#: includes/class-blogcraft-structure.php:188
+msgid "Thinnest section"
+msgstr ""
+
 #: includes/class-blogcraft-verify.php:166
 msgid "No opening paragraph answering the title."
 msgstr ""

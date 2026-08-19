@@ -484,6 +484,10 @@ class Blogcraft_Scorecard {
 		$metrics = Blogcraft_Metrics::measure( $content, $blueprint );
 		$checks  = self::checks( $metrics, $blueprint );
 
+		// Structural checks read rendered markup rather than prose, so they
+		// build their own verdicts and are merged in whole.
+		$checks = array_merge( $checks, Blogcraft_Structure::checks( $content, $blueprint ) );
+
 		$earned = 0;
 		$total  = 0;
 
