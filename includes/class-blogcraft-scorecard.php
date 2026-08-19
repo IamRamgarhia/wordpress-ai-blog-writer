@@ -59,9 +59,6 @@ class Blogcraft_Scorecard {
 			$checks[] = self::internal_links( $metrics, $blueprint );
 		}
 
-		$checks[] = self::alt_text( $metrics );
-		$checks[] = self::heading_order( $metrics );
-		$checks[] = self::thin_section( $metrics, $blueprint );
 		$checks[] = self::passive( $metrics );
 
 		return $checks;
@@ -450,86 +447,6 @@ class Blogcraft_Scorecard {
 			sprintf( '%d+', $target ),
 			3,
 			''
-		);
-	}
-
-	/**
-	 * Images carrying no alt text.
-	 *
-	 * Published accessibility guidance and a documented image search signal,
-	 * and the sort of thing that goes missing because nothing ever checks.
-	 *
-	 * @param array $metrics Metrics.
-	 * @return array
-	 */
-	private static function alt_text( $metrics ) {
-		$missing = isset( $metrics['images_no_alt'] ) ? (int) $metrics['images_no_alt'] : 0;
-
-		return self::check(
-			'alt_text',
-			__( 'Image alt text', 'blogcraft' ),
-			0 === $missing,
-			sprintf( '%d missing', $missing ),
-			__( 'none missing', 'blogcraft' ),
-			6,
-			''
-		);
-	}
-
-	/**
-	 * Heading levels that descend in order.
-	 *
-	 * A jump from H2 straight to H4 hands a parser a structure that does not
-	 * match the one a reader sees.
-	 *
-	 * @param array $metrics Metrics.
-	 * @return array
-	 */
-	private static function heading_order( $metrics ) {
-		$ok = ! isset( $metrics['heading_order'] ) || (bool) $metrics['heading_order'];
-
-		return self::check(
-			'heading_order',
-			__( 'Heading order', 'blogcraft' ),
-			$ok,
-			$ok ? __( 'in order', 'blogcraft' ) : __( 'a level is skipped', 'blogcraft' ),
-			__( 'no skipped levels', 'blogcraft' ),
-			6,
-			$ok ? '' : 'Heading levels skip a step somewhere. Use H3 only directly beneath an H2, and never jump from H2 to H4.'
-		);
-	}
-
-	/**
-	 * The thinnest section.
-	 *
-	 * A total word count that passes can still hide one forty-word section,
-	 * and a thin section is exactly what reads as padding.
-	 *
-	 * @param array $metrics   Metrics.
-	 * @param array $blueprint Blueprint.
-	 * @return array
-	 */
-	private static function thin_section( $metrics, $blueprint ) {
-		$actual = isset( $metrics['thinnest'] ) ? (int) $metrics['thinnest'] : 0;
-
-		// A fifth of an even split is the point where a section stops saying
-		// anything, and it scales with the length actually asked for.
-		$sections = max( 1, (int) $blueprint['sections_max'] );
-		$floor    = max( 60, (int) round( ( (int) $blueprint['word_target'] / $sections ) * 0.4 ) );
-		$pass     = ( 0 === $actual || $actual >= $floor );
-
-		return self::check(
-			'thin_section',
-			__( 'Thinnest section', 'blogcraft' ),
-			$pass,
-			sprintf( '%d words', $actual ),
-			sprintf( '%d+', $floor ),
-			10,
-			$pass ? '' : sprintf(
-				'One section runs only %1$d words against a %2$d floor. Give it the same depth as the others or fold it into a neighbour.',
-				$actual,
-				$floor
-			)
 		);
 	}
 
