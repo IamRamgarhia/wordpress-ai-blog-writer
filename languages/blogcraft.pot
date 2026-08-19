@@ -18,11 +18,11 @@ msgid "Activity"
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:76
-#: includes/class-blogcraft-admin.php:54
 #: includes/class-blogcraft-blueprint-screen.php:128
 #: includes/class-blogcraft-calendar.php:91
 #: includes/class-blogcraft-connection.php:285
 #: includes/class-blogcraft-generate.php:192
+#: includes/class-blogcraft-overview.php:30
 #: includes/class-blogcraft-review.php:91
 msgid "You are not allowed to access this page."
 msgstr ""
@@ -59,6 +59,7 @@ msgid "Step"
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:149
+#: includes/class-blogcraft-overview.php:324
 msgid "Status"
 msgstr ""
 
@@ -127,97 +128,8 @@ msgstr ""
 
 #: includes/class-blogcraft-admin.php:37
 #: includes/class-blogcraft-admin.php:38
-#: includes/class-blogcraft-admin.php:64
+#: includes/class-blogcraft-overview.php:38
 msgid "Blogcraft"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:65
-msgid "What is queued, what is waiting on you, and what it has cost."
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:71
-msgid "No AI provider is connected yet."
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:73
-msgid "Set one up"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:78
-#: includes/class-blogcraft-generate.php:235
-msgid "Queue"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:79
-msgid "Each post moves through seven steps, one per run, so no single request has to finish the whole pipeline."
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:85
-msgid "Waiting"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:86
-msgid "In progress"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:87
-msgid "Finished"
-msgstr ""
-
-#. translators: %s: the value the blueprint asked for.
-#: includes/class-blogcraft-admin.php:88
-#: includes/class-blogcraft-review.php:225
-msgid "Failed"
-msgstr ""
-
-#. translators: %d: number of failed jobs.
-#: includes/class-blogcraft-admin.php:111
-msgid "%d post could not be written."
-msgid_plural "%d posts could not be written."
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators: %d: number of failed jobs.
-#: includes/class-blogcraft-admin.php:121
-msgid "See why, and try again"
-msgstr ""
-
-#. translators: %s: the clashing topic.
-#: includes/class-blogcraft-admin.php:129
-#: includes/class-blogcraft-generate.php:177
-#: includes/class-blogcraft-generate.php:178
-#: includes/class-blogcraft-generate.php:200
-#: includes/class-blogcraft-nav.php:31
-msgid "Write a post"
-msgstr ""
-
-#. translators: %d: number of posts waiting for review.
-#: includes/class-blogcraft-admin.php:139
-msgid "%d post needs review"
-msgid_plural "%d posts need review"
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators: %d: number of posts waiting for review.
-#: includes/class-blogcraft-admin.php:150
-msgid "This month"
-msgstr ""
-
-#. translators: %d: number of posts waiting for review.
-#: includes/class-blogcraft-admin.php:151
-msgid "Tokens are billed by your provider, not by us. A monthly cap is available in Settings."
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:158
-msgid "Requests"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:163
-msgid "Prompt tokens"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:168
-msgid "Completion tokens"
 msgstr ""
 
 #: includes/class-blogcraft-backlinks.php:91
@@ -243,6 +155,7 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:96
 #: includes/class-blogcraft-blueprint-screen.php:180
 #: includes/class-blogcraft-nav.php:32
+#: includes/class-blogcraft-overview.php:263
 msgid "How it writes"
 msgstr ""
 
@@ -1163,6 +1076,7 @@ msgstr ""
 
 #: includes/class-blogcraft-connection.php:317
 #: includes/class-blogcraft-connection.php:545
+#: includes/class-blogcraft-overview.php:123
 msgid "Connect a provider"
 msgstr ""
 
@@ -1474,6 +1388,15 @@ msgstr ""
 msgid "This looks like a repeat of \"%s\". Queueing it anyway is allowed, but near-identical posts are what search engines penalise."
 msgstr ""
 
+#. translators: %s: the clashing topic.
+#: includes/class-blogcraft-generate.php:177
+#: includes/class-blogcraft-generate.php:178
+#: includes/class-blogcraft-generate.php:200
+#: includes/class-blogcraft-nav.php:31
+#: includes/class-blogcraft-overview.php:258
+msgid "Write a post"
+msgstr ""
+
 #: includes/class-blogcraft-generate.php:201
 msgid "Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site."
 msgstr ""
@@ -1484,6 +1407,10 @@ msgstr ""
 
 #: includes/class-blogcraft-generate.php:230
 msgid "Queue this post"
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:235
+msgid "Queue"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:235
@@ -1742,6 +1669,173 @@ msgstr ""
 msgid "Dismiss this notice"
 msgstr ""
 
+#: includes/class-blogcraft-overview.php:39
+msgid "What is set up, what it has written, and what needs you."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:73
+msgid "Finish setting up"
+msgstr ""
+
+#. translators: 1: steps completed. 2: total steps.
+#: includes/class-blogcraft-overview.php:79
+msgid "%1$d of %2$d done. Nothing gets written until the first one is."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:100
+msgid "Done"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:100
+msgid "Still to do"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:124
+msgid "Your key, your account, your bill."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:127
+msgid "Set it up"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:130
+msgid "Say who you write for"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:131
+msgid "Without this, posts read like every other tool's."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:134
+msgid "Describe it"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:137
+msgid "Write one post"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:138
+msgid "Read it before you turn anything on a schedule."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:141
+msgid "Write one"
+msgstr ""
+
+#. translators: %d: number of posts held for review.
+#: includes/class-blogcraft-overview.php:160
+msgid "%d post is waiting for you to read it."
+msgid_plural "%d posts are waiting for you to read them."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of posts held for review.
+#: includes/class-blogcraft-overview.php:164
+msgid "Review them"
+msgstr ""
+
+#. translators: %d: number of failed jobs.
+#: includes/class-blogcraft-overview.php:173
+msgid "%d post could not be written."
+msgid_plural "%d posts could not be written."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of failed jobs.
+#: includes/class-blogcraft-overview.php:177
+msgid "See why"
+msgstr ""
+
+#. translators: %d: number of failed jobs.
+#: includes/class-blogcraft-overview.php:184
+msgid "The monthly token cap has been reached, so nothing new is being written."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:186
+msgid "Raise it"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:193
+msgid "Automatic writing is on, but no days are chosen, so nothing will ever run."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:195
+msgid "Choose days"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:205
+msgid "Needs you"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:232
+msgid "This month"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:233
+msgid "Tokens are billed by your provider, not by us."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:238
+msgid "Posts written"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:239
+msgid "Waiting"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:240
+msgid "Requests"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:243
+msgid "Tokens"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:276
+msgid "Automatic writing is off. Posts are written only when you ask for one."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:282
+msgid "Automatic writing is on, but there are no topics queued for it."
+msgstr ""
+
+#. translators: 1: topic. 2: date and time.
+#: includes/class-blogcraft-overview.php:289
+msgid "Next up: \"%1$s\", due %2$s."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:312
+msgid "Recently written"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:316
+msgid "Nothing yet. The first post you queue will appear here."
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:323
+msgid "Post"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:325
+msgid "Score"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:326
+msgid "Written"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:365
+msgid "Live"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:369
+msgid "Held for review"
+msgstr ""
+
+#: includes/class-blogcraft-overview.php:372
+msgid "Draft"
+msgstr ""
+
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
 #: includes/class-blogcraft-pipeline.php:621
 msgid "%1$s: %2$s, wanted %3$s"
@@ -1928,6 +2022,11 @@ msgstr ""
 #. translators: %s: the value the blueprint asked for.
 #: includes/class-blogcraft-review.php:221
 msgid "wanted %s"
+msgstr ""
+
+#. translators: %s: the value the blueprint asked for.
+#: includes/class-blogcraft-review.php:225
+msgid "Failed"
 msgstr ""
 
 #. translators: %s: the value the blueprint asked for.

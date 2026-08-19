@@ -711,6 +711,106 @@ a.bc-nav-item:hover {
 	}
 }
 
+/* ------------------------------------------------------------- overview. */
+
+.blogcraft-steps {
+	margin: 16px 0 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: none;
+}
+
+.blogcraft-steps li {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--bc-line);
+	font-size: 13px;
+}
+
+.blogcraft-steps li:last-child {
+	border-bottom: 0;
+}
+
+.blogcraft-step-mark {
+	flex: none;
+	width: 18px;
+	height: 18px;
+	border: 2px solid var(--bc-line);
+	border-radius: 50%;
+}
+
+.blogcraft-steps .is-done .blogcraft-step-mark {
+	border-color: var(--bc-ok);
+	background: var(--bc-ok);
+}
+
+.blogcraft-step-text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	flex: 1;
+	min-width: 0;
+}
+
+.blogcraft-step-text strong {
+	font-weight: 600;
+	color: var(--bc-ink);
+}
+
+.blogcraft-steps .is-done .blogcraft-step-text strong {
+	font-weight: 500;
+	color: var(--bc-muted);
+}
+
+.blogcraft-step-text span {
+	font-size: 12.5px;
+	color: var(--bc-muted);
+}
+
+/* Anything actively wrong or waiting. */
+
+.blogcraft-attention {
+	margin: 4px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.blogcraft-attention li {
+	margin: 0 0 8px;
+	padding: 11px 14px;
+	border-left: 3px solid var(--bc-warn);
+	border-radius: 0 8px 8px 0;
+	background: var(--bc-canvas);
+	font-size: 13px;
+	line-height: 1.55;
+}
+
+.blogcraft-attention li:last-child {
+	margin-bottom: 0;
+}
+
+.blogcraft-attention .is-bad {
+	border-left-color: #b32121;
+}
+
+.blogcraft-attention a {
+	margin-left: 4px;
+	font-weight: 600;
+}
+
+.blogcraft-badge.is-publish {
+	border-color: rgba(0, 112, 23, 0.32);
+	color: var(--bc-ok);
+}
+
+.blogcraft-badge.is-pending {
+	border-color: rgba(146, 64, 14, 0.32);
+	color: #92400e;
+}
+
 @media screen and (max-width: 782px) {
 	.blogcraft-card {
 		padding: 18px 16px 6px 18px;
