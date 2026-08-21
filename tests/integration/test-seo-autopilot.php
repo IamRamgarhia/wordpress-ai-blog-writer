@@ -13,6 +13,13 @@ class Test_Blogcraft_Seo_Autopilot extends WP_UnitTestCase {
 		delete_option( 'blogcraft_settings' );
 		delete_option( Blogcraft_Autopilot::COUNTER_OPTION );
 
+		// tick() only runs inside the configured window, and the defaults are
+		// weekdays from 09:00. Left alone, these tests pass or fail on the hour
+		// the suite happens to run at, which is how they were green locally and
+		// red on an overnight CI run.
+		Blogcraft_Settings::set( 'autopilot_days', '0,1,2,3,4,5,6' );
+		Blogcraft_Settings::set( 'autopilot_hour', 0 );
+
 		global $wpdb;
 		$table = Blogcraft_Migrator::table_name( 'jobs' );
 		$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared

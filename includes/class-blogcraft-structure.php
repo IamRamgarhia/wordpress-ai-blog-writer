@@ -105,8 +105,15 @@ class Blogcraft_Structure {
 	 * A total word count that passes can still hide one forty-word section,
 	 * and a thin section is exactly what reads as padding.
 	 *
+	 * Only prose sections are judged. A key-takeaways list and an FAQ are both
+	 * short on purpose and both sit under an h2, so measuring them flagged every
+	 * post that used either. A section carrying a list or sub-headings is doing
+	 * something other than running short, and is left alone. That misses a thin
+	 * section that happens to contain a list, which is the cheaper mistake:
+	 * a check that fires on every post is one people learn to ignore.
+	 *
 	 * @param string $content Rendered post content.
-	 * @return int Zero when there are no sections to measure.
+	 * @return int Zero when there are no prose sections to measure.
 	 */
 	public static function thinnest_section( $content ) {
 		$content = (string) $content;
@@ -126,13 +133,28 @@ class Blogcraft_Structure {
 		$total  = count( $offsets );
 
 		for ( $i = 0; $i < $total; $i++ ) {
-			$start    = $offsets[ $i ];
-			$end      = ( $i + 1 < $total ) ? $offsets[ $i + 1 ] : strlen( $content );
-			$chunk    = substr( $content, $start, $end - $start );
+			$start = $offsets[ $i ];
+			$end   = ( $i + 1 < $total ) ? $offsets[ $i + 1 ] : strlen( $content );
+			$chunk = substr( $content, $start, $end - $start );
+
+			if ( self::is_furniture( $chunk ) ) {
+				continue;
+			}
+
 			$counts[] = count( Blogcraft_Metrics::words( Blogcraft_Metrics::plain_text( $chunk ) ) );
 		}
 
 		return empty( $counts ) ? 0 : min( $counts );
+	}
+
+	/**
+	 * Whether a section is a list or a question set rather than prose.
+	 *
+	 * @param string $chunk One section's markup, heading included.
+	 * @return bool
+	 */
+	private static function is_furniture( $chunk ) {
+		return 1 === preg_match( '/<(ul|ol|h3)[ >]/i', (string) $chunk );
 	}
 
 	/**
@@ -157,7 +179,15 @@ class Blogcraft_Structure {
 			'actual' => sprintf( '%d missing', $missing ),
 			'target' => __( 'none missing', 'blogcraft' ),
 			'weight' => 6,
-			'repair' => '',
+			// A failed check with nothing to do about it is a deduction, not a
+			// finding. Blogcraft writes alt text on the images it adds itself,
+			// so this only ever fires on images that came from somewhere else.
+			'repair' => ( 0 === $missing )
+				? ''
+				: sprintf(
+					'%d image has no alt text. Describe what each picture shows, in a sentence, for readers who cannot see it.',
+					$missing
+				),
 		);
 
 		$ordered = self::heading_order_ok( $content );

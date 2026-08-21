@@ -25,6 +25,7 @@ class Test_Blogcraft_Cost extends WP_UnitTestCase {
 				'prompt'     => 0,
 				'completion' => 0,
 				'requests'   => 0,
+				'images'     => 0,
 			),
 			Blogcraft_Cost::month_totals()
 		);

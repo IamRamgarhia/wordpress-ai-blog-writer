@@ -254,15 +254,9 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 				),
 				// section
 				array( 'paragraphs' => array( $this->long_body() ) ),
-				// faq
-				array(
-					'faq' => array(
-						array(
-							'question' => 'How long?',
-							'answer'   => 'Twelve to eighteen hours.',
-						),
-					),
-				),
+				// The faq stage makes no call: use_permissive_blueprint() turns
+				// questions off. A fixture here would silently feed the critique
+				// stage the wrong response, and every stage after it.
 				// critique
 				array( 'problems' => array( 'The intro is vague.' ) ),
 				// revise
@@ -281,6 +275,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		Blogcraft_Pipeline::enqueue_topic( 'Cold brew coffee', 'draft' );
 
 		// research, outline, draft, section, faq, critique, revise, verify, publish.
+		// Research and faq are ticks that cost no provider call.
 		for ( $i = 0; $i < 9; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
