@@ -61,6 +61,8 @@ class Blogcraft_Images {
 	public static function providers() {
 		return array(
 			'pollinations' => __( 'Pollinations — generated, no key needed', 'blogcraft' ),
+			'fal'          => __( 'fal.ai — generated, hundreds of models, pay per image', 'blogcraft' ),
+			'openai'       => __( 'OpenAI — generated, uses the key you already entered', 'blogcraft' ),
 			'pexels'       => __( 'Pexels — real photos, free key', 'blogcraft' ),
 			'pixabay'      => __( 'Pixabay — real photos, free key', 'blogcraft' ),
 		);
@@ -146,6 +148,8 @@ class Blogcraft_Images {
 	public static function resolve_url( $prompt ) {
 		$preferred = (string) Blogcraft_Settings::get( 'image_provider' );
 
+		// A paid generator is only ever used when it is the one chosen. Falling
+		// back *to* one would spend money the user did not ask to spend.
 		$order = array( $preferred, 'pexels', 'pixabay', 'pollinations' );
 		$seen  = array();
 
@@ -160,6 +164,8 @@ class Blogcraft_Images {
 				$url = self::pexels_url( $prompt );
 			} elseif ( 'pixabay' === $provider ) {
 				$url = self::pixabay_url( $prompt );
+			} elseif ( 'fal' === $provider || 'openai' === $provider ) {
+				$url = Blogcraft_Image_Models::generate( $prompt, Blogcraft_Blueprint::get() );
 			} else {
 				$url = self::source_url( $prompt );
 			}
@@ -281,7 +287,17 @@ class Blogcraft_Images {
 				continue;
 			}
 
-			$attachment_id = self::sideload( (int) $post_id, $heading, $heading );
+			// Described the same way the featured image is, but told which
+			// section it illustrates so the pictures do not all repeat the
+			// article's headline back at slightly different angles.
+			$described = Blogcraft_Art_Direction::prompt_for(
+				get_the_title( (int) $post_id ),
+				'',
+				Blogcraft_Blueprint::get(),
+				$heading
+			);
+
+			$attachment_id = self::sideload( (int) $post_id, $described, $heading );
 
 			if ( 0 === $attachment_id ) {
 				continue;
@@ -332,7 +348,10 @@ class Blogcraft_Images {
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$prompt = trim( $title . '. ' . $topic );
+		// Handing a bare headline to an image model is why so much AI blog art
+		// looks like clip art of the title. Art_Direction asks the writing model
+		// what the picture should show, then adds the standing look.
+		$prompt = Blogcraft_Art_Direction::prompt_for( $title, $topic, Blogcraft_Blueprint::get() );
 		$tmp    = download_url( self::resolve_url( $prompt ), 45 );
 
 		if ( is_wp_error( $tmp ) ) {

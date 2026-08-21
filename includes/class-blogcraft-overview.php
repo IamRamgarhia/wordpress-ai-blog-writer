@@ -197,6 +197,20 @@ class Blogcraft_Overview {
 			);
 		}
 
+		// A half-configured picture service is silent: the chain falls through to
+		// a free one and the post still gets an image, so nothing looks wrong and
+		// the model that was chosen is never used.
+		$image_provider = (string) Blogcraft_Settings::get( 'image_provider' );
+
+		if ( array_key_exists( $image_provider, Blogcraft_Image_Models::providers() ) && ! Blogcraft_Image_Models::is_configured() ) {
+			$items[] = array(
+				'text' => __( 'The picture service you chose is missing a key or a model name, so free images are being used instead.', 'blogcraft' ),
+				'url'  => admin_url( 'admin.php?page=blogcraft-settings#bc-card-automation' ),
+				'link' => __( 'Finish it', 'blogcraft' ),
+				'kind' => 'wait',
+			);
+		}
+
 		if ( empty( $items ) ) {
 			return;
 		}
@@ -242,6 +256,12 @@ class Blogcraft_Overview {
 			self::compact( (int) $totals['prompt'] + (int) $totals['completion'] ),
 			__( 'Tokens', 'blogcraft' )
 		);
+
+		// Only shown once something has actually been billed for. A permanent
+		// zero would be a tile about a feature nobody here is using.
+		if ( (int) $totals['images'] > 0 ) {
+			self::tile( (string) number_format_i18n( (int) $totals['images'] ), __( 'Paid images', 'blogcraft' ) );
+		}
 
 		echo '</ul>';
 

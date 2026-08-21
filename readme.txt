@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.19.0
+Stable tag: 0.20.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,11 +61,15 @@ It contacts only the services you configure, and only when generating a post:
 * SerpApi — https://serpapi.com/legal and https://serpapi.com/privacy-policy
 * A SearXNG instance you host yourself.
 
-**Image providers** — optional. The post title is sent so an image can be found or generated.
+**Image providers** — optional. A short description of the wanted picture is sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
 
 * Pollinations — https://pollinations.ai
+* fal.ai — https://fal.ai/terms and https://fal.ai/privacy
+* OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Pexels — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/
 * Pixabay — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/
+
+fal.ai and OpenAI charge for each image they generate. Blogcraft never falls back to them: they are used only when you have chosen one of them, so an image is never billed to you by accident.
 
 Blogcraft may also fetch any URL you explicitly add to its research list, to read it as source material.
 
@@ -92,6 +96,19 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.20.0 =
+* Pictures are now described by the model that wrote the article, instead of the headline being handed to an image model
+* Added fal.ai and OpenAI as image sources, alongside the free ones
+* New Pictures controls: treatment, mood, what the picture shows, shape, colours, and what it must never contain
+* Text is kept out of generated images unless you ask for it
+* The image prompt is shown on screen as you change the controls
+
+= 0.19.0 =
+* Overview now answers what needs doing, what is waiting, and how the last few posts scored
+
+= 0.18.0 =
+* Drafts are checked for missing alt text, skipped heading levels, and sections too thin to be worth a heading
 
 = 0.17.0 =
 * Works out which terms a subject is expected to cover, from the pages already covering it, and checks the draft against them

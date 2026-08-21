@@ -209,6 +209,17 @@ class Blogcraft_Blueprint {
 			'external_links_target' => array( 'int', 2 ),
 			'images_target'         => array( 'int', 1 ),
 
+			// How generated pictures should look.
+			'image_describe'        => array( 'bool', true ),
+			'image_style'           => array( 'choice', 'editorial' ),
+			'image_mood'            => array( 'choice', '' ),
+			'image_subject'         => array( 'choice', 'object' ),
+			'image_shape'           => array( 'choice', '16:9' ),
+			'image_palette'         => array( 'string', '' ),
+			'image_extra'           => array( 'text', '' ),
+			'image_avoid'           => array( 'text', '' ),
+			'image_allow_text'      => array( 'bool', false ),
+
 			// Authenticity.
 			'literary_devices'      => array( 'multi', 'example,analogy' ),
 			'allow_contractions'    => array( 'bool', true ),

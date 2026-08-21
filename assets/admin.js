@@ -135,3 +135,36 @@
 		observer.observe( cards[ i ] );
 	}
 }() );
+
+/**
+ * Show a picture service's key and model fields only when it is selected.
+ *
+ * Same reasoning as the custom-endpoint rows above: a fal.ai key field sitting
+ * under a Pollinations selection reads as required setup, and that is the
+ * commonest way to get stuck on a settings screen.
+ */
+( function () {
+	'use strict';
+
+	var select = document.getElementById( 'blogcraft_image_provider' );
+
+	if ( ! select ) {
+		return;
+	}
+
+	var groups = [ 'fal', 'openai' ];
+
+	function sync() {
+		for ( var g = 0; g < groups.length; g++ ) {
+			var rows = document.querySelectorAll( '.blogcraft-image-' + groups[ g ] );
+			var show = select.value === groups[ g ];
+
+			for ( var i = 0; i < rows.length; i++ ) {
+				rows[ i ].hidden = ! show;
+			}
+		}
+	}
+
+	select.addEventListener( 'change', sync );
+	sync();
+}() );

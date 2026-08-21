@@ -114,6 +114,7 @@ class Blogcraft_Blueprint_Screen {
 			'structure' => __( 'Structure', 'blogcraft' ),
 			'seo'       => __( 'Search', 'blogcraft' ),
 			'human'     => __( 'Sounding human', 'blogcraft' ),
+			'pictures'  => __( 'Pictures', 'blogcraft' ),
 			'sections'  => __( 'Section briefs', 'blogcraft' ),
 		);
 	}
@@ -159,6 +160,7 @@ class Blogcraft_Blueprint_Screen {
 		self::pane_structure( $blueprint );
 		self::pane_seo( $blueprint );
 		self::pane_human( $blueprint );
+		self::pane_pictures( $blueprint );
 		self::pane_sections( $blueprint );
 		echo '</div>';
 
@@ -243,6 +245,23 @@ class Blogcraft_Blueprint_Screen {
 		$structure = Blogcraft_Blueprint::structure_rules( $blueprint );
 
 		return trim( $voice . "\n\n" . $structure );
+	}
+
+	/**
+	 * The image prompt these settings produce, with a stand-in subject.
+	 *
+	 * The real subject is written per post by the model that wrote the article,
+	 * so it cannot be shown here. Everything around it can, and that is the part
+	 * these controls actually decide.
+	 *
+	 * @param array $blueprint Blueprint.
+	 * @return string
+	 */
+	public static function picture_text( $blueprint ) {
+		return Blogcraft_Art_Direction::assemble(
+			__( '[what this post is about, described by the model]', 'blogcraft' ),
+			$blueprint
+		);
 	}
 
 	/**
@@ -782,6 +801,89 @@ class Blogcraft_Blueprint_Screen {
 	}
 
 	/**
+	 * How pictures for a post should look.
+	 *
+	 * Kept away from the writing controls because it is a different job: these
+	 * decide treatment, and the article itself decides subject.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function pane_pictures( $bp ) {
+		self::pane_open( 'pictures' );
+
+		echo '<p class="bc-note">' . esc_html__( 'The article decides what the picture shows. These decide how it looks. Which service makes them is chosen under Settings.', 'blogcraft' ) . '</p>';
+
+		self::row(
+			__( 'Describe the picture first', 'blogcraft' ),
+			__( 'Ask the writing model to describe a scene for this specific post, instead of handing the headline to an image model and hoping. This is the single biggest difference between a useful image and clip art of the title.', 'blogcraft' ),
+			self::toggle( 'image_describe', $bp['image_describe'], __( 'Write a proper description for each image', 'blogcraft' ) )
+		);
+
+		self::row(
+			__( 'Treatment', 'blogcraft' ),
+			'',
+			self::select( 'image_style', Blogcraft_Art_Direction::styles(), $bp['image_style'] ),
+			'bc_image_style'
+		);
+
+		self::row(
+			__( 'Mood', 'blogcraft' ),
+			'',
+			self::select( 'image_mood', Blogcraft_Art_Direction::moods(), $bp['image_mood'] ),
+			'bc_image_mood'
+		);
+
+		self::row(
+			__( 'What it shows', 'blogcraft' ),
+			__( 'The angle every picture takes on its subject.', 'blogcraft' ),
+			self::select( 'image_subject', Blogcraft_Art_Direction::subjects(), $bp['image_subject'] ),
+			'bc_image_subject'
+		);
+
+		self::row(
+			__( 'Shape', 'blogcraft' ),
+			'',
+			self::segmented( 'image_shape', Blogcraft_Art_Direction::shapes(), $bp['image_shape'] )
+		);
+
+		self::row(
+			__( 'Colours', 'blogcraft' ),
+			__( 'Describe them in words. Leave blank to let each picture suit its own subject.', 'blogcraft' ),
+			self::text( 'image_palette', $bp['image_palette'], __( 'muted greens, warm oak, off-white', 'blogcraft' ) ),
+			'bc_image_palette'
+		);
+
+		self::row(
+			__( 'Anything else', 'blogcraft' ),
+			__( 'Added to every image prompt as written.', 'blogcraft' ),
+			self::area( 'image_extra', $bp['image_extra'], __( 'shot from slightly above, shallow depth of field', 'blogcraft' ), 2 ),
+			'bc_image_extra'
+		);
+
+		self::row(
+			__( 'Never show', 'blogcraft' ),
+			__( 'Things that keep appearing and should not.', 'blogcraft' ),
+			self::area( 'image_avoid', $bp['image_avoid'], __( 'crowds, brand names, hands holding phones', 'blogcraft' ), 2 ),
+			'bc_image_avoid'
+		);
+
+		self::row(
+			__( 'Words in the picture', 'blogcraft' ),
+			__( 'Image models render lettering as convincing gibberish, so text is excluded by default. Turn this on only with a model that handles typography.', 'blogcraft' ),
+			self::toggle( 'image_allow_text', $bp['image_allow_text'], __( 'Allow text in generated images', 'blogcraft' ) )
+		);
+
+		echo '<h3 class="bc-subhead">' . esc_html__( 'What the image model is told', 'blogcraft' ) . '</h3>';
+		printf(
+			'<pre class="bc-brief-body" id="bc-picture-prompt" aria-live="polite">%s</pre>',
+			esc_html( self::picture_text( $bp ) )
+		);
+
+		echo '</section>';
+	}
+
+	/**
 	 * Per-section instruction controls.
 	 *
 	 * @param array $bp Blueprint.
@@ -906,7 +1008,12 @@ class Blogcraft_Blueprint_Screen {
 			array_merge( Blogcraft_Blueprint::get(), self::from_request( $raw ) )
 		);
 
-		wp_send_json_success( array( 'brief' => self::brief_text( $blueprint ) ) );
+		wp_send_json_success(
+			array(
+				'brief'   => self::brief_text( $blueprint ),
+				'picture' => self::picture_text( $blueprint ),
+			)
+		);
 	}
 
 	/**

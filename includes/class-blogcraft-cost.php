@@ -86,6 +86,7 @@ class Blogcraft_Cost {
 				'prompt'     => 0,
 				'completion' => 0,
 				'requests'   => 0,
+				'images'     => 0,
 			);
 		}
 
@@ -93,7 +94,55 @@ class Blogcraft_Cost {
 			'prompt'     => (int) $stored[ $month ]['prompt'],
 			'completion' => (int) $stored[ $month ]['completion'],
 			'requests'   => (int) $stored[ $month ]['requests'],
+			'images'     => isset( $stored[ $month ]['images'] ) ? (int) $stored[ $month ]['images'] : 0,
 		);
+	}
+
+	/**
+	 * Add one generated image to this month's count.
+	 *
+	 * Counted apart from tokens because it is billed apart from tokens: a paid
+	 * image service charges per picture, and a token cap says nothing about
+	 * how many pictures a month of posting will buy.
+	 *
+	 * @return void
+	 */
+	public static function record_image() {
+		$month  = self::current_month();
+		$stored = self::raw();
+
+		if ( ! isset( $stored[ $month ] ) ) {
+			$stored[ $month ] = array(
+				'prompt'     => 0,
+				'completion' => 0,
+				'requests'   => 0,
+			);
+		}
+
+		$current = isset( $stored[ $month ]['images'] ) ? (int) $stored[ $month ]['images'] : 0;
+
+		$stored[ $month ]['images'] = $current + 1;
+
+		update_option( self::OPTION, $stored, false );
+	}
+
+	/**
+	 * Whether this month has reached the configured image cap.
+	 *
+	 * A cap of zero means unlimited, matching the token cap above.
+	 *
+	 * @return bool
+	 */
+	public static function over_image_cap() {
+		$cap = (int) Blogcraft_Settings::get( 'monthly_image_cap' );
+
+		if ( $cap <= 0 ) {
+			return false;
+		}
+
+		$totals = self::month_totals();
+
+		return $totals['images'] >= $cap;
 	}
 
 	/**

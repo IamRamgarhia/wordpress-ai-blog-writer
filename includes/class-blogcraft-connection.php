@@ -447,6 +447,14 @@ class Blogcraft_Connection {
 		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft' ) . '</p>';
 		echo '</td></tr>';
 
+		self::number_row(
+			'monthly_image_cap',
+			__( 'Most generated images per month', 'blogcraft' ),
+			__( 'Only counts pictures made by a paid service. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'blogcraft' )
+		);
+
+		self::image_model_rows();
+
 		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft' ) );
 		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft' ) );
 
@@ -765,19 +773,85 @@ class Blogcraft_Connection {
 	 * only ever render a mask and treating blank as "clear" would wipe the value
 	 * every time an unrelated field was saved.
 	 *
-	 * @param string $name  Setting key.
-	 * @param string $label Field label.
+	 * @param string $name      Setting key.
+	 * @param string $label     Field label.
+	 * @param string $row_class Class on the row, so it can be shown conditionally.
 	 * @return void
 	 */
-	private static function secret_row( $name, $label ) {
+	private static function secret_row( $name, $label, $row_class = '' ) {
 		$stored = (string) Blogcraft_Settings::get( $name );
 
 		printf(
-			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p></td></tr>',
+			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $stored ) ),
-			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' )
+			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ),
+			esc_attr( $row_class )
+		);
+	}
+
+	/**
+	 * Keys and model ids for the services that generate pictures.
+	 *
+	 * Model ids are typed rather than picked from a list. Providers retire
+	 * models on their own schedule and this plugin has already shipped one dead
+	 * model id in a hint; a list baked in here would go stale silently. The
+	 * links go to each provider's live catalogue instead.
+	 *
+	 * @return void
+	 */
+	private static function image_model_rows() {
+		$fal    = Blogcraft_Image_Models::help( 'fal' );
+		$openai = Blogcraft_Image_Models::help( 'openai' );
+
+		self::secret_row( 'fal_api_key', __( 'fal.ai API key', 'blogcraft' ), 'blogcraft-image-fal' );
+		self::provider_link_row(
+			__( 'Where to get it', 'blogcraft' ),
+			$fal['key_url'],
+			__( 'Create a fal.ai key', 'blogcraft' ),
+			'',
+			'blogcraft-image-fal'
+		);
+
+		self::text_row( 'fal_model', __( 'fal.ai model', 'blogcraft' ), 'blogcraft-image-fal' );
+		self::provider_link_row(
+			__( 'Which model', 'blogcraft' ),
+			$fal['models_url'],
+			__( 'Browse text-to-image models', 'blogcraft' ),
+			__( 'Paste the id exactly as the model page shows it, for example fal-ai/flux/schnell. Schnell is the cheapest and fastest. A pro FLUX model looks better and costs more. Ideogram is the one to pick if you need legible words in the picture.', 'blogcraft' ),
+			'blogcraft-image-fal'
+		);
+
+		self::secret_row( 'openai_image_key', __( 'OpenAI image key', 'blogcraft' ), 'blogcraft-image-openai' );
+		self::text_row( 'openai_image_model', __( 'OpenAI image model', 'blogcraft' ), 'blogcraft-image-openai' );
+		self::provider_link_row(
+			__( 'Which model', 'blogcraft' ),
+			$openai['models_url'],
+			__( 'OpenAI image guide', 'blogcraft' ),
+			__( 'Leave the key blank if you already entered an OpenAI key for writing; the same one is used.', 'blogcraft' ),
+			'blogcraft-image-openai'
+		);
+	}
+
+	/**
+	 * A row that is only a link out to a provider.
+	 *
+	 * @param string $label       Row label.
+	 * @param string $url         Destination.
+	 * @param string $link_text   Link text.
+	 * @param string $description Extra explanation.
+	 * @param string $row_class   Class on the row, so it can be shown conditionally.
+	 * @return void
+	 */
+	private static function provider_link_row( $label, $url, $link_text, $description = '', $row_class = '' ) {
+		printf(
+			'<tr class="%5$s"><th scope="row">%1$s</th><td><a href="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>%4$s</td></tr>',
+			esc_html( $label ),
+			esc_url( $url ),
+			esc_html( $link_text ),
+			'' === $description ? '' : '<p class="description">' . esc_html( $description ) . '</p>',
+			esc_attr( $row_class )
 		);
 	}
 
@@ -816,7 +890,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model' )
 		);
 
 		foreach ( $plain as $key ) {
@@ -828,6 +902,10 @@ class Blogcraft_Connection {
 
 		if ( isset( $_POST['monthly_token_cap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			Blogcraft_Settings::set( 'monthly_token_cap', (int) $_POST['monthly_token_cap'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		if ( isset( $_POST['monthly_image_cap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'monthly_image_cap', max( 0, (int) $_POST['monthly_image_cap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
 		if ( isset( $_POST['autopilot_per_day'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -864,7 +942,7 @@ class Blogcraft_Connection {
 		// An empty key field means "leave unchanged": the form renders a mask rather
 		// than the real value, so treating blank as "clear" would wipe the stored key
 		// every time an unrelated field was saved.
-		foreach ( array( 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
+		foreach ( array( 'fal_api_key', 'openai_image_key', 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
 			$value = isset( $_POST[ $secret ] ) ? trim( (string) wp_unslash( $_POST[ $secret ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 
 			if ( '' !== $value ) {

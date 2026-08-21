@@ -487,6 +487,25 @@
 	opacity: 0.45;
 }
 
+/* ----------------------------------------------------- picture preview. */
+
+.bc-subhead {
+	margin: 28px 0 10px;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	color: var(--bp-ink);
+}
+
+/* The brief panel on the right is about words, so the picture prompt gets its
+   own frame here rather than a second panel competing with it. */
+#bc-picture-prompt {
+	border: 1px solid var(--bp-line);
+	border-radius: 12px;
+	background: var(--bp-wash);
+	max-width: 68ch;
+}
+
 /* ------------------------------------------------------------- composer. */
 
 .bc-compose {

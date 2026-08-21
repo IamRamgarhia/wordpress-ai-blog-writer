@@ -20,6 +20,7 @@
 
 	var config = window.blogcraftBlueprint || {};
 	var brief = document.getElementById( 'bc-brief-body' );
+	var picture = document.getElementById( 'bc-picture-prompt' );
 
 	/* Panes. */
 
@@ -100,6 +101,10 @@
 			.then( function ( payload ) {
 				if ( payload && payload.success && payload.data ) {
 					brief.textContent = payload.data.brief;
+
+					if ( picture && payload.data.picture ) {
+						picture.textContent = payload.data.picture;
+					}
 				}
 
 				brief.classList.remove( 'is-stale' );

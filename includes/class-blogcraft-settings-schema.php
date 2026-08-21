@@ -79,6 +79,31 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			'monthly_image_cap'               => array(
+				'default' => 0,
+				'type'    => 'int',
+				'secret'  => false,
+			),
+			'fal_api_key'                     => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => true,
+			),
+			'fal_model'                       => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'openai_image_key'                => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => true,
+			),
+			'openai_image_model'              => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'pexels_api_key'                  => array(
 				'default' => '',
 				'type'    => 'string',
