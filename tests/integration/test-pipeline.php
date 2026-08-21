@@ -31,6 +31,15 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		Blogcraft_Settings::set( 'provider_model', 'test-model' );
 		Blogcraft_Settings::set( 'monthly_token_cap', 0 );
 
+		// The keyless research sources are on by default and make real HTTP
+		// calls. fake_completions() stubs every request with a canned
+		// completion, so a Wikipedia lookup would eat the response the outline
+		// stage was going to get and every fixture after it would be off by
+		// one. These tests are about the pipeline's control flow; research has
+		// its own.
+		Blogcraft_Settings::set( 'research_wikipedia', false );
+		Blogcraft_Settings::set( 'research_community', false );
+
 		$this->use_permissive_blueprint();
 	}
 

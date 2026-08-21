@@ -242,27 +242,31 @@ class Blogcraft_Research {
 	 * @return array
 	 */
 	public static function free_material( $topic ) {
-		$out = array();
+		$wanted = array();
 
 		if ( Blogcraft_Settings::get( 'research_wikipedia' ) ) {
-			try {
-				$out = array_merge( $out, self::search_wikipedia( $topic ) );
-			} catch ( Throwable $e ) {
-				$out = $out;
-			}
+			$wanted[] = 'search_wikipedia';
 		}
 
 		if ( Blogcraft_Settings::get( 'research_community' ) ) {
-			try {
-				$out = array_merge( $out, self::search_reddit( $topic ) );
-			} catch ( Throwable $e ) {
-				$out = $out;
-			}
+			$wanted[] = 'search_reddit';
+			$wanted[] = 'search_hn';
+		}
 
+		$out = array();
+
+		foreach ( $wanted as $method ) {
 			try {
-				$out = array_merge( $out, self::search_hn( $topic ) );
+				$out = array_merge( $out, (array) call_user_func( array( __CLASS__, $method ), $topic ) );
 			} catch ( Throwable $e ) {
-				$out = $out;
+				Blogcraft_Logger::info(
+					'A free research source could not be read; carrying on without it.',
+					array(
+						'source' => $method,
+						'reason' => $e->getMessage(),
+					),
+					null
+				);
 			}
 		}
 
