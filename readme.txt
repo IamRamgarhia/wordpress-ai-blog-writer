@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.23.1
+Stable tag: 0.23.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.23.2 =
+* Fixed: picture settings reported as ready when they were not, so every image quietly fell back to a free service
+* The picture controls now name the service drawing them and link straight to it
+* The OpenAI image key field says whether your writing key already covers it
 
 = 0.23.1 =
 * The brief tabs on Write a post now say what they are and stay in view, so Pictures and Publishing can actually be found

@@ -988,7 +988,12 @@ class Blogcraft_Connection {
 			__( 'Which model', 'blogcraft' ),
 			$openai['models_url'],
 			__( 'OpenAI image guide', 'blogcraft' ),
-			__( 'Leave the key blank if you already entered an OpenAI key for writing; the same one is used.', 'blogcraft' ),
+			// Whether one key covers both depends entirely on who wrote the
+			// key, so say which case the reader is actually in rather than
+			// making them work it out.
+			'openai' === (string) Blogcraft_Settings::get( 'provider_type' )
+				? __( 'You are writing with OpenAI, so leave the key above blank and the same key makes the pictures. One key, one bill. You still need to name an image model here.', 'blogcraft' )
+				: __( 'Your writing provider is not OpenAI, so a separate OpenAI key is needed above. A key from one company will not work at another.', 'blogcraft' ),
 			'blogcraft-image-openai'
 		);
 	}

@@ -73,11 +73,40 @@ class Blogcraft_Image_Models {
 		}
 
 		if ( 'openai' === $provider ) {
-			return '' !== trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) )
-				|| '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
+			// Asked the same way generate() asks it. These were two separate
+			// pieces of logic and they disagreed: this said "configured"
+			// whenever any provider key was stored, so someone writing with
+			// Gemini and generating with OpenAI was told their setup was fine
+			// while every picture silently fell back to a free service. It also
+			// ignored the model id, which generate() requires.
+			return '' !== self::openai_key()
+				&& '' !== trim( (string) Blogcraft_Settings::get( 'openai_image_model' ) );
 		}
 
 		return false;
+	}
+
+	/**
+	 * The OpenAI key to use for pictures, if there is one.
+	 *
+	 * Falls back to the writing key, but only when the writing provider really
+	 * is OpenAI. A key issued by Groq or Anthropic will not make an image, and
+	 * treating one as though it might is how a setup screen comes to lie.
+	 *
+	 * @return string Empty when no usable key is stored.
+	 */
+	public static function openai_key() {
+		$key = trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) );
+
+		if ( '' !== $key ) {
+			return $key;
+		}
+
+		if ( 'openai' === (string) Blogcraft_Settings::get( 'provider_type' ) ) {
+			return trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
+		}
+
+		return '';
 	}
 
 	/**
@@ -182,11 +211,7 @@ class Blogcraft_Image_Models {
 	 * @return string
 	 */
 	private static function openai( $prompt, $blueprint ) {
-		$key = trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) );
-
-		if ( '' === $key && 'openai' === (string) Blogcraft_Settings::get( 'provider_type' ) ) {
-			$key = trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
-		}
+		$key = self::openai_key();
 
 		if ( '' === $key ) {
 			return '';

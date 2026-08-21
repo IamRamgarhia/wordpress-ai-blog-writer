@@ -812,10 +812,9 @@ class Blogcraft_Generate {
 		$rows = array(
 			Blogcraft_Controls::row(
 				__( 'Featured image', 'blogcraft' ),
-				Blogcraft_Settings::get( 'images_enabled' )
-					? __( 'The article decides what the picture shows. These decide how it looks. Which service makes them is chosen under Settings.', 'blogcraft' )
-					: __( 'Pictures are switched off under Settings, so nothing here will run.', 'blogcraft' ),
+				'',
 				Blogcraft_Controls::toggle( 'o_image_describe', $bp['image_describe'], __( 'Let the model describe the picture for this post', 'blogcraft' ) )
+				. self::pictures_note()
 			),
 			Blogcraft_Controls::row(
 				__( 'Pictures in the body', 'blogcraft' ),
@@ -872,6 +871,45 @@ class Blogcraft_Generate {
 
 		echo implode( '', $rows );
 		echo '</section>';
+	}
+
+	/**
+	 * Which service is making these pictures, and a way to get there.
+	 *
+	 * These controls decide how a picture looks; a different screen decides who
+	 * draws it. Naming that screen without linking to it was asking the reader
+	 * to go and find a select they had never seen.
+	 *
+	 * @return string
+	 */
+	private static function pictures_note() {
+		$link = admin_url( 'admin.php?page=blogcraft-settings#bc-card-automation' );
+
+		if ( ! Blogcraft_Settings::get( 'images_enabled' ) ) {
+			return sprintf(
+				'<p class="bc-hint">%1$s <a href="%2$s">%3$s</a></p>',
+				esc_html__( 'Pictures are switched off, so nothing here will run.', 'blogcraft' ),
+				esc_url( $link ),
+				esc_html__( 'Turn them on', 'blogcraft' )
+			);
+		}
+
+		$providers = Blogcraft_Images::providers();
+		$chosen    = (string) Blogcraft_Settings::get( 'image_provider' );
+		$name      = isset( $providers[ $chosen ] ) ? $providers[ $chosen ] : $chosen;
+
+		return sprintf(
+			'<p class="bc-hint">%1$s <a href="%2$s">%3$s</a></p>',
+			esc_html(
+				sprintf(
+					/* translators: %s: the picture service currently chosen. */
+					__( 'The article decides what the picture shows; these decide how it looks. Drawn right now by: %s.', 'blogcraft' ),
+					$name
+				)
+			),
+			esc_url( $link ),
+			esc_html__( 'Change the service', 'blogcraft' )
+		);
 	}
 
 	/**

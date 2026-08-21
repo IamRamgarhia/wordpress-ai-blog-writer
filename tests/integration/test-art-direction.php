@@ -198,6 +198,57 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		Blogcraft_Cost::reset();
 	}
 
+	public function test_one_openai_key_covers_writing_and_pictures() {
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', 'sk-writing' );
+		Blogcraft_Settings::set( 'openai_image_key', '' );
+
+		$this->assertSame( 'sk-writing', Blogcraft_Image_Models::openai_key() );
+	}
+
+	public function test_a_key_from_another_company_is_not_borrowed_for_pictures() {
+		// A Gemini key will not make an OpenAI image, and pretending it might is
+		// how a setup screen comes to say "ready" about something that silently
+		// falls back to free pictures on every post.
+		Blogcraft_Settings::set( 'provider_type', 'gemini' );
+		Blogcraft_Settings::set( 'provider_api_key', 'gemini-key' );
+		Blogcraft_Settings::set( 'openai_image_key', '' );
+
+		$this->assertSame( '', Blogcraft_Image_Models::openai_key() );
+	}
+
+	public function test_a_separate_image_key_wins_over_the_writing_one() {
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', 'sk-writing' );
+		Blogcraft_Settings::set( 'openai_image_key', 'sk-pictures' );
+
+		$this->assertSame( 'sk-pictures', Blogcraft_Image_Models::openai_key() );
+	}
+
+	public function test_openai_pictures_are_not_ready_without_a_model() {
+		Blogcraft_Settings::set( 'image_provider', 'openai' );
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', 'sk-writing' );
+		Blogcraft_Settings::set( 'openai_image_model', '' );
+
+		// generate() refuses without a model, so is_configured() must agree.
+		$this->assertFalse( Blogcraft_Image_Models::is_configured() );
+
+		Blogcraft_Settings::set( 'openai_image_model', 'gpt-image-1' );
+
+		$this->assertTrue( Blogcraft_Image_Models::is_configured() );
+	}
+
+	public function test_openai_pictures_are_not_ready_on_another_writing_provider() {
+		Blogcraft_Settings::set( 'image_provider', 'openai' );
+		Blogcraft_Settings::set( 'provider_type', 'groq' );
+		Blogcraft_Settings::set( 'provider_api_key', 'gsk-writing' );
+		Blogcraft_Settings::set( 'openai_image_key', '' );
+		Blogcraft_Settings::set( 'openai_image_model', 'gpt-image-1' );
+
+		$this->assertFalse( Blogcraft_Image_Models::is_configured() );
+	}
+
 	public function test_every_generative_provider_says_where_to_get_a_key() {
 		foreach ( array_keys( Blogcraft_Image_Models::providers() ) as $provider ) {
 			$help = Blogcraft_Image_Models::help( $provider );
