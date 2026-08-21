@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.23.3
+Stable tag: 0.24.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,14 @@ Every feature is included. Nothing is locked, nothing expires, and there are no 
 3. **Critique.** Reads its own draft and lists what is vague, repetitive or padded.
 4. **Revise.** Rewrites to fix what it found. If the critique finds nothing, this pass is skipped rather than run for the sake of it.
 5. **Verify.** Checks that every link resolves and scores the draft. Anything below your threshold is held for review instead of published.
+
+**It can match an article you admire**
+
+Paste the address of any published post and Blogcraft reads it: how long it runs, how many sections, how long its sentences and paragraphs are, whether it uses tables and lists, how heavily it links out, how many concrete figures it states, whether it says "I" or "you". Those measurements become your writing rules.
+
+Structure only. None of the wording is copied, kept, or shown to a model — what it takes is public form, which belongs to nobody. Nothing else in this category does this, and it is a truer answer than a preset named after a famous blog, because it stays right when that blog changes.
+
+There are also eight ready-made shapes to start from: definitive guide, numbered list, step by step, this against that, data study, argued opinion, quick explainer, hands-on review.
 
 **It measures what it was asked for**
 
@@ -122,6 +130,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.24.0 =
+* Start from a shape: eight ready-made sets of rules for guides, listicles, tutorials, comparisons, data studies, opinion, explainers and reviews
+* Match an article: paste any published post and Blogcraft measures how it is built, then sets the rules to match. Structure only, never wording
+* The base URL hint now changes when you change provider instead of describing whichever one was saved
 
 = 0.23.3 =
 * Fixed: Pexels and Pixabay were being sent the whole image prompt as a search query, so they matched nothing and every post quietly fell back to a free generator

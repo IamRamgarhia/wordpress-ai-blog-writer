@@ -83,6 +83,11 @@ class Blogcraft_Connection {
 			'blogcraftProviders',
 			array(
 				'help'     => Blogcraft_Provider_Registry::help_map(),
+				'bases'    => Blogcraft_Provider_Registry::base_url_map(),
+				/* translators: %s: default API address for the selected provider. */
+				'baseText' => __( 'Leave blank to use %s.', 'blogcraft' ),
+				'baseNone' => __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ),
+				'baseTail' => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'blogcraft' ),
 				/* translators: %s: provider name, such as OpenAI. */
 				'keyText'  => __( 'Get a key from %s', 'blogcraft' ),
 				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
@@ -357,8 +362,18 @@ class Blogcraft_Connection {
 		}
 		echo '</select></td></tr>';
 
+		$default_base = Blogcraft_Provider_Registry::default_base_url(
+			(string) Blogcraft_Settings::get( 'provider_type' )
+		);
+
 		foreach ( self::common_fields() as $name => $field ) {
-			self::text_row( $name, $field[0], '', $field[1] );
+			self::text_row(
+				$name,
+				$field[0],
+				'',
+				$field[1],
+				'provider_base_url' === $name ? $default_base : ''
+			);
 		}
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
@@ -894,16 +909,20 @@ class Blogcraft_Connection {
 	 * @param string $label       Field label.
 	 * @param string $row_class   Optional class for the row.
 	 * @param string $description Optional hint shown beneath.
+	 * @param string $placeholder Optional text shown in the empty field.
 	 * @return void
 	 */
-	private static function text_row( $name, $label, $row_class = '', $description = '' ) {
+	private static function text_row( $name, $label, $row_class = '', $description = '', $placeholder = '' ) {
 		printf(
-			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" autocomplete="off" spellcheck="false" />%5$s</td></tr>',
+			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" placeholder="%6$s" autocomplete="off" spellcheck="false" />%5$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( (string) Blogcraft_Settings::get( $name ) ),
 			esc_attr( $row_class ),
-			'' === $description ? '' : '<p class="description">' . esc_html( $description ) . '</p>'
+			'' === $description
+				? ''
+				: '<p class="description" id="' . esc_attr( 'blogcraft_' . $name . '_hint' ) . '">' . esc_html( $description ) . '</p>',
+			esc_attr( $placeholder )
 		);
 	}
 

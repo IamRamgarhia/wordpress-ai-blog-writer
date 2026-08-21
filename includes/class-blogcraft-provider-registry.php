@@ -243,6 +243,21 @@ class Blogcraft_Provider_Registry {
 	}
 
 	/**
+	 * Every provider's default address, for the front end.
+	 *
+	 * @return array
+	 */
+	public static function base_url_map() {
+		$out = array();
+
+		foreach ( self::catalogue() as $id => $spec ) {
+			$out[ $id ] = (string) $spec['base_url'];
+		}
+
+		return $out;
+	}
+
+	/**
 	 * The same, for every provider at once, for the front end to switch between.
 	 *
 	 * @return array

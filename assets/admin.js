@@ -62,13 +62,44 @@
 		help.hidden = false;
 	}
 
+	/**
+	 * Keep the base URL hint and placeholder honest.
+	 *
+	 * These were rendered once from the saved provider and never touched again,
+	 * so choosing Anthropic and reading "Leave blank to use api.openai.com" was
+	 * the normal experience of this screen until you pressed save.
+	 */
+	var baseField = document.getElementById( 'blogcraft_provider_base_url' );
+	var baseHint = document.getElementById( 'blogcraft_provider_base_url_hint' );
+
+	function syncBase() {
+		if ( ! baseField || ! providers.bases ) {
+			return;
+		}
+
+		var address = providers.bases[ select.value ] || '';
+
+		baseField.placeholder = address;
+
+		if ( ! baseHint ) {
+			return;
+		}
+
+		baseHint.textContent = ( '' === address
+			? providers.baseNone
+			: ( providers.baseText || '%s' ).replace( '%s', address )
+		) + ' ' + ( providers.baseTail || '' );
+	}
+
 	select.addEventListener( 'change', function () {
 		sync();
 		syncHelp();
+		syncBase();
 	} );
 
 	sync();
 	syncHelp();
+	syncBase();
 }() );
 
 /**

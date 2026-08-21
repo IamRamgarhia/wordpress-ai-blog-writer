@@ -846,3 +846,84 @@
 	font-size: 13px;
 	font-weight: 600;
 }
+
+/* ------------------------------------------------------- starting points. */
+
+.bc-shapes {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 10px;
+	margin: 0 0 8px;
+}
+
+.bc-shape {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 14px 16px;
+	border: 1px solid var(--bp-line);
+	border-radius: 12px;
+	background: var(--bp-paper);
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.bc-shape:hover {
+	border-color: var(--bp-accent);
+	transform: translateY(-1px);
+	box-shadow: 0 6px 18px -12px rgba(22, 24, 29, 0.4);
+}
+
+.bc-shape.is-chosen {
+	border-color: var(--bp-accent);
+	background: var(--bp-accent-soft);
+}
+
+.bc-shape strong {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--bp-ink);
+}
+
+.bc-shape span {
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--bp-graphite);
+}
+
+.bc-match {
+	margin-left: 10px;
+}
+
+.bc-shape-notes {
+	margin: 14px 0 0;
+	padding: 14px 18px;
+	border: 1px solid rgba(0, 112, 23, 0.18);
+	border-radius: 12px;
+	background: rgba(0, 112, 23, 0.05);
+}
+
+.bc-shape-notes.is-bad {
+	border-color: rgba(138, 97, 22, 0.22);
+	background: rgba(138, 97, 22, 0.06);
+}
+
+.bc-shape-notes p {
+	margin: 0 0 6px;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bp-ink);
+}
+
+.bc-shape-notes p:last-child {
+	margin-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bc-shape,
+	.bc-shape:hover {
+		transition: none;
+		transform: none;
+	}
+}

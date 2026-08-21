@@ -45,6 +45,7 @@ class Blogcraft_Blueprint_Screen {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 16 );
 		add_action( 'admin_post_blogcraft_save_blueprint', array( __CLASS__, 'handle_save' ) );
 		add_action( 'wp_ajax_blogcraft_preview_brief', array( __CLASS__, 'handle_preview' ) );
+		add_action( 'wp_ajax_blogcraft_shape', array( __CLASS__, 'handle_shape' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 	}
 
@@ -78,8 +79,11 @@ class Blogcraft_Blueprint_Screen {
 			'blogcraft-blueprint',
 			'blogcraftBlueprint',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'failed'  => __( 'The brief could not be refreshed. Save to see it applied.', 'blogcraft' ),
+				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+				'failed'       => __( 'The brief could not be refreshed. Save to see it applied.', 'blogcraft' ),
+				'shapeSaved'   => __( 'Filled in on the other tabs. Nothing is saved until you press Save changes.', 'blogcraft' ),
+				'shapeReading' => __( 'Reading the article...', 'blogcraft' ),
+				'shapeNoUrl'   => __( 'Paste the address of an article first.', 'blogcraft' ),
 			)
 		);
 	}
@@ -110,6 +114,7 @@ class Blogcraft_Blueprint_Screen {
 	 */
 	public static function groups() {
 		return array(
+			'start'     => __( 'Start from', 'blogcraft' ),
 			'voice'     => __( 'Voice', 'blogcraft' ),
 			'structure' => __( 'Structure', 'blogcraft' ),
 			'seo'       => __( 'Search', 'blogcraft' ),
@@ -156,6 +161,7 @@ class Blogcraft_Blueprint_Screen {
 		self::render_rail();
 
 		echo '<div class="bc-panes">';
+		self::pane_start();
 		self::pane_voice( $blueprint );
 		self::pane_structure( $blueprint );
 		self::pane_seo( $blueprint );
@@ -261,6 +267,118 @@ class Blogcraft_Blueprint_Screen {
 		return Blogcraft_Art_Direction::assemble(
 			__( '[what this post is about, described by the model]', 'blogcraft' ),
 			$blueprint
+		);
+	}
+
+	/**
+	 * Somewhere to begin, rather than forty-eight fields at their defaults.
+	 *
+	 * Two ways in. A shape is a whole set of rules for a recognisable kind of
+	 * post. Matching an article measures a real one and derives the rules from
+	 * what it actually does, which is the honest version of "write like that
+	 * site" — and unlike a preset named after somebody, it stays true when they
+	 * change.
+	 *
+	 * Neither saves. Both fill the controls in, and everything stays editable.
+	 *
+	 * @return void
+	 */
+	private static function pane_start() {
+		self::pane_open( 'start', true );
+
+		echo '<p class="bc-note">' . esc_html__( 'Both of these fill in the controls on the other tabs. Nothing is saved until you press Save changes, and every field stays yours to change.', 'blogcraft' ) . '</p>';
+
+		echo '<h3 class="bc-subhead">' . esc_html__( 'A shape', 'blogcraft' ) . '</h3>';
+		echo '<div class="bc-shapes">';
+
+		foreach ( Blogcraft_Archetypes::all() as $slug => $shape ) {
+			printf(
+				'<button type="button" class="bc-shape" data-shape="%1$s"><strong>%2$s</strong><span>%3$s</span></button>',
+				esc_attr( $slug ),
+				esc_html( $shape['label'] ),
+				esc_html( $shape['blurb'] )
+			);
+		}
+
+		echo '</div>';
+
+		echo '<h3 class="bc-subhead">' . esc_html__( 'Or match an article you like', 'blogcraft' ) . '</h3>';
+
+		self::row(
+			__( 'Address', 'blogcraft' ),
+			__( 'Any published article, including one of your own. Blogcraft reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says "I" or "you". Structure only: none of the wording is copied, kept, or shown to a model.', 'blogcraft' ),
+			'<input type="url" class="bc-text" id="bc-match-url" placeholder="https://example.com/their-best-post" autocomplete="off" />'
+			. '<button type="button" class="button bc-match" id="bc-match-go">' . esc_html__( 'Read it and match', 'blogcraft' ) . '</button>',
+			'bc-match-url'
+		);
+
+		echo '<div class="bc-shape-notes" id="bc-shape-notes" hidden></div>';
+
+		echo '</section>';
+	}
+
+	/**
+	 * Work out a set of rules, from a shape or from a real article.
+	 *
+	 * @return void
+	 */
+	public static function handle_shape() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+		}
+
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+		}
+
+		$shape = isset( $_POST['shape'] ) ? sanitize_key( wp_unslash( $_POST['shape'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( '' !== $shape ) {
+			$all    = Blogcraft_Archetypes::all();
+			$fields = Blogcraft_Archetypes::fields( $shape );
+
+			if ( empty( $fields ) ) {
+				wp_send_json_error( array( 'message' => __( 'That shape is not one of the ones offered.', 'blogcraft' ) ), 400 );
+			}
+
+			wp_send_json_success(
+				array(
+					'fields' => $fields,
+					'notes'  => array( $all[ $shape ]['blurb'] ),
+				)
+			);
+		}
+
+		$url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( '' === $url ) {
+			wp_send_json_error( array( 'message' => __( 'Give it a web address to read.', 'blogcraft' ) ), 400 );
+		}
+
+		$study = Blogcraft_Emulate::study( $url );
+
+		if ( ! $study['ok'] ) {
+			wp_send_json_error( array( 'message' => $study['error'] ), 400 );
+		}
+
+		wp_send_json_success(
+			array(
+				'fields' => $study['fields'],
+				'notes'  => array_merge(
+					array(
+						'' === $study['title']
+							? __( 'Read that page.', 'blogcraft' )
+							: sprintf(
+								/* translators: %s: the title of the article that was read. */
+								__( 'Read "%s".', 'blogcraft' ),
+								$study['title']
+							),
+					),
+					$study['notes']
+				),
+			)
 		);
 	}
 
@@ -466,7 +584,7 @@ class Blogcraft_Blueprint_Screen {
 	 * @return void
 	 */
 	private static function pane_voice( $bp ) {
-		self::pane_open( 'voice', true );
+		self::pane_open( 'voice' );
 
 		self::row(
 			__( 'Tone', 'blogcraft' ),
