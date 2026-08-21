@@ -26,15 +26,31 @@ class Test_Blogcraft_Schema extends WP_UnitTestCase {
 	/**
 	 * A published post to describe.
 	 *
+	 * @param int $author Author id, or 0 for a post nobody is credited with.
 	 * @return int
 	 */
-	private function a_post() {
+	private function a_post( $author = 0 ) {
 		return self::factory()->post->create(
 			array(
 				'post_title'   => 'How Cold Brew Coffee Works',
 				'post_content' => '<p>' . str_repeat( 'Cold water pulls fewer bitter compounds. ', 20 ) . '</p>',
 				'post_excerpt' => 'Why cold brew tastes sweeter than hot coffee.',
 				'post_status'  => 'publish',
+				'post_author'  => (int) $author,
+			)
+		);
+	}
+
+	/**
+	 * A user to credit a post to.
+	 *
+	 * @return int
+	 */
+	private function an_author() {
+		return self::factory()->user->create(
+			array(
+				'role'         => 'author',
+				'display_name' => 'Ada Mensah',
 			)
 		);
 	}
@@ -55,11 +71,21 @@ class Test_Blogcraft_Schema extends WP_UnitTestCase {
 	public function test_the_author_carries_a_link_and_credentials_when_set() {
 		Blogcraft_Settings::set( 'author_credentials', 'Head barista, twelve years' );
 
-		$graph = Blogcraft_Seo::build_schema( $this->a_post() );
+		$graph = Blogcraft_Seo::build_schema( $this->a_post( $this->an_author() ) );
 
 		$this->assertSame( 'Person', $graph['author']['@type'] );
+		$this->assertSame( 'Ada Mensah', $graph['author']['name'] );
 		$this->assertNotEmpty( $graph['author']['url'] );
 		$this->assertSame( 'Head barista, twelve years', $graph['author']['jobTitle'] );
+	}
+
+	public function test_a_post_nobody_is_credited_with_claims_no_author() {
+		// Inventing a byline would be worse than having none: the whole point
+		// of the markup is that a named person stands behind the page.
+		$graph = Blogcraft_Seo::build_schema( $this->a_post() );
+
+		$this->assertArrayNotHasKey( 'author', $graph );
+		$this->assertArrayHasKey( 'publisher', $graph, 'the rest of the graph must still be emitted' );
 	}
 
 	public function test_a_reviewer_is_named_when_one_is_configured() {
