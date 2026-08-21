@@ -225,10 +225,21 @@ class Blogcraft_Generate {
 		self::render_composer();
 
 		echo '<div class="bc-compose-actions">';
-		printf(
-			'<button type="submit" class="bc-save">%s</button>',
-			esc_html__( 'Queue this post', 'blogcraft' )
-		);
+
+		if ( Blogcraft_Provider_Registry::is_configured() ) {
+			printf(
+				'<button type="submit" class="bc-save">%s</button>',
+				esc_html__( 'Queue this post', 'blogcraft' )
+			);
+		} else {
+			printf(
+				'<button type="submit" class="bc-save" disabled>%1$s</button><a class="bc-compose-fix" href="%2$s">%3$s</a>',
+				esc_html__( 'Queue this post', 'blogcraft' ),
+				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-provider' ) ),
+				esc_html__( 'Connect a provider first', 'blogcraft' )
+			);
+		}
+
 		echo '</div>';
 		echo '</form>';
 
@@ -506,6 +517,11 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	private static function render_brief_tabs( $bp ) {
+		echo '<div class="bc-tabs-head">';
+		echo '<h2>' . esc_html__( 'Everything else about this post', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'These start from your standing rules and change this post only. Pictures and Publishing are here too.', 'blogcraft' ) . '</p>';
+		echo '</div>';
+
 		echo '<div class="bc-tabs" role="tablist">';
 
 		$tabs = array(

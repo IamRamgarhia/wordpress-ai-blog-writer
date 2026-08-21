@@ -665,8 +665,10 @@ class Blogcraft_Connection {
 
 		$id = 'bc-help-' . $slug;
 
+		// A bare question mark in a corner is a control nobody finds. It says
+		// what it does.
 		printf(
-			'<button type="button" class="bc-help-toggle" aria-expanded="false" aria-controls="%1$s"><span aria-hidden="true">?</span><span class="screen-reader-text">%2$s</span></button>',
+			'<button type="button" class="bc-help-toggle" aria-expanded="false" aria-controls="%1$s"><span aria-hidden="true">?</span>%2$s</button>',
 			esc_attr( $id ),
 			esc_html__( 'How this works', 'blogcraft' )
 		);

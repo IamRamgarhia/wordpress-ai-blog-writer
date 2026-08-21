@@ -17,7 +17,10 @@
 	--bc-ok: #007017;
 	--bc-warn: #8a6116;
 
-	max-width: 900px;
+	/* Was 900px, which on a 1900px monitor left half the screen empty while the
+	   fields stayed cramped in a narrow column. Prose still needs a measure, so
+	   the descriptions cap themselves; the page does not have to. */
+	max-width: 1240px;
 }
 
 /* ---------------------------------------------------------------- header. */
@@ -960,23 +963,26 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .blogcraft-card > header {
 	position: relative;
-	padding-right: 40px;
+	padding-right: 150px;
 }
 
 .bc-help-toggle {
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: 26px;
-	height: 26px;
-	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 28px;
+	padding: 0 12px;
 	border: 1px solid var(--bc-glass-edge);
-	border-radius: 50%;
+	border-radius: 999px;
 	background: rgba(255, 255, 255, 0.7);
 	box-shadow: inset 0 1px 0 var(--bc-glass-rim);
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 600;
 	line-height: 1;
+	white-space: nowrap;
 	color: var(--bc-muted);
 	cursor: pointer;
 	transition: color 140ms ease, background 140ms ease, transform 140ms ease;

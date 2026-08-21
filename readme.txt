@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.23.0
+Stable tag: 0.23.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,12 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.23.1 =
+* The brief tabs on Write a post now say what they are and stay in view, so Pictures and Publishing can actually be found
+* Screens use the width of the window instead of a 900px column
+* The help control on each settings section is a labelled button rather than a small question mark
+* Queueing is blocked, with a link to fix it, when no provider is connected
 
 = 0.23.0 =
 * Fourteen named providers instead of four, including Grok, Kimi, DeepSeek, Groq, OpenRouter, Mistral and local models through Ollama or LM Studio
