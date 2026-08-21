@@ -212,8 +212,24 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 		$api_key = (string) $this->config( 'api_key', '' );
 
 		if ( '' !== $api_key ) {
-			$header_name             = (string) $this->config( 'auth_header', 'Authorization' );
-			$prefix                  = (string) $this->config( 'auth_prefix', 'Bearer ' );
+			$header_name = trim( (string) $this->config( 'auth_header', 'Authorization' ) );
+			$prefix      = (string) $this->config( 'auth_prefix', 'Bearer ' );
+
+			if ( '' === trim( $header_name ) ) {
+				$header_name = 'Authorization';
+			}
+
+			// Settings are stored through sanitize_text_field(), which trims,
+			// so a prefix typed as "Bearer " arrives as "Bearer" and would
+			// otherwise be glued to the key as "Bearerabc123". Rather than
+			// stop trimming — which would let stray whitespace into a header —
+			// the separator is put back here.
+			$prefix = rtrim( $prefix );
+
+			if ( '' !== $prefix ) {
+				$prefix .= ' ';
+			}
+
 			$headers[ $header_name ] = $prefix . $api_key;
 		}
 

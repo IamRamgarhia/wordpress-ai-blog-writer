@@ -134,8 +134,93 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'X-Api-Key', $sent['headers'], 'the chosen auth header was ignored' );
 		$this->assertSame( 'Token k', $sent['headers']['X-Api-Key'], 'the chosen auth prefix was ignored' );
+
 		$this->assertSame( 'hello', $response->text, 'the chosen response path was ignored' );
 		$this->assertStringContainsString( 'a-model', (string) $sent['body'], 'the request template was ignored' );
+	}
+
+	public function test_a_prefix_is_separated_from_the_key_however_it_was_typed() {
+		// Settings are stored through sanitize_text_field(), which trims, so a
+		// prefix typed as "Bearer " arrives as "Bearer" and would be glued to
+		// the key as "Bearerabc123". Every spelling has to work.
+		foreach ( array( 'Bearer', 'Bearer ', '  Bearer  ' ) as $typed ) {
+			Blogcraft_Settings::set( 'provider_type', 'custom' );
+			Blogcraft_Settings::set( 'provider_base_url', 'https://example.test/v1/chat' );
+			Blogcraft_Settings::set( 'provider_model', 'm' );
+			Blogcraft_Settings::set( 'provider_api_key', 'abc123' );
+			Blogcraft_Settings::set( 'provider_auth_prefix', $typed );
+			Blogcraft_Settings::set( 'provider_auth_header', 'Authorization' );
+			Blogcraft_Settings::set( 'provider_request_template', '{"model":"{{model}}","input":"{{prompt}}"}' );
+
+			$sent = array();
+
+			add_filter(
+				'pre_http_request',
+				function ( $preempt, $args ) use ( &$sent ) {
+					$sent = $args;
+
+					return array(
+						'response' => array( 'code' => 200 ),
+						'body'     => wp_json_encode( array( 'text' => 'ok' ) ),
+						'headers'  => array(),
+					);
+				},
+				10,
+				2
+			);
+
+			Blogcraft_Provider_Registry::from_settings()->complete(
+				array(
+					array(
+						'role'    => 'user',
+						'content' => 'hi',
+					),
+				)
+			);
+
+			remove_all_filters( 'pre_http_request' );
+
+			$this->assertSame( 'Bearer abc123', $sent['headers']['Authorization'], 'prefix typed as "' . $typed . '"' );
+		}
+	}
+
+	public function test_an_empty_header_name_falls_back_rather_than_sending_nothing() {
+		Blogcraft_Settings::set( 'provider_type', 'custom' );
+		Blogcraft_Settings::set( 'provider_base_url', 'https://example.test/v1/chat' );
+		Blogcraft_Settings::set( 'provider_model', 'm' );
+		Blogcraft_Settings::set( 'provider_api_key', 'abc123' );
+		Blogcraft_Settings::set( 'provider_auth_header', '' );
+		Blogcraft_Settings::set( 'provider_request_template', '{"input":"{{prompt}}"}' );
+
+		$sent = array();
+
+		add_filter(
+			'pre_http_request',
+			function ( $preempt, $args ) use ( &$sent ) {
+				$sent = $args;
+
+				return array(
+					'response' => array( 'code' => 200 ),
+					'body'     => wp_json_encode( array( 'text' => 'ok' ) ),
+					'headers'  => array(),
+				);
+			},
+			10,
+			2
+		);
+
+		Blogcraft_Provider_Registry::from_settings()->complete(
+			array(
+				array(
+					'role'    => 'user',
+					'content' => 'hi',
+				),
+			)
+		);
+
+		remove_all_filters( 'pre_http_request' );
+
+		$this->assertArrayHasKey( 'Authorization', $sent['headers'] );
 	}
 
 	public function test_every_custom_config_key_has_a_setting_behind_it() {
