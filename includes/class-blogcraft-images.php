@@ -142,10 +142,14 @@ class Blogcraft_Images {
 	 * Pollinations is always the last resort because it needs no key, so the
 	 * chain can never run out of options and leave a post with no image.
 	 *
-	 * @param string $prompt Description of the wanted image.
+	 * @param string $prompt Description of the wanted image, for the generators.
+	 * @param string $query  A few keywords, for the libraries that search.
 	 * @return string
 	 */
-	public static function resolve_url( $prompt ) {
+	public static function resolve_url( $prompt, $query = '' ) {
+		// A generator takes a prompt and a library takes a query; they are not
+		// the same string and treating them as one is a silent miss.
+		$query     = ( '' === trim( (string) $query ) ) ? (string) $prompt : (string) $query;
 		$preferred = (string) Blogcraft_Settings::get( 'image_provider' );
 
 		// A paid generator is only ever used when it is the one chosen. Falling
@@ -161,9 +165,9 @@ class Blogcraft_Images {
 			$seen[ $provider ] = true;
 
 			if ( 'pexels' === $provider ) {
-				$url = self::pexels_url( $prompt );
+				$url = self::pexels_url( $query );
 			} elseif ( 'pixabay' === $provider ) {
-				$url = self::pixabay_url( $prompt );
+				$url = self::pixabay_url( $query );
 			} elseif ( 'fal' === $provider || 'openai' === $provider ) {
 				$url = Blogcraft_Image_Models::generate( $prompt, Blogcraft_Blueprint::get() );
 			} else {
@@ -206,14 +210,15 @@ class Blogcraft_Images {
 	 * @param int    $post_id Post to attach to.
 	 * @param string $prompt  What the image should show.
 	 * @param string $alt     Alt text.
+	 * @param string $query   Keywords, for the libraries that search.
 	 * @return int Attachment id, or 0 on any failure.
 	 */
-	private static function sideload( $post_id, $prompt, $alt ) {
+	private static function sideload( $post_id, $prompt, $alt, $query = '' ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$tmp = download_url( self::resolve_url( $prompt ), 45 );
+		$tmp = download_url( self::resolve_url( $prompt, $query ), 45 );
 
 		if ( is_wp_error( $tmp ) ) {
 			return 0;
@@ -338,14 +343,14 @@ class Blogcraft_Images {
 			// Described the same way the featured image is, but told which
 			// section it illustrates so the pictures do not all repeat the
 			// article's headline back at slightly different angles.
-			$described = Blogcraft_Art_Direction::prompt_for(
+			$brief = Blogcraft_Art_Direction::brief_for(
 				get_the_title( (int) $post_id ),
 				'',
 				Blogcraft_Blueprint::get(),
 				$heading
 			);
 
-			$attachment_id = self::sideload( (int) $post_id, $described, $heading );
+			$attachment_id = self::sideload( (int) $post_id, $brief['prompt'], $heading, $brief['search'] );
 
 			if ( 0 === $attachment_id ) {
 				continue;
@@ -401,8 +406,8 @@ class Blogcraft_Images {
 		// Handing a bare headline to an image model is why so much AI blog art
 		// looks like clip art of the title. Art_Direction asks the writing model
 		// what the picture should show, then adds the standing look.
-		$prompt = Blogcraft_Art_Direction::prompt_for( $title, $topic, Blogcraft_Blueprint::get() );
-		$tmp    = download_url( self::resolve_url( $prompt ), 45 );
+		$brief = Blogcraft_Art_Direction::brief_for( $title, $topic, Blogcraft_Blueprint::get() );
+		$tmp   = download_url( self::resolve_url( $brief['prompt'], $brief['search'] ), 45 );
 
 		if ( is_wp_error( $tmp ) ) {
 			Blogcraft_Logger::error(

@@ -307,6 +307,24 @@ class Blogcraft_Art_Direction {
 	 * @return string
 	 */
 	public static function prompt_for( $title, $topic, $blueprint, $section = '' ) {
+		$brief = self::brief_for( $title, $topic, $blueprint, $section );
+
+		return $brief['prompt'];
+	}
+
+	/**
+	 * The subject and the full prompt, worked out once.
+	 *
+	 * Both are wanted and describing costs a provider call, so asking for them
+	 * separately would pay for the same sentence twice.
+	 *
+	 * @param string $title     Post title.
+	 * @param string $topic     Original topic.
+	 * @param array  $blueprint Blueprint.
+	 * @param string $section   Section heading, when illustrating one.
+	 * @return array Keys: subject, prompt, search.
+	 */
+	public static function brief_for( $title, $topic, $blueprint, $section = '' ) {
 		$subject = '';
 
 		if ( ! isset( $blueprint['image_describe'] ) || $blueprint['image_describe'] ) {
@@ -317,6 +335,83 @@ class Blogcraft_Art_Direction {
 			$subject = ( '' === $section ) ? $title : $section;
 		}
 
-		return self::assemble( $subject, $blueprint );
+		return array(
+			'subject' => $subject,
+			'prompt'  => self::assemble( $subject, $blueprint ),
+			'search'  => self::search_terms( $subject ),
+		);
+	}
+
+	/**
+	 * A few keywords, for the services that search rather than draw.
+	 *
+	 * A stock library takes a query, not a prompt. Handing Pexels the whole
+	 * assembled instruction — treatment, palette, "no text, no watermarks" —
+	 * matches nothing, and because a miss falls through to the next provider it
+	 * failed silently: the post still got a picture, just never the one that was
+	 * asked for.
+	 *
+	 * @param string $subject What the picture shows.
+	 * @return string
+	 */
+	public static function search_terms( $subject ) {
+		$stop = array(
+			'a',
+			'an',
+			'the',
+			'of',
+			'in',
+			'on',
+			'at',
+			'to',
+			'and',
+			'or',
+			'with',
+			'for',
+			'from',
+			'by',
+			'is',
+			'are',
+			'was',
+			'were',
+			'it',
+			'its',
+			'this',
+			'that',
+			'as',
+			'into',
+			'over',
+			'under',
+			'beside',
+			'next',
+			'showing',
+			'shows',
+			'shot',
+			'view',
+			'image',
+			'photograph',
+			'picture',
+			'frame',
+		);
+
+		$out = array();
+
+		foreach ( Blogcraft_Metrics::words( (string) $subject ) as $word ) {
+			$plain = strtolower( $word );
+
+			if ( strlen( $plain ) < 3 || in_array( $plain, $stop, true ) ) {
+				continue;
+			}
+
+			$out[ $plain ] = $plain;
+
+			// Stock search is an all-terms match on most libraries, so a long
+			// query is a guaranteed miss.
+			if ( count( $out ) >= 5 ) {
+				break;
+			}
+		}
+
+		return implode( ' ', $out );
 	}
 }

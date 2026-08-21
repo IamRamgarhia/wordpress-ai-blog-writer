@@ -198,6 +198,38 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		Blogcraft_Cost::reset();
 	}
 
+	public function test_a_stock_library_gets_keywords_not_a_prompt() {
+		// Pexels matches on all terms, so handing it the whole assembled
+		// instruction returns nothing — and because a miss falls through to the
+		// next provider, the post still got a picture and nobody noticed.
+		$terms = Blogcraft_Art_Direction::search_terms(
+			'A worn oak workbench with a glass jar of cold brew coffee beside it'
+		);
+
+		$this->assertLessThanOrEqual( 5, count( explode( ' ', $terms ) ) );
+		$this->assertStringNotContainsString( 'with', $terms );
+		$this->assertStringContainsString( 'workbench', $terms );
+	}
+
+	public function test_the_search_terms_drop_words_about_the_photograph_itself() {
+		$terms = Blogcraft_Art_Direction::search_terms( 'A photograph showing a kettle in frame' );
+
+		$this->assertStringNotContainsString( 'photograph', $terms );
+		$this->assertStringNotContainsString( 'frame', $terms );
+		$this->assertStringContainsString( 'kettle', $terms );
+	}
+
+	public function test_the_brief_carries_subject_prompt_and_search_together() {
+		// Describing costs a provider call, so asking for these separately
+		// would pay for the same sentence twice.
+		$brief = Blogcraft_Art_Direction::brief_for( 'How to season a pan', 'cast iron', $this->blueprint() );
+
+		$this->assertSame( 'How to season a pan', $brief['subject'] );
+		$this->assertStringContainsString( 'How to season a pan', $brief['prompt'] );
+		$this->assertStringContainsString( 'season', $brief['search'] );
+		$this->assertStringNotContainsString( 'no watermarks', $brief['search'] );
+	}
+
 	public function test_one_openai_key_covers_writing_and_pictures() {
 		Blogcraft_Settings::set( 'provider_type', 'openai' );
 		Blogcraft_Settings::set( 'provider_api_key', 'sk-writing' );
