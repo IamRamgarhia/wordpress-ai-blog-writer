@@ -1,0 +1,232 @@
+<?php
+/**
+ * Provider catalogue, learning from existing posts, and where a post lands.
+ *
+ * @package Blogcraft
+ */
+
+class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
+
+	public function set_up() {
+		parent::set_up();
+		Blogcraft_Migrator::migrate();
+		delete_option( 'blogcraft_settings' );
+	}
+
+	public function tear_down() {
+		delete_option( 'blogcraft_settings' );
+		parent::tear_down();
+	}
+
+	// ------------------------------------------------------------ providers.
+
+	public function test_every_provider_is_complete() {
+		foreach ( Blogcraft_Provider_Registry::catalogue() as $id => $spec ) {
+			foreach ( array( 'label', 'adapter', 'base_url', 'help', 'key_url', 'docs_url' ) as $field ) {
+				$this->assertArrayHasKey( $field, $spec, $id . ' is missing ' . $field );
+			}
+
+			$this->assertNotSame( '', $spec['label'], $id . ' has no label' );
+			$this->assertNotSame( '', $spec['adapter'], $id . ' has no adapter' );
+		}
+	}
+
+	public function test_every_provider_builds_an_adapter() {
+		foreach ( array_keys( Blogcraft_Provider_Registry::catalogue() ) as $id ) {
+			$provider = Blogcraft_Provider_Registry::make( $id, array( 'model' => 'x' ) );
+
+			$this->assertInstanceOf( 'Blogcraft_Provider', $provider, $id . ' built nothing' );
+		}
+	}
+
+	public function test_an_unknown_provider_builds_nothing() {
+		$this->assertNull( Blogcraft_Provider_Registry::make( 'not-a-provider' ) );
+	}
+
+	public function test_the_named_providers_are_all_offered() {
+		// Listing one entry called "OpenAI-compatible" is the difference between
+		// a user finding their provider and assuming it is unsupported.
+		$types = Blogcraft_Provider_Registry::types();
+
+		foreach ( array( 'openai', 'anthropic', 'gemini', 'xai', 'moonshot', 'deepseek', 'groq', 'openrouter', 'ollama' ) as $id ) {
+			$this->assertArrayHasKey( $id, $types );
+		}
+	}
+
+	public function test_hosted_providers_say_where_to_get_a_key() {
+		foreach ( Blogcraft_Provider_Registry::catalogue() as $id => $spec ) {
+			// Local runtimes need no key, and the custom endpoint is the user's
+			// own; everything else must point somewhere.
+			if ( in_array( $id, array( 'custom', 'ollama', 'lmstudio' ), true ) ) {
+				continue;
+			}
+
+			$help = Blogcraft_Provider_Registry::help( $id );
+
+			$this->assertNotSame( '', $help['key_url'], $id . ' does not say where to get a key' );
+			$this->assertNotSame( '', $help['docs_url'], $id . ' does not link its model list' );
+		}
+	}
+
+	public function test_every_provider_but_the_custom_one_has_an_address() {
+		foreach ( array_keys( Blogcraft_Provider_Registry::catalogue() ) as $id ) {
+			if ( 'custom' === $id ) {
+				continue;
+			}
+
+			$this->assertNotSame( '', Blogcraft_Provider_Registry::default_base_url( $id ), $id . ' has no default address' );
+		}
+	}
+
+	public function test_a_local_runtime_needs_no_key_to_count_as_configured() {
+		Blogcraft_Settings::set( 'provider_type', 'ollama' );
+		Blogcraft_Settings::set( 'provider_model', 'llama3' );
+		Blogcraft_Settings::set( 'provider_api_key', '' );
+
+		$this->assertTrue( Blogcraft_Provider_Registry::is_configured() );
+	}
+
+	// --------------------------------------------------------- review tab.
+
+	public function test_the_review_tab_is_hidden_when_nothing_is_waiting() {
+		$this->assertFalse( Blogcraft_Review::has_pending() );
+		$this->assertArrayNotHasKey( 'blogcraft-review', Blogcraft_Nav::screens() );
+	}
+
+	public function test_the_review_tab_appears_when_something_is_waiting() {
+		$post_id = self::factory()->post->create( array( 'post_status' => 'pending' ) );
+		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		$this->assertTrue( Blogcraft_Review::has_pending() );
+		$this->assertArrayHasKey( 'blogcraft-review', Blogcraft_Nav::screens() );
+	}
+
+	// -------------------------------------------------------------- research.
+
+	public function test_the_free_sources_are_on_by_default() {
+		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $key ) {
+			$this->assertTrue( (bool) Blogcraft_Settings::get( $key ), $key . ' is off by default' );
+		}
+	}
+
+	public function test_turning_the_free_sources_off_gathers_nothing_from_them() {
+		Blogcraft_Settings::set( 'research_wikipedia', false );
+		Blogcraft_Settings::set( 'research_community', false );
+
+		$this->assertSame( array(), Blogcraft_Research::free_material( 'anything' ) );
+	}
+
+	// ------------------------------------------------------------- learning.
+
+	/**
+	 * Publish a post with known prose.
+	 *
+	 * @param string $title Title.
+	 * @param string $body  Body text.
+	 * @return int
+	 */
+	private function publish( $title, $body ) {
+		return self::factory()->post->create(
+			array(
+				'post_title'   => $title,
+				'post_content' => $body,
+				'post_status'  => 'publish',
+			)
+		);
+	}
+
+	public function test_nothing_to_learn_from_says_so() {
+		$suggestion = Blogcraft_Learn::suggest();
+
+		$this->assertSame( 0, $suggestion['found'] );
+		$this->assertSame( array(), $suggestion['fields'] );
+		$this->assertNotEmpty( $suggestion['notes'] );
+	}
+
+	public function test_posts_blogcraft_wrote_are_not_learned_from() {
+		// Learning a voice from your own output is a feedback loop that ends
+		// with every post sounding like the first one it generated.
+		$post_id = $this->publish( 'Generated', '<p>' . str_repeat( 'Words here. ', 30 ) . '</p>' );
+		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		$this->assertSame( array(), Blogcraft_Learn::sample() );
+	}
+
+	public function test_it_measures_how_the_blog_actually_writes() {
+		$this->publish(
+			'Short and personal',
+			'<p>I tried it. We liked it. It worked.</p><p>I did it again. It still worked.</p>'
+		);
+
+		$seen = Blogcraft_Learn::observe();
+
+		$this->assertSame( 1, $seen['posts'] );
+		$this->assertSame( 'first', $seen['person'] );
+		$this->assertLessThan( 10, $seen['sentence_words'] );
+	}
+
+	public function test_it_notices_a_blog_that_addresses_the_reader() {
+		$this->publish(
+			'Second person',
+			'<p>You should try it. Your results will vary. You will want to check yours.</p>'
+		);
+
+		$this->assertSame( 'second', Blogcraft_Learn::observe()['person'] );
+	}
+
+	public function test_the_rules_it_writes_follow_from_the_measurements() {
+		$this->publish(
+			'Short and personal',
+			'<p>I tried it. We liked it. It worked.</p><p>I did it again. It still worked.</p>'
+		);
+
+		$rules = implode( "\n", Blogcraft_Learn::style_rules( Blogcraft_Learn::observe() ) );
+
+		$this->assertStringContainsString( 'first person', $rules );
+		$this->assertStringContainsString( 'em dashes', $rules );
+	}
+
+	public function test_it_invents_no_rules_it_did_not_observe() {
+		$this->assertSame( array(), Blogcraft_Learn::style_rules( array( 'posts' => 0 ) ) );
+	}
+
+	public function test_it_suggests_without_saving_anything() {
+		$this->publish( 'A post', '<p>I tried it. We liked it. It worked.</p>' );
+
+		$before = (string) Blogcraft_Settings::get( 'voice_style_rules' );
+
+		$suggestion = Blogcraft_Learn::suggest();
+
+		$this->assertNotEmpty( $suggestion['fields']['voice_style_rules'] );
+		$this->assertSame( $before, (string) Blogcraft_Settings::get( 'voice_style_rules' ), 'settings were changed without asking' );
+	}
+
+	// ------------------------------------------------------------ placement.
+
+	public function test_where_a_post_lands_is_carried_on_the_job() {
+		$job_id = Blogcraft_Pipeline::enqueue_topic(
+			'anything',
+			'draft',
+			'',
+			array(),
+			'',
+			array(
+				'category' => 3,
+				'tags'     => 'one, two',
+				'author'   => 5,
+			)
+		);
+
+		$this->assertGreaterThan( 0, $job_id );
+
+		$rows    = Blogcraft_Queue::recent_jobs( 1 );
+		$payload = json_decode( $rows[0]['payload'], true );
+
+		$this->assertSame( 3, $payload['placement']['category'] );
+		$this->assertSame( 'one, two', $payload['placement']['tags'] );
+	}
+
+	public function test_a_post_with_no_placement_still_queues() {
+		$this->assertGreaterThan( 0, Blogcraft_Pipeline::enqueue_topic( 'something else', 'draft' ) );
+	}
+}

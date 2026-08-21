@@ -327,6 +327,14 @@ class Blogcraft_Generate {
 				'banned_phrases',
 				'negative_keywords',
 				'avoid_subjects',
+				'images_target',
+				'image_style',
+				'image_mood',
+				'image_subject',
+				'image_shape',
+				'image_palette',
+				'image_extra',
+				'image_avoid',
 			),
 			'toggle' => array(
 				'takeaways',
@@ -340,6 +348,8 @@ class Blogcraft_Generate {
 				'require_experience',
 				'require_citations',
 				'require_statistics',
+				'image_describe',
+				'image_allow_text',
 			),
 			'multi'  => array( 'literary_devices' ),
 		);
@@ -499,10 +509,12 @@ class Blogcraft_Generate {
 		echo '<div class="bc-tabs" role="tablist">';
 
 		$tabs = array(
-			'shape' => __( 'Shape', 'blogcraft' ),
-			'voice' => __( 'Voice', 'blogcraft' ),
-			'seo'   => __( 'Search', 'blogcraft' ),
-			'human' => __( 'Sounding human', 'blogcraft' ),
+			'shape'    => __( 'Shape', 'blogcraft' ),
+			'voice'    => __( 'Voice', 'blogcraft' ),
+			'seo'      => __( 'Search', 'blogcraft' ),
+			'human'    => __( 'Sounding human', 'blogcraft' ),
+			'pictures' => __( 'Pictures', 'blogcraft' ),
+			'publish'  => __( 'Publishing', 'blogcraft' ),
 		);
 
 		$first = true;
@@ -524,6 +536,8 @@ class Blogcraft_Generate {
 		self::tab_voice( $bp );
 		self::tab_seo( $bp );
 		self::tab_human( $bp );
+		self::tab_pictures( $bp );
+		self::tab_publish();
 	}
 
 	/**
@@ -767,6 +781,151 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * How the pictures for this post should look.
+	 *
+	 * The same controls as the blueprint's Pictures pane, so a post can be
+	 * illustrated differently from the rest of the blog without editing the
+	 * standing rules and remembering to put them back.
+	 *
+	 * @param array $bp Blueprint.
+	 * @return void
+	 */
+	private static function tab_pictures( $bp ) {
+		self::tab_open( 'pictures' );
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Featured image', 'blogcraft' ),
+				Blogcraft_Settings::get( 'images_enabled' )
+					? __( 'The article decides what the picture shows. These decide how it looks. Which service makes them is chosen under Settings.', 'blogcraft' )
+					: __( 'Pictures are switched off under Settings, so nothing here will run.', 'blogcraft' ),
+				Blogcraft_Controls::toggle( 'o_image_describe', $bp['image_describe'], __( 'Let the model describe the picture for this post', 'blogcraft' ) )
+			),
+			Blogcraft_Controls::row(
+				__( 'Pictures in the body', 'blogcraft' ),
+				__( 'One beneath each section heading, up to this many.', 'blogcraft' ),
+				Blogcraft_Controls::slider( 'o_images_target', 0, 6, 1, $bp['images_target'] )
+			),
+			Blogcraft_Controls::row(
+				__( 'Treatment', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_image_style', Blogcraft_Art_Direction::styles(), $bp['image_style'] ),
+				'bc_o_image_style'
+			),
+			Blogcraft_Controls::row(
+				__( 'Mood', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::select( 'o_image_mood', Blogcraft_Art_Direction::moods(), $bp['image_mood'] ),
+				'bc_o_image_mood'
+			),
+			Blogcraft_Controls::row(
+				__( 'What it shows', 'blogcraft' ),
+				__( 'The angle every picture takes on its subject.', 'blogcraft' ),
+				Blogcraft_Controls::select( 'o_image_subject', Blogcraft_Art_Direction::subjects(), $bp['image_subject'] ),
+				'bc_o_image_subject'
+			),
+			Blogcraft_Controls::row(
+				__( 'Shape', 'blogcraft' ),
+				'',
+				Blogcraft_Controls::segmented( 'o_image_shape', Blogcraft_Art_Direction::shapes(), $bp['image_shape'] )
+			),
+			Blogcraft_Controls::row(
+				__( 'Colours', 'blogcraft' ),
+				__( 'In words. Leave blank to let each picture suit its own subject.', 'blogcraft' ),
+				Blogcraft_Controls::text( 'o_image_palette', $bp['image_palette'], __( 'muted greens, warm oak, off-white', 'blogcraft' ) ),
+				'bc_o_image_palette'
+			),
+			Blogcraft_Controls::row(
+				__( 'Anything else', 'blogcraft' ),
+				__( 'Added to every image prompt as written.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_image_extra', $bp['image_extra'], __( 'shot from slightly above, shallow depth of field', 'blogcraft' ), 2 ),
+				'bc_o_image_extra'
+			),
+			Blogcraft_Controls::row(
+				__( 'Never show', 'blogcraft' ),
+				__( 'Things that keep appearing and should not.', 'blogcraft' ),
+				Blogcraft_Controls::area( 'o_image_avoid', $bp['image_avoid'], __( 'crowds, brand names, hands holding phones', 'blogcraft' ), 2 ),
+				'bc_o_image_avoid'
+			),
+			Blogcraft_Controls::row(
+				__( 'Words in the picture', 'blogcraft' ),
+				__( 'Image models render lettering as convincing gibberish, so text is excluded by default.', 'blogcraft' ),
+				Blogcraft_Controls::toggle( 'o_image_allow_text', $bp['image_allow_text'], __( 'Allow text in generated images', 'blogcraft' ) )
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
+	 * Where the finished post lands.
+	 *
+	 * Answers the question people ask first and the screen never used to: what
+	 * happens to this when it is done, and where do I find it.
+	 *
+	 * @return void
+	 */
+	private static function tab_publish() {
+		self::tab_open( 'publish' );
+
+		$categories = wp_dropdown_categories(
+			array(
+				'name'              => 'post_category',
+				'id'                => 'bc_post_category',
+				'class'             => 'bc-select',
+				'show_option_none'  => __( 'Whatever the site default is', 'blogcraft' ),
+				'option_none_value' => 0,
+				'hide_empty'        => false,
+				'echo'              => false,
+				'orderby'           => 'name',
+			)
+		);
+
+		$authors = wp_dropdown_users(
+			array(
+				'name'              => 'post_author',
+				'id'                => 'bc_post_author',
+				'class'             => 'bc-select',
+				'show_option_none'  => __( 'Me', 'blogcraft' ),
+				'option_none_value' => 0,
+				'echo'              => false,
+				'capability'        => array( 'edit_posts' ),
+			)
+		);
+
+		$rows = array(
+			Blogcraft_Controls::row(
+				__( 'Category', 'blogcraft' ),
+				'',
+				(string) $categories,
+				'bc_post_category'
+			),
+			Blogcraft_Controls::row(
+				__( 'Tags', 'blogcraft' ),
+				__( 'Comma separated. Left blank, no tags are added.', 'blogcraft' ),
+				Blogcraft_Controls::text( 'post_tags', '', __( 'cold brew, coffee gear', 'blogcraft' ) ),
+				'bc_post_tags'
+			),
+			Blogcraft_Controls::row(
+				__( 'Credited to', 'blogcraft' ),
+				__( 'Whose byline appears on the post. A named author with stated credentials is a real trust signal, and it is published as structured data.', 'blogcraft' ),
+				(string) $authors,
+				'bc_post_author'
+			),
+			Blogcraft_Controls::row(
+				__( 'Publish at', 'blogcraft' ),
+				__( 'Leave blank to publish as soon as it is written. Only applies if you chose to publish rather than save a draft.', 'blogcraft' ),
+				'<input type="datetime-local" class="bc-text" name="publish_at" id="bc_publish_at" value="" />',
+				'bc_publish_at'
+			),
+		);
+
+		echo implode( '', $rows );
+		echo '</section>';
+	}
+
+	/**
 	 * What this post will come out as.
 	 *
 	 * @param array $blueprint Blueprint.
@@ -873,6 +1032,38 @@ class Blogcraft_Generate {
 	// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	/**
+	 * Read where the finished post should land.
+	 *
+	 * Everything is validated again in the pipeline against what actually
+	 * exists, because a term or a user can be deleted between queueing a post
+	 * and writing it.
+	 *
+	 * @param array $source Raw request data.
+	 * @return array
+	 */
+	private static function placement_from( $source ) {
+		$out = array();
+
+		if ( isset( $source['post_category'] ) ) {
+			$out['category'] = (int) $source['post_category'];
+		}
+
+		if ( isset( $source['post_author'] ) ) {
+			$out['author'] = (int) $source['post_author'];
+		}
+
+		if ( isset( $source['post_tags'] ) ) {
+			$out['tags'] = sanitize_text_field( wp_unslash( $source['post_tags'] ) );
+		}
+
+		if ( isset( $source['publish_at'] ) ) {
+			$out['publish_at'] = sanitize_text_field( wp_unslash( $source['publish_at'] ) );
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Queue a submitted topic.
 	 *
 	 * @return void
@@ -893,7 +1084,8 @@ class Blogcraft_Generate {
 		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$evidence     = isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$overrides    = self::overrides_from( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
-		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides, $evidence );
+		$placement    = self::placement_from( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is cast or sanitised inside placement_from().
+		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides, $evidence, $placement );
 
 		if ( $job_id <= 0 ) {
 			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )

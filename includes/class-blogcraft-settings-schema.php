@@ -79,6 +79,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			'research_wikipedia'              => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'research_community'              => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'author_credentials'              => array(
 				'default' => '',
 				'type'    => 'string',

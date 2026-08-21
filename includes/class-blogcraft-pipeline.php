@@ -47,9 +47,10 @@ class Blogcraft_Pipeline {
 	 * @param string $instructions Optional per-topic guidance.
 	 * @param array  $overrides    Blueprint fields to change for this post only.
 	 * @param string $evidence     The writer's own figures and findings, used as fact.
+	 * @param array  $placement    Where the finished post lands: category, tags, author, publish_at.
 	 * @return int Job id, or 0 on failure.
 	 */
-	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '' ) {
+	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '', $placement = array() ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
 		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' ) ) {
@@ -77,6 +78,9 @@ class Blogcraft_Pipeline {
 				// cannot produce, so it is carried separately from guidance and
 				// treated as fact rather than suggestion.
 				'evidence'     => (string) $evidence,
+				// Where the finished post lands. Carried on the job rather than
+				// applied at queue time because the post does not exist yet.
+				'placement'    => is_array( $placement ) ? $placement : array(),
 				// Snapshot rather than reference: editing a blueprint must not
 				// change the rules a post already part-written is judged by.
 				'blueprint'    => Blogcraft_Blueprint::with_overrides(
@@ -626,6 +630,56 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * Apply the category, author, tags and publish time chosen for this post.
+	 *
+	 * A future publish date is honoured only for a post that was going to be
+	 * published anyway: scheduling something the user asked to keep as a draft
+	 * would publish it against their wishes, which is the one mistake here that
+	 * cannot be taken back.
+	 *
+	 * @param array $postarr   Arguments for wp_insert_post().
+	 * @param array $placement Choices made in the composer.
+	 * @return array
+	 */
+	private static function apply_placement( $postarr, $placement ) {
+		if ( empty( $placement ) ) {
+			return $postarr;
+		}
+
+		$category = isset( $placement['category'] ) ? (int) $placement['category'] : 0;
+
+		if ( $category > 0 && term_exists( $category, 'category' ) ) {
+			$postarr['post_category'] = array( $category );
+		}
+
+		$author = isset( $placement['author'] ) ? (int) $placement['author'] : 0;
+
+		if ( $author > 0 && get_userdata( $author ) ) {
+			$postarr['post_author'] = $author;
+		}
+
+		$tags = isset( $placement['tags'] ) ? (string) $placement['tags'] : '';
+
+		if ( '' !== trim( $tags ) ) {
+			$postarr['tags_input'] = array_filter( array_map( 'trim', explode( ',', $tags ) ) );
+		}
+
+		$when = isset( $placement['publish_at'] ) ? (string) $placement['publish_at'] : '';
+
+		if ( '' !== $when && 'publish' === $postarr['post_status'] ) {
+			$stamp = strtotime( $when );
+
+			if ( $stamp && $stamp > time() ) {
+				$postarr['post_status']   = 'future';
+				$postarr['post_date']     = gmdate( 'Y-m-d H:i:s', $stamp + ( (int) get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
+				$postarr['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', $stamp );
+			}
+		}
+
+		return $postarr;
+	}
+
+	/**
 	 * Decide the status a finished post should take.
 	 *
 	 * @param array $payload Job payload.
@@ -776,6 +830,8 @@ class Blogcraft_Pipeline {
 		if ( ! empty( $outline['meta_description'] ) ) {
 			$postarr['post_excerpt'] = sanitize_text_field( (string) $outline['meta_description'] );
 		}
+
+		$postarr = self::apply_placement( $postarr, isset( $payload['placement'] ) ? (array) $payload['placement'] : array() );
 
 		$post_id = wp_insert_post( $postarr, true );
 

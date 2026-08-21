@@ -26,7 +26,7 @@ class Blogcraft_Nav {
 	 * @return array Slug => label.
 	 */
 	public static function screens() {
-		return array(
+		$screens = array(
 			Blogcraft_Admin::MENU_SLUG => __( 'Overview', 'blogcraft' ),
 			'blogcraft-write'          => __( 'Write a post', 'blogcraft' ),
 			'blogcraft-blueprint'      => __( 'How it writes', 'blogcraft' ),
@@ -35,6 +35,15 @@ class Blogcraft_Nav {
 			'blogcraft-activity'       => __( 'Activity', 'blogcraft' ),
 			'blogcraft-settings'       => __( 'Settings', 'blogcraft' ),
 		);
+
+		// A tab for an empty queue is a tab that is never worth clicking. It
+		// stays while it is the page being viewed, because removing the tab
+		// you are standing on is worse than showing an empty one.
+		if ( ! Blogcraft_Review::has_pending() && 'blogcraft-review' !== self::current() ) {
+			unset( $screens['blogcraft-review'] );
+		}
+
+		return $screens;
 	}
 
 	/**

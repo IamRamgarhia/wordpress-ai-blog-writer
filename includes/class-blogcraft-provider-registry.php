@@ -17,17 +17,158 @@ defined( 'ABSPATH' ) || exit;
 class Blogcraft_Provider_Registry {
 
 	/**
+	 * Every provider, and everything that differs between them.
+	 *
+	 * Most of these speak the OpenAI chat-completions protocol, so they need no
+	 * adapter of their own — only an address and a link to where the keys and
+	 * the model list live. Listing them by name rather than leaving one entry
+	 * called "OpenAI-compatible" is the difference between a user finding their
+	 * provider and assuming it is not supported.
+	 *
+	 * No model ids appear here. Providers retire them on their own schedule and
+	 * this plugin has already shipped one dead model id in a hint; the links go
+	 * to each provider's live catalogue instead.
+	 *
+	 * @return array Machine id => spec.
+	 */
+	public static function catalogue() {
+		return array(
+			'openai'     => array(
+				'label'    => __( 'OpenAI — GPT', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.openai.com/v1',
+				'help'     => 'OpenAI',
+				'key_url'  => 'https://platform.openai.com/api-keys',
+				'docs_url' => 'https://platform.openai.com/docs/models',
+			),
+			'anthropic'  => array(
+				'label'    => __( 'Anthropic — Claude', 'blogcraft' ),
+				'adapter'  => 'anthropic',
+				'base_url' => 'https://api.anthropic.com/v1',
+				'help'     => 'Anthropic Console',
+				'key_url'  => 'https://console.anthropic.com/settings/keys',
+				'docs_url' => 'https://docs.anthropic.com/en/docs/about-claude/models',
+			),
+			'gemini'     => array(
+				'label'    => __( 'Google — Gemini', 'blogcraft' ),
+				'adapter'  => 'gemini',
+				'base_url' => 'https://generativelanguage.googleapis.com/v1beta',
+				'help'     => 'Google AI Studio',
+				'key_url'  => 'https://aistudio.google.com/app/apikey',
+				'docs_url' => 'https://ai.google.dev/gemini-api/docs/models',
+			),
+			'xai'        => array(
+				'label'    => __( 'xAI — Grok', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.x.ai/v1',
+				'help'     => 'xAI Console',
+				'key_url'  => 'https://console.x.ai/',
+				'docs_url' => 'https://docs.x.ai/docs/models',
+			),
+			'moonshot'   => array(
+				'label'    => __( 'Moonshot — Kimi', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.moonshot.ai/v1',
+				'help'     => 'Moonshot Platform',
+				'key_url'  => 'https://platform.moonshot.ai/console/api-keys',
+				'docs_url' => 'https://platform.moonshot.ai/docs/intro',
+			),
+			'deepseek'   => array(
+				'label'    => __( 'DeepSeek', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.deepseek.com/v1',
+				'help'     => 'DeepSeek Platform',
+				'key_url'  => 'https://platform.deepseek.com/api_keys',
+				'docs_url' => 'https://api-docs.deepseek.com/quick_start/pricing',
+			),
+			'groq'       => array(
+				'label'    => __( 'Groq — fast, free tier', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.groq.com/openai/v1',
+				'help'     => 'Groq Console',
+				'key_url'  => 'https://console.groq.com/keys',
+				'docs_url' => 'https://console.groq.com/docs/models',
+			),
+			'openrouter' => array(
+				'label'    => __( 'OpenRouter — many models, one key', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://openrouter.ai/api/v1',
+				'help'     => 'OpenRouter',
+				'key_url'  => 'https://openrouter.ai/keys',
+				'docs_url' => 'https://openrouter.ai/models',
+			),
+			'mistral'    => array(
+				'label'    => __( 'Mistral', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.mistral.ai/v1',
+				'help'     => 'Mistral Console',
+				'key_url'  => 'https://console.mistral.ai/api-keys/',
+				'docs_url' => 'https://docs.mistral.ai/getting-started/models/models_overview/',
+			),
+			'together'   => array(
+				'label'    => __( 'Together AI', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.together.xyz/v1',
+				'help'     => 'Together AI',
+				'key_url'  => 'https://api.together.xyz/settings/api-keys',
+				'docs_url' => 'https://docs.together.ai/docs/serverless-models',
+			),
+			'fireworks'  => array(
+				'label'    => __( 'Fireworks AI', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.fireworks.ai/inference/v1',
+				'help'     => 'Fireworks AI',
+				'key_url'  => 'https://fireworks.ai/account/api-keys',
+				'docs_url' => 'https://fireworks.ai/models',
+			),
+			'cerebras'   => array(
+				'label'    => __( 'Cerebras', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'https://api.cerebras.ai/v1',
+				'help'     => 'Cerebras Cloud',
+				'key_url'  => 'https://cloud.cerebras.ai/',
+				'docs_url' => 'https://inference-docs.cerebras.ai/models/overview',
+			),
+			'ollama'     => array(
+				'label'    => __( 'Ollama — on this machine, no key', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'http://localhost:11434/v1',
+				'help'     => 'Ollama',
+				'key_url'  => '',
+				'docs_url' => 'https://ollama.com/library',
+			),
+			'lmstudio'   => array(
+				'label'    => __( 'LM Studio — on this machine, no key', 'blogcraft' ),
+				'adapter'  => 'openai',
+				'base_url' => 'http://localhost:1234/v1',
+				'help'     => 'LM Studio',
+				'key_url'  => '',
+				'docs_url' => 'https://lmstudio.ai/docs/app/api/endpoints/openai',
+			),
+			'custom'     => array(
+				'label'    => __( 'Anything else — enter the address yourself', 'blogcraft' ),
+				'adapter'  => 'custom',
+				'base_url' => '',
+				'help'     => '',
+				'key_url'  => '',
+				'docs_url' => '',
+			),
+		);
+	}
+
+	/**
 	 * Known provider types and their human labels.
 	 *
 	 * @return array Machine id => translatable label.
 	 */
 	public static function types() {
-		return array(
-			'openai'    => __( 'OpenAI-compatible', 'blogcraft' ),
-			'gemini'    => __( 'Google Gemini', 'blogcraft' ),
-			'anthropic' => __( 'Anthropic', 'blogcraft' ),
-			'custom'    => __( 'Custom endpoint', 'blogcraft' ),
-		);
+		$out = array();
+
+		foreach ( self::catalogue() as $id => $spec ) {
+			$out[ $id ] = $spec['label'];
+		}
+
+		return $out;
 	}
 
 	/**
@@ -38,11 +179,15 @@ class Blogcraft_Provider_Registry {
 	 * @return Blogcraft_Provider|null Null for an unrecognised type; never fatals.
 	 */
 	public static function make( $type, $config = array() ) {
-		$config = is_array( $config ) ? $config : array();
+		$config    = is_array( $config ) ? $config : array();
+		$catalogue = self::catalogue();
+		$type      = (string) $type;
 
-		switch ( (string) $type ) {
-			case 'openai':
-				return new Blogcraft_Provider_Openai( $config );
+		if ( ! isset( $catalogue[ $type ] ) ) {
+			return null;
+		}
+
+		switch ( $catalogue[ $type ]['adapter'] ) {
 			case 'gemini':
 				return new Blogcraft_Provider_Gemini( $config );
 			case 'anthropic':
@@ -50,7 +195,7 @@ class Blogcraft_Provider_Registry {
 			case 'custom':
 				return new Blogcraft_Provider_Custom( $config );
 			default:
-				return null;
+				return new Blogcraft_Provider_Openai( $config );
 		}
 	}
 
@@ -67,15 +212,10 @@ class Blogcraft_Provider_Registry {
 	 * @return string Empty when the type has no sensible default.
 	 */
 	public static function default_base_url( $type ) {
-		$defaults = array(
-			'openai'    => 'https://api.openai.com/v1',
-			'gemini'    => 'https://generativelanguage.googleapis.com/v1beta',
-			'anthropic' => 'https://api.anthropic.com/v1',
-		);
+		$catalogue = self::catalogue();
+		$type      = (string) $type;
 
-		$type = (string) $type;
-
-		return isset( $defaults[ $type ] ) ? $defaults[ $type ] : '';
+		return isset( $catalogue[ $type ] ) ? (string) $catalogue[ $type ]['base_url'] : '';
 	}
 
 	/**
@@ -88,32 +228,18 @@ class Blogcraft_Provider_Registry {
 	 * @return array Keys: label, key_url, docs_url. Empty strings when unknown.
 	 */
 	public static function help( $type ) {
-		$map = array(
-			'openai'    => array(
-				'label'    => 'OpenAI',
-				'key_url'  => 'https://platform.openai.com/api-keys',
-				'docs_url' => 'https://platform.openai.com/docs/models',
-			),
-			'gemini'    => array(
-				'label'    => 'Google AI Studio',
-				'key_url'  => 'https://aistudio.google.com/app/apikey',
-				'docs_url' => 'https://ai.google.dev/gemini-api/docs/models',
-			),
-			'anthropic' => array(
-				'label'    => 'Anthropic Console',
-				'key_url'  => 'https://console.anthropic.com/settings/keys',
-				'docs_url' => 'https://docs.anthropic.com/en/docs/about-claude/models',
-			),
-			'custom'    => array(
-				'label'    => '',
-				'key_url'  => '',
-				'docs_url' => '',
-			),
+		$catalogue = self::catalogue();
+		$type      = (string) $type;
+
+		if ( ! isset( $catalogue[ $type ] ) ) {
+			$type = 'custom';
+		}
+
+		return array(
+			'label'    => (string) $catalogue[ $type ]['help'],
+			'key_url'  => (string) $catalogue[ $type ]['key_url'],
+			'docs_url' => (string) $catalogue[ $type ]['docs_url'],
 		);
-
-		$type = (string) $type;
-
-		return isset( $map[ $type ] ) ? $map[ $type ] : $map['custom'];
 	}
 
 	/**

@@ -828,3 +828,293 @@ a.bc-nav-item:hover {
 		overflow-x: auto;
 	}
 }
+
+/* =========================================================================
+   Glass.
+
+   Translucent panels floating over a soft ambient wash, in the manner of
+   Apple's recent system surfaces. Three things make it work rather than just
+   look blurry:
+
+   1. There has to be something behind the blur. WordPress admin is flat grey,
+      so an ambient gradient is painted behind the page first. Without it a
+      blurred panel is indistinguishable from an opaque one.
+   2. The rim, not the fill, reads as glass. A bright inset hairline along the
+      top edge and a darker one along the bottom is what suggests thickness.
+   3. Text never sits on glass alone. Every surface keeps enough opacity that
+      contrast holds if the blur fails, which it does on older browsers, over
+      video, and whenever the reader has asked for less transparency.
+   ========================================================================= */
+
+.blogcraft-page,
+.blogcraft-blueprint {
+	--bc-glass: rgba(255, 255, 255, 0.72);
+	--bc-glass-strong: rgba(255, 255, 255, 0.86);
+	--bc-glass-rim: rgba(255, 255, 255, 0.75);
+	--bc-glass-edge: rgba(17, 24, 39, 0.08);
+	--bc-glass-shadow:
+		0 1px 1px rgba(17, 24, 39, 0.04),
+		0 8px 24px -12px rgba(17, 24, 39, 0.18);
+	--bc-blur: saturate(180%) blur(20px);
+}
+
+/* The wash the panels have something to blur.
+
+   Painted on the admin body rather than a pseudo-element inside the page. A
+   negative z-index child only lands behind its parent when no ancestor has
+   made a stacking context, which is not something a plugin can promise inside
+   someone else's admin theme; the body always works. Fixed attachment so it
+   does not slide under the panels as the page scrolls. */
+body[class*="page_blogcraft"] {
+	background-color: #f4f6fa;
+	background-image:
+		radial-gradient(48rem 32rem at 12% -8%, rgba(56, 88, 233, 0.10), transparent 60%),
+		radial-gradient(40rem 28rem at 92% 4%, rgba(147, 51, 234, 0.08), transparent 60%),
+		radial-gradient(52rem 34rem at 70% 96%, rgba(14, 165, 233, 0.07), transparent 62%),
+		linear-gradient(180deg, #fbfcfe 0%, #f4f6fa 100%);
+	background-attachment: fixed;
+}
+
+/* #wpbody paints its own colour over the body on some admin colour schemes,
+   which would hide the wash entirely. */
+body[class*="page_blogcraft"] #wpbody,
+body[class*="page_blogcraft"] #wpbody-content,
+body[class*="page_blogcraft"] #wpcontent {
+	background: transparent;
+}
+
+.blogcraft-card,
+.bc-pane,
+.bc-brief,
+.bc-outcome,
+.bc-bar,
+.bc-rail,
+.bc-jump {
+	border: 1px solid var(--bc-glass-edge);
+	border-radius: 16px;
+	background: var(--bc-glass);
+	-webkit-backdrop-filter: var(--bc-blur);
+	backdrop-filter: var(--bc-blur);
+	box-shadow:
+		var(--bc-glass-shadow),
+		inset 0 1px 0 var(--bc-glass-rim);
+}
+
+/* The sticky bar sits over content as it scrolls, so it is the one surface
+   that has to stay legible against anything. */
+.bc-bar {
+	background: var(--bc-glass-strong);
+	border-radius: 18px;
+}
+
+.blogcraft-card {
+	padding: 24px 26px 12px 28px;
+}
+
+/* The accent rule was a hard edge against an opaque card. On glass it reads
+   better as light coming through the rim than as a painted stripe. */
+.blogcraft-card::before {
+	top: 22px;
+	bottom: 22px;
+	width: 4px;
+	border-radius: 0 4px 4px 0;
+	background: linear-gradient(180deg, var(--bc-accent), rgba(56, 88, 233, 0.35));
+	opacity: 0.9;
+}
+
+/* Inputs are recessed rather than raised: on a translucent panel a white box
+   with a shadow looks like it is floating in front of the card it belongs to. */
+.blogcraft-card input[type="text"],
+.blogcraft-card input[type="password"],
+.blogcraft-card input[type="number"],
+.blogcraft-card input[type="datetime-local"],
+.blogcraft-card select,
+.blogcraft-card textarea,
+.bc-text,
+.bc-area,
+.bc-select {
+	border-radius: 10px;
+	border-color: var(--bc-glass-edge);
+	background: rgba(255, 255, 255, 0.66);
+	box-shadow: inset 0 1px 2px rgba(17, 24, 39, 0.05);
+	transition: background 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.blogcraft-card input[type="text"]:focus,
+.blogcraft-card input[type="password"]:focus,
+.blogcraft-card input[type="number"]:focus,
+.blogcraft-card select:focus,
+.blogcraft-card textarea:focus,
+.bc-text:focus,
+.bc-area:focus,
+.bc-select:focus {
+	background: #fff;
+	border-color: rgba(56, 88, 233, 0.55);
+	box-shadow:
+		inset 0 1px 2px rgba(17, 24, 39, 0.04),
+		0 0 0 3px rgba(56, 88, 233, 0.14);
+	outline: none;
+}
+
+/* --------------------------------------------------------- help panels. */
+
+.blogcraft-card > header {
+	position: relative;
+	padding-right: 40px;
+}
+
+.bc-help-toggle {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 1px solid var(--bc-glass-edge);
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.7);
+	box-shadow: inset 0 1px 0 var(--bc-glass-rim);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	color: var(--bc-muted);
+	cursor: pointer;
+	transition: color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.bc-help-toggle:hover,
+.bc-help-toggle:focus-visible {
+	color: var(--bc-accent);
+	background: #fff;
+	transform: scale(1.06);
+}
+
+.bc-help-toggle[aria-expanded="true"] {
+	color: #fff;
+	background: var(--bc-accent);
+	border-color: transparent;
+}
+
+.bc-help {
+	margin: 14px 0 2px;
+	padding: 14px 18px;
+	border: 1px solid rgba(56, 88, 233, 0.16);
+	border-radius: 12px;
+	background: rgba(56, 88, 233, 0.05);
+}
+
+.bc-help p {
+	margin: 0 0 10px;
+	max-width: 68ch;
+	font-size: 13px;
+	line-height: 1.65;
+	color: var(--bc-ink);
+}
+
+.bc-help p:last-child {
+	margin-bottom: 0;
+}
+
+.bc-help-more a {
+	font-weight: 600;
+}
+
+/* ------------------------------------------------- learning from posts. */
+
+.bc-learn-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin: 4px 0 0;
+}
+
+.bc-learn-notes {
+	margin: 12px 0 0;
+	padding: 12px 16px;
+	border-radius: 12px;
+	border: 1px solid rgba(0, 112, 23, 0.18);
+	background: rgba(0, 112, 23, 0.05);
+}
+
+.bc-learn-notes.is-bad {
+	border-color: rgba(138, 97, 22, 0.22);
+	background: rgba(138, 97, 22, 0.06);
+}
+
+.bc-learn-notes p {
+	margin: 0 0 6px;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bc-ink);
+}
+
+.bc-learn-notes p:last-child {
+	margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------ fallback. */
+
+/* No backdrop-filter, or a reader who has asked for less transparency: the
+   translucency goes and the layout stays exactly as it was. Glass is a finish,
+   never a load-bearing part of the design. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+	.blogcraft-card,
+	.bc-pane,
+	.bc-brief,
+	.bc-outcome,
+	.bc-bar,
+	.bc-rail,
+	.bc-jump {
+		background: #fff;
+	}
+}
+
+/* Windows and macOS both let people switch transparency off, and a fair number
+   do — this was measured reporting "reduce" on the first machine it was tried
+   on. Only the translucency goes. The wash, the radii and the layered shadows
+   stay, because none of those are transparency and a fallback that reverts to
+   flat white boxes reads as a broken page rather than a considered one. */
+@media (prefers-reduced-transparency: reduce) {
+	.blogcraft-card,
+	.bc-pane,
+	.bc-brief,
+	.bc-outcome,
+	.bc-bar,
+	.bc-rail,
+	.bc-jump {
+		background: #fff;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+
+	.blogcraft-card input[type="text"],
+	.blogcraft-card input[type="password"],
+	.blogcraft-card input[type="number"],
+	.blogcraft-card input[type="datetime-local"],
+	.blogcraft-card select,
+	.blogcraft-card textarea,
+	.bc-text,
+	.bc-area,
+	.bc-select {
+		background: #fdfdfe;
+	}
+
+	.bc-help-toggle {
+		background: #fff;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bc-help-toggle,
+	.bc-text,
+	.bc-area,
+	.bc-select {
+		transition: none;
+	}
+
+	.bc-help-toggle:hover,
+	.bc-help-toggle:focus-visible {
+		transform: none;
+	}
+}

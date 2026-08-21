@@ -46,6 +46,7 @@ class Blogcraft_Connection {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
+		add_action( 'wp_ajax_blogcraft_learn_voice', array( __CLASS__, 'handle_learn' ) );
 	}
 
 	/**
@@ -81,11 +82,38 @@ class Blogcraft_Connection {
 			'blogcraft-admin',
 			'blogcraftProviders',
 			array(
-				'help'    => Blogcraft_Provider_Registry::help_map(),
+				'help'     => Blogcraft_Provider_Registry::help_map(),
 				/* translators: %s: provider name, such as OpenAI. */
-				'keyText' => __( 'Get a key from %s', 'blogcraft' ),
+				'keyText'  => __( 'Get a key from %s', 'blogcraft' ),
+				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( self::SAVE_ACTION ),
+				'learning' => __( 'Reading your posts...', 'blogcraft' ),
+				'learned'  => __( 'Learn from my posts', 'blogcraft' ),
+				'failed'   => __( 'Your posts could not be read. Fill the fields in yourself.', 'blogcraft' ),
 			)
 		);
+	}
+
+	/**
+	 * Fill the voice fields in from the site's existing posts.
+	 *
+	 * Returns values for the form rather than saving them. A settings screen
+	 * that rewrites itself without asking is one nobody trusts twice.
+	 *
+	 * @return void
+	 */
+	public static function handle_learn() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+		}
+
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+		}
+
+		wp_send_json_success( Blogcraft_Learn::suggest() );
 	}
 
 	/**
@@ -380,6 +408,10 @@ class Blogcraft_Connection {
 		}
 		echo '</select></td></tr>';
 
+		foreach ( Blogcraft_Research::free_sources() as $name => $label ) {
+			self::checkbox_row( $name, $label );
+		}
+
 		self::text_row( 'research_base_url', __( 'SearXNG URL', 'blogcraft' ) );
 
 		echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'blogcraft' ) . '</label></th><td>';
@@ -401,6 +433,14 @@ class Blogcraft_Connection {
 		self::close_card();
 
 		self::open_card( '03', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ), 'voice' );
+		if ( Blogcraft_Learn::sample( 1 ) ) {
+			printf(
+				'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
+				esc_html__( 'Learn from my posts', 'blogcraft' ),
+				esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'blogcraft' )
+			);
+		}
+
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::voice_area_fields() as $name => $meta ) {
@@ -542,12 +582,108 @@ class Blogcraft_Connection {
 	 */
 	private static function open_card( $step, $title, $description, $slug = '' ) {
 		printf(
-			'<section class="blogcraft-card" id="%4$s"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p></header>',
+			'<section class="blogcraft-card" id="%4$s"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p>',
 			esc_html( $step ),
 			esc_html( $title ),
 			esc_html( $description ),
 			esc_attr( '' === $slug ? '' : 'bc-card-' . $slug )
 		);
+
+		self::render_help( $slug );
+
+		echo '</header>';
+	}
+
+	/**
+	 * What each card is for, in more words than its subtitle allows.
+	 *
+	 * Folded away by default. A settings screen that explains everything up
+	 * front is unreadable, and one that explains nothing sends people to a
+	 * search engine; a control that opens the explanation in place is the only
+	 * arrangement that serves both the person who knows and the person who
+	 * does not.
+	 *
+	 * @return array Slug => array( paragraphs, docs anchor ).
+	 */
+	private static function help_text() {
+		return array(
+			'provider'   => array(
+				'anchor' => 'providers',
+				'lines'  => array(
+					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'blogcraft' ),
+					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'blogcraft' ),
+					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'blogcraft' ),
+				),
+			),
+			'research'   => array(
+				'anchor' => 'research',
+				'lines'  => array(
+					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft' ),
+					__( 'Wikipedia, Reddit and Hacker News need no key and are on by default. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'blogcraft' ),
+					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft' ),
+				),
+			),
+			'voice'      => array(
+				'anchor' => 'voice',
+				'lines'  => array(
+					__( 'Everything here is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog.', 'blogcraft' ),
+					__( 'If you already have posts published, use "Learn from my posts". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say "I" or "you" — and drafts the descriptions from your own titles. Nothing is saved until you press save.', 'blogcraft' ),
+					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.', 'blogcraft' ),
+				),
+			),
+			'automation' => array(
+				'anchor' => 'automation',
+				'lines'  => array(
+					__( 'None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before.', 'blogcraft' ),
+					__( 'Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.', 'blogcraft' ),
+					__( 'Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback.', 'blogcraft' ),
+				),
+			),
+			'test'       => array(
+				'anchor' => 'checking-it-works',
+				'lines'  => array(
+					__( 'Sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.', 'blogcraft' ),
+					__( 'Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching.', 'blogcraft' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * The help control and its folded panel.
+	 *
+	 * @param string $slug Card slug.
+	 * @return void
+	 */
+	private static function render_help( $slug ) {
+		$all  = self::help_text();
+		$slug = (string) $slug;
+
+		if ( ! isset( $all[ $slug ] ) ) {
+			return;
+		}
+
+		$id = 'bc-help-' . $slug;
+
+		printf(
+			'<button type="button" class="bc-help-toggle" aria-expanded="false" aria-controls="%1$s"><span aria-hidden="true">?</span><span class="screen-reader-text">%2$s</span></button>',
+			esc_attr( $id ),
+			esc_html__( 'How this works', 'blogcraft' )
+		);
+
+		printf( '<div class="bc-help" id="%s" hidden>', esc_attr( $id ) );
+
+		foreach ( $all[ $slug ]['lines'] as $line ) {
+			printf( '<p>%s</p>', esc_html( $line ) );
+		}
+
+		printf(
+			'<p class="bc-help-more"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a></p>',
+			esc_url( BLOGCRAFT_DOCS_URL . '#' . $all[ $slug ]['anchor'] ),
+			esc_html__( 'Read the full documentation', 'blogcraft' )
+		);
+
+		echo '</div>';
 	}
 
 	/**
@@ -956,6 +1092,10 @@ class Blogcraft_Connection {
 		Blogcraft_Settings::set( 'autopilot_days', implode( ',', $days ) );
 
 		// An unchecked checkbox posts nothing, so absence means false.
+		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $toggle ) {
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
 		foreach ( array_keys( self::toggle_fields() ) as $toggle ) {
 			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}

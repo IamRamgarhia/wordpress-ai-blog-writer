@@ -168,3 +168,118 @@
 	select.addEventListener( 'change', sync );
 	sync();
 }() );
+
+/**
+ * Fold each card's explanation open and shut.
+ *
+ * A settings screen that explains everything up front is unreadable, and one
+ * that explains nothing sends people to a search engine. Opening it in place
+ * is the only arrangement that serves both.
+ */
+( function () {
+	'use strict';
+
+	var toggles = document.querySelectorAll( '.bc-help-toggle' );
+
+	for ( var i = 0; i < toggles.length; i++ ) {
+		toggles[ i ].addEventListener( 'click', function ( event ) {
+			var button = event.currentTarget;
+			var panel = document.getElementById( button.getAttribute( 'aria-controls' ) );
+
+			if ( ! panel ) {
+				return;
+			}
+
+			var open = 'true' === button.getAttribute( 'aria-expanded' );
+
+			button.setAttribute( 'aria-expanded', open ? 'false' : 'true' );
+			panel.hidden = open;
+		} );
+	}
+}() );
+
+/**
+ * Fill the voice fields in from what the site has already published.
+ *
+ * The values land in the form rather than being saved. A settings screen that
+ * rewrites itself without asking is one nobody trusts twice, and a guess in a
+ * field you can still correct is help; the same guess saved silently is not.
+ */
+( function () {
+	'use strict';
+
+	var button = document.getElementById( 'blogcraft-learn' );
+	var config = window.blogcraftProviders || {};
+
+	if ( ! button || ! config.ajaxUrl || ! window.fetch || ! window.FormData ) {
+		return;
+	}
+
+	var notes = document.getElementById( 'blogcraft-learn-notes' );
+
+	function say( lines, bad ) {
+		if ( ! notes ) {
+			return;
+		}
+
+		notes.textContent = '';
+		notes.hidden = false;
+		notes.classList.toggle( 'is-bad', !! bad );
+
+		for ( var i = 0; i < lines.length; i++ ) {
+			var line = document.createElement( 'p' );
+			line.textContent = lines[ i ];
+			notes.appendChild( line );
+		}
+	}
+
+	button.addEventListener( 'click', function () {
+		button.disabled = true;
+		button.textContent = config.learning || 'Reading...';
+
+		var data = new FormData();
+		data.append( 'action', 'blogcraft_learn_voice' );
+		data.append( '_blogcraft_nonce', config.nonce || '' );
+
+		window
+			.fetch( config.ajaxUrl, {
+				method: 'POST',
+				body: data,
+				credentials: 'same-origin'
+			} )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( payload ) {
+				button.disabled = false;
+				button.textContent = config.learned || 'Learn from my posts';
+
+				if ( ! payload || ! payload.success || ! payload.data ) {
+					say( [ ( payload && payload.data && payload.data.message ) || config.failed ], true );
+					return;
+				}
+
+				var fields = payload.data.fields || {};
+
+				for ( var name in fields ) {
+					if ( ! Object.prototype.hasOwnProperty.call( fields, name ) ) {
+						continue;
+					}
+
+					var input = document.getElementById( 'blogcraft_' + name );
+
+					// Never overwrite something the person already wrote.
+					if ( input && '' === input.value.trim() ) {
+						input.value = fields[ name ];
+					}
+				}
+
+				say( payload.data.notes || [] );
+			} )
+			.catch( function () {
+				button.disabled = false;
+				button.textContent = config.learned || 'Learn from my posts';
+				say( [ config.failed ], true );
+			} );
+	} );
+}() );

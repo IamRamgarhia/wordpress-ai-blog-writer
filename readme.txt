@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.22.0
+Stable tag: 0.23.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,9 +69,11 @@ It contacts only the services you configure, and only when generating a post:
 
 **AI providers** — one of the following, whichever you set up. The topic, your style settings and any gathered research are sent so the post can be written.
 
-* OpenAI-compatible endpoints, including Groq, OpenRouter, DeepSeek, Together, Mistral, Cerebras and local models. Terms and privacy policy vary by provider; see the one you choose.
-* Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
+* OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Anthropic — https://www.anthropic.com/legal/consumer-terms and https://www.anthropic.com/legal/privacy
+* Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
+* xAI (Grok), Moonshot (Kimi), DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks and Cerebras. Terms and privacy policy vary; see the one you choose.
+* Ollama or LM Studio running on your own machine, which sends nothing anywhere.
 * A custom endpoint you define yourself.
 
 **Research providers** — optional. The post topic is sent so relevant sources can be found.
@@ -79,6 +81,11 @@ It contacts only the services you configure, and only when generating a post:
 * Tavily — https://tavily.com/terms and https://tavily.com/privacy
 * SerpApi — https://serpapi.com/legal and https://serpapi.com/privacy-policy
 * A SearXNG instance you host yourself.
+* Wikipedia — https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+* Reddit — https://www.redditinc.com/policies/user-agreement and https://www.reddit.com/policies/privacy-policy
+* Hacker News search, via Algolia — https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
+
+The last three need no key and are on by default. Only the post topic is sent to any of them. Turn them off under Blogcraft, Settings, Research.
 
 **Image providers** — optional. A short description of the wanted picture is sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
 
@@ -115,6 +122,15 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.23.0 =
+* Fourteen named providers instead of four, including Grok, Kimi, DeepSeek, Groq, OpenRouter, Mistral and local models through Ollama or LM Studio
+* Wikipedia, Reddit and Hacker News are now read for every post, free and with no key
+* "Learn from my posts" fills the voice settings in from what you have already published
+* Every settings section has a help control explaining what it is for
+* Pictures and Publishing tabs on Write a post: art direction per post, plus category, tags, author and a publish time
+* Needs review only appears when something is actually waiting
+* New look throughout: translucent panels over a soft wash, with a solid fallback for anyone who has switched transparency off
 
 = 0.22.0 =
 * A field for your own figures, results and prices, used as fact and checked against the finished draft

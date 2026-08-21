@@ -37,9 +37,18 @@ class Blogcraft_Review {
 	 * @return void
 	 */
 	public static function init() {
+		// Never persisted: a stale "nothing to review" would hide the tab while
+		// posts sat waiting.
+		wp_cache_add_non_persistent_groups( array( self::CACHE_GROUP ) );
+
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 18 );
 		add_action( 'admin_post_blogcraft_review_action', array( __CLASS__, 'handle_action' ) );
 	}
+
+	/**
+	 * Cache group for this request's queue lookup.
+	 */
+	const CACHE_GROUP = 'blogcraft_review';
 
 	/**
 	 * Add the submenu, with a count bubble when anything is waiting.
@@ -55,7 +64,11 @@ class Blogcraft_Review {
 		}
 
 		add_submenu_page(
-			Blogcraft_Admin::MENU_SLUG,
+			// A menu entry for an empty queue is a permanent nudge about
+			// nothing. Passing null as the parent registers the page without
+			// listing it, so a link from Overview or a bookmark still works
+			// and the reader still gets a page that says the queue is clear.
+			$waiting > 0 ? Blogcraft_Admin::MENU_SLUG : null,
 			__( 'Needs review', 'blogcraft' ),
 			$label,
 			Blogcraft_Capabilities::MANAGE,
@@ -65,12 +78,34 @@ class Blogcraft_Review {
 	}
 
 	/**
+	 * Whether anything is waiting to be read.
+	 *
+	 * @return bool
+	 */
+	public static function has_pending() {
+		return count( self::pending_posts() ) > 0;
+	}
+
+	/**
 	 * Generated posts currently held for review.
 	 *
 	 * @return array WP_Post objects.
 	 */
 	public static function pending_posts() {
-		return get_posts(
+		// Asked three times on every admin page load now: once by the menu, once
+		// by the nav row, once by the nav's count bubble. One query is enough.
+		//
+		// The object cache rather than a static, because a static survives the
+		// whole PHP process: in the test suite that means one test's empty
+		// queue is still cached when the next test has queued something, and a
+		// cache that outlives the truth is worse than no cache.
+		$cached = wp_cache_get( 'pending_posts', self::CACHE_GROUP );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$cached = get_posts(
 			array(
 				'post_type'      => 'post',
 				'post_status'    => 'pending',
@@ -79,6 +114,10 @@ class Blogcraft_Review {
 				'meta_key'       => '_blogcraft_generated', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			)
 		);
+
+		wp_cache_set( 'pending_posts', $cached, self::CACHE_GROUP );
+
+		return $cached;
 	}
 
 	/**

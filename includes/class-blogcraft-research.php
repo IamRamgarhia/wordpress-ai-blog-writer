@@ -29,7 +29,16 @@ class Blogcraft_Research {
 	/**
 	 * Most sources gathered for one post.
 	 */
-	const MAX_SOURCES = 5;
+	const MAX_SOURCES = 9;
+
+	/**
+	 * Most sources any single free service may contribute.
+	 *
+	 * Capped per service so one chatty source cannot crowd out the rest. A post
+	 * researched entirely from one forum thread is worse than one researched
+	 * from four different kinds of place.
+	 */
+	const MAX_PER_SOURCE = 2;
 
 	/**
 	 * Providers a user can pick, keyed by id.
@@ -43,6 +52,221 @@ class Blogcraft_Research {
 			'serpapi' => __( 'SerpApi', 'blogcraft' ),
 			'searxng' => __( 'SearXNG (self-hosted)', 'blogcraft' ),
 		);
+	}
+
+	/**
+	 * Free sources that need no key and run alongside whatever is chosen above.
+	 *
+	 * Each is a different kind of material, which is the point. Reference works
+	 * give definitions and dates; forums give what actually happened to people
+	 * who tried the thing. A post built from both says more than one built from
+	 * ten pages of the same search results.
+	 *
+	 * @return array Setting key => label.
+	 */
+	public static function free_sources() {
+		return array(
+			'research_wikipedia' => __( 'Wikipedia — definitions, dates and background', 'blogcraft' ),
+			'research_community' => __( 'Reddit and Hacker News — what people who tried it say', 'blogcraft' ),
+		);
+	}
+
+	/**
+	 * Look up a topic on Wikipedia.
+	 *
+	 * @param string $topic Topic.
+	 * @return array
+	 */
+	public static function search_wikipedia( $topic ) {
+		$found = Blogcraft_Http::get_json(
+			add_query_arg(
+				array(
+					'action'      => 'query',
+					'list'        => 'search',
+					'srsearch'    => rawurlencode( $topic ),
+					'srlimit'     => self::MAX_PER_SOURCE,
+					'format'      => 'json',
+					'srnamespace' => 0,
+				),
+				'https://en.wikipedia.org/w/api.php'
+			),
+			array(),
+			15
+		);
+
+		if ( '' !== $found['error'] || empty( $found['body']['query']['search'] ) ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( $found['body']['query']['search'] as $hit ) {
+			if ( empty( $hit['title'] ) ) {
+				continue;
+			}
+
+			$summary = Blogcraft_Http::get_json(
+				'https://en.wikipedia.org/api/rest_v1/page/summary/' . rawurlencode( (string) $hit['title'] ),
+				array(),
+				15
+			);
+
+			if ( '' !== $summary['error'] || empty( $summary['body']['extract'] ) ) {
+				continue;
+			}
+
+			$out[] = array(
+				'url'     => isset( $summary['body']['content_urls']['desktop']['page'] )
+					? esc_url_raw( (string) $summary['body']['content_urls']['desktop']['page'] )
+					: 'https://en.wikipedia.org/wiki/' . rawurlencode( (string) $hit['title'] ),
+				'title'   => wp_strip_all_tags( (string) $hit['title'] ),
+				'excerpt' => self::sanitise_excerpt( (string) $summary['body']['extract'] ),
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Search Reddit for people discussing the topic.
+	 *
+	 * @param string $topic Topic.
+	 * @return array
+	 */
+	public static function search_reddit( $topic ) {
+		$result = Blogcraft_Http::get_json(
+			add_query_arg(
+				array(
+					'q'     => rawurlencode( $topic ),
+					'limit' => 5,
+					'sort'  => 'relevance',
+					't'     => 'year',
+				),
+				'https://www.reddit.com/search.json'
+			),
+			array(),
+			15
+		);
+
+		if ( '' !== $result['error'] || empty( $result['body']['data']['children'] ) ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( $result['body']['data']['children'] as $child ) {
+			if ( count( $out ) >= self::MAX_PER_SOURCE ) {
+				break;
+			}
+
+			$post = isset( $child['data'] ) ? $child['data'] : array();
+			$body = isset( $post['selftext'] ) ? trim( (string) $post['selftext'] ) : '';
+
+			// A link post with no text of its own says nothing here.
+			if ( '' === $body || empty( $post['permalink'] ) ) {
+				continue;
+			}
+
+			$out[] = array(
+				'url'     => esc_url_raw( 'https://www.reddit.com' . (string) $post['permalink'] ),
+				'title'   => wp_strip_all_tags( isset( $post['title'] ) ? (string) $post['title'] : '' )
+					. ( empty( $post['subreddit'] ) ? '' : ' (r/' . wp_strip_all_tags( (string) $post['subreddit'] ) . ')' ),
+				'excerpt' => self::sanitise_excerpt( $body ),
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Search Hacker News comments for practitioner opinion.
+	 *
+	 * Comments rather than stories: a story is a link somewhere else, which the
+	 * search provider would have found anyway. The comments are the part that
+	 * exists nowhere else.
+	 *
+	 * @param string $topic Topic.
+	 * @return array
+	 */
+	public static function search_hn( $topic ) {
+		$result = Blogcraft_Http::get_json(
+			add_query_arg(
+				array(
+					'query'          => rawurlencode( $topic ),
+					'tags'           => 'comment',
+					'hitsPerPage'    => 5,
+					'numericFilters' => 'points>2',
+				),
+				'https://hn.algolia.com/api/v1/search'
+			),
+			array(),
+			15
+		);
+
+		if ( '' !== $result['error'] || empty( $result['body']['hits'] ) ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( $result['body']['hits'] as $hit ) {
+			if ( count( $out ) >= self::MAX_PER_SOURCE ) {
+				break;
+			}
+
+			$text = isset( $hit['comment_text'] ) ? trim( (string) $hit['comment_text'] ) : '';
+
+			if ( '' === $text || empty( $hit['objectID'] ) ) {
+				continue;
+			}
+
+			$out[] = array(
+				'url'     => esc_url_raw( 'https://news.ycombinator.com/item?id=' . rawurlencode( (string) $hit['objectID'] ) ),
+				'title'   => wp_strip_all_tags(
+					isset( $hit['story_title'] ) ? (string) $hit['story_title'] : __( 'Hacker News discussion', 'blogcraft' )
+				),
+				'excerpt' => self::sanitise_excerpt( $text ),
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Every free source the user has left switched on.
+	 *
+	 * Failures are silent and individual: one service being down or rate
+	 * limiting must not cost the post the other three.
+	 *
+	 * @param string $topic Topic.
+	 * @return array
+	 */
+	public static function free_material( $topic ) {
+		$out = array();
+
+		if ( Blogcraft_Settings::get( 'research_wikipedia' ) ) {
+			try {
+				$out = array_merge( $out, self::search_wikipedia( $topic ) );
+			} catch ( Throwable $e ) {
+				$out = $out;
+			}
+		}
+
+		if ( Blogcraft_Settings::get( 'research_community' ) ) {
+			try {
+				$out = array_merge( $out, self::search_reddit( $topic ) );
+			} catch ( Throwable $e ) {
+				$out = $out;
+			}
+
+			try {
+				$out = array_merge( $out, self::search_hn( $topic ) );
+			} catch ( Throwable $e ) {
+				$out = $out;
+			}
+		}
+
+		return $out;
 	}
 
 	/**
@@ -278,6 +502,10 @@ class Blogcraft_Research {
 	 */
 	public static function gather( $topic ) {
 		$sources = self::search( $topic );
+
+		// Added to whatever the chosen provider found rather than instead of
+		// it. Different kinds of source is the point; more of the same is not.
+		$sources = array_merge( $sources, self::free_material( $topic ) );
 
 		foreach ( Blogcraft_Voice::to_list( Blogcraft_Settings::get( 'research_urls' ) ) as $url ) {
 			if ( count( $sources ) >= self::MAX_SOURCES ) {
