@@ -23,6 +23,13 @@ class Blogcraft_Prompts {
 	private static $blueprint = null;
 
 	/**
+	 * The writer's own material for the post being written, or ''.
+	 *
+	 * @var string
+	 */
+	private static $evidence = '';
+
+	/**
 	 * Shared system framing for every stage.
 	 *
 	 * @return string
@@ -60,6 +67,46 @@ class Blogcraft_Prompts {
 	 */
 	public static function use_blueprint( $blueprint ) {
 		self::$blueprint = is_array( $blueprint ) ? $blueprint : null;
+	}
+
+	/**
+	 * The writer's own material every prompt from now on should build on.
+	 *
+	 * Carried as state rather than as a fifth argument to four prompt builders,
+	 * for the same reason the blueprint is.
+	 *
+	 * @param string $evidence Facts supplied by the person, or '' for none.
+	 * @return void
+	 */
+	public static function use_evidence( $evidence ) {
+		self::$evidence = trim( (string) $evidence );
+	}
+
+	/**
+	 * The writer's own material as a prompt block.
+	 *
+	 * Stated as fact and fenced hard. A model handed "our returns rate was 3 in
+	 * 9" will happily produce a fourth figure that reads just as confidently
+	 * and is not true, and a fabricated statistic attributed to the site is
+	 * worse than no statistic at all.
+	 *
+	 * @return string Empty when there is none.
+	 */
+	private static function evidence_block() {
+		if ( '' === self::$evidence ) {
+			return '';
+		}
+
+		return "
+
+Facts the author has supplied from their own work. These are true and are yours to state as the site's own findings:
+"
+			. self::$evidence
+			. "
+
+Use them. Build at least one section around them, and say plainly that they are the site's own figures. "
+			. 'Do not round them, do not extend them, and do not invent any further figure of the same kind. '
+			. 'If something is not in this list and not in the reference material, do not state it as a number.';
 	}
 
 	/**
@@ -174,6 +221,7 @@ Rules for this article:
 '
 			. '- Where reference material gives a figure or a fact, use it and name the source in the sentence. '
 			. 'Where it shows what existing coverage already says, add what it leaves out rather than repeating it.'
+			. self::evidence_block()
 			. self::extra( $instructions )
 			. self::structure_block();
 
@@ -239,6 +287,7 @@ Rules for this article:
 				? sprintf( "- key_takeaways: exactly %d specific, useful points. Not a summary of the headings.\n", (int) $takeaways )
 				: '' )
 			. '- Plain text only in every field. No markdown, no HTML.'
+			. self::evidence_block()
 			. self::extra( $instructions )
 			. self::structure_block();
 
@@ -295,6 +344,7 @@ Rules for this article:
 			. "- Open with the substance, not a restatement of the heading.\n"
 			. "- Be specific. A number, an example or a named thing beats an adjective.\n"
 			. '- Plain text only. No markdown, no HTML, no heading text.'
+			. self::evidence_block()
 			. self::extra( $instructions )
 			. self::structure_block();
 

@@ -197,6 +197,30 @@ class Blogcraft_Overview {
 			);
 		}
 
+		// Half of the content search engines cite is under three months old, so
+		// a shelf of ageing posts is a standing loss rather than a tidy-up job.
+		// Refreshing one keeps the URL and everything it has earned; writing a
+		// new post starts from nothing.
+		$stale = count( Blogcraft_Refresh::find_stale( null, 20 ) );
+
+		if ( $stale > 0 && ! Blogcraft_Settings::get( 'refresh_enabled' ) ) {
+			$items[] = array(
+				'text' => sprintf(
+					/* translators: %d: number of posts that have not been updated recently. */
+					_n(
+						'%d post has not been updated in a long time. Refreshing it is usually worth more than writing a new one.',
+						'%d posts have not been updated in a long time. Refreshing them is usually worth more than writing new ones.',
+						$stale,
+						'blogcraft'
+					),
+					$stale
+				),
+				'url'  => admin_url( 'admin.php?page=blogcraft-settings#bc-card-automation' ),
+				'link' => __( 'Turn refreshing on', 'blogcraft' ),
+				'kind' => 'wait',
+			);
+		}
+
 		// A half-configured picture service is silent: the chain falls through to
 		// a free one and the post still gets an image, so nothing looks wrong and
 		// the model that was chosen is never used.

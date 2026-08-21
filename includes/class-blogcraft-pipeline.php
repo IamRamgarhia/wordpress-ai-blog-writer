@@ -48,7 +48,7 @@ class Blogcraft_Pipeline {
 	 * @param array  $overrides    Blueprint fields to change for this post only.
 	 * @return int Job id, or 0 on failure.
 	 */
-	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array() ) {
+	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '' ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
 		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' ) ) {
@@ -71,6 +71,11 @@ class Blogcraft_Pipeline {
 				'topic'        => (string) $topic,
 				'status'       => ( 'publish' === $status ) ? 'publish' : 'draft',
 				'instructions' => (string) $instructions,
+				// The writer's own material: figures, results, prices, what
+				// happened when they tried it. The only part of a post a model
+				// cannot produce, so it is carried separately from guidance and
+				// treated as fact rather than suggestion.
+				'evidence'     => (string) $evidence,
 				// Snapshot rather than reference: editing a blueprint must not
 				// change the rules a post already part-written is judged by.
 				'blueprint'    => Blogcraft_Blueprint::with_overrides(
@@ -117,6 +122,7 @@ class Blogcraft_Pipeline {
 			'title'            => isset( $outline['title'] ) ? (string) $outline['title'] : '',
 			'meta_description' => isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : '',
 			'sources'          => isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array(),
+			'evidence'         => self::evidence( $job ),
 		);
 	}
 
@@ -128,6 +134,16 @@ class Blogcraft_Pipeline {
 	 */
 	private static function instructions( $job ) {
 		return isset( $job->payload['instructions'] ) ? (string) $job->payload['instructions'] : '';
+	}
+
+	/**
+	 * The writer's own material for this post, if any.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return string
+	 */
+	private static function evidence( $job ) {
+		return isset( $job->payload['evidence'] ) ? (string) $job->payload['evidence'] : '';
 	}
 
 	/**
@@ -261,6 +277,7 @@ class Blogcraft_Pipeline {
 		$topic   = isset( $job->payload['topic'] ) ? $job->payload['topic'] : '';
 		$sources = isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array();
 		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources, self::instructions( $job ) ) );
 
@@ -360,6 +377,7 @@ class Blogcraft_Pipeline {
 		$blueprint = self::blueprint( $job );
 
 		Blogcraft_Prompts::use_blueprint( $blueprint );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		$topic   = isset( $payload['topic'] ) ? $payload['topic'] : '';
 		$outline = isset( $payload['outline'] ) ? $payload['outline'] : array();
@@ -411,6 +429,7 @@ class Blogcraft_Pipeline {
 		$blueprint = self::blueprint( $job );
 
 		Blogcraft_Prompts::use_blueprint( $blueprint );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		$headings = self::headings( $payload );
 		$index    = isset( $payload['section_index'] ) ? (int) $payload['section_index'] : 0;
@@ -473,6 +492,7 @@ class Blogcraft_Pipeline {
 		}
 
 		Blogcraft_Prompts::use_blueprint( $blueprint );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		// The body is already written by this point. Questions are furniture,
 		// so a failure here publishes the article without them rather than
@@ -523,6 +543,7 @@ class Blogcraft_Pipeline {
 		$blueprint = self::blueprint( $job );
 
 		Blogcraft_Prompts::use_blueprint( $blueprint );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		$result   = self::ask( Blogcraft_Prompts::critique( $article ) );
 		$problems = isset( $result['problems'] ) && is_array( $result['problems'] ) ? $result['problems'] : array();
@@ -575,6 +596,7 @@ class Blogcraft_Pipeline {
 		$outline  = isset( $payload['outline'] ) && is_array( $payload['outline'] ) ? $payload['outline'] : array();
 
 		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
 		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems, $outline ), self::draft_options() );
 
@@ -720,9 +742,23 @@ class Blogcraft_Pipeline {
 		// would confidently invent URLs that 404.
 		if ( Blogcraft_Settings::get( 'internal_links_enabled' ) ) {
 			$topic_for_links = isset( $payload['topic'] ) ? (string) $payload['topic'] : $title;
-			$content        .= Blogcraft_Seo::render_related_block(
-				Blogcraft_Seo::related_posts( $topic_for_links, 4 )
-			);
+			$related         = Blogcraft_Seo::related_posts( $topic_for_links, 4 );
+
+			// A link inside a sentence is worth more than the same link in a
+			// list at the bottom that nobody scrolls to. Whatever could not be
+			// placed in the prose still gets listed, so nothing is lost.
+			$woven   = Blogcraft_Seo::link_in_text( $content, $related, 3 );
+			$content = $woven['content'];
+
+			$leftover = array();
+
+			foreach ( $related as $item ) {
+				if ( ! in_array( (int) $item['id'], array_map( 'intval', $woven['linked'] ), true ) ) {
+					$leftover[] = $item;
+				}
+			}
+
+			$content .= Blogcraft_Seo::render_related_block( $leftover );
 		}
 
 		$postarr = array(

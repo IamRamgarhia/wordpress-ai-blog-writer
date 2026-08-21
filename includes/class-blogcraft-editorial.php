@@ -424,7 +424,42 @@ class Blogcraft_Editorial {
 			$checks[] = self::originality( $text, (array) $context['sources'] );
 		}
 
+		if ( ! empty( $context['evidence'] ) ) {
+			$checks[] = self::own_material( $text, (string) $context['evidence'] );
+		}
+
 		return $checks;
+	}
+
+	/**
+	 * Figures the writer supplied that never reached the article.
+	 *
+	 * Someone who takes the trouble to type in their own numbers has given the
+	 * post the one thing that cannot be generated. A model that then writes
+	 * around them has thrown away the only reason this page beats the pages it
+	 * was researched from, and nothing would have said so.
+	 *
+	 * @param string $text     Plain article text.
+	 * @param string $evidence Material the writer supplied.
+	 * @return array Data points that were supplied but not used.
+	 */
+	public static function unused_evidence( $text, $evidence ) {
+		$supplied = self::data_points( (string) $evidence );
+
+		if ( empty( $supplied ) ) {
+			return array();
+		}
+
+		$used = array_flip( self::data_points( (string) $text ) );
+		$out  = array();
+
+		foreach ( $supplied as $point ) {
+			if ( ! isset( $used[ $point ] ) ) {
+				$out[] = $point;
+			}
+		}
+
+		return $out;
 	}
 
 	/**
@@ -680,6 +715,32 @@ class Blogcraft_Editorial {
 			__( '2 or more', 'blogcraft' ),
 			6,
 			'Nothing here reads as written by someone who has done it. Add at least two passages describing what actually happened when you did — what you tried, what it cost, what went wrong — and keep them specific.'
+		);
+	}
+
+	/**
+	 * Whether the writer's own material actually made it in.
+	 *
+	 * @param string $text     Plain article text.
+	 * @param string $evidence Material the writer supplied.
+	 * @return array
+	 */
+	private static function own_material( $text, $evidence ) {
+		$missing = self::unused_evidence( $text, $evidence );
+		$count   = count( $missing );
+		$pass    = ( 0 === $count );
+
+		return self::check(
+			'own_material',
+			__( 'Uses what you supplied', 'blogcraft' ),
+			$pass,
+			sprintf( '%d unused', $count ),
+			__( 'none unused', 'blogcraft' ),
+			12,
+			sprintf(
+				'These figures were supplied by the author and do not appear in the article: %s. They are the only part of this post that is not available anywhere else, so state them, exactly as given, and say they are the site\'s own.',
+				implode( ', ', array_slice( $missing, 0, 5 ) )
+			)
 		);
 	}
 

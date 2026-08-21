@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.21.0
+Stable tag: 0.22.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,12 +44,18 @@ You can also store your own anecdotes and experience, which is the one thing AI 
 
 **It looks after the rest of your site**
 
-* Links each new post to your existing ones, and goes back to link older posts to the new one
+* Links each new post to your existing ones from inside the sentences, not just a list at the bottom, and goes back to link older posts to the new one
 * Refuses a topic too similar to something you have already published
 * Rewrites your older posts in place when they go stale, keeping the same URL
 * Adds a featured image, alt text, structured data and a contents outline
 * Publishes author, reviewer, organisation and breadcrumb markup, which is what search and answer engines read as an expertise signal
 * Fills in Yoast, Rank Math or SEOPress fields when one of those is active
+
+**What it does not do**
+
+It does not find topics for you. Every tool in this category that does is reselling keyword-volume data, and that data cannot be had for free — so charging nothing and supplying topics are not both possible. You bring the subject; Blogcraft does the rest.
+
+It does not invent evidence. There is a field for your own figures, results and prices, and they are used as fact and checked against the finished draft. Nothing fills that field for you, because nothing can.
 
 **You stay in control**
 
@@ -109,6 +115,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.22.0 =
+* A field for your own figures, results and prices, used as fact and checked against the finished draft
+* Internal links are now placed inside sentences where the wording matches, with the rest still listed at the end
+* Overview says when posts have gone stale and refreshing is switched off
 
 = 0.21.0 =
 * Nine new checks, including answer-first openings, figures without a source, and how much of a draft merely repeats what its sources said

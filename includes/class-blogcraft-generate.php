@@ -458,6 +458,18 @@ class Blogcraft_Generate {
 		);
 
 		echo Blogcraft_Controls::row(
+			__( 'What you know that nobody else does', 'blogcraft' ),
+			__( 'Your own numbers, results, prices, or what happened when you tried it. This is the only part of a post a model cannot produce, and it is what separates a page worth reading from a summary of pages that already exist. Everything here is used as fact and never invented beyond.', 'blogcraft' ),
+			Blogcraft_Controls::area(
+				'evidence',
+				'',
+				__( 'We tested 9 desks over 4 months. The £220 bracket wobbled above 110cm; the £400 bracket did not. Our own returns rate on the cheapest was 3 in 9.', 'blogcraft' ),
+				4
+			),
+			'bc_evidence'
+		);
+
+		echo Blogcraft_Controls::row(
 			__( 'When it is finished', 'blogcraft' ),
 			'',
 			Blogcraft_Controls::segmented(
@@ -879,8 +891,9 @@ class Blogcraft_Generate {
 		}
 
 		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$evidence     = isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$overrides    = self::overrides_from( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
-		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides );
+		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides, $evidence );
 
 		if ( $job_id <= 0 ) {
 			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )

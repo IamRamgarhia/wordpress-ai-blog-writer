@@ -338,6 +338,68 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
 	}
 
+	public function test_a_published_post_links_into_its_own_prose() {
+		// A link inside a sentence is worth more than the same link in a list
+		// at the bottom that nobody scrolls to.
+		Blogcraft_Settings::set( 'internal_links_enabled', true );
+
+		self::factory()->post->create(
+			array(
+				'post_title'  => 'How to choose a standing desk',
+				'post_status' => 'publish',
+			)
+		);
+
+		$this->fake_completions(
+			array(
+				array(
+					'title'            => 'Working At A Standing Desk All Day',
+					'slug'             => 'standing-desk-all-day',
+					'meta_description' => 'What actually happens when you work at a standing desk for a full day, and how to set one up so it is bearable.',
+					'sections'         => array( array( 'heading' => 'The first week' ) ),
+				),
+				array( 'intro' => $this->good_opening() ),
+				array( 'paragraphs' => array( 'Before anything else you have to choose a standing desk that suits the room. ' . $this->long_body() ) ),
+				array( 'problems' => array() ),
+			)
+		);
+
+		Blogcraft_Pipeline::enqueue_topic( 'standing desks', 'draft' );
+
+		for ( $i = 0; $i < 8; $i++ ) {
+			Blogcraft_Worker::run( 0 );
+		}
+
+		$posts = get_posts(
+			array(
+				'post_status'    => 'draft',
+				'posts_per_page' => 5,
+				'meta_key'       => '_blogcraft_generated', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'     => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+
+		$this->assertCount( 1, $posts );
+		$this->assertStringContainsString( 'choose a standing desk</a>', $posts[0]->post_content );
+	}
+
+	public function test_the_writers_own_figures_reach_the_prompt() {
+		$job_id = Blogcraft_Pipeline::enqueue_topic(
+			'standing desks',
+			'draft',
+			'',
+			array(),
+			'Our returns rate was 3 in 9.'
+		);
+
+		$this->assertGreaterThan( 0, $job_id );
+
+		$rows    = Blogcraft_Queue::recent_jobs( 1 );
+		$payload = json_decode( $rows[0]['payload'], true );
+
+		$this->assertSame( 'Our returns rate was 3 in 9.', $payload['evidence'] );
+	}
+
 	public function test_pipeline_records_token_usage() {
 		$this->fake_completions(
 			array(

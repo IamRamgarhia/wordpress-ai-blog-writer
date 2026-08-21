@@ -274,6 +274,46 @@ class Test_Blogcraft_Editorial extends WP_UnitTestCase {
 		$this->assertSame( array(), Blogcraft_Editorial::borrowed_sentences( 'It is good.', $this->sources() ) );
 	}
 
+	// ---------------------------------------------------------- own material.
+
+	public function test_figures_the_writer_supplied_but_the_model_dropped_are_named() {
+		$evidence = 'We tested 9 desks over 4 months. The 220 bracket wobbled above 110cm. Our returns rate was 3 in 9.';
+		$article  = 'We tested desks for a while and the cheap ones wobbled above 110cm.';
+
+		$missing = Blogcraft_Editorial::unused_evidence( $article, $evidence );
+
+		$this->assertContains( '3 in 9', $missing );
+		$this->assertNotContains( '110cm', $missing );
+	}
+
+	public function test_evidence_fully_used_leaves_nothing_missing() {
+		$evidence = 'The bracket wobbled above 110cm and the returns rate was 3 in 9.';
+		$article  = 'Above 110cm it wobbled, and our own returns rate came to 3 in 9 across the batch.';
+
+		$this->assertSame( array(), Blogcraft_Editorial::unused_evidence( $article, $evidence ) );
+	}
+
+	public function test_evidence_carrying_no_figures_asks_for_nothing() {
+		// Someone who typed a sentence of context rather than numbers has not
+		// promised anything checkable, so nothing is demanded of the draft.
+		$this->assertSame( array(), Blogcraft_Editorial::unused_evidence( 'Anything.', 'We think cheap desks wobble.' ) );
+	}
+
+	public function test_the_check_only_runs_when_material_was_supplied() {
+		$without = Blogcraft_Editorial::checks( $this->good_opening(), $this->blueprint() );
+
+		$this->assertNull( $this->verdict( $without, 'own_material' ) );
+
+		$with = Blogcraft_Editorial::checks(
+			$this->good_opening(),
+			$this->blueprint(),
+			array( 'evidence' => 'Our returns rate was 3 in 9.' )
+		);
+
+		$this->assertNotNull( $this->verdict( $with, 'own_material' ) );
+		$this->assertFalse( $this->verdict( $with, 'own_material' )['pass'] );
+	}
+
 	// ------------------------------------------------------------- scorecard.
 
 	public function test_every_check_arrives_in_the_scorecard_shape() {
@@ -284,10 +324,11 @@ class Test_Blogcraft_Editorial extends WP_UnitTestCase {
 				'title'            => 'How Cold Brew Coffee Works',
 				'meta_description' => 'x',
 				'sources'          => $this->sources(),
+				'evidence'         => 'Our own acidity reading came out at 67%.',
 			)
 		);
 
-		$this->assertCount( 9, $checks );
+		$this->assertCount( 10, $checks );
 
 		foreach ( $checks as $check ) {
 			foreach ( array( 'key', 'label', 'pass', 'actual', 'target', 'weight', 'repair' ) as $field ) {

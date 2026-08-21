@@ -128,6 +128,173 @@ class Blogcraft_Seo {
 	}
 
 	/**
+	 * Phrases from a title worth using as link text, longest first.
+	 *
+	 * A link reading "standing desk height" inside a sentence is worth more
+	 * than the same link sitting in a list at the bottom that nobody scrolls
+	 * to. Leading question words and articles are dropped because "How to
+	 * choose a standing desk" almost never appears verbatim in prose, while
+	 * "choose a standing desk" often does.
+	 *
+	 * @param string $title Post title.
+	 * @return array Candidate phrases, longest first.
+	 */
+	public static function anchor_phrases( $title ) {
+		$title = trim( wp_strip_all_tags( html_entity_decode( (string) $title, ENT_QUOTES, 'UTF-8' ) ) );
+
+		// Anything after a colon or dash is a subtitle, not the subject.
+		$title = preg_split( '/\s+[:\x{2013}\x{2014}-]\s+/u', $title, 2 )[0];
+		$words = preg_split( '/\s+/u', $title, -1, PREG_SPLIT_NO_EMPTY );
+
+		if ( count( $words ) < 2 ) {
+			return array();
+		}
+
+		$lead = array( 'how', 'what', 'why', 'when', 'where', 'which', 'who', 'the', 'a', 'an', 'to', 'is', 'are', 'do', 'does', 'your', 'my', 'our', 'best', 'top' );
+		$out  = array();
+
+		// Whole title first, then progressively drop leading filler.
+		for ( $start = 0; $start < count( $words ) - 1; $start++ ) {
+			$phrase = implode( ' ', array_slice( $words, $start ) );
+
+			if ( strlen( $phrase ) >= 12 ) {
+				$out[] = $phrase;
+			}
+
+			$next = strtolower( preg_replace( '/[^\p{L}\p{N}]/u', '', $words[ $start ] ) );
+
+			if ( ! in_array( $next, $lead, true ) ) {
+				break;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Link phrases in the body to related posts, once each.
+	 *
+	 * Deliberately timid. Every complaint about automated internal linking is
+	 * that it links the wrong words to the wrong page, so this only ever links
+	 * text that matches a real post's title, only inside paragraphs, only in
+	 * paragraphs that carry no link already, and only once per target. Fewer
+	 * links that are all correct beats more links that are mostly noise.
+	 *
+	 * @param string $content Rendered post content.
+	 * @param array  $related Related posts, each with url and title.
+	 * @param int    $limit   Most links to add.
+	 * @return array Keys: content, linked (list of post ids linked).
+	 */
+	public static function link_in_text( $content, $related, $limit = 3 ) {
+		$content = (string) $content;
+		$linked  = array();
+
+		if ( empty( $related ) || $limit < 1 ) {
+			return array(
+				'content' => $content,
+				'linked'  => $linked,
+			);
+		}
+
+		$found = preg_match_all(
+			'/<!--\s*wp:paragraph.*?<!--\s*\/wp:paragraph\s*-->/s',
+			$content,
+			$matches,
+			PREG_OFFSET_CAPTURE
+		);
+
+		if ( ! $found ) {
+			return array(
+				'content' => $content,
+				'linked'  => $linked,
+			);
+		}
+
+		// Rebuilt back to front so earlier offsets stay valid.
+		$blocks = array_reverse( $matches[0] );
+		$taken  = array();
+
+		foreach ( $blocks as $block ) {
+			if ( count( $linked ) >= (int) $limit ) {
+				break;
+			}
+
+			$markup = (string) $block[0];
+
+			// A paragraph that already links somewhere is left alone.
+			if ( preg_match( '/<a\s[^>]*href=/i', $markup ) ) {
+				continue;
+			}
+
+			foreach ( $related as $item ) {
+				if ( empty( $item['url'] ) || empty( $item['title'] ) ) {
+					continue;
+				}
+
+				$id = isset( $item['id'] ) ? (int) $item['id'] : 0;
+
+				if ( isset( $taken[ $item['url'] ] ) ) {
+					continue;
+				}
+
+				$replaced = self::link_phrase( $markup, self::anchor_phrases( $item['title'] ), (string) $item['url'] );
+
+				if ( '' === $replaced ) {
+					continue;
+				}
+
+				$content = substr_replace( $content, $replaced, (int) $block[1], strlen( $markup ) );
+
+				$taken[ $item['url'] ] = true;
+				$linked[]              = ( $id > 0 ) ? $id : $item['url'];
+				break;
+			}
+		}
+
+		return array(
+			'content' => $content,
+			'linked'  => $linked,
+		);
+	}
+
+	/**
+	 * Wrap the first clean occurrence of any phrase in a link.
+	 *
+	 * @param string $markup   One paragraph block.
+	 * @param array  $phrases  Candidate phrases, longest first.
+	 * @param string $url      Where the link should go.
+	 * @return string The rewritten block, or '' when nothing matched.
+	 */
+	private static function link_phrase( $markup, $phrases, $url ) {
+		// Search the paragraph's own text only. Matching inside the opening
+		// block comment would put an anchor tag in a place Gutenberg treats as
+		// metadata, and quietly corrupt the block.
+		$body = strpos( $markup, '<p' );
+
+		if ( false === $body ) {
+			return '';
+		}
+
+		$text = substr( $markup, $body );
+
+		foreach ( $phrases as $phrase ) {
+			$pattern = '/(?<![\p{L}\p{N}])' . preg_quote( $phrase, '/' ) . '(?![\p{L}\p{N}])/iu';
+
+			if ( ! preg_match( $pattern, $text, $hit, PREG_OFFSET_CAPTURE ) ) {
+				continue;
+			}
+
+			$at      = (int) $body + (int) $hit[0][1];
+			$matched = (string) $hit[0][0];
+			$anchor  = sprintf( '<a href="%s">%s</a>', esc_url( $url ), esc_html( $matched ) );
+
+			return substr_replace( $markup, $anchor, $at, strlen( $matched ) );
+		}
+
+		return '';
+	}
+
+	/**
 	 * Meta keys used by the SEO plugins that store their fields as post meta.
 	 *
 	 * All In One SEO is absent deliberately: it keeps titles and descriptions in
