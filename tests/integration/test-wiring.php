@@ -106,6 +106,9 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		Blogcraft_Settings::set( 'provider_auth_header', 'X-Api-Key' );
 		Blogcraft_Settings::set( 'provider_auth_prefix', 'Token ' );
 		Blogcraft_Settings::set( 'provider_text_path', 'result.text' );
+		// Without a template the adapter refuses before it reaches the network,
+		// so leaving it out tests nothing.
+		Blogcraft_Settings::set( 'provider_request_template', '{"model":"{{model}}","input":"{{prompt}}"}' );
 
 		$sent = array();
 
@@ -132,14 +135,15 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'X-Api-Key', $sent['headers'], 'the chosen auth header was ignored' );
 		$this->assertSame( 'Token k', $sent['headers']['X-Api-Key'], 'the chosen auth prefix was ignored' );
 		$this->assertSame( 'hello', $response->text, 'the chosen response path was ignored' );
+		$this->assertStringContainsString( 'a-model', (string) $sent['body'], 'the request template was ignored' );
 	}
 
 	public function test_every_custom_config_key_has_a_setting_behind_it() {
 		$settings = Blogcraft_Settings_Schema::all();
 
-		foreach ( Blogcraft_Provider_Registry::custom_config_keys() as $key ) {
+		foreach ( Blogcraft_Provider_Registry::custom_config_keys() as $key => $setting ) {
 			$this->assertArrayHasKey(
-				'provider_' . $key,
+				$setting,
 				$settings,
 				'the custom adapter reads ' . $key . ' but nothing stores it'
 			);

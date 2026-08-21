@@ -249,16 +249,21 @@ class Blogcraft_Provider_Registry {
 	 * adapter cannot end up disagreeing about which fields exist, which is
 	 * exactly how these six came to be rendered and never used.
 	 *
-	 * @return array Config key names, each stored as provider_<key>.
+	 * Written as literal setting names rather than assembled from a prefix, so
+	 * that searching the source for a setting finds the place it is used. A
+	 * key built by concatenation is invisible to any audit, which is part of
+	 * how these six went unnoticed.
+	 *
+	 * @return array Adapter config key => setting name.
 	 */
 	public static function custom_config_keys() {
 		return array(
-			'auth_header',
-			'auth_prefix',
-			'request_template',
-			'text_path',
-			'prompt_tokens_path',
-			'completion_tokens_path',
+			'auth_header'            => 'provider_auth_header',
+			'auth_prefix'            => 'provider_auth_prefix',
+			'request_template'       => 'provider_request_template',
+			'text_path'              => 'provider_text_path',
+			'prompt_tokens_path'     => 'provider_prompt_tokens_path',
+			'completion_tokens_path' => 'provider_completion_tokens_path',
 		);
 	}
 
@@ -353,8 +358,8 @@ class Blogcraft_Provider_Registry {
 		// then ignored — every custom endpoint fell back to Authorization,
 		// Bearer, and a default response path, whatever the user had typed.
 		if ( 'custom' === $type ) {
-			foreach ( self::custom_config_keys() as $key ) {
-				$config[ $key ] = Blogcraft_Settings::get( 'provider_' . $key );
+			foreach ( self::custom_config_keys() as $key => $setting ) {
+				$config[ $key ] = Blogcraft_Settings::get( $setting );
 			}
 		}
 
