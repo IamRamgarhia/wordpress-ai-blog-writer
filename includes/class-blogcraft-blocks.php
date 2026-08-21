@@ -39,6 +39,16 @@ class Blogcraft_Blocks {
 			$out .= self::unordered_list( $article['key_takeaways'] );
 		}
 
+		// Early, because it lets a reader decide in five seconds whether the
+		// rest of the article is for them. Saying who something is not for is
+		// the part almost nobody writes and the part readers trust.
+		$out .= self::two_lists(
+			isset( $article['for_whom'] ) ? $article['for_whom'] : array(),
+			isset( $article['not_for'] ) ? $article['not_for'] : array(),
+			__( 'Who this is for', 'blogcraft' ),
+			__( 'Who it is not for', 'blogcraft' )
+		);
+
 		if ( ! empty( $article['sections'] ) && is_array( $article['sections'] ) ) {
 			foreach ( $article['sections'] as $section ) {
 				if ( ! is_array( $section ) ) {
@@ -61,6 +71,20 @@ class Blogcraft_Blocks {
 			}
 		}
 
+		$out .= self::two_lists(
+			isset( $article['pros'] ) ? $article['pros'] : array(),
+			isset( $article['cons'] ) ? $article['cons'] : array(),
+			__( 'What works', 'blogcraft' ),
+			__( 'What does not', 'blogcraft' )
+		);
+
+		$out .= self::figures( isset( $article['figures'] ) ? $article['figures'] : array() );
+
+		if ( ! empty( $article['mistakes'] ) && is_array( $article['mistakes'] ) ) {
+			$out .= self::heading( __( 'Mistakes worth avoiding', 'blogcraft' ), 2 );
+			$out .= self::unordered_list( $article['mistakes'] );
+		}
+
 		if ( ! empty( $article['faq'] ) && is_array( $article['faq'] ) ) {
 			$out .= self::heading( __( 'Frequently asked questions', 'blogcraft' ), 2 );
 
@@ -77,7 +101,124 @@ class Blogcraft_Blocks {
 			}
 		}
 
+		$out .= self::sources( isset( $article['sources'] ) ? $article['sources'] : array() );
+
 		return trim( $out );
+	}
+
+	/**
+	 * Two headed lists, rendered only when there is something in them.
+	 *
+	 * @param array  $first  Items for the first list.
+	 * @param array  $second Items for the second list.
+	 * @param string $head   Heading for the first.
+	 * @param string $tail   Heading for the second.
+	 * @return string
+	 */
+	private static function two_lists( $first, $second, $head, $tail ) {
+		$out = '';
+
+		if ( ! empty( $first ) && is_array( $first ) ) {
+			$list = self::unordered_list( $first );
+
+			if ( '' !== $list ) {
+				$out .= self::heading( $head, 2 ) . $list;
+			}
+		}
+
+		if ( ! empty( $second ) && is_array( $second ) ) {
+			$list = self::unordered_list( $second );
+
+			if ( '' !== $list ) {
+				$out .= self::heading( $tail, 2 ) . $list;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * The figures an article states, gathered into one table with their sources.
+	 *
+	 * A number a reader can check is worth more than one they cannot, and
+	 * putting them together makes the ones without a source obvious.
+	 *
+	 * @param array $figures Each with figure, meaning and source.
+	 * @return string
+	 */
+	private static function figures( $figures ) {
+		if ( empty( $figures ) || ! is_array( $figures ) ) {
+			return '';
+		}
+
+		$rows = array();
+
+		foreach ( $figures as $entry ) {
+			if ( ! is_array( $entry ) || empty( $entry['figure'] ) ) {
+				continue;
+			}
+
+			$rows[] = array(
+				isset( $entry['figure'] ) ? $entry['figure'] : '',
+				isset( $entry['meaning'] ) ? $entry['meaning'] : '',
+				isset( $entry['source'] ) ? $entry['source'] : '',
+			);
+		}
+
+		$table = self::table(
+			array(
+				__( 'Figure', 'blogcraft' ),
+				__( 'What it means', 'blogcraft' ),
+				__( 'Where it came from', 'blogcraft' ),
+			),
+			$rows
+		);
+
+		return ( '' === $table ) ? '' : self::heading( __( 'The numbers', 'blogcraft' ), 2 ) . $table;
+	}
+
+	/**
+	 * The sources an article was written from.
+	 *
+	 * Links are built from the url the research stage recorded, never from
+	 * anything the model produced: a model asked for a citation will invent a
+	 * plausible address that goes nowhere.
+	 *
+	 * @param array $sources Each with title and url.
+	 * @return string
+	 */
+	private static function sources( $sources ) {
+		if ( empty( $sources ) || ! is_array( $sources ) ) {
+			return '';
+		}
+
+		$items = array();
+
+		foreach ( $sources as $source ) {
+			if ( ! is_array( $source ) || empty( $source['url'] ) ) {
+				continue;
+			}
+
+			$url = esc_url( (string) $source['url'] );
+
+			if ( '' === $url ) {
+				continue;
+			}
+
+			$label = trim( wp_strip_all_tags( isset( $source['title'] ) ? (string) $source['title'] : '' ) );
+
+			if ( '' === $label ) {
+				$label = $url;
+			}
+
+			$items[] = '<a href="' . $url . '" rel="nofollow noopener" target="_blank">' . esc_html( $label ) . '</a>';
+		}
+
+		if ( empty( $items ) ) {
+			return '';
+		}
+
+		return self::heading( __( 'Sources', 'blogcraft' ), 2 ) . self::unordered_list( $items );
 	}
 
 	/**
@@ -143,6 +284,95 @@ class Blogcraft_Blocks {
 		}
 
 		return "<!-- wp:list -->\n<ul class=\"wp-block-list\">\n" . $rendered . "</ul>\n<!-- /wp:list -->\n\n";
+	}
+
+	/**
+	 * A numbered list block.
+	 *
+	 * @param array $items List items.
+	 * @return string Empty when nothing usable was supplied.
+	 */
+	public static function ordered_list( $items ) {
+		$rendered = '';
+
+		foreach ( (array) $items as $item ) {
+			$item = self::clean( $item );
+
+			if ( '' === $item ) {
+				continue;
+			}
+
+			$rendered .= "<!-- wp:list-item -->\n<li>" . $item . "</li>\n<!-- /wp:list-item -->\n";
+		}
+
+		if ( '' === $rendered ) {
+			return '';
+		}
+
+		return "<!-- wp:list {\"ordered\":true} -->\n<ol class=\"wp-block-list\">\n" . $rendered . "</ol>\n<!-- /wp:list -->\n\n";
+	}
+
+	/**
+	 * A table block.
+	 *
+	 * The blueprint has offered a "use tables" switch since it was written and
+	 * nothing could render one, so the setting produced a line in a prompt and
+	 * a model politely writing a table out as prose. This is the renderer that
+	 * was missing.
+	 *
+	 * @param array $head Column headings.
+	 * @param array $rows Rows, each an array of cells.
+	 * @return string Empty when there is nothing to lay out.
+	 */
+	public static function table( $head, $rows ) {
+		$head  = array_values( array_filter( array_map( array( __CLASS__, 'clean' ), (array) $head ), 'strlen' ) );
+		$body  = '';
+		$width = count( $head );
+
+		foreach ( (array) $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$cells = array_values( array_map( array( __CLASS__, 'clean' ), $row ) );
+
+			if ( empty( array_filter( $cells, 'strlen' ) ) ) {
+				continue;
+			}
+
+			// A ragged row renders as a broken table, so pad or trim it to the
+			// width the headings promised.
+			if ( $width > 0 ) {
+				$cells = array_slice( array_pad( $cells, $width, '' ), 0, $width );
+			}
+
+			$line = '';
+
+			foreach ( $cells as $cell ) {
+				$line .= '<td>' . $cell . '</td>';
+			}
+
+			$body .= '<tr>' . $line . "</tr>\n";
+		}
+
+		if ( '' === $body ) {
+			return '';
+		}
+
+		$header = '';
+
+		if ( ! empty( $head ) ) {
+			$cells = '';
+
+			foreach ( $head as $cell ) {
+				$cells .= '<th>' . $cell . '</th>';
+			}
+
+			$header = '<thead><tr>' . $cells . "</tr></thead>\n";
+		}
+
+		return "<!-- wp:table -->\n<figure class=\"wp-block-table\"><table>\n"
+			. $header . '<tbody>' . "\n" . $body . "</tbody>\n</table></figure>\n<!-- /wp:table -->\n\n";
 	}
 
 	/**

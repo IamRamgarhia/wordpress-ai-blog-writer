@@ -298,9 +298,10 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'Cold brew coffee', 'draft' );
 
-		// research, outline, draft, section, faq, critique, revise, verify, publish.
-		// Research and faq are ticks that cost no provider call.
-		for ( $i = 0; $i < 9; $i++ ) {
+		// research, outline, draft, section, faq, extras, critique, revise,
+		// verify, publish. Research, faq and extras cost no provider call here:
+		// the blueprint turns questions off and no extra sections are asked for.
+		for ( $i = 0; $i < 10; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 
@@ -338,13 +339,43 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'Anything', 'draft' );
 
-		// research, outline, draft, section, faq, critique, verify, publish.
-		// The blueprint has no takeaways and no questions, so faq costs no call.
-		for ( $i = 0; $i < 8; $i++ ) {
+		// research, outline, draft, section, faq, extras, critique, verify,
+		// publish. Three of those cost no provider call.
+		for ( $i = 0; $i < 9; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
+	}
+
+	public function test_the_extras_stage_costs_nothing_when_no_section_is_asked_for() {
+		// Off is the default, and a stage that spent a request to add nothing
+		// would be a tax on everybody who never turned one on.
+		$this->fake_completions(
+			array(
+				array(
+					'title'            => 'A Draft With No Extras At All',
+					'slug'             => 'no-extras',
+					'meta_description' => 'A post written with none of the optional extra sections switched on, to prove the stage costs nothing.',
+					'sections'         => array( array( 'heading' => 'Only section' ) ),
+				),
+				array( 'intro' => $this->good_opening() ),
+				array( 'paragraphs' => array( $this->long_body() ) ),
+				array( 'problems' => array() ),
+			)
+		);
+
+		Blogcraft_Pipeline::enqueue_topic( 'anything at all', 'draft' );
+
+		for ( $i = 0; $i < 9; $i++ ) {
+			Blogcraft_Worker::run( 0 );
+		}
+
+		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
+
+		// Four canned responses were queued and four were used. A fifth call
+		// would have taken a WP_Error and failed the job.
+		$this->assertSame( 4, Blogcraft_Cost::month_totals()['requests'] );
 	}
 
 	public function test_a_published_post_links_into_its_own_prose() {
@@ -375,7 +406,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'standing desks', 'draft' );
 
-		for ( $i = 0; $i < 8; $i++ ) {
+		for ( $i = 0; $i < 9; $i++ ) {
 			Blogcraft_Worker::run( 0 );
 		}
 

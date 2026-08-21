@@ -33,6 +33,7 @@ class Blogcraft_Pipeline {
 		Blogcraft_Worker::register_stage( self::NAME, 'draft', array( __CLASS__, 'stage_draft' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'section', array( __CLASS__, 'stage_section' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'faq', array( __CLASS__, 'stage_faq' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'extras', array( __CLASS__, 'stage_extras' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'critique', array( __CLASS__, 'stage_critique' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'revise', array( __CLASS__, 'stage_revise' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'verify', array( __CLASS__, 'stage_verify' ) );
@@ -491,7 +492,7 @@ class Blogcraft_Pipeline {
 
 		if ( ! (bool) $blueprint['faq'] ) {
 			return array(
-				'next'    => 'critique',
+				'next'    => 'extras',
 				'payload' => $payload,
 			);
 		}
@@ -531,11 +532,87 @@ class Blogcraft_Pipeline {
 		}
 
 		return array(
-			'next'    => 'critique',
+			'next'    => 'extras',
 			'payload' => $payload,
 		);
 	}
 
+
+	/**
+	 * The extra sections the blueprint asked for.
+	 *
+	 * One call for all of them. They are short, they all need the same finished
+	 * article in front of them, and a stage each would cost five times as much
+	 * for a few dozen lines.
+	 *
+	 * Costs nothing at all when none are switched on, which is the default: the
+	 * stage passes straight through without touching a provider.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 * @throws RuntimeException When the provider is rate limiting, so the worker can wait.
+	 */
+	public static function stage_extras( $job ) {
+		$payload   = $job->payload;
+		$blueprint = self::blueprint( $job );
+
+		$wanted = array();
+
+		foreach ( array( 'block_audience', 'block_proscons', 'block_figures', 'block_mistakes' ) as $block ) {
+			if ( ! empty( $blueprint[ $block ] ) ) {
+				$wanted[] = $block;
+			}
+		}
+
+		// The sources list is built from what research actually fetched, never
+		// from the model: asked for a citation, a model invents a plausible
+		// address that goes nowhere.
+		if ( ! empty( $blueprint['block_sources'] ) && ! empty( $payload['sources'] ) ) {
+			$payload['article']['sources'] = array_slice( (array) $payload['sources'], 0, 8 );
+		}
+
+		if ( empty( $wanted ) ) {
+			return array(
+				'next'    => 'critique',
+				'payload' => $payload,
+			);
+		}
+
+		Blogcraft_Prompts::use_blueprint( $blueprint );
+		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
+
+		try {
+			$result = self::ask(
+				Blogcraft_Prompts::extras( $payload['article'], $wanted ),
+				self::draft_options()
+			);
+
+			foreach ( array( 'for_whom', 'not_for', 'pros', 'cons', 'figures', 'mistakes' ) as $key ) {
+				if ( isset( $result[ $key ] ) && is_array( $result[ $key ] ) ) {
+					$payload['article'][ $key ] = $result[ $key ];
+				}
+			}
+		} catch ( RuntimeException $e ) {
+			// A rate limit still has to reach the worker, which knows to wait.
+			// Everything else loses the extras and keeps the article, which is
+			// the right trade: these are additions, not the post.
+			if ( false !== strpos( $e->getMessage(), 'HTTP 429' )
+				|| false !== stripos( $e->getMessage(), 'exceeded your current quota' ) ) {
+				throw $e;
+			}
+
+			Blogcraft_Logger::error(
+				'The extra sections could not be written; publishing the article without them.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
+
+		return array(
+			'next'    => 'critique',
+			'payload' => $payload,
+		);
+	}
 
 	/**
 	 * Critique the draft.

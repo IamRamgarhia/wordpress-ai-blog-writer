@@ -243,6 +243,26 @@ class Blogcraft_Provider_Registry {
 	}
 
 	/**
+	 * The extra configuration only the custom adapter understands.
+	 *
+	 * Named here rather than assembled inline so the settings screen and the
+	 * adapter cannot end up disagreeing about which fields exist, which is
+	 * exactly how these six came to be rendered and never used.
+	 *
+	 * @return array Config key names, each stored as provider_<key>.
+	 */
+	public static function custom_config_keys() {
+		return array(
+			'auth_header',
+			'auth_prefix',
+			'request_template',
+			'text_path',
+			'prompt_tokens_path',
+			'completion_tokens_path',
+		);
+	}
+
+	/**
 	 * Every provider's default address, for the front end.
 	 *
 	 * @return array
@@ -327,6 +347,16 @@ class Blogcraft_Provider_Registry {
 			'api_key'  => Blogcraft_Settings::get( 'provider_api_key' ),
 			'model'    => Blogcraft_Settings::get( 'provider_model' ),
 		);
+
+		// The custom adapter reads six more keys, and nothing was passing them.
+		// Six fields on the settings screen were being filled in, saved, and
+		// then ignored — every custom endpoint fell back to Authorization,
+		// Bearer, and a default response path, whatever the user had typed.
+		if ( 'custom' === $type ) {
+			foreach ( self::custom_config_keys() as $key ) {
+				$config[ $key ] = Blogcraft_Settings::get( 'provider_' . $key );
+			}
+		}
 
 		return self::make( $type, $config );
 	}

@@ -361,6 +361,11 @@ class Blogcraft_Generate {
 				'require_statistics',
 				'image_describe',
 				'image_allow_text',
+				'block_audience',
+				'block_proscons',
+				'block_figures',
+				'block_mistakes',
+				'block_sources',
 			),
 			'multi'  => array( 'literary_devices' ),
 		);
@@ -467,7 +472,7 @@ class Blogcraft_Generate {
 		echo Blogcraft_Controls::row(
 			__( 'Topic', 'blogcraft' ),
 			__( 'A sentence works better than a keyword. Say what the post should actually answer.', 'blogcraft' ),
-			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'blogcraft' ) . '" /><p class="bc-clash" id="bc-clash" hidden></p>',
+			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'blogcraft' ) . '" /><p class="bc-only-this">' . esc_html__( 'This is the only thing you have to fill in. Everything below already has an answer, taken from your standing rules.', 'blogcraft' ) . '</p><p class="bc-clash" id="bc-clash" hidden></p>',
 			'bc_topic'
 		);
 

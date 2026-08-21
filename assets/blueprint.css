@@ -927,3 +927,12 @@
 		transform: none;
 	}
 }
+
+/* The topic field is the only required one, and the screen should say so. */
+.bc-only-this {
+	margin: 8px 0 0;
+	max-width: 62ch;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--bp-graphite);
+}

@@ -753,6 +753,16 @@ class Blogcraft_Blueprint_Screen {
 		);
 
 		self::row(
+			__( 'Extra sections', 'blogcraft' ),
+			__( 'Each one is written after the article is finished, from the article, in a single extra request. Off by default because a post that has all of them bolted on reads like a form.', 'blogcraft' ),
+			self::toggle( 'block_audience', $bp['block_audience'], __( 'Who this is for, and who it is not', 'blogcraft' ) )
+			. self::toggle( 'block_proscons', $bp['block_proscons'], __( 'What works and what does not', 'blogcraft' ) )
+			. self::toggle( 'block_figures', $bp['block_figures'], __( 'A table of the figures, with sources', 'blogcraft' ) )
+			. self::toggle( 'block_mistakes', $bp['block_mistakes'], __( 'Mistakes worth avoiding', 'blogcraft' ) )
+			. self::toggle( 'block_sources', $bp['block_sources'], __( 'The sources it was written from', 'blogcraft' ) )
+		);
+
+		self::row(
 			__( 'Allow', 'blogcraft' ),
 			'',
 			self::toggle( 'lists', $bp['lists'], __( 'Bulleted lists', 'blogcraft' ) )

@@ -195,6 +195,11 @@ class Blogcraft_Blueprint {
 			'lists'                 => array( 'bool', true ),
 			'bold_key_phrases'      => array( 'bool', true ),
 			'toc'                   => array( 'bool', false ),
+			'block_audience'        => array( 'bool', false ),
+			'block_proscons'        => array( 'bool', false ),
+			'block_figures'         => array( 'bool', false ),
+			'block_mistakes'        => array( 'bool', false ),
+			'block_sources'         => array( 'bool', false ),
 
 			// SEO.
 			'primary_keyword'       => array( 'string', '' ),

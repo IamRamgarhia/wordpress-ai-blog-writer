@@ -472,6 +472,75 @@ Rules for this article:
 	}
 
 	/**
+	 * The extra sections a blueprint has asked for, in one request.
+	 *
+	 * One call for all of them rather than one each: these are short, they all
+	 * need the same finished article in front of them, and five separate turns
+	 * would cost five times as much to produce a few dozen lines.
+	 *
+	 * @param array $article Draft article.
+	 * @param array $wanted  Block keys switched on.
+	 * @return array
+	 */
+	public static function extras( $article, $wanted ) {
+		$shape = array();
+		$rules = '';
+
+		if ( in_array( 'block_audience', $wanted, true ) ) {
+			$shape[] = '"for_whom":[""],"not_for":[""]';
+			$rules  .= '- for_whom and not_for: two or three each, concrete. Saying who this is not for is the part readers trust, so name a real case it does not suit.
+';
+		}
+
+		if ( in_array( 'block_proscons', $wanted, true ) ) {
+			$shape[] = '"pros":[""],"cons":[""]';
+			$rules  .= '- pros and cons: three or four each, specific to this subject. A cons list that only contains mild compliments is worse than none.
+';
+		}
+
+		if ( in_array( 'block_figures', $wanted, true ) ) {
+			$shape[] = '"figures":[{"figure":"","meaning":"","source":""}]';
+			$rules  .= '- figures: only numbers that already appear in the draft above. Do not invent any. Say what each one means for the reader, and where it came from. If the draft states no figures, return an empty list.
+';
+		}
+
+		if ( in_array( 'block_mistakes', $wanted, true ) ) {
+			$shape[] = '"mistakes":[""]';
+			$rules  .= '- mistakes: three or four things people actually get wrong here, each with what to do instead.
+';
+		}
+
+		$user = 'Here is a finished draft.
+
+' . wp_json_encode( $article ) . '
+
+'
+			. 'Add the sections listed below. Do not rewrite the draft and do not repeat what it already says.
+
+'
+			. 'Reply with JSON of exactly this shape:
+{' . implode( ',', $shape ) . '}
+
+'
+			. 'Rules:
+' . $rules
+			. '- Plain text only in every field. No markdown, no HTML.'
+			. self::evidence_block()
+			. self::structure_block();
+
+		return array(
+			array(
+				'role'    => 'system',
+				'content' => self::base_system(),
+			),
+			array(
+				'role'    => 'user',
+				'content' => $user,
+			),
+		);
+	}
+
+	/**
 	 * Render per-topic guidance as a prompt fragment.
 	 *
 	 * Carrying instructions for this one post is the direct answer to the

@@ -1124,3 +1124,29 @@ body[class*="page_blogcraft"] #wpcontent {
 		transform: none;
 	}
 }
+
+/* --------------------------------------------------- required or not. */
+
+/* Five numbered cards read as five things you have to do. Only the first is. */
+.bc-need {
+	display: inline-block;
+	margin: 0 0 6px 8px;
+	padding: 2px 9px;
+	border-radius: 999px;
+	background: rgba(17, 24, 39, 0.06);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--bc-muted);
+	vertical-align: 2px;
+}
+
+.bc-need.is-needed {
+	background: var(--bc-accent-soft);
+	color: var(--bc-accent);
+}
+
+.blogcraft-step {
+	display: inline-block;
+}

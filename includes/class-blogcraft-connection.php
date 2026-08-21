@@ -596,12 +596,19 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function open_card( $step, $title, $description, $slug = '' ) {
+		// Numbered steps read as five things you must do. Only the first one is,
+		// and saying so is the difference between a screen someone finishes and
+		// one they abandon half way down.
+		$needed = ( 'provider' === $slug );
+
 		printf(
-			'<section class="blogcraft-card" id="%4$s"><header><span class="blogcraft-step">%1$s</span><h2>%2$s</h2><p>%3$s</p>',
+			'<section class="blogcraft-card" id="%4$s"><header><span class="blogcraft-step">%1$s</span><span class="bc-need%5$s">%6$s</span><h2>%2$s</h2><p>%3$s</p>',
 			esc_html( $step ),
 			esc_html( $title ),
 			esc_html( $description ),
-			esc_attr( '' === $slug ? '' : 'bc-card-' . $slug )
+			esc_attr( '' === $slug ? '' : 'bc-card-' . $slug ),
+			$needed ? ' is-needed' : '',
+			esc_html( $needed ? __( 'Required', 'blogcraft' ) : __( 'Optional', 'blogcraft' ) )
 		);
 
 		self::render_help( $slug );
