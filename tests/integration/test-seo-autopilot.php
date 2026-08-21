@@ -149,6 +149,51 @@ class Test_Blogcraft_Seo_Autopilot extends WP_UnitTestCase {
 		$this->assertSame( 0, Blogcraft_Images::attach_featured( $id, 'Title' ) );
 	}
 
+	public function test_a_section_heading_is_found_whatever_the_block_markup() {
+		// This used to match a literal string assembled from the exact markup
+		// the block renderer happened to emit, so any change to it stopped
+		// every section image appearing, silently.
+		$content = "<!-- wp:heading {\"level\":2,\"className\":\"is-style-fancy\"} -->
+"
+			. "<h2 class=\"wp-block-heading\" id=\"chem\">The chemistry</h2>
+<!-- /wp:heading -->
+
+"
+			. "<!-- wp:paragraph -->
+<p>Body.</p>
+<!-- /wp:paragraph -->";
+
+		$this->assertGreaterThan( 0, Blogcraft_Images::heading_ends_at( $content, 'The chemistry' ) );
+	}
+
+	public function test_a_heading_that_is_not_there_is_reported_as_absent() {
+		$content = Blogcraft_Blocks::heading( 'The chemistry' );
+
+		$this->assertSame( -1, Blogcraft_Images::heading_ends_at( $content, 'Nowhere' ) );
+		$this->assertSame( -1, Blogcraft_Images::heading_ends_at( $content, '' ) );
+		$this->assertSame( -1, Blogcraft_Images::heading_ends_at( '<p>No headings.</p>', 'A' ) );
+	}
+
+	public function test_the_offset_lands_after_the_heading_block() {
+		$heading = Blogcraft_Blocks::heading( 'The chemistry' );
+		$content = '<p>Intro.</p>' . $heading . '<p>Body.</p>';
+		$at      = Blogcraft_Images::heading_ends_at( $content, 'The chemistry' );
+
+		// Everything from the offset on must be what followed the heading.
+		$this->assertStringContainsString( 'Body.', substr( $content, $at ) );
+		$this->assertStringNotContainsString( 'The chemistry', substr( $content, $at ) );
+	}
+
+	public function test_each_of_several_headings_is_found_separately() {
+		$content = Blogcraft_Blocks::heading( 'First' ) . '<p>A.</p>' . Blogcraft_Blocks::heading( 'Second' ) . '<p>B.</p>';
+
+		$first  = Blogcraft_Images::heading_ends_at( $content, 'First' );
+		$second = Blogcraft_Images::heading_ends_at( $content, 'Second' );
+
+		$this->assertGreaterThan( 0, $first );
+		$this->assertGreaterThan( $first, $second );
+	}
+
 	// ------------------------------------------------------------ autopilot.
 
 	public function test_tick_does_nothing_when_disabled() {

@@ -242,6 +242,48 @@ class Blogcraft_Images {
 	}
 
 	/**
+	 * Where the heading block carrying this text ends.
+	 *
+	 * Previously this matched a literal string assembled from the exact markup
+	 * the block renderer happened to emit. Any change to that markup — a class,
+	 * an id, an attribute — stopped every section image appearing, with no
+	 * error and nothing in the log: the post simply came out plainer. Matching
+	 * the block wrapper and comparing the text inside survives all of that.
+	 *
+	 * @param string $content Rendered post content.
+	 * @param string $heading Heading text to find.
+	 * @return int Offset just past the heading block, or -1 when not found.
+	 */
+	public static function heading_ends_at( $content, $heading ) {
+		$wanted = trim( wp_strip_all_tags( html_entity_decode( (string) $heading, ENT_QUOTES, 'UTF-8' ) ) );
+
+		if ( '' === $wanted ) {
+			return -1;
+		}
+
+		$found = preg_match_all(
+			'/<!--\s*wp:heading.*?<!--\s*\/wp:heading\s*-->/s',
+			(string) $content,
+			$matches,
+			PREG_OFFSET_CAPTURE
+		);
+
+		if ( ! $found ) {
+			return -1;
+		}
+
+		foreach ( $matches[0] as $match ) {
+			$text = trim( wp_strip_all_tags( html_entity_decode( (string) $match[0], ENT_QUOTES, 'UTF-8' ) ) );
+
+			if ( $text === $wanted ) {
+				return (int) $match[1] + strlen( (string) $match[0] );
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Add one image beneath each section heading.
 	 *
 	 * Runs after the post exists so each attachment has a parent, and updates
@@ -281,9 +323,15 @@ class Blogcraft_Images {
 			}
 
 			$heading = (string) $section['heading'];
-			$marker  = '<h2>' . esc_html( $heading ) . "</h2>\n<!-- /wp:heading -->";
+			$at      = self::heading_ends_at( $content, $heading );
 
-			if ( false === strpos( $content, $marker ) ) {
+			if ( $at < 0 ) {
+				Blogcraft_Logger::info(
+					'A section heading could not be found in the rendered post, so it was left without a picture.',
+					array( 'heading' => $heading ),
+					null
+				);
+
 				continue;
 			}
 
@@ -309,13 +357,15 @@ class Blogcraft_Images {
 				continue;
 			}
 
-			$content = str_replace(
-				$marker,
-				$marker . '
+			// Located again rather than reused: an earlier insertion in this
+			// same loop has already moved every offset after it.
+			$at = self::heading_ends_at( $content, $heading );
 
-' . $block,
-				$content
-			);
+			if ( $at < 0 ) {
+				continue;
+			}
+
+			$content = substr( $content, 0, $at ) . "\n\n" . $block . substr( $content, $at );
 			++$added;
 		}
 

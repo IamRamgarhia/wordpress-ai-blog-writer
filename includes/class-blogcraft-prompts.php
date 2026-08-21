@@ -81,6 +81,21 @@ Rules for this article:
 	}
 
 	/**
+	 * One numeric limit from the active blueprint.
+	 *
+	 * @param string $key      Blueprint field.
+	 * @param int    $fallback Value to use when no blueprint is active.
+	 * @return int
+	 */
+	private static function limit( $key, $fallback ) {
+		if ( ! is_array( self::$blueprint ) || empty( self::$blueprint[ $key ] ) ) {
+			return (int) $fallback;
+		}
+
+		return (int) self::$blueprint[ $key ];
+	}
+
+	/**
 	 * Messages asking for an article outline.
 	 *
 	 * @param string $topic   Topic to write about.
@@ -97,9 +112,13 @@ Rules for this article:
 			. "Reply with JSON of exactly this shape:\n"
 			. '{"title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"
 			. "Rules:\n"
-			. "- title: compelling, under 65 characters, no colon-subtitle pattern\n"
+			// Both limits are measured on the finished post, so they are taken
+			// from the blueprint rather than hardcoded here. Asking for one
+			// number and checking against another is how a setting comes to do
+			// nothing.
+			. sprintf( "- title: compelling, %d characters at most, no colon-subtitle pattern\n", self::limit( 'meta_title_max', 60 ) )
 			. "- slug: lowercase, hyphenated, no stop words\n"
-			. "- meta_description: under 155 characters, describes what the reader gains\n"
+			. sprintf( "- meta_description: between 70 and %d characters, describing what the reader gains\n", self::limit( 'meta_desc_max', 155 ) )
 			. '- sections: headings that build an argument, not a list of synonyms'
 			. self::extra( $instructions )
 			. self::structure_block();
@@ -211,6 +230,11 @@ Rules for this article:
 			. "Reply with JSON of exactly this shape:\n" . $shape . "\n\n"
 			. "Rules:\n"
 			. sprintf( "- intro: about %d words, answering the title's implicit question directly. No throat-clearing.\n", (int) $words )
+			// The opening is measured, so the rule it is measured against is
+			// stated rather than implied. It is also the passage an answer
+			// panel lifts, which is why the first two sentences must stand
+			// alone with the subject named in them.
+			. "- The first two sentences must answer the question on their own, name the subject, and total under sixty words. Do not open with \"In today's\", \"In this article\", \"When it comes to\", \"Have you ever\" or any similar wind-up.\n"
 			. ( $takeaways > 0
 				? sprintf( "- key_takeaways: exactly %d specific, useful points. Not a summary of the headings.\n", (int) $takeaways )
 				: '' )
@@ -351,9 +375,10 @@ Rules for this article:
 	 *
 	 * @param array $article  Draft article.
 	 * @param array $problems Problems raised by the critique stage.
+	 * @param array $outline  Outline the draft was written under, for title and meta fixes.
 	 * @return array
 	 */
-	public static function revise( $article, $problems ) {
+	public static function revise( $article, $problems, $outline = array() ) {
 		$list = '';
 
 		foreach ( (array) $problems as $problem ) {
@@ -362,8 +387,24 @@ Rules for this article:
 			}
 		}
 
+		// The title and the meta description are measured but live on the
+		// outline, not the draft. Without this the revise stage could be handed
+		// "the title is too long" and have no way to act on it, which is a
+		// deduction dressed up as a finding.
+		$headline = '';
+
+		if ( is_array( $outline ) && ( ! empty( $outline['title'] ) || ! empty( $outline['meta_description'] ) ) ) {
+			$headline = "\n\nThe title and meta description this draft was written under:\n"
+				. 'Title: ' . ( isset( $outline['title'] ) ? $outline['title'] : '' ) . "\n"
+				. 'Meta description: ' . ( isset( $outline['meta_description'] ) ? $outline['meta_description'] : '' ) . "\n\n"
+				. 'If, and only if, one of the problems above concerns the title or the meta description, '
+				. 'add a "title" or "meta_description" key to your reply with a corrected version. '
+				. 'Leave them out otherwise.';
+		}
+
 		$user = "Rewrite this draft, fixing every problem listed.\n\nDraft:\n"
-			. wp_json_encode( $article ) . "\n\nProblems to fix:\n" . $list . "\n"
+			. wp_json_encode( $article ) . "\n\nProblems to fix:\n" . $list
+			. $headline . "\n"
 			. 'Reply with JSON in exactly the same shape as the draft. Keep what works; '
 			. 'change what was criticised. Do not add new sections.'
 			. self::structure_block();

@@ -79,6 +79,21 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			'author_credentials'              => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'reviewer_name'                   => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
+			'reviewer_credentials'            => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'monthly_image_cap'               => array(
 				'default' => 0,
 				'type'    => 'int',

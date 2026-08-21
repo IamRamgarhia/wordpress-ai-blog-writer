@@ -99,6 +99,28 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * What the editorial checks need beyond the prose.
+	 *
+	 * The title and meta description live on the outline and the sources on the
+	 * payload, so the scorecard cannot reach either from rendered content
+	 * alone. Anything absent is simply absent: those checks then do not run.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	private static function context( $job ) {
+		$outline = isset( $job->payload['outline'] ) && is_array( $job->payload['outline'] )
+			? $job->payload['outline']
+			: array();
+
+		return array(
+			'title'            => isset( $outline['title'] ) ? (string) $outline['title'] : '',
+			'meta_description' => isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : '',
+			'sources'          => isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array(),
+		);
+	}
+
+	/**
 	 * Per-topic guidance carried on the job, if any.
 	 *
 	 * @param Blogcraft_Job $job Current job.
@@ -510,7 +532,8 @@ class Blogcraft_Pipeline {
 		// facts, and a fact the model can act on beats a score it never sees.
 		$assessment = Blogcraft_Scorecard::evaluate(
 			Blogcraft_Blocks::render( $article ),
-			$blueprint
+			$blueprint,
+			self::context( $job )
 		);
 
 		foreach ( $assessment['checks'] as $check ) {
@@ -548,11 +571,29 @@ class Blogcraft_Pipeline {
 	public static function stage_revise( $job ) {
 		$article  = isset( $job->payload['article'] ) ? $job->payload['article'] : array();
 		$problems = isset( $job->payload['problems'] ) ? $job->payload['problems'] : array();
+		$payload  = $job->payload;
+		$outline  = isset( $payload['outline'] ) && is_array( $payload['outline'] ) ? $payload['outline'] : array();
+
 		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
 
-		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems ), self::draft_options() );
+		$revised = self::ask( Blogcraft_Prompts::revise( $article, $problems, $outline ), self::draft_options() );
 
-		$payload            = $job->payload;
+		// The title and meta description are measured but belong to the
+		// outline, so a correction for either comes back alongside the draft
+		// and is moved to where it lives. Absent keys change nothing, which is
+		// the common case: they are only asked for when something flagged them.
+		foreach ( array( 'title', 'meta_description' ) as $field ) {
+			if ( isset( $revised[ $field ] ) && '' !== trim( (string) $revised[ $field ] ) ) {
+				$outline[ $field ] = sanitize_text_field( (string) $revised[ $field ] );
+			}
+
+			unset( $revised[ $field ] );
+		}
+
+		if ( ! empty( $outline ) ) {
+			$payload['outline'] = $outline;
+		}
+
 		$payload['article'] = $revised;
 
 		return array(
@@ -609,7 +650,7 @@ class Blogcraft_Pipeline {
 		// the number that decides publish-or-hold is the same one measured
 		// during critique, against the rules this post was actually written to.
 		$blueprint  = self::blueprint( $job );
-		$scorecard  = Blogcraft_Scorecard::evaluate( Blogcraft_Blocks::render( $article ), $blueprint );
+		$scorecard  = Blogcraft_Scorecard::evaluate( Blogcraft_Blocks::render( $article ), $blueprint, self::context( $job ) );
 		$assessment = Blogcraft_Verify::score( $article );
 
 		$reasons = array();

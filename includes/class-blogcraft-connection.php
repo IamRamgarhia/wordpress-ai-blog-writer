@@ -411,6 +411,27 @@ class Blogcraft_Connection {
 			self::text_row( $name, $label );
 		}
 
+		self::text_row(
+			'author_credentials',
+			__( 'What the author does', 'blogcraft' ),
+			'',
+			__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'blogcraft' )
+		);
+
+		self::text_row(
+			'reviewer_name',
+			__( 'Reviewed by', 'blogcraft' ),
+			'',
+			__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'blogcraft' )
+		);
+
+		self::text_row(
+			'reviewer_credentials',
+			__( 'What the reviewer does', 'blogcraft' ),
+			'',
+			__( 'Their role or qualification.', 'blogcraft' )
+		);
+
 		echo '</tbody></table>';
 
 		self::close_card();
@@ -890,7 +911,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model', 'author_credentials', 'reviewer_name', 'reviewer_credentials' )
 		);
 
 		foreach ( $plain as $key ) {

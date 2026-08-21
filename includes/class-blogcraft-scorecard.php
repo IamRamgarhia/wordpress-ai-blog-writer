@@ -478,15 +478,23 @@ class Blogcraft_Scorecard {
 	 *
 	 * @param string $content   Rendered content.
 	 * @param array  $blueprint Blueprint.
+	 * @param array  $context   Optional: title, meta_description, sources.
 	 * @return array Keys: score, checks, metrics.
 	 */
-	public static function evaluate( $content, $blueprint ) {
+	public static function evaluate( $content, $blueprint, $context = array() ) {
 		$metrics = Blogcraft_Metrics::measure( $content, $blueprint );
 		$checks  = self::checks( $metrics, $blueprint );
 
 		// Structural checks read rendered markup rather than prose, so they
 		// build their own verdicts and are merged in whole.
 		$checks = array_merge( $checks, Blogcraft_Structure::checks( $content, $blueprint ) );
+
+		// Editorial checks need the title, the meta description and the
+		// research sources, none of which the rendered prose carries. Any of
+		// them that is missing simply produces no check: the score is
+		// earned-over-offered, so a question that could not be asked costs
+		// nothing rather than costing marks.
+		$checks = array_merge( $checks, Blogcraft_Editorial::checks( $content, $blueprint, $context ) );
 
 		$earned = 0;
 		$total  = 0;

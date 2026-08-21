@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.20.0
+Stable tag: 0.21.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,18 @@ Every feature is included. Nothing is locked, nothing expires, and there are no 
 4. **Revise.** Rewrites to fix what it found. If the critique finds nothing, this pass is skipped rather than run for the sake of it.
 5. **Verify.** Checks that every link resolves and scores the draft. Anything below your threshold is held for review instead of published.
 
+**It measures what it was asked for**
+
+Twenty-five checks run on the finished draft, and every one that fails is written back into the rewrite as an instruction rather than a number. Among them:
+
+* Does the opening answer the question in its first two sentences, or clear its throat first?
+* Are the figures it states supported by a link, section by section?
+* Does it say anything the sources it read do not already say?
+* Is the subject in the title, in a heading, and in the opening?
+* Are the title and meta description the length they need to be?
+
+Nothing else in this category feeds its own measurements back into the rewriting. That loop is the whole point.
+
 **It writes in your voice**
 
 Describe your niche, your reader, your tone, your style rules, and the things you never write about. All of it is sent with every request. A list of common AI tells is blocked by default.
@@ -36,6 +48,7 @@ You can also store your own anecdotes and experience, which is the one thing AI 
 * Refuses a topic too similar to something you have already published
 * Rewrites your older posts in place when they go stale, keeping the same URL
 * Adds a featured image, alt text, structured data and a contents outline
+* Publishes author, reviewer, organisation and breadcrumb markup, which is what search and answer engines read as an expertise signal
 * Fills in Yoast, Rank Math or SEOPress fields when one of those is active
 
 **You stay in control**
@@ -96,6 +109,14 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.21.0 =
+* Nine new checks, including answer-first openings, figures without a source, and how much of a draft merely repeats what its sources said
+* Statistics, citations and first-hand experience are now measured, not just requested
+* Title and meta description are checked, and the rewrite can now fix either
+* Title and description length are taken from your settings instead of being hardcoded
+* Publishes author, reviewer, organisation and breadcrumb structured data
+* Section images no longer depend on exact block markup, so a theme or editor change cannot silently stop them appearing
 
 = 0.20.0 =
 * Pictures are now described by the model that wrote the article, instead of the headline being handed to an image model

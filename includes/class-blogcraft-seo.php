@@ -317,7 +317,18 @@ class Blogcraft_Seo {
 		}
 
 		$graphs = array( $graph );
-		$faq    = get_post_meta( $post_id, '_blogcraft_faq_schema', true );
+
+		$crumbs = self::build_breadcrumbs( $post_id );
+
+		if ( ! empty( $crumbs ) ) {
+			$graphs[] = $crumbs;
+		}
+
+		// Kept although Google retired FAQ rich results in May 2026: the type
+		// is still valid, still describes the page correctly, and is still read
+		// by engines other than Google's result page. It is simply no longer
+		// worth treating as an SEO feature.
+		$faq = get_post_meta( $post_id, '_blogcraft_faq_schema', true );
 
 		if ( is_array( $faq ) && ! empty( $faq ) ) {
 			$graphs[] = $faq;
@@ -362,14 +373,56 @@ class Blogcraft_Seo {
 			$graph['description'] = wp_strip_all_tags( $excerpt );
 		}
 
+		$graph['wordCount'] = count( Blogcraft_Metrics::words( Blogcraft_Metrics::plain_text( $post->post_content ) ) );
+
+		$categories = get_the_category( (int) $post->ID );
+
+		if ( ! empty( $categories ) && isset( $categories[0]->name ) ) {
+			$graph['articleSection'] = $categories[0]->name;
+		}
+
 		$author = get_the_author_meta( 'display_name', (int) $post->post_author );
 
 		if ( '' !== (string) $author ) {
-			$graph['author'] = array(
+			// Credentials and a link out are what separate a byline from a
+			// name. Both are what search engines and answer engines read as an
+			// expertise signal, and neither costs anything to emit.
+			$person = array(
 				'@type' => 'Person',
 				'name'  => $author,
+				'url'   => get_author_posts_url( (int) $post->post_author ),
 			);
+
+			$credentials = trim( (string) Blogcraft_Settings::get( 'author_credentials' ) );
+
+			if ( '' !== $credentials ) {
+				$person['jobTitle'] = $credentials;
+			}
+
+			$graph['author'] = $person;
 		}
+
+		$reviewer = trim( (string) Blogcraft_Settings::get( 'reviewer_name' ) );
+
+		if ( '' !== $reviewer ) {
+			// A second named expert who checked the piece. The strongest signal
+			// available to a site publishing with AI help, and the one thing a
+			// generated post cannot claim for itself.
+			$checked = array(
+				'@type' => 'Person',
+				'name'  => $reviewer,
+			);
+
+			$reviewer_credentials = trim( (string) Blogcraft_Settings::get( 'reviewer_credentials' ) );
+
+			if ( '' !== $reviewer_credentials ) {
+				$checked['jobTitle'] = $reviewer_credentials;
+			}
+
+			$graph['reviewedBy'] = $checked;
+		}
+
+		$graph['publisher'] = self::publisher();
 
 		$thumbnail = get_the_post_thumbnail_url( $post, 'full' );
 
@@ -378,5 +431,91 @@ class Blogcraft_Seo {
 		}
 
 		return $graph;
+	}
+
+	/**
+	 * The site as an organisation.
+	 *
+	 * Organisation and Person markup is how an answer engine works out which
+	 * entity a page belongs to, which is a different job from earning a rich
+	 * result and outlasted several of the formats that did.
+	 *
+	 * @return array
+	 */
+	public static function publisher() {
+		$publisher = array(
+			'@type' => 'Organization',
+			'name'  => get_bloginfo( 'name' ),
+			'url'   => home_url( '/' ),
+		);
+
+		$logo_id = (int) get_theme_mod( 'custom_logo' );
+
+		if ( $logo_id > 0 ) {
+			$logo = wp_get_attachment_image_url( $logo_id, 'full' );
+
+			if ( $logo ) {
+				$publisher['logo'] = array(
+					'@type' => 'ImageObject',
+					'url'   => $logo,
+				);
+			}
+		}
+
+		return $publisher;
+	}
+
+	/**
+	 * Breadcrumbs for a post, as a graph.
+	 *
+	 * One of the few markup types that still earns a visible search result, and
+	 * the plugin was not emitting it.
+	 *
+	 * @param int $post_id Post id.
+	 * @return array Empty when there is nothing worth describing.
+	 */
+	public static function build_breadcrumbs( $post_id ) {
+		$post = get_post( (int) $post_id );
+
+		if ( ! $post ) {
+			return array();
+		}
+
+		$items = array(
+			array(
+				'@type'    => 'ListItem',
+				'position' => 1,
+				'name'     => get_bloginfo( 'name' ),
+				'item'     => home_url( '/' ),
+			),
+		);
+
+		$categories = get_the_category( (int) $post->ID );
+
+		if ( ! empty( $categories ) && isset( $categories[0]->term_id ) ) {
+			$link = get_category_link( (int) $categories[0]->term_id );
+
+			if ( $link ) {
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => count( $items ) + 1,
+					'name'     => $categories[0]->name,
+					'item'     => $link,
+				);
+			}
+		}
+
+		$items[] = array(
+			'@type'    => 'ListItem',
+			'position' => count( $items ) + 1,
+			'name'     => wp_strip_all_tags( get_the_title( $post ) ),
+			'item'     => get_permalink( $post ),
+		);
+
+		return array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $items,
+		);
 	}
 }

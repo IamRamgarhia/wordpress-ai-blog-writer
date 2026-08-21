@@ -104,6 +104,20 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An opening that satisfies the answer-first check.
+	 *
+	 * The check measures the first two sentences: no wind-up phrase, under
+	 * sixty words, and standing on their own. A stub intro would send every
+	 * test in this file down the revise path whether it meant to or not.
+	 *
+	 * @return string
+	 */
+	private function good_opening() {
+		return 'Cold brew is steeped in cold water for twelve hours instead of being poured hot. '
+			. 'That single change is what makes it taste rounder and less sharp.';
+	}
+
+	/**
 	 * Queue OpenAI-shaped responses whose content is the given JSON payloads.
 	 *
 	 * @param array $payloads Ordered array of arrays to encode as message content.
@@ -243,13 +257,14 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 			array(
 				// outline
 				array(
-					'title'    => 'How Cold Brew Works',
-					'slug'     => 'how-cold-brew-works',
-					'sections' => array( array( 'heading' => 'The chemistry' ) ),
+					'title'            => 'How Cold Brew Coffee Actually Works',
+					'slug'             => 'how-cold-brew-works',
+					'meta_description' => 'Cold brew steeps in cold water for twelve hours, which pulls fewer bitter compounds and is why it tastes rounder.',
+					'sections'         => array( array( 'heading' => 'The chemistry' ) ),
 				),
 				// draft: the opening only
 				array(
-					'intro'         => 'Cold brew trades heat for time.',
+					'intro'         => $this->good_opening(),
 					'key_takeaways' => array( 'Steep for twelve hours.' ),
 				),
 				// section
@@ -292,7 +307,7 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 1, $posts );
-		$this->assertSame( 'How Cold Brew Works', $posts[0]->post_title );
+		$this->assertSame( 'How Cold Brew Coffee Actually Works', $posts[0]->post_title );
 		$this->assertStringContainsString( 'trades heat for time', $posts[0]->post_content );
 		$this->assertStringContainsString( '<!-- wp:heading', $posts[0]->post_content );
 	}
@@ -301,11 +316,12 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		$this->fake_completions(
 			array(
 				array(
-					'title'    => 'Clean Draft',
-					'slug'     => 'clean-draft',
-					'sections' => array( array( 'heading' => 'Only section' ) ),
+					'title'            => 'A Clean Draft That Needs No Revision',
+					'slug'             => 'clean-draft',
+					'meta_description' => 'A draft written well enough the first time that the critique stage finds nothing at all to send back.',
+					'sections'         => array( array( 'heading' => 'Only section' ) ),
 				),
-				array( 'intro' => 'Already good.' ),
+				array( 'intro' => $this->good_opening() ),
 				array( 'paragraphs' => array( $this->long_body() ) ),
 				array( 'problems' => array() ),
 			)
