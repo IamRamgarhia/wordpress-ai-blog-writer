@@ -150,11 +150,12 @@ class Blogcraft_Seo {
 			return array();
 		}
 
-		$lead = array( 'how', 'what', 'why', 'when', 'where', 'which', 'who', 'the', 'a', 'an', 'to', 'is', 'are', 'do', 'does', 'your', 'my', 'our', 'best', 'top' );
-		$out  = array();
+		$lead  = array( 'how', 'what', 'why', 'when', 'where', 'which', 'who', 'the', 'a', 'an', 'to', 'is', 'are', 'do', 'does', 'your', 'my', 'our', 'best', 'top' );
+		$out   = array();
+		$total = count( $words );
 
 		// Whole title first, then progressively drop leading filler.
-		for ( $start = 0; $start < count( $words ) - 1; $start++ ) {
+		for ( $start = 0; $start < $total - 1; $start++ ) {
 			$phrase = implode( ' ', array_slice( $words, $start ) );
 
 			if ( strlen( $phrase ) >= 12 ) {

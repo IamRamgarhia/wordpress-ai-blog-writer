@@ -46,6 +46,7 @@ class Blogcraft_Pipeline {
 	 * @param string $status       Post status to create: draft or publish.
 	 * @param string $instructions Optional per-topic guidance.
 	 * @param array  $overrides    Blueprint fields to change for this post only.
+	 * @param string $evidence     The writer's own figures and findings, used as fact.
 	 * @return int Job id, or 0 on failure.
 	 */
 	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '' ) {
