@@ -183,7 +183,7 @@
 		return;
 	}
 
-	var groups = [ 'fal', 'openai' ];
+	var groups = [ 'fal', 'openai', 'gemini', 'xai' ];
 
 	function sync() {
 		for ( var g = 0; g < groups.length; g++ ) {

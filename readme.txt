@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.27.0
+Stable tag: 0.28.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,10 +104,14 @@ The last three need no key and are on by default. Only the post topic is sent to
 * Pollinations — https://pollinations.ai
 * fal.ai — https://fal.ai/terms and https://fal.ai/privacy
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
+* Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
+* xAI (Grok) — https://x.ai/legal/terms-of-service and https://x.ai/legal/privacy-policy
 * Pexels — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/
 * Pixabay — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/
 
-fal.ai and OpenAI charge for each image they generate. Blogcraft never falls back to them: they are used only when you have chosen one of them, so an image is never billed to you by accident.
+If you already write with OpenAI, Google or xAI, choosing the same one for pictures uses the key you have already entered — one key, one bill. A key from a different company will not work, and the settings screen says which case you are in.
+
+fal.ai, OpenAI, Gemini and Grok charge for each image they generate. Blogcraft never falls back to them: they are used only when you have chosen one of them, so an image is never billed to you by accident.
 
 Blogcraft may also fetch any URL you explicitly add to its research list, to read it as source material.
 
@@ -134,6 +138,12 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.28.0 =
+* Google Gemini and xAI Grok can now draw the pictures. If you already write with either, the same key does both
+* Images that arrive as data rather than a link are handled, which is how Gemini answers
+* A generated image is saved with an extension matching what it actually is, so a PNG is no longer rejected for being named .jpg
+* Anything that comes back not being an image is refused rather than written to your media library
 
 = 0.27.0 =
 * The documentation now ships with the plugin, under Blogcraft, Help. The help panels used to link to a page that did not exist

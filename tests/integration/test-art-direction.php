@@ -281,6 +281,103 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		$this->assertFalse( Blogcraft_Image_Models::is_configured() );
 	}
 
+	// ------------------------------------------------------ inline pictures.
+
+	/**
+	 * A real one-pixel PNG, base64 encoded.
+	 *
+	 * @return string
+	 */
+	private function a_png() {
+		return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+	}
+
+	public function test_a_picture_can_arrive_as_bytes_rather_than_a_link() {
+		// Google answers with the image inline. Everything downstream has to
+		// cope with that as well as with a URL to fetch.
+		$made = Blogcraft_Image_Models::from_response(
+			array(
+				'data' => array( array( 'b64_json' => $this->a_png() ) ),
+			)
+		);
+
+		$this->assertSame( '', $made['url'] );
+		$this->assertNotSame( '', $made['bytes'] );
+		$this->assertSame( 'image/png', $made['mime'] );
+	}
+
+	public function test_a_payload_that_is_not_an_image_is_refused() {
+		// A service having a bad day answers with an error page or a truncated
+		// string. Writing that to disk and calling it a JPEG produces a broken
+		// attachment nobody can explain later.
+		$made = Blogcraft_Image_Models::from_response(
+			array(
+				'data' => array( array( 'b64_json' => base64_encode( 'not an image at all' ) ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- building a deliberately invalid payload for the test.
+			)
+		);
+
+		$this->assertSame( '', $made['bytes'] );
+		$this->assertSame( '', $made['url'] );
+	}
+
+	public function test_a_url_is_preferred_when_one_is_offered() {
+		$made = Blogcraft_Image_Models::from_response(
+			array(
+				'data' => array(
+					array(
+						'url'      => 'https://example.com/a.png',
+						'b64_json' => $this->a_png(),
+					),
+				),
+			)
+		);
+
+		$this->assertSame( 'https://example.com/a.png', $made['url'] );
+		$this->assertSame( '', $made['bytes'] );
+	}
+
+	public function test_the_filename_extension_matches_the_bytes() {
+		// WordPress checks the extension against the real type and rejects a
+		// mismatch, so a PNG called .jpg never becomes an attachment.
+		$this->assertStringEndsWith( '.png', Blogcraft_Images::filename_for( 'A title', 'image/png' ) );
+		$this->assertStringEndsWith( '.webp', Blogcraft_Images::filename_for( 'A title', 'image/webp' ) );
+		$this->assertStringEndsWith( '.jpg', Blogcraft_Images::filename_for( 'A title' ) );
+		$this->assertStringEndsWith( '.jpg', Blogcraft_Images::filename_for( 'A title', 'image/jpeg' ) );
+	}
+
+	public function test_every_generated_service_is_offered_and_routable() {
+		// Two lists meant adding a service in one place and having resolve()
+		// never route to it.
+		$offered = Blogcraft_Images::providers();
+
+		foreach ( array_keys( Blogcraft_Image_Models::providers() ) as $service ) {
+			$this->assertArrayHasKey( $service, $offered, $service . ' cannot be chosen' );
+		}
+	}
+
+	public function test_a_service_with_no_key_makes_nothing() {
+		foreach ( array( 'gemini', 'xai' ) as $service ) {
+			Blogcraft_Settings::set( 'image_provider', $service );
+			Blogcraft_Settings::set( 'provider_type', 'groq' );
+			Blogcraft_Settings::set( 'image_key_' . $service, '' );
+			Blogcraft_Settings::set( 'image_model_' . $service, 'a-model' );
+
+			$this->assertFalse( Blogcraft_Image_Models::is_configured(), $service );
+			$this->assertSame( '', Blogcraft_Image_Models::generate( 'a kettle', array() )['bytes'], $service );
+		}
+	}
+
+	public function test_a_writing_key_is_shared_only_with_the_same_company() {
+		Blogcraft_Settings::set( 'provider_type', 'gemini' );
+		Blogcraft_Settings::set( 'provider_api_key', 'gemini-key' );
+		Blogcraft_Settings::set( 'image_key_gemini', '' );
+		Blogcraft_Settings::set( 'image_key_xai', '' );
+
+		$this->assertSame( 'gemini-key', Blogcraft_Image_Models::key_for( 'gemini' ) );
+		$this->assertSame( '', Blogcraft_Image_Models::key_for( 'xai' ) );
+		$this->assertSame( '', Blogcraft_Image_Models::key_for( 'openai' ) );
+	}
+
 	public function test_every_generative_provider_says_where_to_get_a_key() {
 		foreach ( array_keys( Blogcraft_Image_Models::providers() ) as $provider ) {
 			$help = Blogcraft_Image_Models::help( $provider );

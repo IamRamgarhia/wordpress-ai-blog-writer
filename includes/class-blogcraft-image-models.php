@@ -30,7 +30,9 @@ class Blogcraft_Image_Models {
 	public static function providers() {
 		return array(
 			'fal'    => __( 'fal.ai — hundreds of models, pay per image', 'blogcraft' ),
-			'openai' => __( 'OpenAI — uses the key you already entered', 'blogcraft' ),
+			'openai' => __( 'OpenAI — uses your OpenAI writing key if you have one', 'blogcraft' ),
+			'gemini' => __( 'Google Gemini — uses your Gemini writing key if you have one', 'blogcraft' ),
+			'xai'    => __( 'xAI Grok — uses your Grok writing key if you have one', 'blogcraft' ),
 		);
 	}
 
@@ -64,6 +66,11 @@ class Blogcraft_Image_Models {
 				&& '' !== trim( (string) Blogcraft_Settings::get( 'fal_model' ) );
 		}
 
+		if ( in_array( $provider, array( 'gemini', 'xai' ), true ) ) {
+			return '' !== self::key_for( $provider )
+				&& '' !== trim( (string) Blogcraft_Settings::get( 'image_model_' . $provider ) );
+		}
+
 		if ( 'openai' === $provider ) {
 			// Asked the same way generate() asks it. These were two separate
 			// pieces of logic and they disagreed: this said "configured"
@@ -88,13 +95,37 @@ class Blogcraft_Image_Models {
 	 * @return string Empty when no usable key is stored.
 	 */
 	public static function openai_key() {
-		$key = trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) );
+		return self::key_for( 'openai' );
+	}
 
-		if ( '' !== $key ) {
-			return $key;
+	/**
+	 * The key to use for pictures from one service.
+	 *
+	 * Falls back to the writing key, but only when the writing provider is the
+	 * same company. A Gemini key will not make an OpenAI image, and treating one
+	 * as though it might is how a setup screen comes to lie.
+	 *
+	 * @param string $service Image service id.
+	 * @return string Empty when no usable key is stored.
+	 */
+	public static function key_for( $service ) {
+		$own = trim( (string) Blogcraft_Settings::get( 'image_key_' . $service ) );
+
+		if ( '' !== $own ) {
+			return $own;
 		}
 
-		if ( 'openai' === (string) Blogcraft_Settings::get( 'provider_type' ) ) {
+		// One legacy field predates the shared naming and is still what the
+		// settings screen writes for OpenAI.
+		if ( 'openai' === $service ) {
+			$legacy = trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) );
+
+			if ( '' !== $legacy ) {
+				return $legacy;
+			}
+		}
+
+		if ( (string) Blogcraft_Settings::get( 'provider_type' ) === $service ) {
 			return trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
 		}
 
@@ -102,35 +133,119 @@ class Blogcraft_Image_Models {
 	}
 
 	/**
-	 * Generate one image and return a URL to it.
+	 * Nothing: the shape every generator answers with.
+	 *
+	 * Some services hand back an address to fetch and some hand back the image
+	 * itself, base64 encoded. One shape covers both so that callers do not have
+	 * to know which kind they asked.
+	 *
+	 * @return array
+	 */
+	public static function nothing() {
+		return array(
+			'url'   => '',
+			'bytes' => '',
+			'mime'  => '',
+		);
+	}
+
+	/**
+	 * Generate one image.
 	 *
 	 * @param string $prompt    Full image prompt.
 	 * @param array  $blueprint Blueprint, for shape.
-	 * @return string URL, or '' when it could not be made.
+	 * @return array Keys: url, bytes, mime. All empty when nothing was made.
 	 */
 	public static function generate( $prompt, $blueprint ) {
 		$provider = (string) Blogcraft_Settings::get( 'image_provider' );
 
-		// Both of these bill per picture, so the cap is checked before the call
-		// rather than after it. Returning '' hands the post back to the free
-		// providers, which is the right failure: an image, just not a paid one.
+		// These all bill per picture, so the cap is checked before the call
+		// rather than after it. Returning nothing hands the post back to the
+		// free providers, which is the right failure: an image, just not a
+		// paid one.
 		if ( Blogcraft_Cost::over_image_cap() ) {
-			return '';
+			return self::nothing();
 		}
 
-		if ( 'fal' === $provider ) {
-			$url = self::fal( $prompt, $blueprint );
-		} elseif ( 'openai' === $provider ) {
-			$url = self::openai( $prompt, $blueprint );
-		} else {
-			return '';
+		switch ( $provider ) {
+			case 'fal':
+				$made = self::fal( $prompt, $blueprint );
+				break;
+			case 'openai':
+				$made = self::openai( $prompt, $blueprint );
+				break;
+			case 'gemini':
+				$made = self::gemini( $prompt, $blueprint );
+				break;
+			case 'xai':
+				$made = self::xai( $prompt, $blueprint );
+				break;
+			default:
+				return self::nothing();
 		}
 
-		if ( '' !== $url ) {
+		if ( '' !== $made['url'] || '' !== $made['bytes'] ) {
 			Blogcraft_Cost::record_image();
 		}
 
-		return $url;
+		return $made;
+	}
+
+	/**
+	 * Read an image out of a response, however the service returned it.
+	 *
+	 * OpenAI-shaped services answer with data[0].url or data[0].b64_json
+	 * depending on the model and the request, and which one arrives is not
+	 * always the one asked for.
+	 *
+	 * @param array $body Decoded response body.
+	 * @return array
+	 */
+	public static function from_response( $body ) {
+		if ( ! empty( $body['data'][0]['url'] ) ) {
+			return array(
+				'url'   => esc_url_raw( (string) $body['data'][0]['url'] ),
+				'bytes' => '',
+				'mime'  => '',
+			);
+		}
+
+		if ( ! empty( $body['data'][0]['b64_json'] ) ) {
+			return self::decode( (string) $body['data'][0]['b64_json'], 'image/png' );
+		}
+
+		return self::nothing();
+	}
+
+	/**
+	 * Turn base64 into bytes, refusing anything that is not an image.
+	 *
+	 * A service having a bad day can answer with an error page or a truncated
+	 * string, and writing that to disk and calling it a JPEG produces a broken
+	 * attachment in the media library that nobody can explain later.
+	 *
+	 * @param string $encoded Base64 payload.
+	 * @param string $mime    Reported mime type.
+	 * @return array
+	 */
+	private static function decode( $encoded, $mime ) {
+		$bytes = base64_decode( $encoded, true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- decoding an image the configured service returned inline, not obfuscated code.
+
+		if ( ! is_string( $bytes ) || '' === $bytes ) {
+			return self::nothing();
+		}
+
+		$size = @getimagesizefromstring( $bytes ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- a malformed payload is an expected answer here, not an exceptional one.
+
+		if ( false === $size ) {
+			return self::nothing();
+		}
+
+		return array(
+			'url'   => '',
+			'bytes' => $bytes,
+			'mime'  => ( '' === $mime && isset( $size['mime'] ) ) ? (string) $size['mime'] : $mime,
+		);
 	}
 
 	/**
@@ -149,11 +264,11 @@ class Blogcraft_Image_Models {
 		$model = trim( (string) Blogcraft_Settings::get( 'fal_model' ) );
 
 		if ( '' === $key || '' === $model ) {
-			return '';
+			return self::nothing();
 		}
 
 		if ( '' === (string) Blogcraft_Endpoints::image( 'fal' )['endpoint'] ) {
-			return '';
+			return self::nothing();
 		}
 
 		$shape = isset( $blueprint['image_shape'] ) ? (string) $blueprint['image_shape'] : '16:9';
@@ -175,25 +290,37 @@ class Blogcraft_Image_Models {
 		);
 
 		if ( '' !== $result['error'] ) {
-			Blogcraft_Logger::error(
-				'The image could not be generated.',
-				array( 'reason' => $result['error'] ),
-				null
-			);
-
-			return '';
+			return self::failed( $result['error'] );
 		}
 
 		// Most fal models answer with images[], a few with image{}.
-		if ( ! empty( $result['body']['images'][0]['url'] ) ) {
-			return esc_url_raw( (string) $result['body']['images'][0]['url'] );
+		foreach ( array( $result['body']['images'][0]['url'] ?? '', $result['body']['image']['url'] ?? '' ) as $candidate ) {
+			if ( ! empty( $candidate ) ) {
+				return array(
+					'url'   => esc_url_raw( (string) $candidate ),
+					'bytes' => '',
+					'mime'  => '',
+				);
+			}
 		}
 
-		if ( ! empty( $result['body']['image']['url'] ) ) {
-			return esc_url_raw( (string) $result['body']['image']['url'] );
-		}
+		return self::nothing();
+	}
 
-		return '';
+	/**
+	 * Say why a picture could not be made, and answer with nothing.
+	 *
+	 * @param string $reason Provider's own message, already redacted upstream.
+	 * @return array
+	 */
+	private static function failed( $reason ) {
+		Blogcraft_Logger::error(
+			'The image could not be generated.',
+			array( 'reason' => $reason ),
+			null
+		);
+
+		return self::nothing();
 	}
 
 	/**
@@ -210,17 +337,17 @@ class Blogcraft_Image_Models {
 		$key = self::openai_key();
 
 		if ( '' === $key ) {
-			return '';
+			return self::nothing();
 		}
 
 		$model = trim( (string) Blogcraft_Settings::get( 'openai_image_model' ) );
 
 		if ( '' === $model ) {
-			return '';
+			return self::nothing();
 		}
 
 		if ( '' === (string) Blogcraft_Endpoints::image( 'openai' )['endpoint'] ) {
-			return '';
+			return self::nothing();
 		}
 
 		$shape = isset( $blueprint['image_shape'] ) ? (string) $blueprint['image_shape'] : '16:9';
@@ -238,20 +365,119 @@ class Blogcraft_Image_Models {
 		);
 
 		if ( '' !== $result['error'] ) {
-			Blogcraft_Logger::error(
-				'The image could not be generated.',
-				array( 'reason' => $result['error'] ),
-				null
+			return self::failed( $result['error'] );
+		}
+
+		return self::from_response( $result['body'] );
+	}
+
+	/**
+	 * Google's image models.
+	 *
+	 * The only route here that answers with the picture itself rather than an
+	 * address to fetch it from, which is why every caller deals in bytes as
+	 * well as URLs. It is also the one most likely to cost a Gemini user
+	 * nothing: the same key that writes the post draws the pictures.
+	 *
+	 * @param string $prompt    Image prompt.
+	 * @param array  $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function gemini( $prompt, $blueprint ) {
+		unset( $blueprint );
+
+		$key   = self::key_for( 'gemini' );
+		$model = trim( (string) Blogcraft_Settings::get( 'image_model_gemini' ) );
+		$base  = (string) Blogcraft_Endpoints::image( 'gemini' )['endpoint'];
+
+		if ( '' === $key || '' === $model || '' === $base ) {
+			return self::nothing();
+		}
+
+		$result = Blogcraft_Http::post_json(
+			$base . rawurlencode( $model ) . ':generateContent',
+			array(
+				'contents'         => array(
+					array(
+						'parts' => array( array( 'text' => $prompt ) ),
+					),
+				),
+				'generationConfig' => array(
+					'responseModalities' => array( 'IMAGE' ),
+				),
+			),
+			// The key travels as a header rather than in the query string, so
+			// it cannot be written into a server access log.
+			array( 'x-goog-api-key' => $key ),
+			120
+		);
+
+		if ( '' !== $result['error'] ) {
+			return self::failed( $result['error'] );
+		}
+
+		$parts = isset( $result['body']['candidates'][0]['content']['parts'] )
+			? (array) $result['body']['candidates'][0]['content']['parts']
+			: array();
+
+		foreach ( $parts as $part ) {
+			// A response usually carries a line of prose alongside the picture.
+			if ( ! is_array( $part ) || empty( $part['inlineData']['data'] ) ) {
+				continue;
+			}
+
+			$made = self::decode(
+				(string) $part['inlineData']['data'],
+				isset( $part['inlineData']['mimeType'] ) ? (string) $part['inlineData']['mimeType'] : ''
 			);
 
-			return '';
+			if ( '' !== $made['bytes'] ) {
+				return $made;
+			}
 		}
 
-		if ( ! empty( $result['body']['data'][0]['url'] ) ) {
-			return esc_url_raw( (string) $result['body']['data'][0]['url'] );
+		return self::nothing();
+	}
+
+	/**
+	 * Grok's image models.
+	 *
+	 * Speaks the OpenAI images protocol, so the response reading is shared.
+	 * Size is not a parameter it accepts, so the shape chosen in the blueprint
+	 * does not apply here and is deliberately not faked.
+	 *
+	 * @param string $prompt    Image prompt.
+	 * @param array  $blueprint Blueprint.
+	 * @return array
+	 */
+	private static function xai( $prompt, $blueprint ) {
+		unset( $blueprint );
+
+		$key      = self::key_for( 'xai' );
+		$model    = trim( (string) Blogcraft_Settings::get( 'image_model_xai' ) );
+		$endpoint = (string) Blogcraft_Endpoints::image( 'xai' )['endpoint'];
+
+		if ( '' === $key || '' === $model || '' === $endpoint ) {
+			return self::nothing();
 		}
 
-		return '';
+		$result = Blogcraft_Http::post_json(
+			$endpoint,
+			array(
+				'model'           => $model,
+				'prompt'          => $prompt,
+				'n'               => 1,
+				'response_format' => 'url',
+			),
+			array( 'Authorization' => 'Bearer ' . $key ),
+			120
+		);
+
+		if ( '' !== $result['error'] ) {
+			return self::failed( $result['error'] );
+		}
+
+		return self::from_response( $result['body'] );
 	}
 
 	/**

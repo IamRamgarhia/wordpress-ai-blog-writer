@@ -41,16 +41,29 @@ class Blogcraft_Images {
 	 * Turn a post title into a descriptive, hyphenated filename.
 	 *
 	 * @param string $title Post title.
+	 * @param string $mime  Reported image type, so the extension can match it.
 	 * @return string
 	 */
-	public static function filename_for( $title ) {
+	public static function filename_for( $title, $mime = '' ) {
 		$slug = sanitize_title( (string) $title );
 
 		if ( '' === $slug ) {
 			$slug = 'blogcraft-image';
 		}
 
-		return substr( $slug, 0, 60 ) . '.jpg';
+		// The extension has to match the bytes. WordPress checks one against
+		// the other and rejects a mismatch, so a PNG called .jpg does not
+		// become an attachment at all — it just quietly fails.
+		$types = array(
+			'image/png'  => '.png',
+			'image/webp' => '.webp',
+			'image/gif'  => '.gif',
+			'image/avif' => '.avif',
+		);
+
+		$mime = strtolower( trim( (string) $mime ) );
+
+		return substr( $slug, 0, 60 ) . ( isset( $types[ $mime ] ) ? $types[ $mime ] : '.jpg' );
 	}
 
 	/**
@@ -59,13 +72,15 @@ class Blogcraft_Images {
 	 * @return array
 	 */
 	public static function providers() {
-		return array(
-			'pollinations' => __( 'Pollinations — generated, no key needed', 'blogcraft' ),
-			'fal'          => __( 'fal.ai — generated, hundreds of models, pay per image', 'blogcraft' ),
-			'openai'       => __( 'OpenAI — generated, uses the key you already entered', 'blogcraft' ),
-			'pexels'       => __( 'Pexels — real photos, free key', 'blogcraft' ),
-			'pixabay'      => __( 'Pixabay — real photos, free key', 'blogcraft' ),
-		);
+		// The generators come from Blogcraft_Image_Models rather than being
+		// listed again here. Two lists meant adding a service in one place and
+		// having resolve() never route to it.
+		return array( 'pollinations' => __( 'Pollinations — generated, no key needed', 'blogcraft' ) )
+			+ Blogcraft_Image_Models::providers()
+			+ array(
+				'pexels'  => __( 'Pexels — real photos, free key', 'blogcraft' ),
+				'pixabay' => __( 'Pixabay — real photos, free key', 'blogcraft' ),
+			);
 	}
 
 	/**
@@ -147,10 +162,26 @@ class Blogcraft_Images {
 	 * @return string
 	 */
 	public static function resolve_url( $prompt, $query = '' ) {
+		return self::resolve( $prompt, $query )['url'];
+	}
+
+	/**
+	 * Find a picture, as an address or as the picture itself.
+	 *
+	 * Google answers with the image inline rather than a link to fetch, so one
+	 * return type has to carry both. Everything downstream asks this for a temp
+	 * file and never has to know which arrived.
+	 *
+	 * @param string $prompt Description of the wanted image, for the generators.
+	 * @param string $query  A few keywords, for the libraries that search.
+	 * @return array Keys: url, bytes, mime.
+	 */
+	public static function resolve( $prompt, $query = '' ) {
 		// A generator takes a prompt and a library takes a query; they are not
 		// the same string and treating them as one is a silent miss.
 		$query     = ( '' === trim( (string) $query ) ) ? (string) $prompt : (string) $query;
 		$preferred = (string) Blogcraft_Settings::get( 'image_provider' );
+		$generated = array_keys( Blogcraft_Image_Models::providers() );
 
 		// A paid generator is only ever used when it is the one chosen. Falling
 		// back *to* one would spend money the user did not ask to spend.
@@ -168,18 +199,72 @@ class Blogcraft_Images {
 				$url = self::pexels_url( $query );
 			} elseif ( 'pixabay' === $provider ) {
 				$url = self::pixabay_url( $query );
-			} elseif ( 'fal' === $provider || 'openai' === $provider ) {
-				$url = Blogcraft_Image_Models::generate( $prompt, Blogcraft_Blueprint::get() );
+			} elseif ( in_array( $provider, $generated, true ) ) {
+				$made = Blogcraft_Image_Models::generate( $prompt, Blogcraft_Blueprint::get() );
+
+				if ( '' !== $made['url'] || '' !== $made['bytes'] ) {
+					return $made;
+				}
+
+				continue;
 			} else {
 				$url = self::source_url( $prompt );
 			}
 
 			if ( '' !== $url ) {
-				return $url;
+				return self::at( $url );
 			}
 		}
 
-		return self::source_url( $prompt );
+		return self::at( self::source_url( $prompt ) );
+	}
+
+	/**
+	 * A picture that lives at an address.
+	 *
+	 * @param string $url Where it is.
+	 * @return array
+	 */
+	private static function at( $url ) {
+		return array(
+			'url'   => (string) $url,
+			'bytes' => '',
+			'mime'  => '',
+		);
+	}
+
+	/**
+	 * Get a picture onto disk, however it arrived.
+	 *
+	 * @param array $made Output of resolve().
+	 * @return string Temp file path, or '' when nothing could be written.
+	 */
+	private static function to_temp( $made ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		if ( empty( $made['bytes'] ) ) {
+			$tmp = download_url( (string) $made['url'], 45 );
+
+			return is_wp_error( $tmp ) ? '' : $tmp;
+		}
+
+		global $wp_filesystem;
+
+		if ( ! $wp_filesystem ) {
+			WP_Filesystem();
+		}
+
+		if ( ! $wp_filesystem ) {
+			return '';
+		}
+
+		$tmp = wp_tempnam( 'blogcraft-image' );
+
+		if ( ! $tmp || ! $wp_filesystem->put_contents( $tmp, $made['bytes'], FS_CHMOD_FILE ) ) {
+			return '';
+		}
+
+		return $tmp;
 	}
 
 	/**
@@ -218,15 +303,16 @@ class Blogcraft_Images {
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$tmp = download_url( self::resolve_url( $prompt, $query ), 45 );
+		$made = self::resolve( $prompt, $query );
+		$tmp  = self::to_temp( $made );
 
-		if ( is_wp_error( $tmp ) ) {
+		if ( '' === $tmp ) {
 			return 0;
 		}
 
 		$attachment_id = media_handle_sideload(
 			array(
-				'name'     => self::filename_for( $alt ),
+				'name'     => self::filename_for( $alt, $made['mime'] ),
 				'tmp_name' => $tmp,
 			),
 			(int) $post_id,
@@ -407,12 +493,13 @@ class Blogcraft_Images {
 		// looks like clip art of the title. Art_Direction asks the writing model
 		// what the picture should show, then adds the standing look.
 		$brief = Blogcraft_Art_Direction::brief_for( $title, $topic, Blogcraft_Blueprint::get() );
-		$tmp   = download_url( self::resolve_url( $brief['prompt'], $brief['search'] ), 45 );
+		$made  = self::resolve( $brief['prompt'], $brief['search'] );
+		$tmp   = self::to_temp( $made );
 
-		if ( is_wp_error( $tmp ) ) {
+		if ( '' === $tmp ) {
 			Blogcraft_Logger::error(
 				'Featured image could not be fetched.',
-				array( 'reason' => $tmp->get_error_message() ),
+				array(),
 				null
 			);
 
@@ -420,7 +507,7 @@ class Blogcraft_Images {
 		}
 
 		$file = array(
-			'name'     => self::filename_for( $title ),
+			'name'     => self::filename_for( $title, $made['mime'] ),
 			'tmp_name' => $tmp,
 		);
 

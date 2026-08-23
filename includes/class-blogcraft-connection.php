@@ -1011,6 +1011,37 @@ class Blogcraft_Connection {
 			'blogcraft-image-fal'
 		);
 
+		foreach ( array( 'gemini', 'xai' ) as $service ) {
+			$spec  = Blogcraft_Image_Models::help( $service );
+			$class = 'blogcraft-image-' . $service;
+
+			self::secret_row(
+				'image_key_' . $service,
+				sprintf(
+					/* translators: %s: the service name, such as Google AI Studio. */
+					__( '%s image key', 'blogcraft' ),
+					$spec['label']
+				),
+				$class
+			);
+
+			self::text_row(
+				'image_model_' . $service,
+				__( 'Image model', 'blogcraft' ),
+				$class
+			);
+
+			self::provider_link_row(
+				__( 'Which model', 'blogcraft' ),
+				$spec['models_url'],
+				__( 'See the image models', 'blogcraft' ),
+				(string) Blogcraft_Settings::get( 'provider_type' ) === $service
+					? __( 'You are already writing with this provider, so leave the key blank and the same one draws the pictures. You still need to name an image model.', 'blogcraft' )
+					: __( 'Your writing provider is a different company, so a key for this one is needed above.', 'blogcraft' ),
+				$class
+			);
+		}
+
 		self::secret_row( 'openai_image_key', __( 'OpenAI image key', 'blogcraft' ), 'blogcraft-image-openai' );
 		self::text_row( 'openai_image_model', __( 'OpenAI image model', 'blogcraft' ), 'blogcraft-image-openai' );
 		self::provider_link_row(
@@ -1083,7 +1114,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model', 'author_credentials', 'reviewer_name', 'reviewer_credentials' )
+			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model', 'image_model_gemini', 'image_model_xai', 'author_credentials', 'reviewer_name', 'reviewer_credentials' )
 		);
 
 		foreach ( $plain as $key ) {
@@ -1139,7 +1170,7 @@ class Blogcraft_Connection {
 		// An empty key field means "leave unchanged": the form renders a mask rather
 		// than the real value, so treating blank as "clear" would wipe the stored key
 		// every time an unrelated field was saved.
-		foreach ( array( 'fal_api_key', 'openai_image_key', 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
+		foreach ( array( 'fal_api_key', 'openai_image_key', 'image_key_gemini', 'image_key_xai', 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
 			$value = isset( $_POST[ $secret ] ) ? trim( (string) wp_unslash( $_POST[ $secret ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 
 			if ( '' !== $value ) {
