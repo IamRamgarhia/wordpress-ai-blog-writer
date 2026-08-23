@@ -464,11 +464,52 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * Say so before starting, when the provider is already refusing.
+	 *
+	 * A post costs eight to ten separate calls, so starting one into an
+	 * exhausted quota does not fail cleanly at the door — it gets several
+	 * stages in, spends whatever those cost, and then parks until the limit
+	 * clears. Better to say it up front.
+	 *
+	 * Deliberately not phrased as "you have N requests left". No provider in
+	 * the list exposes a remaining-quota figure, and the only place a free
+	 * tier ever states its limit is inside the error after you exceed it, so
+	 * any number here would be invented. What is known is that the provider
+	 * refused, what it said, and when the waiting job resumes.
+	 *
+	 * @return void
+	 */
+	private static function render_rate_limit_notice() {
+		$limit = Blogcraft_Queue::rate_limited_until();
+
+		if ( empty( $limit ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-warning bc-quota-notice"><p><strong>%1$s</strong> %2$s</p>%3$s</div>',
+			esc_html__( 'Your provider is rate limiting.', 'blogcraft' ),
+			esc_html(
+				sprintf(
+					/* translators: %s: a clock time, such as "3:45 pm". */
+					__( 'A post already being written resumes at about %s. Starting another now will most likely stop part-way too, and the stages it runs first still cost you.', 'blogcraft' ),
+					wp_date( get_option( 'time_format' ), (int) $limit['resumes'] )
+				)
+			),
+			'' === trim( $limit['reason'] )
+				? ''
+				: '<p><code>' . esc_html( $limit['reason'] ) . '</code></p>'
+		);
+	}
+
+	/**
 	 * The topic field and the things that belong beside it.
 	 *
 	 * @return void
 	 */
 	private static function render_topic() {
+		self::render_rate_limit_notice();
+
 		echo '<section class="bc-pane bc-pane-topic">';
 
 		echo Blogcraft_Controls::row(

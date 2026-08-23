@@ -195,6 +195,17 @@ class Blogcraft_Progress {
 
 		$finished = in_array( $job->status, array( 'complete', 'failed', 'cancelled', 'ready' ), true );
 
+		// A rate-limited job is put back as pending with available_at in the
+		// future, which is correct — it will resume on its own. But the page
+		// cannot claim it meanwhile, so it polled, got nothing, and polled
+		// again: working and waiting looked identical, and waiting looked
+		// like broken.
+		$waits_until = self::waiting_until( $job );
+
+		if ( '' !== $waits_until ) {
+			$finished = true;
+		}
+
 		$order = array_keys( self::steps() );
 		$at    = array_search( $job->stage, $order, true );
 		$at    = ( false === $at ) ? 0 : (int) $at;
@@ -220,7 +231,30 @@ class Blogcraft_Progress {
 			'title'   => isset( $job->payload['outline']['title'] ) ? (string) $job->payload['outline']['title'] : '',
 			'heads'   => self::headings_so_far( $job ),
 			'written' => isset( $job->payload['article']['sections'] ) ? count( (array) $job->payload['article']['sections'] ) : 0,
+			'waiting' => $waits_until,
 		);
+	}
+
+	/**
+	 * When a job is deliberately waiting, rather than working.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return string Empty when it is not waiting; otherwise a local time.
+	 */
+	private static function waiting_until( $job ) {
+		if ( 'pending' !== $job->status || '' === $job->available_at ) {
+			return '';
+		}
+
+		$at = strtotime( $job->available_at . ' UTC' );
+
+		// A minute of slack: a job available "now" is not waiting, and clock
+		// skew of a second or two should not be reported as a pause.
+		if ( false === $at || $at <= time() + 60 ) {
+			return '';
+		}
+
+		return (string) wp_date( get_option( 'time_format' ), $at );
 	}
 
 	/**
@@ -382,6 +416,12 @@ class Blogcraft_Progress {
 		$topic = isset( $job->payload['topic'] ) ? (string) $job->payload['topic'] : '';
 
 		echo '<h1>' . esc_html( '' === $topic ? __( 'Writing a post', 'blogcraft' ) : $topic ) . '</h1>';
+
+		$waiting = self::waiting_until( $job );
+
+		if ( '' !== $waiting ) {
+			self::render_waiting( $job, $waiting );
+		}
 
 		self::render_steps( $job );
 
@@ -724,6 +764,48 @@ class Blogcraft_Progress {
 			esc_html__( 'Leave it for now', 'blogcraft' )
 		);
 		echo '</form></section>';
+	}
+
+	/**
+	 * A job pausing because the provider asked it to.
+	 *
+	 * Not a failure, and saying so matters: nothing is lost, nothing needs
+	 * doing, and every stage already paid for is still on the job. The one
+	 * thing a reader needs is when it resumes and why it stopped.
+	 *
+	 * @param Blogcraft_Job $job     Waiting job.
+	 * @param string        $resumes Local time it may next run.
+	 * @return void
+	 */
+	private static function render_waiting( $job, $resumes ) {
+		echo '<section class="blogcraft-card bc-waiting-card"><header>';
+		echo '<h2>' . esc_html__( 'Paused by your provider', 'blogcraft' ) . '</h2>';
+		printf(
+			'<p>%s</p>',
+			esc_html(
+				sprintf(
+					/* translators: %s: a clock time, such as "3:45 pm". */
+					__( 'Your provider is rate limiting, so this is waiting rather than failing. It carries on by itself at about %s, and everything written so far is kept.', 'blogcraft' ),
+					$resumes
+				)
+			)
+		);
+		echo '</header>';
+
+		$error = trim( (string) $job->last_error );
+
+		if ( '' !== $error ) {
+			printf( '<p class="bc-waiting-detail"><code>%s</code></p>', esc_html( $error ) );
+		}
+
+		printf(
+			'<p>%1$s <a href="%2$s">%3$s</a></p>',
+			esc_html__( 'You can close this page. Come back to it from', 'blogcraft' ),
+			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
+			esc_html__( 'Written by AI', 'blogcraft' )
+		);
+
+		echo '</section>';
 	}
 
 	/**

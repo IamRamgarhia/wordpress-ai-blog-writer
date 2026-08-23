@@ -65,6 +65,19 @@ class Blogcraft_Job {
 	public $max_attempts = 3;
 
 	/**
+	 * When this job may next be worked on, as a GMT datetime string.
+	 *
+	 * A rate-limited job is put back as pending with this stamped into the
+	 * future. Without reading it back, "pending" alone cannot distinguish a
+	 * job waiting its turn from one deliberately waiting out a provider's
+	 * quota — which is the difference between a progress screen that explains
+	 * itself and one that appears to hang.
+	 *
+	 * @var string
+	 */
+	public $available_at = '';
+
+	/**
 	 * Why the last attempt stopped, when one did.
 	 *
 	 * Carried so a screen can say what went wrong without a second query. The
@@ -90,6 +103,7 @@ class Blogcraft_Job {
 		$job->attempts     = isset( $row['attempts'] ) ? (int) $row['attempts'] : 0;
 		$job->max_attempts = isset( $row['max_attempts'] ) ? (int) $row['max_attempts'] : 3;
 		$job->last_error   = isset( $row['last_error'] ) ? (string) $row['last_error'] : '';
+		$job->available_at = isset( $row['available_at'] ) ? (string) $row['available_at'] : '';
 
 		$decoded      = isset( $row['payload'] ) ? json_decode( (string) $row['payload'], true ) : array();
 		$job->payload = is_array( $decoded ) ? $decoded : array();

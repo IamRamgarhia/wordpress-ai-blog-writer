@@ -164,7 +164,10 @@
 
 				var state = payload.data;
 
-				if ( state.done ) {
+				// Paused by the provider: it resumes on its own, so the page
+				// stops asking and reloads to explain itself rather than
+				// polling against a job it cannot claim.
+				if ( state.done || state.waiting ) {
 					// The server renders the draft, the score and the buttons,
 					// so a reload is both the simplest and the most honest way
 					// to show them — no second copy of that markup in here.

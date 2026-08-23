@@ -126,10 +126,108 @@ class Blogcraft_Library {
 		echo '<h1>' . esc_html__( 'Written by AI', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Every post this plugin has written, and every draft still waiting on you.', 'blogcraft' ) . '</p>';
 
+		self::render_in_progress();
 		self::render_waiting();
 		self::render_published();
 
 		echo '</div>';
+	}
+
+	/**
+	 * Posts still being written, or paused part-way.
+	 *
+	 * The progress screen belongs to one job and is reached by writing a post,
+	 * so closing that tab left no route back to it — a job paused by a rate
+	 * limit was still working perfectly and looked, from the outside, like
+	 * something that had been lost.
+	 *
+	 * @return void
+	 */
+	private static function render_in_progress() {
+		$rows = array();
+
+		foreach ( Blogcraft_Queue::recent_jobs( 25 ) as $row ) {
+			if ( in_array( (string) $row['status'], array( 'pending', 'running', 'deferred' ), true ) ) {
+				$rows[] = $row;
+			}
+		}
+
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'Being written', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Open one to watch it, or to see why it paused.', 'blogcraft' ) . '</p>';
+		echo '</header>';
+
+		echo '<table class="widefat striped"><thead><tr>';
+		echo '<th>' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Step', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'State', 'blogcraft' ) . '</th>';
+		echo '<th></th>';
+		echo '</tr></thead><tbody>';
+
+		$steps = Blogcraft_Progress::steps();
+
+		foreach ( $rows as $row ) {
+			$payload = json_decode( isset( $row['payload'] ) ? (string) $row['payload'] : '', true );
+			$payload = is_array( $payload ) ? $payload : array();
+			$topic   = isset( $payload['topic'] ) ? (string) $payload['topic'] : '';
+			$stage   = isset( $row['stage'] ) ? (string) $row['stage'] : '';
+
+			$paused = self::pause_note( isset( $row['available_at'] ) ? (string) $row['available_at'] : '' );
+
+			echo '<tr>';
+			printf( '<td><strong>%s</strong></td>', esc_html( '' === $topic ? __( 'Untitled', 'blogcraft' ) : $topic ) );
+			printf( '<td>%s</td>', esc_html( isset( $steps[ $stage ] ) ? $steps[ $stage ] : $stage ) );
+			printf(
+				'<td>%s</td>',
+				esc_html( '' === $paused ? __( 'Working', 'blogcraft' ) : $paused )
+			);
+			printf(
+				'<td><a class="button button-small" href="%1$s">%2$s</a></td>',
+				esc_url(
+					add_query_arg(
+						array(
+							'page' => Blogcraft_Progress::PAGE_SLUG,
+							'job'  => (int) $row['id'],
+						),
+						admin_url( 'admin.php' )
+					)
+				),
+				esc_html__( 'Open', 'blogcraft' )
+			);
+			echo '</tr>';
+		}
+
+		echo '</tbody></table></section>';
+	}
+
+	/**
+	 * Whether a job is waiting for a provider, and until when.
+	 *
+	 * @param string $available_at GMT datetime the job may next run.
+	 * @return string Empty when it is not waiting.
+	 */
+	private static function pause_note( $available_at ) {
+		$available_at = trim( $available_at );
+
+		if ( '' === $available_at ) {
+			return '';
+		}
+
+		$at = strtotime( $available_at . ' UTC' );
+
+		if ( false === $at || $at <= time() + 60 ) {
+			return '';
+		}
+
+		return sprintf(
+			/* translators: %s: a clock time, such as "3:45 pm". */
+			__( 'Paused until %s', 'blogcraft' ),
+			wp_date( get_option( 'time_format' ), $at )
+		);
 	}
 
 	/**

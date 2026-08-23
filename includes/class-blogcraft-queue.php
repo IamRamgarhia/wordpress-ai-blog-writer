@@ -680,6 +680,47 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * The provider's own words, if it has recently asked us to slow down.
+	 *
+	 * There is no general way to ask a provider how much quota is left —
+	 * most do not expose it, and the one place a free-tier limit is ever
+	 * stated is inside the error returned after exceeding it. So rather than
+	 * inventing a number, this reports the last real refusal and when the
+	 * affected job resumes, which is the only quota fact actually in hand.
+	 *
+	 * @return array Empty when nothing is waiting on a limit; otherwise
+	 *               keys: resumes (timestamp), reason (string).
+	 */
+	public static function rate_limited_until() {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT available_at, last_error FROM {$table} WHERE status = 'pending' AND available_at > %s ORDER BY available_at DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				current_time( 'mysql', true )
+			),
+			ARRAY_A
+		);
+
+		if ( ! is_array( $row ) || empty( $row['available_at'] ) ) {
+			return array();
+		}
+
+		$at = strtotime( (string) $row['available_at'] . ' UTC' );
+
+		if ( false === $at || $at <= time() + 60 ) {
+			return array();
+		}
+
+		return array(
+			'resumes' => $at,
+			'reason'  => isset( $row['last_error'] ) ? (string) $row['last_error'] : '',
+		);
+	}
+
+	/**
 	 * How many drafts are waiting to be read.
 	 *
 	 * @return int

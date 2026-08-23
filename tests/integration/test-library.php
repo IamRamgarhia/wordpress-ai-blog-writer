@@ -107,6 +107,43 @@ class Test_Blogcraft_Library extends WP_UnitTestCase {
 		$this->assertCount( 4, Blogcraft_Library::generated_posts() );
 	}
 
+	// ------------------------------------------------- paused, not broken.
+
+	public function test_a_rate_limited_job_is_reported_as_waiting_not_working() {
+		// A 429 puts the job back as pending with available_at in the future.
+		// The progress screen polled, could not claim it, got nothing, and
+		// polled again — so waiting looked exactly like broken.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'critique', array( 'topic' => 'grok' ) );
+		Blogcraft_Queue::defer( $job_id, 30 * MINUTE_IN_SECONDS, 'HTTP 429: quota exceeded' );
+
+		$state = Blogcraft_Progress::state( $job_id );
+
+		$this->assertNotSame( '', $state['waiting'], 'a deferred job was not reported as waiting' );
+		$this->assertTrue( $state['done'], 'the page would keep polling a job it cannot claim' );
+	}
+
+	public function test_a_job_merely_queued_is_not_reported_as_waiting() {
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'ordinary' ) );
+
+		$state = Blogcraft_Progress::state( $job_id );
+
+		$this->assertSame( '', $state['waiting'] );
+		$this->assertFalse( $state['done'] );
+	}
+
+	public function test_the_write_screen_can_tell_a_limit_is_in_force() {
+		$this->assertSame( array(), Blogcraft_Queue::rate_limited_until() );
+
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'draft', array( 'topic' => 'anything' ) );
+		Blogcraft_Queue::defer( $job_id, 30 * MINUTE_IN_SECONDS, 'HTTP 429: quota exceeded' );
+
+		$limit = Blogcraft_Queue::rate_limited_until();
+
+		$this->assertNotEmpty( $limit );
+		$this->assertGreaterThan( time(), $limit['resumes'] );
+		$this->assertStringContainsString( '429', $limit['reason'] );
+	}
+
 	/**
 	 * A job parked at the review stage.
 	 *
