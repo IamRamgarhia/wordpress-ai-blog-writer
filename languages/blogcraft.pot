@@ -1584,7 +1584,7 @@ msgid "Monthly token cap"
 msgstr ""
 
 #. translators: %d: configured monthly token cap.
-#: includes/class-blogcraft-provider-registry.php:354
+#: includes/class-blogcraft-provider-registry.php:375
 msgid "Monthly token cap of %d tokens has been reached; no request was sent."
 msgstr ""
 
@@ -1738,7 +1738,7 @@ msgstr ""
 msgid "No provider yet"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:361
+#: includes/class-blogcraft-provider-registry.php:382
 msgid "No providers were configured."
 msgstr ""
 
@@ -2239,7 +2239,7 @@ msgstr ""
 msgid "Provider connected"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:441
+#: includes/class-blogcraft-provider-registry.php:462
 msgid "Provider could not be reached."
 msgstr ""
 
