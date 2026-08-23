@@ -287,6 +287,12 @@ class Blogcraft_Pipeline {
 		$payload            = $job->payload;
 		$payload['sources'] = $sources;
 
+		// What people actually search for next, when the provider returned it.
+		// Carried on the payload rather than re-fetched at the FAQ stage,
+		// which runs in a separate request and would have to pay for the
+		// search a second time.
+		$payload['questions'] = Blogcraft_Research::last_questions();
+
 		// Terms the pages already covering this subject all mention. Derived
 		// from research this stage has already fetched, so it costs nothing
 		// extra, and it only fills in when the user has not named terms of
@@ -554,7 +560,8 @@ class Blogcraft_Pipeline {
 				Blogcraft_Prompts::faq(
 					isset( $payload['topic'] ) ? $payload['topic'] : '',
 					self::headings( $payload ),
-					(int) $blueprint['faq_count']
+					(int) $blueprint['faq_count'],
+					isset( $payload['questions'] ) ? (array) $payload['questions'] : array()
 				),
 				self::draft_options()
 			);

@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.34.0
+Stable tag: 0.35.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,7 +57,7 @@ You can also store your own anecdotes and experience, which is the one thing AI 
 * Rewrites your older posts in place when they go stale, keeping the same URL
 * Adds a featured image, alt text, structured data and a contents outline
 * Publishes author, reviewer, organisation and breadcrumb markup, which is what search and answer engines read as an expertise signal
-* Fills in Yoast, Rank Math or SEOPress fields when one of those is active
+* Fills in Yoast, Rank Math or SEOPress fields when one of those is active, and writes the description and sharing tags into the page itself when none of them is
 
 **What it does not do**
 
@@ -126,6 +126,12 @@ Pictures work the same way: Pollinations needs no key, Pexels and Pixabay are fr
 
 Free allowances move on each provider's schedule, so the settings screen links to every provider's own pricing page rather than repeating a number here that would go stale.
 
+= Do I need an SEO plugin? =
+
+No. If Yoast, Rank Math or SEOPress is active, Blogcraft writes the title and description into that plugin's own fields and leaves the rest to it. If none is active, Blogcraft prints the description and the Facebook and X sharing tags for its own posts, so the description it wrote is actually used rather than sitting unread in the database.
+
+It stops there deliberately. Filling in head tags for pages Blogcraft did not write is what an SEO plugin is for, and doing it anyway would mean two plugins fighting over the same tags on any site that later installs one.
+
 = Will posts publish without my review? =
 
 Only if you turn that on. Drafts are the default, and any post scoring below your quality threshold is held for review even when you asked for immediate publication.
@@ -143,6 +149,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.35.0 =
+* The meta description now reaches the page on sites with no SEO plugin. It was being written for every post, stored, and measured by the quality checks, and then never emitted, because WordPress prints no description tag of its own — so on a bare theme the most carefully checked sentence in the post did nothing at all. Facebook and X sharing tags come with it
+* Only for posts Blogcraft wrote, and only when Yoast, Rank Math, SEOPress or All in One SEO is absent. Filling in head tags for the rest of the site is what an SEO plugin is for, and a theme that prints its own can switch these off with a filter
+* Questions now come from what people actually search for. SerpApi returns "people also ask" in the same response the research sources arrive in, and it was being discarded while the model was asked to imagine questions instead. Tavily and a self-hosted SearXNG do not return them, so nothing changes there
 
 = 0.34.0 =
 * A post is never published twice. Publishing inserts the post and then spends minutes fetching pictures, which was long enough to cross the stale-job cutoff and be reclaimed while still running — and the re-run wrote a second copy. The post is now claimed the moment it exists, in two places that fail differently, and a resumed job finishes the one it already made

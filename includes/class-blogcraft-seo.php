@@ -497,6 +497,122 @@ class Blogcraft_Seo {
 	 */
 	public static function init() {
 		add_action( 'wp_head', array( __CLASS__, 'print_schema' ), 20 );
+		add_action( 'wp_head', array( __CLASS__, 'print_head_meta' ), 5 );
+	}
+
+	/**
+	 * Print the description and sharing tags when nothing else will.
+	 *
+	 * Blogcraft writes a meta description for every post it generates, and on
+	 * a site with an SEO plugin that description goes into the plugin's own
+	 * field and gets used. On a site without one it went nowhere at all: the
+	 * text was written, stored, measured by the scorecard, and then never
+	 * emitted, because WordPress itself outputs no description or social tags.
+	 *
+	 * Deliberately narrow. This covers posts Blogcraft generated, not the
+	 * whole site — filling in head tags for every page is what an SEO plugin
+	 * is for, and quietly becoming one would be both scope creep and a source
+	 * of duplicate tags. Canonical is left alone for the same reason: core
+	 * already emits it via rel_canonical().
+	 *
+	 * @return void
+	 */
+	public static function print_head_meta() {
+		if ( ! is_singular( 'post' ) || self::schema_handled_elsewhere() ) {
+			return;
+		}
+
+		$post_id = get_the_ID();
+
+		if ( ! $post_id || ! get_post_meta( $post_id, self::GENERATED_META, true ) ) {
+			return;
+		}
+
+		/**
+		 * Whether Blogcraft should emit head tags for this post.
+		 *
+		 * A theme that already prints its own Open Graph tags can turn this
+		 * off rather than ending up with two of everything.
+		 *
+		 * @param bool $enabled Whether to print.
+		 * @param int  $post_id Post being rendered.
+		 */
+		if ( ! apply_filters( 'blogcraft_print_head_meta', true, $post_id ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$title       = wp_strip_all_tags( get_the_title( $post_id ) );
+		$description = trim( wp_strip_all_tags( (string) $post->post_excerpt ) );
+		$url         = get_permalink( $post_id );
+		$image       = has_post_thumbnail( $post_id ) ? get_the_post_thumbnail_url( $post_id, 'full' ) : '';
+
+		if ( '' !== $description ) {
+			printf(
+				'<meta name="description" content="%s" />' . "\n",
+				esc_attr( $description )
+			);
+			printf(
+				'<meta property="og:description" content="%s" />' . "\n",
+				esc_attr( $description )
+			);
+			printf(
+				'<meta name="twitter:description" content="%s" />' . "\n",
+				esc_attr( $description )
+			);
+		}
+
+		printf(
+			'<meta property="og:title" content="%s" />' . "\n",
+			esc_attr( $title )
+		);
+		printf(
+			'<meta name="twitter:title" content="%s" />' . "\n",
+			esc_attr( $title )
+		);
+		printf(
+			'<meta property="og:type" content="article" />' . "\n"
+		);
+		printf(
+			'<meta property="og:url" content="%s" />' . "\n",
+			esc_url( $url )
+		);
+		printf(
+			'<meta property="og:site_name" content="%s" />' . "\n",
+			esc_attr( get_bloginfo( 'name' ) )
+		);
+		printf(
+			'<meta property="article:published_time" content="%s" />' . "\n",
+			esc_attr( get_post_time( 'c', true, $post ) )
+		);
+		printf(
+			'<meta property="article:modified_time" content="%s" />' . "\n",
+			esc_attr( get_post_modified_time( 'c', true, $post ) )
+		);
+
+		// A card with no picture is a link with a headline, which is what the
+		// summary type is for. Claiming the large type without an image gets
+		// the post rendered as a bare link anyway.
+		printf(
+			'<meta name="twitter:card" content="%s" />' . "\n",
+			esc_attr( '' === $image ? 'summary' : 'summary_large_image' )
+		);
+
+		if ( '' !== $image ) {
+			printf(
+				'<meta property="og:image" content="%s" />' . "\n",
+				esc_url( $image )
+			);
+			printf(
+				'<meta name="twitter:image" content="%s" />' . "\n",
+				esc_url( $image )
+			);
+		}
 	}
 
 	/**

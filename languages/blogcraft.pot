@@ -57,7 +57,7 @@ msgid "%1$s: %2$s"
 msgstr ""
 
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
-#: includes/class-blogcraft-pipeline.php:872
+#: includes/class-blogcraft-pipeline.php:879
 msgid "%1$s: %2$s, wanted %3$s"
 msgstr ""
 
@@ -1065,11 +1065,11 @@ msgstr ""
 msgid "Habits"
 msgstr ""
 
-#: includes/class-blogcraft-research.php:175
+#: includes/class-blogcraft-research.php:190
 msgid "Hacker News discussion"
 msgstr ""
 
-#: includes/class-blogcraft-research.php:70
+#: includes/class-blogcraft-research.php:85
 msgid "Hacker News — what people who tried it say"
 msgstr ""
 
@@ -1610,7 +1610,7 @@ msgstr ""
 msgid "None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before."
 msgstr ""
 
-#: includes/class-blogcraft-research.php:50
+#: includes/class-blogcraft-research.php:65
 msgid "None — use my own site and any URLs I supply"
 msgstr ""
 
@@ -2278,7 +2278,7 @@ msgstr ""
 msgid "Scored %d of 100"
 msgstr ""
 
-#: includes/class-blogcraft-research.php:53
+#: includes/class-blogcraft-research.php:68
 msgid "SearXNG (self-hosted)"
 msgstr ""
 
@@ -2357,7 +2357,7 @@ msgstr ""
 msgid "Sentence length"
 msgstr ""
 
-#: includes/class-blogcraft-research.php:52
+#: includes/class-blogcraft-research.php:67
 msgid "SerpApi"
 msgstr ""
 
@@ -2576,7 +2576,7 @@ msgstr ""
 msgid "Target phrase"
 msgstr ""
 
-#: includes/class-blogcraft-research.php:51
+#: includes/class-blogcraft-research.php:66
 msgid "Tavily"
 msgstr ""
 
@@ -2984,7 +2984,7 @@ msgstr ""
 msgid "Unknown action."
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:937
+#: includes/class-blogcraft-pipeline.php:944
 msgid "Untitled"
 msgstr ""
 
@@ -3223,7 +3223,7 @@ msgstr ""
 msgid "Wikipedia and Hacker News need no key, so a tick is all they take. Each is a different kind of material, which is the point: a reference work gives dates and definitions, a forum gives what actually happened to people who tried the thing."
 msgstr ""
 
-#: includes/class-blogcraft-research.php:69
+#: includes/class-blogcraft-research.php:84
 msgid "Wikipedia — definitions, dates and background"
 msgstr ""
 

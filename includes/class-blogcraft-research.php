@@ -32,6 +32,21 @@ class Blogcraft_Research {
 	const MAX_SOURCES = 9;
 
 	/**
+	 * Most real search questions carried forward for one post.
+	 *
+	 * Enough to choose from without handing the model a list longer than the
+	 * FAQ it is being asked to write.
+	 */
+	const MAX_QUESTIONS = 8;
+
+	/**
+	 * Questions the most recent search returned, if any.
+	 *
+	 * @var array
+	 */
+	private static $last_questions = array();
+
+	/**
 	 * Most sources any single free service may contribute.
 	 *
 	 * Capped per service so one chatty source cannot crowd out the rest. A post
@@ -289,6 +304,11 @@ class Blogcraft_Research {
 	 * @return array List of array( url, title, excerpt ).
 	 */
 	public static function search( $topic ) {
+		// Cleared per search, or a job whose provider returns no questions
+		// would inherit the previous job's and write an FAQ about something
+		// else entirely.
+		self::$last_questions = array();
+
 		$provider = (string) Blogcraft_Settings::get( 'research_provider' );
 		$key      = (string) Blogcraft_Settings::get( 'research_api_key' );
 
@@ -370,6 +390,12 @@ class Blogcraft_Research {
 			return $out;
 		}
 
+		// The same response also carries what people actually type into the
+		// search box next. It costs nothing extra to keep, and the questions
+		// an article answers are otherwise invented by the model — which is
+		// guessing at exactly the thing this response already knows.
+		self::$last_questions = self::questions_from( $result['body'] );
+
 		foreach ( (array) $result['body']['organic_results'] as $item ) {
 			$out[] = array(
 				'url'     => isset( $item['link'] ) ? esc_url_raw( (string) $item['link'] ) : '',
@@ -379,6 +405,68 @@ class Blogcraft_Research {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Pull the "People also ask" questions out of a SerpApi response.
+	 *
+	 * @param array $body Decoded response body.
+	 * @return array List of question strings.
+	 */
+	private static function questions_from( $body ) {
+		$out = array();
+
+		// Both spellings. SerpApi documents this block as related_questions
+		// for the Google engine, but the feature is worthless if a rename or
+		// an engine variant silently returns nothing — and "silently returns
+		// nothing" is indistinguishable from "working" from the outside.
+		$block = array();
+
+		foreach ( array( 'related_questions', 'people_also_ask' ) as $key ) {
+			if ( ! empty( $body[ $key ] ) && is_array( $body[ $key ] ) ) {
+				$block = $body[ $key ];
+				break;
+			}
+		}
+
+		if ( empty( $block ) ) {
+			return $out;
+		}
+
+		foreach ( $block as $item ) {
+			if ( ! is_array( $item ) || empty( $item['question'] ) ) {
+				continue;
+			}
+
+			$question = trim( wp_strip_all_tags( (string) $item['question'] ) );
+
+			// A question mark is the cheap test for "this is a question rather
+			// than a heading SerpApi happened to file here".
+			if ( '' === $question || false === strpos( $question, '?' ) ) {
+				continue;
+			}
+
+			$out[ $question ] = $question;
+
+			if ( count( $out ) >= self::MAX_QUESTIONS ) {
+				break;
+			}
+		}
+
+		return array_values( $out );
+	}
+
+	/**
+	 * The questions the last search turned up, if it turned any up.
+	 *
+	 * Real searches beat invented ones, and only the provider that returns
+	 * them can supply them: Tavily and a self-hosted SearXNG do not, so this
+	 * is empty on those and the model falls back to writing its own.
+	 *
+	 * @return array
+	 */
+	public static function last_questions() {
+		return self::$last_questions;
 	}
 
 	/**

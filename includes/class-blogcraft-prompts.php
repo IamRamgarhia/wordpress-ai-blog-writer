@@ -366,11 +366,29 @@ Rules for this article:
 	 * @param string $topic   Topic.
 	 * @param array  $covered Headings already written.
 	 * @param int    $count   How many questions.
+	 * @param array  $asked   Real questions from search results, when available.
 	 * @return array
 	 */
-	public static function faq( $topic, $covered, $count = 4 ) {
+	public static function faq( $topic, $covered, $count = 4, $asked = array() ) {
+		// Real questions beat invented ones, and a model asked to guess what
+		// people search for reliably produces the same handful of tidy,
+		// plausible questions nobody types. These come from the search
+		// provider's own "people also ask" data, so they are what was
+		// actually searched. Offered rather than mandated: some will already
+		// be answered in the body, and a forced question with a padded answer
+		// is worse than one fewer question.
+		$real = '';
+
+		if ( ! empty( $asked ) ) {
+			$real = "People searching for this also asked:\n- "
+				. implode( "\n- ", array_map( 'wp_strip_all_tags', $asked ) )
+				. "\n\nPrefer these, in this order, over questions of your own. "
+				. "Skip any the article already answers in full, and reword one only if it does not read as a sentence.\n\n";
+		}
+
 		$user = "Write the questions and answers for an article about: {$topic}\n\n"
 			. ( empty( $covered ) ? '' : "The article already covers:\n- " . implode( "\n- ", $covered ) . "\n\n" )
+			. $real
 			. "Reply with JSON of exactly this shape:\n"
 			. '{"faq":[{"question":"","answer":""}]}' . "\n\n"
 			. "Rules:\n"
