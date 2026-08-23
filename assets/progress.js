@@ -80,6 +80,38 @@
 		clock.textContent = clockText( elapsed, remaining );
 	}
 
+	function live( state ) {
+		var box = document.getElementById( 'blogcraft-live' );
+		var title = document.getElementById( 'blogcraft-live-title' );
+		var heads = document.getElementById( 'blogcraft-live-heads' );
+
+		if ( ! box || ! title || ! heads ) {
+			return;
+		}
+
+		if ( state.title ) {
+			title.textContent = state.title;
+		}
+
+		var planned = state.heads || [];
+
+		// Rebuilt rather than patched: the list is a handful of items and
+		// diffing it would be more code than redrawing it.
+		if ( planned.length && heads.childElementCount !== planned.length ) {
+			heads.innerHTML = '';
+
+			for ( var i = 0; i < planned.length; i++ ) {
+				var li = document.createElement( 'li' );
+				li.textContent = planned[ i ].text;
+				heads.appendChild( li );
+			}
+		}
+
+		for ( var j = 0; j < planned.length && j < heads.children.length; j++ ) {
+			heads.children[ j ].className = planned[ j ].done ? 'is-written' : '';
+		}
+	}
+
 	function paint( state ) {
 		var items = steps.querySelectorAll( 'li' );
 		var seen = false;
@@ -143,6 +175,7 @@
 
 				stepsDone++;
 				paint( state );
+				live( state );
 				tick();
 				failures = 0;
 				window.setTimeout( advance, 400 );

@@ -1408,3 +1408,70 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: 14px;
 	line-height: 1.7;
 }
+
+/* The live panel: what actually exists so far. A bar that fills says the
+ * machine is alive; the title and the headings say whether it is writing the
+ * post you asked for, which is otherwise a several-minute wait to find out. */
+
+#blogcraft-progress-card {
+	max-width: 820px;
+}
+
+.bc-progress-bar,
+.bc-progress-meta {
+	width: 100%;
+}
+
+.bc-live {
+	margin: 18px 0 4px;
+	padding: 16px 18px;
+	border: 1px solid var(--bc-line);
+	border-radius: 8px;
+	background: var(--bc-surface-soft, #fbfbfc);
+}
+
+.bc-live:empty { display: none; }
+
+.bc-live h3 {
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.4;
+	color: var(--bc-ink);
+}
+
+.bc-live h3:empty { display: none; }
+
+.bc-live-heads {
+	margin: 10px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-live-heads:empty { display: none; }
+
+.bc-live-heads li {
+	position: relative;
+	padding: 4px 0 4px 20px;
+	font-size: 13px;
+	color: var(--bc-muted);
+}
+
+.bc-live-heads li::before {
+	content: "";
+	position: absolute;
+	left: 2px;
+	top: 10px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	border: 1.5px solid var(--bc-line);
+}
+
+.bc-live-heads .is-written {
+	color: var(--bc-ink);
+}
+
+.bc-live-heads .is-written::before {
+	border-color: var(--bc-ok);
+	background: var(--bc-ok);
+}

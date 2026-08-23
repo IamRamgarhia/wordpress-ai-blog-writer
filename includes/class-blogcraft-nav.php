@@ -31,6 +31,7 @@ class Blogcraft_Nav {
 			'blogcraft-write'          => __( 'Write a post', 'blogcraft' ),
 			'blogcraft-blueprint'      => __( 'How it writes', 'blogcraft' ),
 			'blogcraft-calendar'       => __( 'Calendar', 'blogcraft' ),
+			'blogcraft-library'        => __( 'Written by AI', 'blogcraft' ),
 			'blogcraft-review'         => __( 'Needs review', 'blogcraft' ),
 			'blogcraft-activity'       => __( 'Activity', 'blogcraft' ),
 			'blogcraft-settings'       => __( 'Settings', 'blogcraft' ),

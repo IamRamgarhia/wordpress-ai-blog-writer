@@ -649,6 +649,47 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * Every draft that finished writing and is still waiting to be read.
+	 *
+	 * These are the ones with nowhere else to appear: the writing is paid for
+	 * and complete, but no post exists yet, so nothing in WordPress lists them
+	 * and closing the tab makes them effectively invisible. Newest first.
+	 *
+	 * @param int $limit Most to return.
+	 * @return array Rows, newest first.
+	 */
+	public static function held_jobs( $limit = 50 ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT id, pipeline, stage, status, attempts, max_attempts, last_error, payload, created_at, updated_at FROM {$table} WHERE status = 'ready' ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				(int) $limit
+			),
+			ARRAY_A
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * How many drafts are waiting to be read.
+	 *
+	 * @return int
+	 */
+	public static function held_count() {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT COUNT(*) FROM {$table} WHERE status = 'ready'" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+	}
+
+	/**
 	 * Apply an update to one job, always stamping updated_at.
 	 *
 	 * @param int   $job_id Job id.

@@ -1,0 +1,322 @@
+<?php
+/**
+ * Everything this plugin has written, in one place.
+ *
+ * @package Blogcraft
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * The record of what Blogcraft has produced, whatever became of it.
+ *
+ * Two kinds of thing end up here, and one of them had nowhere else to live.
+ *
+ * A draft that finished writing and was never approved exists only as a job
+ * row: it cost real money to produce, it is complete, and no post exists for
+ * it — so nothing in WordPress lists it, and closing the tab made it
+ * effectively lost. Those come first, because they are the ones waiting on a
+ * decision.
+ *
+ * Posts that were created are findable in the posts list already, but not
+ * *as a set*, and not with the score they were judged by. Gathering them here
+ * answers "what has this thing actually written for me", which is a question
+ * the plugin could not previously answer at all.
+ */
+class Blogcraft_Library {
+
+	/**
+	 * Menu slug.
+	 */
+	const PAGE_SLUG = 'blogcraft-library';
+
+	/**
+	 * Nonce action for discarding a draft.
+	 */
+	const ACTION = 'blogcraft_library';
+
+	/**
+	 * Wire the screen.
+	 *
+	 * @return void
+	 */
+	public static function init() {
+		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 20 );
+		add_action( 'admin_post_blogcraft_discard_draft', array( __CLASS__, 'handle_discard' ) );
+	}
+
+	/**
+	 * Add the submenu entry.
+	 *
+	 * @return void
+	 */
+	public static function register_menu() {
+		add_submenu_page(
+			Blogcraft_Admin::MENU_SLUG,
+			__( 'Written by AI', 'blogcraft' ),
+			__( 'Written by AI', 'blogcraft' ),
+			Blogcraft_Capabilities::MANAGE,
+			self::PAGE_SLUG,
+			array( __CLASS__, 'render' )
+		);
+	}
+
+	/**
+	 * Posts this plugin created.
+	 *
+	 * @param int $limit Most to return.
+	 * @return array WP_Post objects.
+	 */
+	public static function generated_posts( $limit = 100 ) {
+		return get_posts(
+			array(
+				'post_type'        => 'post',
+				'post_status'      => array( 'publish', 'draft', 'pending', 'future', 'private' ),
+				'posts_per_page'   => (int) $limit,
+				'orderby'          => 'date',
+				'order'            => 'DESC',
+				'no_found_rows'    => true,
+				'suppress_filters' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_key'         => Blogcraft_Seo::GENERATED_META,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_value'       => '1',
+			)
+		);
+	}
+
+	/**
+	 * Throw away a draft that was never wanted.
+	 *
+	 * @return void
+	 */
+	public static function handle_discard() {
+		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
+
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( $job_id > 0 ) {
+			// Cancelled rather than deleted: the row is the only record that
+			// this topic was written and what it cost, and quietly removing
+			// that would make the Activity log lie by omission.
+			Blogcraft_Queue::cancel( $job_id );
+
+			Blogcraft_Logger::info( 'A finished draft was discarded without being published.', array(), $job_id );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
+		exit;
+	}
+
+	/**
+	 * Render the screen.
+	 *
+	 * @return void
+	 */
+	public static function render() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			return;
+		}
+
+		echo '<div class="wrap blogcraft-wrap">';
+		Blogcraft_Nav::render();
+
+		echo '<h1>' . esc_html__( 'Written by AI', 'blogcraft' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Every post this plugin has written, and every draft still waiting on you.', 'blogcraft' ) . '</p>';
+
+		self::render_waiting();
+		self::render_published();
+
+		echo '</div>';
+	}
+
+	/**
+	 * Drafts that finished writing and were never acted on.
+	 *
+	 * @return void
+	 */
+	private static function render_waiting() {
+		$held = Blogcraft_Queue::held_jobs();
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'Waiting for you', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Finished, paid for, and not on your site yet. These stay here until you do something with them.', 'blogcraft' ) . '</p>';
+		echo '</header>';
+
+		if ( empty( $held ) ) {
+			echo '<p>' . esc_html__( 'Nothing waiting. Every draft has been dealt with.', 'blogcraft' ) . '</p></section>';
+
+			return;
+		}
+
+		echo '<table class="widefat striped"><thead><tr>';
+		echo '<th>' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'What now', 'blogcraft' ) . '</th>';
+		echo '</tr></thead><tbody>';
+
+		foreach ( $held as $row ) {
+			$payload = json_decode( isset( $row['payload'] ) ? (string) $row['payload'] : '', true );
+			$payload = is_array( $payload ) ? $payload : array();
+
+			$title = '';
+
+			if ( ! empty( $payload['outline']['title'] ) ) {
+				$title = (string) $payload['outline']['title'];
+			} elseif ( ! empty( $payload['topic'] ) ) {
+				$title = (string) $payload['topic'];
+			}
+
+			$score = isset( $payload['quality']['score'] ) ? (int) $payload['quality']['score'] : null;
+
+			echo '<tr>';
+			printf( '<td><strong>%s</strong></td>', esc_html( '' === $title ? __( 'Untitled', 'blogcraft' ) : $title ) );
+			printf(
+				'<td>%s</td>',
+				esc_html( null === $score ? '—' : sprintf( '%d/100', $score ) )
+			);
+			printf( '<td>%s</td>', esc_html( self::when( isset( $row['updated_at'] ) ? $row['updated_at'] : '' ) ) );
+
+			echo '<td>';
+			printf(
+				'<a class="button button-primary button-small" href="%1$s">%2$s</a> ',
+				esc_url(
+					add_query_arg(
+						array(
+							'page' => Blogcraft_Progress::PAGE_SLUG,
+							'job'  => (int) $row['id'],
+						),
+						admin_url( 'admin.php' )
+					)
+				),
+				esc_html__( 'Read it', 'blogcraft' )
+			);
+			self::discard_button( (int) $row['id'] );
+			echo '</td></tr>';
+		}
+
+		echo '</tbody></table></section>';
+	}
+
+	/**
+	 * The control that throws a draft away.
+	 *
+	 * @param int $job_id Job id.
+	 * @return void
+	 */
+	private static function discard_button( $job_id ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="blogcraft-inline-form">';
+		echo '<input type="hidden" name="action" value="blogcraft_discard_draft" />';
+		printf( '<input type="hidden" name="job" value="%d" />', (int) $job_id );
+		Blogcraft_Request::nonce_field( self::ACTION );
+		printf(
+			'<button type="submit" class="button button-small button-link-delete" aria-label="%1$s">%2$s</button>',
+			esc_attr(
+				sprintf(
+					/* translators: %d: job number. */
+					__( 'Discard draft %d', 'blogcraft' ),
+					(int) $job_id
+				)
+			),
+			esc_html__( 'Discard', 'blogcraft' )
+		);
+		echo '</form>';
+	}
+
+	/**
+	 * Posts that were created.
+	 *
+	 * @return void
+	 */
+	private static function render_published() {
+		$posts = self::generated_posts();
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'On your site', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Posts this plugin wrote, with the score each one was judged by when it was written.', 'blogcraft' ) . '</p>';
+		echo '</header>';
+
+		if ( empty( $posts ) ) {
+			echo '<p>' . esc_html__( 'Nothing yet. The first post you create will appear here.', 'blogcraft' ) . '</p></section>';
+
+			return;
+		}
+
+		echo '<table class="widefat striped"><thead><tr>';
+		echo '<th>' . esc_html__( 'Post', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
+		echo '</tr></thead><tbody>';
+
+		foreach ( $posts as $post ) {
+			$score = get_post_meta( $post->ID, '_blogcraft_quality', true );
+
+			echo '<tr>';
+			printf(
+				'<td><a href="%1$s"><strong>%2$s</strong></a></td>',
+				esc_url( (string) get_edit_post_link( $post->ID ) ),
+				esc_html( '' === $post->post_title ? __( 'Untitled', 'blogcraft' ) : $post->post_title )
+			);
+			printf( '<td>%s</td>', esc_html( self::status_label( $post->post_status ) ) );
+			printf(
+				'<td>%s</td>',
+				esc_html( '' === $score ? '—' : sprintf( '%d/100', (int) $score ) )
+			);
+			printf( '<td>%s</td>', esc_html( self::when( $post->post_date_gmt ) ) );
+			echo '</tr>';
+		}
+
+		echo '</tbody></table></section>';
+	}
+
+	/**
+	 * A post status in words a reader recognises.
+	 *
+	 * @param string $status Post status.
+	 * @return string
+	 */
+	private static function status_label( $status ) {
+		switch ( (string) $status ) {
+			case 'publish':
+				return __( 'Published', 'blogcraft' );
+			case 'future':
+				return __( 'Scheduled', 'blogcraft' );
+			case 'pending':
+				return __( 'Held for review', 'blogcraft' );
+			case 'private':
+				return __( 'Private', 'blogcraft' );
+			default:
+				return __( 'Draft', 'blogcraft' );
+		}
+	}
+
+	/**
+	 * A timestamp as "how long ago", in the site's own timezone.
+	 *
+	 * @param string $gmt A GMT datetime string.
+	 * @return string
+	 */
+	private static function when( $gmt ) {
+		$gmt = trim( (string) $gmt );
+
+		if ( '' === $gmt ) {
+			return '—';
+		}
+
+		$stamp = strtotime( $gmt . ' UTC' );
+
+		if ( false === $stamp ) {
+			return '—';
+		}
+
+		return sprintf(
+			/* translators: %s: a length of time, such as "2 hours". */
+			__( '%s ago', 'blogcraft' ),
+			human_time_diff( $stamp, time() )
+		);
+	}
+}

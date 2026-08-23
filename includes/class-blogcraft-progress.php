@@ -200,20 +200,63 @@ class Blogcraft_Progress {
 		$at    = ( false === $at ) ? 0 : (int) $at;
 
 		return array(
-			'status' => $job->status,
-			'stage'  => $job->stage,
-			'error'  => (string) $job->last_error,
+			'status'  => $job->status,
+			'stage'   => $job->stage,
+			'error'   => (string) $job->last_error,
 			// "Done" means stop asking, not "it worked" — a failed job and a
 			// draft waiting to be read both want the page to stop polling.
-			'done'   => $finished,
-			'ready'  => 'ready' === $job->status,
-			'postId' => isset( $job->payload['post_id'] ) ? (int) $job->payload['post_id'] : 0,
+			'done'    => $finished,
+			'ready'   => 'ready' === $job->status,
+			'postId'  => isset( $job->payload['post_id'] ) ? (int) $job->payload['post_id'] : 0,
 			// Position, so the bar and the counter move without the page
 			// having to work it out from the stage name a second time.
-			'step'   => $finished ? count( $order ) : $at,
-			'total'  => count( $order ),
-			'label'  => isset( self::steps()[ $job->stage ] ) ? self::steps()[ $job->stage ] : '',
+			'step'    => $finished ? count( $order ) : $at,
+			'total'   => count( $order ),
+			'label'   => isset( self::steps()[ $job->stage ] ) ? self::steps()[ $job->stage ] : '',
+			// What actually exists so far. A bar that fills tells you the
+			// machine is alive; the title and the headings tell you whether
+			// it is writing the post you asked for — which is the thing you
+			// would otherwise wait several minutes to find out.
+			'title'   => isset( $job->payload['outline']['title'] ) ? (string) $job->payload['outline']['title'] : '',
+			'heads'   => self::headings_so_far( $job ),
+			'written' => isset( $job->payload['article']['sections'] ) ? count( (array) $job->payload['article']['sections'] ) : 0,
 		);
+	}
+
+	/**
+	 * The headings the outline settled on, with the written ones marked.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	private static function headings_so_far( $job ) {
+		$planned = isset( $job->payload['outline']['sections'] ) ? (array) $job->payload['outline']['sections'] : array();
+		$written = isset( $job->payload['article']['sections'] ) ? (array) $job->payload['article']['sections'] : array();
+
+		$done = array();
+
+		foreach ( $written as $section ) {
+			if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+				$done[ strtolower( trim( (string) $section['heading'] ) ) ] = true;
+			}
+		}
+
+		$out = array();
+
+		foreach ( $planned as $section ) {
+			if ( ! is_array( $section ) || empty( $section['heading'] ) ) {
+				continue;
+			}
+
+			$heading = (string) $section['heading'];
+
+			$out[] = array(
+				'text' => $heading,
+				'done' => isset( $done[ strtolower( trim( $heading ) ) ] ),
+			);
+		}
+
+		return $out;
 	}
 
 	/**
@@ -400,7 +443,20 @@ class Blogcraft_Progress {
 					: __( 'This runs while the page is open. Leaving is safe — it picks up where it stopped.', 'blogcraft' )
 			)
 		);
-		echo '</header><ol class="blogcraft-steps" id="blogcraft-progress-steps">';
+		echo '</header>';
+
+		// Filled in by the script as the outline and the sections arrive. It
+		// starts empty rather than hidden so the space it will occupy is not
+		// a jump when the first heading lands.
+		printf(
+			'<div class="bc-live" id="blogcraft-live"%s>'
+			. '<h3 id="blogcraft-live-title"></h3>'
+			. '<ul class="bc-live-heads" id="blogcraft-live-heads"></ul>'
+			. '</div>',
+			$held ? ' hidden' : ''
+		);
+
+		echo '<ol class="blogcraft-steps" id="blogcraft-progress-steps">';
 
 		$index = 0;
 
