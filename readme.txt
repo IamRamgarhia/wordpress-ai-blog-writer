@@ -37,7 +37,7 @@ There are also eight ready-made shapes to start from: definitive guide, numbered
 Twenty-five checks run on the finished draft, and every one that fails is written back into the rewrite as an instruction rather than a number. Among them:
 
 * Does the opening answer the question in its first two sentences, or clear its throat first?
-* Are the figures it states supported by a link, section by section?
+* Does every section that states a figure carry a link beside it? (It checks the link is there, not that the number is on the page at the other end.)
 * Does it say anything the sources it read do not already say?
 * Is the subject in the title, in a heading, and in the opening?
 * Are the title and meta description the length they need to be?

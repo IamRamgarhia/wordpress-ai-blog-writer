@@ -192,6 +192,26 @@ class Test_Blogcraft_Editorial extends WP_UnitTestCase {
 
 	// ------------------------------------------------------------- citations.
 
+	public function test_the_figure_check_is_named_for_what_it_measures() {
+		// It finds a figure in a section with no link. It does not open the link
+		// and confirm the number is there — which is the shape most fabricated
+		// citations take — so the label must not imply that it did.
+		$content = '<h2>The chemistry</h2><p>It cuts acidity by 67%.</p>';
+		$check   = $this->verdict( Blogcraft_Editorial::checks( $content, $this->blueprint() ), 'unsupported_claims' );
+
+		$this->assertStringNotContainsString( 'source', strtolower( $check['label'] ) );
+		$this->assertStringContainsString( 'link', strtolower( $check['label'] ) );
+	}
+
+	public function test_a_link_to_anywhere_satisfies_the_figure_check() {
+		// Stated plainly so nobody is surprised by it later: the link is not
+		// followed, so any link in the section passes.
+		$content = '<h2>The chemistry</h2><p>It cuts acidity by 67%. <a href="https://example.com/unrelated">Something else</a></p>';
+		$check   = $this->verdict( Blogcraft_Editorial::checks( $content, $this->blueprint() ), 'unsupported_claims' );
+
+		$this->assertTrue( $check['pass'] );
+	}
+
 	public function test_a_figure_with_nothing_to_check_it_against_fails() {
 		$content = '<h2>The chemistry</h2><p>It cuts acidity by 67% every time.</p>';
 		$checks  = Blogcraft_Editorial::checks( $content, $this->blueprint() );

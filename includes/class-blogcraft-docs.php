@@ -119,8 +119,9 @@ class Blogcraft_Docs {
 				'title' => __( 'What is checked, and why it matters', 'blogcraft' ),
 				'body'  => array(
 					__( 'Every draft is measured before it becomes a post, and every failed check is written back into the rewrite as an instruction rather than a number. That loop is the thing this plugin does that the others do not.', 'blogcraft' ),
-					__( 'Among the checks: whether the opening answers the question in its first two sentences, whether figures are supported by a link section by section, whether the draft says anything its sources do not already say, whether the subject appears in the title and in a heading, and whether the figures you supplied actually reached the page.', 'blogcraft' ),
+					__( 'Among the checks: whether the opening answers the question in its first two sentences, whether every section that states a figure carries a link beside it, whether the draft says anything its sources do not already say, whether the subject appears in the title and in a heading, and whether the figures you supplied actually reached the page.', 'blogcraft' ),
 					__( 'A check that cannot be assessed is skipped rather than failed. The score is what was earned out of what was offered, so a question that could not be asked costs nothing.', 'blogcraft' ),
+					__( 'Two limits worth knowing. The figure check looks for a link in the same section as a number; it does not open that link and confirm the number is on the page at the other end, which is the shape most invented citations take. And the originality check compares the draft against the source excerpts it was given, so it can only see what it was shown — it is not a plagiarism service.', 'blogcraft' ),
 					__( 'Anything scoring below your threshold is held for review instead of published, whatever you chose.', 'blogcraft' ),
 				),
 			),

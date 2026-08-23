@@ -239,6 +239,12 @@ class Blogcraft_Editorial {
 	 * claim. Measured per section rather than per article, because one link in
 	 * the introduction does not vouch for a figure eight hundred words later.
 	 *
+	 * What this does not do is follow the link and confirm the figure is on the
+	 * page at the other end. That is the shape most fabricated citations
+	 * actually take — a real address, a plausible title, and a number that is
+	 * not there — so this check narrows the problem rather than solving it. It
+	 * is named accordingly.
+	 *
 	 * @param string $content Rendered content.
 	 * @return array Headings of the offending sections.
 	 */
@@ -685,9 +691,15 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'unsupported_claims',
-			__( 'Figures with a source', 'blogcraft' ),
+			// Named for what it measures. "Figures with a source" claimed more
+			// than this does: it finds a figure sitting in a section with no
+			// link anywhere in it. It does not open the link and confirm the
+			// number is on the other end, and a check whose name implies
+			// verification it never performed is worse than no check, because
+			// the first person to notice stops believing the other twenty-four.
+			__( 'Figures with a link beside them', 'blogcraft' ),
 			$pass,
-			sprintf( '%d unsourced', $count ),
+			sprintf( '%d with nothing to check', $count ),
 			__( 'none', 'blogcraft' ),
 			8,
 			sprintf(
