@@ -22,7 +22,7 @@ class Blogcraft_Seo {
 	const GENERATED_META = '_blogcraft_generated';
 
 	/**
-	 * Meta key holding a cached word count and the revision it was taken from.
+	 * Meta key holding a cached word count and a hash of the content it counted.
 	 */
 	const WORDS_META = '_blogcraft_words';
 
@@ -643,25 +643,31 @@ class Blogcraft_Seo {
 	 * paid by every reader on every view, forever, to compute something that
 	 * only changes when the post is edited.
 	 *
-	 * Stored against the post and recomputed when the content changes.
+	 * Keyed on a hash of the content rather than on post_modified_gmt. The
+	 * timestamp has one-second resolution, so two edits inside the same second
+	 * leave it unchanged and the stale count is served as though it were
+	 * current — which a test caught on the first run. Hashing costs a fraction
+	 * of what the counting does and is exact.
 	 *
 	 * @param WP_Post $post Post to count.
 	 * @return int
 	 */
 	public static function word_count( $post ) {
-		$stored = get_post_meta( (int) $post->ID, self::WORDS_META, true );
+		$content = (string) $post->post_content;
+		$key     = md5( $content );
+		$stored  = get_post_meta( (int) $post->ID, self::WORDS_META, true );
 
-		if ( is_array( $stored ) && isset( $stored['at'], $stored['words'] ) && $stored['at'] === $post->post_modified_gmt ) {
+		if ( is_array( $stored ) && isset( $stored['of'], $stored['words'] ) && $stored['of'] === $key ) {
 			return (int) $stored['words'];
 		}
 
-		$words = count( Blogcraft_Metrics::words( Blogcraft_Metrics::plain_text( $post->post_content ) ) );
+		$words = count( Blogcraft_Metrics::words( Blogcraft_Metrics::plain_text( $content ) ) );
 
 		update_post_meta(
 			(int) $post->ID,
 			self::WORDS_META,
 			array(
-				'at'    => $post->post_modified_gmt,
+				'of'    => $key,
 				'words' => $words,
 			)
 		);

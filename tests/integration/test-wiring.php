@@ -306,12 +306,16 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		add_filter( 'blogcraft_providers', $empty, 99 );
 
-		$types = Blogcraft_Provider_Registry::types();
+		$types   = Blogcraft_Provider_Registry::types();
+		$address = Blogcraft_Provider_Registry::default_base_url( 'openai' );
 
+		// Asked while the filter is still on. Removing it first and then asking
+		// tests the ordinary path, which is what the first version of this did.
 		remove_filter( 'blogcraft_providers', $empty, 99 );
 
 		$this->assertIsArray( $types );
-		$this->assertSame( '', Blogcraft_Provider_Registry::default_base_url( 'openai' ) );
+		$this->assertSame( '', $address );
+		$this->assertNotSame( '', Blogcraft_Provider_Registry::default_base_url( 'openai' ) );
 	}
 
 	public function test_the_documentation_ships_with_the_plugin() {
@@ -356,8 +360,31 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		$stored = get_post_meta( $post_id, Blogcraft_Seo::WORDS_META, true );
 
 		$this->assertSame( $first, (int) $stored['words'] );
-		$this->assertSame( $post->post_modified_gmt, $stored['at'] );
+		$this->assertSame( md5( $post->post_content ), $stored['of'] );
 		$this->assertSame( $first, Blogcraft_Seo::word_count( $post ) );
+	}
+
+	public function test_two_edits_in_the_same_second_still_recount() {
+		// post_modified_gmt has one-second resolution, so keying the cache on it
+		// served a stale count for edits that landed together. Tests are fast
+		// enough to hit that every time.
+		$post_id = self::factory()->post->create( array( 'post_content' => '<p>Four words exactly here.</p>' ) );
+
+		$before = Blogcraft_Seo::word_count( get_post( $post_id ) );
+
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => '<p>' . str_repeat( 'Many more words now. ', 30 ) . '</p>',
+			)
+		);
+
+		clean_post_cache( $post_id );
+
+		$after = Blogcraft_Seo::word_count( get_post( $post_id ) );
+
+		$this->assertNotSame( $before, $after );
+		$this->assertGreaterThan( 50, $after );
 	}
 
 	public function test_editing_a_post_recounts_it() {
