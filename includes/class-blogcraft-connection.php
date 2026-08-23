@@ -417,7 +417,7 @@ class Blogcraft_Connection {
 		self::open_card(
 			'02',
 			__( 'Connect a picture service', 'blogcraft' ),
-			__( 'Pictures come from a different kind of service than the writing does. One of them is free and needs no key, so this card can be left exactly as it is.', 'blogcraft' ),
+			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'blogcraft' ),
 			'pictures'
 		);
 		echo '<table class="form-table" role="presentation"><tbody>';
@@ -676,7 +676,7 @@ class Blogcraft_Connection {
 				'anchor' => 'research',
 				'lines'  => array(
 					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft' ),
-					__( 'Wikipedia, Reddit and Hacker News need no key and are on by default. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'blogcraft' ),
+					__( 'Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'blogcraft' ),
 					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft' ),
 				),
 			),

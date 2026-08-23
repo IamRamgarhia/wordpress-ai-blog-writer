@@ -1,10 +1,10 @@
 === Blogcraft ===
 Contributors: dicecodes
-Tags: ai content generator, ai writer, autoblogging, content generator, seo content
+Tags: ai content generator, ai writer, autoblogging, seo content, blog automation
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.30.0
+Stable tag: 0.31.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ Every feature is included. Nothing is locked, nothing expires, and there are no 
 
 Paste the address of any published post and Blogcraft reads it: how long it runs, how many sections, how long its sentences and paragraphs are, whether it uses tables and lists, how heavily it links out, how many concrete figures it states, whether it says "I" or "you". Those measurements become your writing rules.
 
-Structure only. None of the wording is copied, kept, or shown to a model — what it takes is public form, which belongs to nobody. Nothing else in this category does this, and it is a truer answer than a preset named after a famous blog, because it stays right when that blog changes.
+Structure only. None of the wording is copied, kept, or shown to a model — what it takes is public form, which belongs to nobody. It is a truer answer than a preset named after a famous blog, because it stays right when that blog changes.
 
 There are also eight ready-made shapes to start from: definitive guide, numbered list, step by step, this against that, data study, argued opinion, quick explainer, hands-on review.
 
@@ -42,7 +42,7 @@ Twenty-five checks run on the finished draft, and every one that fails is writte
 * Is the subject in the title, in a heading, and in the opening?
 * Are the title and meta description the length they need to be?
 
-Nothing else in this category feeds its own measurements back into the rewriting. That loop is the whole point.
+The loop is the whole point: a score you have to act on yourself is a report card, and a rewrite that never gets measured is a guess.
 
 **It writes in your voice**
 
@@ -94,14 +94,13 @@ Blogcraft still talks to providers directly as well, and will keep doing so. It 
 * SerpApi — https://serpapi.com/legal and https://serpapi.com/privacy-policy
 * A SearXNG instance you host yourself.
 * Wikipedia — https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
-* Reddit — https://www.redditinc.com/policies/user-agreement and https://www.reddit.com/policies/privacy-policy
 * Hacker News search, via Algolia — https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
 
-The last three need no key and are on by default. Only the post topic is sent to any of them. Turn them off under Blogcraft, Settings, Research.
+Every one of these starts switched off, including the two that need no key. Blogcraft contacts nothing until you turn a source on, and only the post topic is ever sent. Blogcraft, Settings, Research.
 
-**Image providers** — optional. A short description of the wanted picture is sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
+**Image providers** — off until you switch pictures on, which is how you choose one. A short description of the wanted picture is then sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
 
-* Pollinations — https://pollinations.ai
+* Pollinations — https://pollinations.ai (this service publishes no terms or privacy page; it is offered because it needs no account, and it is off until you choose it)
 * fal.ai — https://fal.ai/terms and https://fal.ai/privacy
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
@@ -138,6 +137,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.31.0 =
+* Research sources and pictures now start switched off. Blogcraft contacts nothing until you turn a source on; turning it on is how you say yes to it
+* Reddit is no longer read. It refuses anonymous automated requests from most shared hosting, so it returned nothing for a large share of the people who had it on, and its terms want a registered application either way
+* Hacker News, Wikipedia and every paid source are unchanged, and still send only the post topic
 
 = 0.30.0 =
 * A queued post can be stopped from Activity. Queueing twenty topics and changing your mind previously left no way out but the database

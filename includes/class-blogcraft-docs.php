@@ -84,7 +84,8 @@ class Blogcraft_Docs {
 				'title' => __( 'Research', 'blogcraft' ),
 				'body'  => array(
 					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft' ),
-					__( 'Wikipedia, Reddit and Hacker News need no key and are on by default. Each is a different kind of material, which is the point: a reference work gives dates and definitions, a forum gives what actually happened to people who tried the thing.', 'blogcraft' ),
+					__( 'Everything here starts switched off, including the free sources. Blogcraft does not contact anybody you have not chosen: pasting a provider key is consent for that provider and for nothing else. Turning a source on is how you consent to it.', 'blogcraft' ),
+					__( 'Wikipedia and Hacker News need no key, so a tick is all they take. Each is a different kind of material, which is the point: a reference work gives dates and definitions, a forum gives what actually happened to people who tried the thing.', 'blogcraft' ),
 					__( 'Tavily and SerpApi are paid and return more current results. A SearXNG instance is free if you host one. You can also list URLs to be read for every post.', 'blogcraft' ),
 					__( 'Whatever is found is also used to check the finished draft. If the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft' ),
 				),

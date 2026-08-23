@@ -67,7 +67,7 @@ class Blogcraft_Research {
 	public static function free_sources() {
 		return array(
 			'research_wikipedia' => __( 'Wikipedia — definitions, dates and background', 'blogcraft' ),
-			'research_community' => __( 'Reddit and Hacker News — what people who tried it say', 'blogcraft' ),
+			'research_community' => __( 'Hacker News — what people who tried it say', 'blogcraft' ),
 		);
 	}
 
@@ -121,57 +121,6 @@ class Blogcraft_Research {
 					: 'https://en.wikipedia.org/wiki/' . rawurlencode( (string) $hit['title'] ),
 				'title'   => wp_strip_all_tags( (string) $hit['title'] ),
 				'excerpt' => self::sanitise_excerpt( (string) $summary['body']['extract'] ),
-			);
-		}
-
-		return $out;
-	}
-
-	/**
-	 * Search Reddit for people discussing the topic.
-	 *
-	 * @param string $topic Topic.
-	 * @return array
-	 */
-	public static function search_reddit( $topic ) {
-		$result = Blogcraft_Http::get_json(
-			add_query_arg(
-				array(
-					'q'     => rawurlencode( $topic ),
-					'limit' => 5,
-					'sort'  => 'relevance',
-					't'     => 'year',
-				),
-				'https://www.reddit.com/search.json'
-			),
-			array(),
-			15
-		);
-
-		if ( '' !== $result['error'] || empty( $result['body']['data']['children'] ) ) {
-			return array();
-		}
-
-		$out = array();
-
-		foreach ( $result['body']['data']['children'] as $child ) {
-			if ( count( $out ) >= self::MAX_PER_SOURCE ) {
-				break;
-			}
-
-			$post = isset( $child['data'] ) ? $child['data'] : array();
-			$body = isset( $post['selftext'] ) ? trim( (string) $post['selftext'] ) : '';
-
-			// A link post with no text of its own says nothing here.
-			if ( '' === $body || empty( $post['permalink'] ) ) {
-				continue;
-			}
-
-			$out[] = array(
-				'url'     => esc_url_raw( 'https://www.reddit.com' . (string) $post['permalink'] ),
-				'title'   => wp_strip_all_tags( isset( $post['title'] ) ? (string) $post['title'] : '' )
-					. ( empty( $post['subreddit'] ) ? '' : ' (r/' . wp_strip_all_tags( (string) $post['subreddit'] ) . ')' ),
-				'excerpt' => self::sanitise_excerpt( $body ),
 			);
 		}
 
@@ -249,7 +198,6 @@ class Blogcraft_Research {
 		}
 
 		if ( Blogcraft_Settings::get( 'research_community' ) ) {
-			$wanted[] = 'search_reddit';
 			$wanted[] = 'search_hn';
 		}
 

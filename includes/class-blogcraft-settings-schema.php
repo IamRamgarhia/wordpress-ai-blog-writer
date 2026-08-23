@@ -59,8 +59,12 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'string',
 				'secret'  => false,
 			),
+			// Off until asked for. Turning it on picks an image service, and
+			// picking one is the consent for contacting it. A fresh install
+			// that quietly fetched a picture from a third party nobody chose
+			// is exactly what Guideline 7 is about.
 			'images_enabled'                  => array(
-				'default' => true,
+				'default' => false,
 				'type'    => 'bool',
 				'secret'  => false,
 			),
@@ -80,12 +84,12 @@ class Blogcraft_Settings_Schema {
 				'secret'  => false,
 			),
 			'research_wikipedia'              => array(
-				'default' => true,
+				'default' => false,
 				'type'    => 'bool',
 				'secret'  => false,
 			),
 			'research_community'              => array(
-				'default' => true,
+				'default' => false,
 				'type'    => 'bool',
 				'secret'  => false,
 			),
