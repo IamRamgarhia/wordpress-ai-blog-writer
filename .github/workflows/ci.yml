@@ -14,6 +14,20 @@ jobs:
       - run: composer install --prefer-dist --no-progress
       - run: composer lint
 
+  # The translation template is generated from the source, so it silently goes
+  # stale every time a string is added. It had drifted to 61% coverage before
+  # anyone noticed, which a translator would experience as half a screen still
+  # in English. This fails the build instead.
+  i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check languages/blogcraft.pot is current
+        run: python bin/makepot.py --check
+
   # Syntax-checks every PHP file across the full supported PHP range. This
   # catches parse errors per version but cannot catch runtime deprecation
   # notices (e.g. PHP 8.5 notices that phpunit.xml.dist's
