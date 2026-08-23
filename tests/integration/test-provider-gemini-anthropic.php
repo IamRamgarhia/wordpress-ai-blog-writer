@@ -97,17 +97,21 @@ class Test_Blogcraft_Provider_Gemini_Anthropic extends WP_UnitTestCase {
 		$this->assertSame( 34, $response->completion_tokens );
 	}
 
-	public function test_gemini_key_travels_in_query_string_not_a_header() {
+	public function test_gemini_key_travels_in_a_header_not_the_query_string() {
+		// The reverse of what this test used to assert. Gemini accepts the key
+		// either way, and the query string is the way that gets written down:
+		// proxies, load balancers and access logs record a URL as a matter of
+		// course, so the key ended up in plain text in files nobody thinks of
+		// as holding secrets. The image route already made this choice.
 		$this->fake_http( array( array( 'code' => 200, 'body' => $this->gemini_success_body() ) ) );
 		$provider = $this->make_gemini();
 		$provider->complete( array( array( 'role' => 'user', 'content' => 'hi' ) ) );
 
-		$this->assertStringContainsString( 'key=gm-test-key', $this->requests[0]['url'] );
+		$this->assertStringNotContainsString( 'gm-test-key', $this->requests[0]['url'] );
 
 		$headers = $this->requests[0]['args']['headers'];
-		foreach ( $headers as $name => $value ) {
-			$this->assertStringNotContainsString( 'gm-test-key', (string) $name . (string) $value );
-		}
+		$this->assertArrayHasKey( 'x-goog-api-key', $headers );
+		$this->assertSame( 'gm-test-key', $headers['x-goog-api-key'] );
 	}
 
 	public function test_gemini_endpoint_targets_generate_content_for_configured_model() {
@@ -116,7 +120,7 @@ class Test_Blogcraft_Provider_Gemini_Anthropic extends WP_UnitTestCase {
 		$provider->complete( array( array( 'role' => 'user', 'content' => 'hi' ) ) );
 
 		$url = $this->requests[0]['url'];
-		$this->assertStringStartsWith( 'https://example.test/v1beta/models/gemini-1.5-pro:generateContent?', $url );
+		$this->assertSame( 'https://example.test/v1beta/models/gemini-1.5-pro:generateContent', $url );
 	}
 
 	public function test_gemini_assistant_role_maps_to_model() {
@@ -280,14 +284,14 @@ class Test_Blogcraft_Provider_Gemini_Anthropic extends WP_UnitTestCase {
 		$this->assertSame( array( 'gemini-1.0-pro', 'gemini-1.5-pro' ), $models );
 	}
 
-	public function test_gemini_list_models_key_travels_in_query_string() {
+	public function test_gemini_list_models_key_travels_in_a_header() {
 		$body = wp_json_encode( array( 'models' => array() ) );
 		$this->fake_http( array( array( 'code' => 200, 'body' => $body ) ) );
 		$provider = $this->make_gemini( array( 'base_url' => 'https://example.test/v1beta/' ) );
 		$provider->list_models();
 
-		$this->assertStringStartsWith( 'https://example.test/v1beta/models?', $this->requests[0]['url'] );
-		$this->assertStringContainsString( 'key=gm-test-key', $this->requests[0]['url'] );
+		$this->assertSame( 'https://example.test/v1beta/models', $this->requests[0]['url'] );
+		$this->assertSame( 'gm-test-key', $this->requests[0]['args']['headers']['x-goog-api-key'] );
 		$this->assertSame( 'GET', $this->requests[0]['args']['method'] );
 	}
 
