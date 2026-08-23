@@ -164,3 +164,90 @@
 		}
 	} );
 }() );
+
+/**
+ * Ask the model what questions this topic deserves.
+ *
+ * The evidence field is the heaviest check on a finished post and the only
+ * part a model cannot produce — and it is left empty more than any other,
+ * because "what do you know that nobody else does" is a hard question asked
+ * cold. Asked about a specific topic it becomes easy.
+ *
+ * The answer is a list of questions, never answers. Filling this field in for
+ * somebody would be inventing the one thing the whole quality system leans on
+ * being true.
+ */
+( function () {
+	'use strict';
+
+	var button = document.getElementById( 'blogcraft-suggest' );
+	var out = document.getElementById( 'blogcraft-suggest-out' );
+	var list = document.getElementById( 'blogcraft-suggest-list' );
+	var config = window.blogcraftCompose || {};
+
+	if ( ! button || ! out || ! list ) {
+		return;
+	}
+
+	button.addEventListener( 'click', function () {
+		var topic = document.getElementById( 'bc_topic' );
+		var angle = document.getElementById( 'bc_instructions' );
+
+		if ( ! topic || '' === topic.value.trim() ) {
+			out.hidden = false;
+			list.innerHTML = '';
+			var warn = document.createElement( 'li' );
+			warn.textContent = config.noTopic || 'Write a topic first.';
+			list.appendChild( warn );
+
+			return;
+		}
+
+		button.disabled = true;
+		button.textContent = config.asking || 'Thinking...';
+
+		var body = new FormData();
+		body.append( 'action', 'blogcraft_suggest_brief' );
+		body.append( '_blogcraft_nonce', config.nonce || '' );
+		body.append( 'topic', topic.value );
+
+		fetch( config.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body } )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( payload ) {
+				button.disabled = false;
+				button.textContent = config.askAgain || 'What should I write about this?';
+
+				list.innerHTML = '';
+				out.hidden = false;
+
+				if ( ! payload || ! payload.success || ! payload.data ) {
+					var failed = document.createElement( 'li' );
+					failed.textContent = ( payload && payload.data && payload.data.message ) || '';
+					list.appendChild( failed );
+
+					return;
+				}
+
+				// The angle is a suggestion about shape, not a fact, so it is
+				// safe to offer directly — and only when the writer has not
+				// already said something of their own.
+				if ( payload.data.angle && angle && '' === angle.value.trim() ) {
+					angle.value = payload.data.angle;
+				}
+
+				var questions = payload.data.questions || [];
+
+				for ( var i = 0; i < questions.length; i++ ) {
+					var li = document.createElement( 'li' );
+					li.textContent = questions[ i ];
+					list.appendChild( li );
+				}
+			} )
+			.catch( function () {
+				button.disabled = false;
+				button.textContent = config.askAgain || 'What should I write about this?';
+			} );
+	} );
+}() );

@@ -178,6 +178,16 @@ class Blogcraft_Settings_Schema {
 			// doing. Filled in, it is used for the stages that are bulk
 			// execution of a plan rather than judgement — see
 			// Blogcraft_Pipeline::model_for().
+			// Which provider the stored key was saved for. Keys live in one
+			// shared setting, so switching provider used to leave the previous
+			// provider's key sitting there looking saved — the screen showed a
+			// mask, the model list failed against the wrong service, and
+			// nothing said why.
+			'provider_key_owner'              => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'provider_draft_model'            => array(
 				'default' => '',
 				'type'    => 'string',

@@ -58,6 +58,7 @@ class Blogcraft_Generate {
 		add_action( 'admin_post_blogcraft_bulk_topics', array( __CLASS__, 'handle_bulk' ) );
 		add_action( 'admin_post_blogcraft_rollback', array( __CLASS__, 'handle_rollback' ) );
 		add_action( 'wp_ajax_blogcraft_preview_post', array( __CLASS__, 'handle_preview' ) );
+		add_action( 'wp_ajax_blogcraft_suggest_brief', array( __CLASS__, 'handle_suggest' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 	}
 
@@ -91,7 +92,11 @@ class Blogcraft_Generate {
 			'blogcraft-compose',
 			'blogcraftCompose',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( self::QUEUE_ACTION ),
+				'asking'   => __( 'Thinking about your topic...', 'blogcraft' ),
+				'askAgain' => __( 'What should I write about this?', 'blogcraft' ),
+				'noTopic'  => __( 'Write a topic first, then ask again.', 'blogcraft' ),
 			)
 		);
 	}
@@ -464,6 +469,85 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * What this brief is missing, and what missing it costs.
+	 *
+	 * The scorecard judges the finished post, which is too late to change what
+	 * went into it. This judges the brief, before anything is spent — and
+	 * names the cost of each gap rather than demanding the field be filled,
+	 * because a plugin that requires twenty inputs before it will do anything
+	 * is one people uninstall on the first attempt.
+	 *
+	 * @return void
+	 */
+	private static function render_readiness() {
+		// Assessed from what is stored rather than what is typed: the panel
+		// re-renders on load, and the per-post fields start empty by design.
+		$state = Blogcraft_Readiness::assess( '', '', '' );
+
+		$missing = array();
+
+		foreach ( $state['items'] as $item ) {
+			if ( ! $item['ok'] && in_array( $item['key'], array( 'voice', 'research' ), true ) ) {
+				$missing[] = $item;
+			}
+		}
+
+		if ( empty( $missing ) ) {
+			return;
+		}
+
+		echo '<aside class="bc-readiness">';
+		echo '<h2>' . esc_html__( 'Before you write', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'These are set once and used by every post afterwards. Skipping them is the difference between a post that sounds like your blog and one that sounds like every other AI blog.', 'blogcraft' ) . '</p>';
+		echo '<ul>';
+
+		foreach ( $missing as $item ) {
+			printf(
+				'<li><strong>%1$s</strong><span>%2$s</span></li>',
+				esc_html( $item['label'] ),
+				esc_html( $item['why'] )
+			);
+		}
+
+		echo '</ul>';
+		printf(
+			'<p><a class="button button-small" href="%1$s">%2$s</a></p>',
+			esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
+			esc_html__( 'Set them up', 'blogcraft' )
+		);
+		echo '</aside>';
+	}
+
+	/**
+	 * Turn the topic into questions worth answering.
+	 *
+	 * @return void
+	 */
+	public static function handle_suggest() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+		}
+
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+		}
+
+		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( '' === trim( $topic ) ) {
+			wp_send_json_error( array( 'message' => __( 'Write a topic first.', 'blogcraft' ) ), 400 );
+		}
+
+		try {
+			wp_send_json_success( Blogcraft_Readiness::suggest_for( $topic ) );
+		} catch ( Throwable $e ) {
+			wp_send_json_error( array( 'message' => $e->getMessage() ), 200 );
+		}
+	}
+
+	/**
 	 * Say so before starting, when the provider is already refusing.
 	 *
 	 * A post costs eight to ten separate calls, so starting one into an
@@ -536,6 +620,22 @@ class Blogcraft_Generate {
 				4
 			),
 			'bc_evidence'
+		);
+
+		// "What do you know that nobody else does" is a hard question asked
+		// cold, and an empty answer is the single commonest reason a finished
+		// post reads like every other AI post. Asked about a specific topic it
+		// becomes easy, so this offers to ask it properly.
+		printf(
+			'<div class="bc-suggest">'
+			. '<button type="button" class="button" id="blogcraft-suggest">%1$s</button>'
+			. '<p class="description">%2$s</p>'
+			. '<div class="bc-suggest-out" id="blogcraft-suggest-out" hidden>'
+			. '<p class="bc-suggest-lead">%3$s</p><ul id="blogcraft-suggest-list"></ul></div>'
+			. '</div>',
+			esc_html__( 'What should I write about this?', 'blogcraft' ),
+			esc_html__( 'Reads your topic and asks four questions only you can answer. It never answers them for you — invented facts are exactly what this field exists to avoid.', 'blogcraft' ),
+			esc_html__( 'Answer any of these in the box above, in your own words:', 'blogcraft' )
 		);
 
 		echo Blogcraft_Controls::row(
@@ -1034,6 +1134,8 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	private static function render_outcome( $blueprint ) {
+		self::render_readiness();
+
 		echo '<aside class="bc-outcome" aria-labelledby="bc-outcome-title">';
 		echo '<div class="bc-outcome-head">';
 		echo '<h2 id="bc-outcome-title">' . esc_html__( 'What you will get', 'blogcraft' ) . '</h2>';

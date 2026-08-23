@@ -85,7 +85,19 @@ class Blogcraft_Connection {
 		$base = isset( $_POST['base_url'] ) ? esc_url_raw( trim( (string) wp_unslash( $_POST['base_url'] ) ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- esc_url_raw is the sanitiser for a URL.
 
 		if ( '' === $key ) {
-			$key = (string) Blogcraft_Settings::get( 'provider_api_key' );
+			$owner = (string) Blogcraft_Settings::get( 'provider_key_owner' );
+
+			// Only fall back to the stored key when it belongs to the provider
+			// being asked. Sending Gemini's key to Anthropic produces an
+			// authentication error that reads like a broken plugin.
+			if ( '' === $owner || $owner === $type ) {
+				$key = (string) Blogcraft_Settings::get( 'provider_api_key' );
+			} else {
+				wp_send_json_error(
+					array( 'message' => __( 'The saved key belongs to a different provider. Paste a key for this one, then try again.', 'blogcraft' ) ),
+					200
+				);
+			}
 		}
 
 		if ( '' === $base ) {
@@ -181,6 +193,14 @@ class Blogcraft_Connection {
 				/* translators: %d: how many models the provider returned. */
 				'gotModels' => __( '%d models on your account. Pick one and it fills the box above.', 'blogcraft' ),
 				'pickModel' => __( 'Pick a model...', 'blogcraft' ),
+				// Which provider the saved key belongs to, so the field can
+				// stop claiming a key the moment the provider changes. The
+				// key itself is never sent to the browser.
+				'keyOwner'  => (string) Blogcraft_Settings::get( 'provider_key_owner' ),
+				'keyMask'   => '' === (string) Blogcraft_Settings::get( 'provider_api_key' )
+					? __( 'Not set', 'blogcraft' )
+					: Blogcraft_Crypto::mask( (string) Blogcraft_Settings::get( 'provider_api_key' ) ),
+				'keyNone'   => __( 'Not set', 'blogcraft' ),
 			)
 		);
 	}
@@ -488,12 +508,35 @@ class Blogcraft_Connection {
 			}
 		}
 
+		// A key saved for a different provider is not a key you have. Showing
+		// its mask made the field claim otherwise, and the model list then
+		// failed against the wrong service with nothing explaining why.
+		$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
+		$key_fits = ( '' !== $key ) && ( '' === $owner || $owner === $type );
+
 		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
 		printf(
 			'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
-			esc_attr( '' === $key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $key ) )
+			esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'blogcraft' ) )
 		);
-		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+
+		if ( '' !== $key && ! $key_fits ) {
+			$types = Blogcraft_Provider_Registry::types();
+
+			printf(
+				'<p class="bc-key-mismatch" id="blogcraft-key-mismatch">%s</p>',
+				esc_html(
+					sprintf(
+						/* translators: %s: the provider the saved key belongs to. */
+						__( 'The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place.', 'blogcraft' ),
+						isset( $types[ $owner ] ) ? $types[ $owner ] : $owner
+					)
+				)
+			);
+		} else {
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		}
+
 		echo self::clear_key_control( 'provider_api_key', $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		self::render_provider_help( $type );
 		echo '</td></tr>';
@@ -1450,6 +1493,12 @@ class Blogcraft_Connection {
 			// authenticate for no reason anybody could see.
 			if ( ! Blogcraft_Settings::set( $secret, $value ) ) {
 				$failed[] = $secret;
+			}
+
+			// Remember whose key this is, so switching provider can say
+			// honestly that nothing is saved for the new one.
+			if ( 'provider_api_key' === $secret ) {
+				Blogcraft_Settings::set( 'provider_key_owner', (string) Blogcraft_Settings::get( 'provider_type' ) );
 			}
 		}
 

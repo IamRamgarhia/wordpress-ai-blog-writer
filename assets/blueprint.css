@@ -936,3 +936,82 @@
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
+
+/* ---------------------------------------------------- planning a good post.
+ * The evidence field is the heaviest check on a finished post and the one
+ * left empty most often, because "what do you know that nobody else does" is
+ * a hard question asked cold. These two blocks exist to answer it.
+ */
+
+.bc-suggest {
+	margin: -6px 0 22px;
+	padding: 0 0 0 2px;
+}
+
+.bc-suggest .description {
+	margin: 6px 0 0;
+	max-width: 46em;
+}
+
+.bc-suggest-out {
+	margin-top: 12px;
+	padding: 12px 14px;
+	border-left: 3px solid var(--bc-accent, #2271b1);
+	background: var(--bc-surface-soft, #fbfbfc);
+	border-radius: 0 6px 6px 0;
+}
+
+.bc-suggest-lead {
+	margin: 0 0 8px;
+	font-size: 12.5px;
+	color: var(--bc-muted);
+}
+
+.bc-suggest-out ul {
+	margin: 0;
+	padding-left: 18px;
+}
+
+.bc-suggest-out li {
+	margin: 0 0 6px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+/* Set-once settings that every later post depends on. Shown only while one
+ * is actually missing, so it disappears the moment it stops being useful. */
+.bc-readiness {
+	margin: 0 0 16px;
+	padding: 16px 18px;
+	border: 1px solid var(--bc-warn, #b26b00);
+	border-radius: 10px;
+	background: #fffaf3;
+}
+
+.bc-readiness h2 {
+	margin: 0 0 4px;
+	font-size: 14px;
+}
+
+.bc-readiness > p {
+	margin: 0 0 10px;
+	font-size: 12.5px;
+	color: var(--bc-muted);
+}
+
+.bc-readiness ul {
+	margin: 0 0 12px;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-readiness li {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 8px 0;
+	border-top: 1px solid rgba(178, 107, 0, .18);
+}
+
+.bc-readiness li strong { font-size: 13px; }
+.bc-readiness li span   { font-size: 12px; color: var(--bc-muted); line-height: 1.5; }

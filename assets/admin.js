@@ -95,12 +95,43 @@
 		sync();
 		syncHelp();
 		syncBase();
+		syncKey();
 	} );
 
 	sync();
 	syncHelp();
 	syncBase();
 }() );
+
+/**
+ * Stop the key field claiming a key that belongs to a different provider.
+ *
+ * Keys live in one shared setting, so switching provider left the previous
+ * one's key sitting there behind a mask. The field said a key was saved, the
+ * model list failed against the wrong service, and nothing connected the two.
+ *
+ * The stored key itself is never sent here — only whether it fits.
+ */
+function syncKey() {
+	var select = document.getElementById( 'blogcraft_provider_type' );
+	var field = document.getElementById( 'blogcraft_provider_api_key' );
+	var providers = window.blogcraftProviders || {};
+
+	if ( ! select || ! field ) {
+		return;
+	}
+
+	var owner = providers.keyOwner || '';
+	var fits = '' === owner || owner === select.value;
+
+	field.placeholder = fits ? ( providers.keyMask || '' ) : ( providers.keyNone || 'Not set' );
+
+	var note = document.getElementById( 'blogcraft-key-mismatch' );
+
+	if ( note ) {
+		note.hidden = fits;
+	}
+}
 
 /**
  * Highlight whichever settings section is on screen.

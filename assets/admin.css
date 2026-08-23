@@ -1475,3 +1475,20 @@ body[class*="page_blogcraft"] #wpcontent {
 	border-color: var(--bc-ok);
 	background: var(--bc-ok);
 }
+
+/* A key saved for a different provider is not a key you have. */
+.bc-key-mismatch {
+	margin: 6px 0 0;
+	padding: 8px 10px;
+	border-left: 3px solid var(--bc-warn, #b26b00);
+	background: var(--bc-surface-soft, #fbfbfc);
+	font-size: 12.5px;
+	color: var(--bc-ink);
+}
+
+.bc-quota-notice code {
+	display: inline-block;
+	margin-top: 4px;
+	font-size: 11.5px;
+	word-break: break-word;
+}
