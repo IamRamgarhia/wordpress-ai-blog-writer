@@ -371,7 +371,12 @@ class Blogcraft_Connection {
 				esc_html( $label )
 			);
 		}
-		echo '</select></td></tr>';
+		echo '</select>';
+		printf(
+			'<p class="bc-hint">%s</p>',
+			esc_html__( '"Free tier" or "some free" means the provider itself gives away some usage at no cost, not that Blogcraft has changed anything. Limits move on their schedule, not this plugin\'s, so check the provider\'s own page below for the current number rather than trusting a figure written into a plugin.', 'blogcraft' )
+		);
+		echo '</td></tr>';
 
 		$default_base = Blogcraft_Provider_Registry::default_base_url(
 			(string) Blogcraft_Settings::get( 'provider_type' )

@@ -36,21 +36,29 @@ class Blogcraft_Provider_Registry {
 		// addresses live in data/providers.json so the list can be filtered and
 		// changed without a release. Everything in that file is disclosed in
 		// readme.txt under External Services.
+		// A handful of these have a genuine, long-standing free tier or free
+		// models and say so; the rest are marked paid rather than left silent,
+		// so "does this cost anything" is never a guess. Exact limits are not
+		// named here for the same reason no model id is: a quota changes on
+		// the provider's own schedule, not this plugin's, and a number copied
+		// in today is a number wrong by the time anyone reads it. The docs
+		// link next to each provider on the settings screen always has the
+		// current figure.
 		$labels = array(
-			'openai'     => __( 'OpenAI — GPT', 'blogcraft' ),
-			'anthropic'  => __( 'Anthropic — Claude', 'blogcraft' ),
-			'gemini'     => __( 'Google — Gemini', 'blogcraft' ),
-			'xai'        => __( 'xAI — Grok', 'blogcraft' ),
-			'moonshot'   => __( 'Moonshot — Kimi', 'blogcraft' ),
-			'deepseek'   => __( 'DeepSeek', 'blogcraft' ),
+			'openai'     => __( 'OpenAI — GPT, paid', 'blogcraft' ),
+			'anthropic'  => __( 'Anthropic — Claude, paid', 'blogcraft' ),
+			'gemini'     => __( 'Google — Gemini, free tier', 'blogcraft' ),
+			'xai'        => __( 'xAI — Grok, paid', 'blogcraft' ),
+			'moonshot'   => __( 'Moonshot — Kimi, paid', 'blogcraft' ),
+			'deepseek'   => __( 'DeepSeek, paid', 'blogcraft' ),
 			'groq'       => __( 'Groq — fast, free tier', 'blogcraft' ),
-			'openrouter' => __( 'OpenRouter — many models, one key', 'blogcraft' ),
-			'mistral'    => __( 'Mistral', 'blogcraft' ),
-			'together'   => __( 'Together AI', 'blogcraft' ),
-			'fireworks'  => __( 'Fireworks AI', 'blogcraft' ),
-			'cerebras'   => __( 'Cerebras', 'blogcraft' ),
-			'ollama'     => __( 'Ollama — on this machine, no key', 'blogcraft' ),
-			'lmstudio'   => __( 'LM Studio — on this machine, no key', 'blogcraft' ),
+			'openrouter' => __( 'OpenRouter — many models, one key, some free', 'blogcraft' ),
+			'mistral'    => __( 'Mistral, free tier', 'blogcraft' ),
+			'together'   => __( 'Together AI, paid', 'blogcraft' ),
+			'fireworks'  => __( 'Fireworks AI, paid', 'blogcraft' ),
+			'cerebras'   => __( 'Cerebras, paid', 'blogcraft' ),
+			'ollama'     => __( 'Ollama — on this machine, free, no key', 'blogcraft' ),
+			'lmstudio'   => __( 'LM Studio — on this machine, free, no key', 'blogcraft' ),
 			'custom'     => __( 'Anything else — enter the address yourself', 'blogcraft' ),
 		);
 
@@ -61,7 +69,11 @@ class Blogcraft_Provider_Registry {
 		// not, since an option that cannot work is worse than no option.
 		if ( Blogcraft_Provider_Wpai::is_available() ) {
 			$out['wpai'] = array(
-				'label'    => __( 'WordPress AI Client — no key needed', 'blogcraft' ),
+				// "Whatever WordPress is set up with" rather than free or paid:
+				// this route hands the request to WordPress itself, which may
+				// be pointed at a free local model or a paid account, and the
+				// plugin genuinely cannot tell which from here.
+				'label'    => __( 'WordPress AI Client — no key needed, free or paid depending on how WordPress is set up', 'blogcraft' ),
 				'adapter'  => 'wpai',
 				'base_url' => '',
 				'help'     => 'WordPress',

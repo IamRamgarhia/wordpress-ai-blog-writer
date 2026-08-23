@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.32.0
+Stable tag: 0.33.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -118,7 +118,13 @@ Blogcraft may also fetch any URL you explicitly add to its research list, to rea
 
 = Do I need to pay for anything? =
 
-The plugin is free and complete. You need an API key from an AI provider, and several offer free tiers.
+The plugin is free and complete, and takes no cut of anything. You need an account with an AI provider, and every provider in the list is marked either free, "free tier", or paid, so you can see before you pick.
+
+Three routes cost nothing at all. Ollama and LM Studio run a model on your own computer, need no key, and send nothing anywhere. Google Gemini, Groq and Mistral each give away some usage at no cost, and OpenRouter lists a number of free models. The rest bill you directly at their own rates.
+
+Pictures work the same way: Pollinations needs no key, Pexels and Pixabay are free with a free key, and fal.ai, OpenAI, Gemini and Grok charge per image and are only ever used if you pick one of them.
+
+Free allowances move on each provider's schedule, so the settings screen links to every provider's own pricing page rather than repeating a number here that would go stale.
 
 = Will posts publish without my review? =
 
@@ -137,6 +143,10 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.33.0 =
+* Every provider now says whether it costs money. The writing providers are marked free, "free tier" or paid, and the picture services the same way, so the first question anyone has about a list of fifteen names is answered before they pick one instead of after the first bill
+* No label names a specific free allowance. Quotas move on each provider's schedule, so a number written into a plugin goes stale silently; the settings screen links to each provider's own pricing page instead
 
 = 0.32.0 =
 * The quality threshold and refresh-after-days settings are now actually saved. Both were rendered on the settings screen and read everywhere the pipeline needs them, but nothing in between wrote them to the database — the number typed in was shown back as "Settings saved" and then discarded, so every post was gated against 60 regardless of what was chosen
