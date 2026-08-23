@@ -280,11 +280,24 @@ class Blogcraft_Provider_Registry {
 		$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
 		$key_fits = ( '' === $owner || $owner === $type );
 
-		$has_key  = $key_fits && '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
-		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) )
-			|| '' !== self::default_base_url( $type );
+		$has_key = $key_fits && '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
 
-		return $has_key || $has_base;
+		// Whether this provider issues keys at all. Ollama and LM Studio run
+		// on the machine and need none, so an address is the whole setup; a
+		// custom endpoint is the user's own and may be either.
+		$help    = self::help( $type );
+		$keyless = ( '' === trim( (string) $help['key_url'] ) );
+
+		if ( $keyless ) {
+			return '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) )
+				|| '' !== self::default_base_url( $type );
+		}
+
+		// Every hosted provider has a default address, so accepting an address
+		// as proof of setup meant they all counted as configured with no key
+		// whatsoever — the checklist said ready before anything had been
+		// pasted in at all.
+		return $has_key;
 	}
 
 

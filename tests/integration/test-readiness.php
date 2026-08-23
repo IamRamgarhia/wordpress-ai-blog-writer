@@ -91,6 +91,17 @@ class Test_Blogcraft_Readiness extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_a_hosted_provider_with_no_key_is_not_configured() {
+		// Every hosted provider has a default address, and an address used to
+		// count as proof of setup — so they all reported ready before a key
+		// had been pasted in at all.
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_model', 'gpt-4o' );
+		Blogcraft_Settings::set( 'provider_api_key', '' );
+
+		$this->assertFalse( Blogcraft_Provider_Registry::is_configured() );
+	}
+
 	public function test_a_key_saved_for_another_provider_does_not_count_as_configured() {
 		// Keys live in one shared setting, so switching provider leaves the
 		// previous one's behind. Counting it meant the checklist said "ready"
