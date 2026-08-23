@@ -408,6 +408,43 @@ class Blogcraft_Queue {
 	 * @param int $job_id Job to revive.
 	 * @return bool Whether a failed job was found and requeued.
 	 */
+	public static function cancel( $job_id ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$status = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT status FROM {$table} WHERE id = %d", $job_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		// Only something not yet being worked on. A job mid-stage holds a lock
+		// and is part-way through spending money; stopping it there would leave
+		// a half-written article and a lock nobody releases. Anything running
+		// finishes, and the reader can cancel it on the next tick if they still
+		// want to.
+		if ( ! in_array( (string) $status, array( 'pending', 'deferred', 'failed' ), true ) ) {
+			return false;
+		}
+
+		self::update(
+			$job_id,
+			array(
+				'status'     => 'cancelled',
+				'last_error' => null,
+				'lock_token' => null,
+				'locked_at'  => null,
+			)
+		);
+
+		return true;
+	}
+
+	/**
+	 * Put a failed job back in the queue.
+	 *
+	 * @param int $job_id Job to retry.
+	 * @return bool Whether it was requeued.
+	 */
 	public static function requeue( $job_id ) {
 		global $wpdb;
 

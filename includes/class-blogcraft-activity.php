@@ -35,6 +35,11 @@ class Blogcraft_Activity {
 	const RETRY_ACTION = 'blogcraft_retry_job';
 
 	/**
+	 * Nonce action for stopping a queued job.
+	 */
+	const CANCEL_ACTION = 'blogcraft_cancel_job';
+
+	/**
 	 * Transient prefix for one-shot notices.
 	 */
 	const NOTICE_TRANSIENT = 'blogcraft_activity_notice_';
@@ -48,6 +53,7 @@ class Blogcraft_Activity {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 19 );
 		add_action( 'admin_post_blogcraft_clear_log', array( __CLASS__, 'handle_clear' ) );
 		add_action( 'admin_post_blogcraft_retry_job', array( __CLASS__, 'handle_retry' ) );
+		add_action( 'admin_post_blogcraft_cancel_job', array( __CLASS__, 'handle_cancel' ) );
 	}
 
 	/**
@@ -181,6 +187,12 @@ class Blogcraft_Activity {
 				self::retry_button( (int) $job['id'] );
 			}
 
+			// Queueing twenty topics from a pasted list and changing your mind
+			// left no way out but the database.
+			if ( in_array( $status, array( 'pending', 'deferred', 'failed' ), true ) ) {
+				self::cancel_button( (int) $job['id'] );
+			}
+
 			echo '</td>';
 			echo '</tr>';
 		}
@@ -242,6 +254,51 @@ class Blogcraft_Activity {
 			esc_html__( 'Try again', 'blogcraft' )
 		);
 		echo '</form>';
+	}
+
+	/**
+	 * A control for stopping a job that has not started.
+	 *
+	 * @param int $job_id Job to offer cancelling.
+	 * @return void
+	 */
+	private static function cancel_button( $job_id ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="blogcraft-inline-form">';
+		echo '<input type="hidden" name="action" value="blogcraft_cancel_job" />';
+		printf( '<input type="hidden" name="job_id" value="%d" />', (int) $job_id );
+		Blogcraft_Request::nonce_field( self::CANCEL_ACTION );
+		printf(
+			'<button type="submit" class="button button-small button-link-delete" aria-label="%1$s">%2$s</button>',
+			esc_attr(
+				sprintf(
+					/* translators: %d: job number. */
+					__( 'Stop job %d', 'blogcraft' ),
+					(int) $job_id
+				)
+			),
+			esc_html__( 'Stop', 'blogcraft' )
+		);
+		echo '</form>';
+	}
+
+	/**
+	 * Stop a queued job.
+	 *
+	 * @return void
+	 */
+	public static function handle_cancel() {
+		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::CANCEL_ACTION, $nonce );
+
+		$job_id = isset( $_POST['job_id'] ) ? (int) $_POST['job_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( $job_id > 0 && Blogcraft_Queue::cancel( $job_id ) ) {
+			Blogcraft_Logger::info( 'A queued post was stopped.', array(), $job_id );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
+		exit;
 	}
 
 	/**

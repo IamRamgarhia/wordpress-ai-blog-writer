@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.29.1
+Stable tag: 0.30.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,6 +138,9 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.30.0 =
+* A queued post can be stopped from Activity. Queueing twenty topics and changing your mind previously left no way out but the database
 
 = 0.29.1 =
 * Fixed: 313 of the plugin's 802 translatable strings were missing from the translation template, so nearly two fifths of the interface could not be translated at all

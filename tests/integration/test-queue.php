@@ -171,4 +171,50 @@ class Test_Blogcraft_Queue extends WP_UnitTestCase {
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'failed' ) );
 		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'pending' ) );
 	}
+
+	public function test_a_queued_job_can_be_stopped() {
+		// Queueing twenty topics from a pasted list and changing your mind left
+		// no way out but the database.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'A topic' ) );
+
+		$this->assertTrue( Blogcraft_Queue::cancel( $job_id ) );
+		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'pending' ) );
+		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'cancelled' ) );
+	}
+
+	public function test_a_stopped_job_is_never_picked_up() {
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'A topic' ) );
+		Blogcraft_Queue::cancel( $job_id );
+
+		$this->assertNull( Blogcraft_Queue::claim() );
+	}
+
+	public function test_a_job_already_running_is_not_stopped_underneath_itself() {
+		// It holds a lock and is part-way through spending money. Stopping it
+		// there leaves a half-written article and a lock nobody releases.
+		Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'A topic' ) );
+
+		$job = Blogcraft_Queue::claim();
+
+		$this->assertNotNull( $job );
+		$this->assertFalse( Blogcraft_Queue::cancel( $job->id ) );
+		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'running' ) );
+	}
+
+	public function test_a_failed_job_can_be_stopped_instead_of_retried() {
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'A topic' ) );
+		Blogcraft_Queue::claim();
+		Blogcraft_Queue::fail( $job_id, 'went wrong' );
+
+		$this->assertTrue( Blogcraft_Queue::cancel( $job_id ) );
+	}
+
+	public function test_a_stopped_topic_no_longer_blocks_queueing_it_again() {
+		// The duplicate check reads pending and running jobs, so a topic you
+		// stopped must not keep refusing itself.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'research', array( 'topic' => 'Cold brew' ) );
+		Blogcraft_Queue::cancel( $job_id );
+
+		$this->assertSame( array(), Blogcraft_Queue::pending_topics() );
+	}
 }

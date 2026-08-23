@@ -214,9 +214,9 @@ msgstr ""
 msgid "Academic"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:61
-#: includes/class-blogcraft-activity.php:62
-#: includes/class-blogcraft-activity.php:82
+#: includes/class-blogcraft-activity.php:67
+#: includes/class-blogcraft-activity.php:68
+#: includes/class-blogcraft-activity.php:88
 #: includes/class-blogcraft-nav.php:35
 msgid "Activity"
 msgstr ""
@@ -577,7 +577,7 @@ msgstr ""
 msgid "Classic, 3:2"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:303
+#: includes/class-blogcraft-activity.php:360
 msgid "Clear the log"
 msgstr ""
 
@@ -791,7 +791,7 @@ msgstr ""
 msgid "Each one is written after the article is finished, from the article, in a single extra request. Off by default because a post that has all of them bolted on reads like a form."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:135
+#: includes/class-blogcraft-activity.php:141
 msgid "Each post moves through the pipeline one step per run. A job that fails waits, then tries again."
 msgstr ""
 
@@ -831,7 +831,7 @@ msgstr ""
 msgid "Enthusiasts"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:256
+#: includes/class-blogcraft-activity.php:313
 msgid "Event log"
 msgstr ""
 
@@ -1202,8 +1202,8 @@ msgstr ""
 msgid "It contacts only the services you configure, and only when generating a post. Your topic, your style settings and any gathered research are sent to the AI provider you chose so the post can be written. The full list of services, with their terms and privacy policies, is in the readme under External Services."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:146
-#: includes/class-blogcraft-activity.php:270
+#: includes/class-blogcraft-activity.php:152
+#: includes/class-blogcraft-activity.php:327
 msgid "Job"
 msgstr ""
 
@@ -1242,7 +1242,7 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:152
+#: includes/class-blogcraft-activity.php:158
 msgid "Last problem"
 msgstr ""
 
@@ -1293,7 +1293,7 @@ msgstr ""
 msgid "Let the model describe the picture for this post"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:269
+#: includes/class-blogcraft-activity.php:326
 msgid "Level"
 msgstr ""
 
@@ -1317,7 +1317,7 @@ msgstr ""
 msgid "Live"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:347
+#: includes/class-blogcraft-activity.php:404
 msgid "Log cleared."
 msgstr ""
 
@@ -1607,7 +1607,7 @@ msgstr ""
 msgid "Not specified"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:139
+#: includes/class-blogcraft-activity.php:145
 msgid "Nothing has been queued yet."
 msgstr ""
 
@@ -1615,7 +1615,7 @@ msgstr ""
 msgid "Nothing has been saved. Correct anything that is wrong, then save."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:261
+#: includes/class-blogcraft-activity.php:318
 msgid "Nothing logged yet."
 msgstr ""
 
@@ -2036,7 +2036,7 @@ msgstr ""
 msgid "Queue this post"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:363
+#: includes/class-blogcraft-activity.php:420
 msgid "Queued again. It will run on the next step."
 msgstr ""
 
@@ -2108,7 +2108,7 @@ msgstr ""
 msgid "Reading your posts..."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:134
+#: includes/class-blogcraft-activity.php:140
 msgid "Recent jobs"
 msgstr ""
 
@@ -2456,7 +2456,7 @@ msgstr ""
 msgid "Starting at"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:149
+#: includes/class-blogcraft-activity.php:155
 #: includes/class-blogcraft-overview.php:458
 msgid "Status"
 msgstr ""
@@ -2466,7 +2466,7 @@ msgstr ""
 msgid "Steer clear of"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:148
+#: includes/class-blogcraft-activity.php:154
 msgid "Step"
 msgstr ""
 
@@ -2476,6 +2476,15 @@ msgstr ""
 
 #: includes/class-blogcraft-overview.php:101
 msgid "Still to do"
+msgstr ""
+
+#: includes/class-blogcraft-activity.php:279
+msgid "Stop"
+msgstr ""
+
+#. translators: %d: job number.
+#: includes/class-blogcraft-activity.php:275
+msgid "Stop job %d"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:399
@@ -2569,7 +2578,7 @@ msgstr ""
 msgid "That form has expired. Reload the page."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:366
+#: includes/class-blogcraft-activity.php:423
 msgid "That job could not be queued again."
 msgstr ""
 
@@ -2681,7 +2690,7 @@ msgstr ""
 msgid "The monthly token cap has been reached, so nothing new is being written."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:257
+#: includes/class-blogcraft-activity.php:314
 msgid "The newest hundred entries. Older ones are trimmed automatically. API keys are never recorded here."
 msgstr ""
 
@@ -2870,7 +2879,7 @@ msgstr ""
 msgid "Tone"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:147
+#: includes/class-blogcraft-activity.php:153
 #: includes/class-blogcraft-calendar.php:223
 #: includes/class-blogcraft-generate.php:473
 msgid "Topic"
@@ -2893,16 +2902,16 @@ msgstr ""
 msgid "Treatment"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:150
+#: includes/class-blogcraft-activity.php:156
 msgid "Tries"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:242
+#: includes/class-blogcraft-activity.php:254
 msgid "Try again"
 msgstr ""
 
 #. translators: %d: job number.
-#: includes/class-blogcraft-activity.php:238
+#: includes/class-blogcraft-activity.php:250
 msgid "Try job %d again"
 msgstr ""
 
@@ -2946,7 +2955,7 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:151
+#: includes/class-blogcraft-activity.php:157
 msgid "Updated"
 msgstr ""
 
@@ -3004,7 +3013,7 @@ msgstr ""
 msgid "What does not"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:271
+#: includes/class-blogcraft-activity.php:328
 msgid "What happened"
 msgstr ""
 
@@ -3045,7 +3054,7 @@ msgstr ""
 msgid "What the image model is told"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:83
+#: includes/class-blogcraft-activity.php:89
 msgid "What the plugin has been doing, and why anything stopped."
 msgstr ""
 
@@ -3085,7 +3094,7 @@ msgstr ""
 msgid "Whatever the site default is"
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:268
+#: includes/class-blogcraft-activity.php:325
 msgid "When"
 msgstr ""
 
@@ -3275,7 +3284,7 @@ msgstr ""
 msgid "You are already writing with this provider, so leave the key blank and the same one draws the pictures. You still need to name an image model."
 msgstr ""
 
-#: includes/class-blogcraft-activity.php:76
+#: includes/class-blogcraft-activity.php:82
 #: includes/class-blogcraft-blueprint-screen.php:134
 #: includes/class-blogcraft-calendar.php:91
 #: includes/class-blogcraft-connection.php:329
