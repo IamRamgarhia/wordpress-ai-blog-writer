@@ -39,6 +39,16 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_option( 'blogcraft_cost' );
 		delete_option( 'blogcraft_autopilot_counter' );
 
+		// The blueprint store and the schema version. These were missing, so
+		// "every trace" above was not true: deleting the plugin and installing
+		// it again handed the newcomer the last owner's writing rules, and a
+		// schema version claiming tables that had just been dropped — which
+		// would have stopped the runtime migration from rebuilding them.
+		delete_option( 'blogcraft_blueprints' );
+		delete_option( 'blogcraft_active_blueprint' );
+		delete_option( 'blogcraft_blueprints_migrated' );
+		delete_option( 'blogcraft_db_version' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 
 		// The posts themselves are the user's and stay. Everything Blogcraft
@@ -54,6 +64,8 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 			'_blogcraft_topic',
 			'_blogcraft_faq_schema',
 			'_blogcraft_refreshed',
+			'_blogcraft_job',
+			'_blogcraft_section_images',
 		);
 
 		foreach ( $post_meta as $key ) {

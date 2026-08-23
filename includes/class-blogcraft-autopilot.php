@@ -145,7 +145,14 @@ class Blogcraft_Autopilot {
 
 		$from    = ( null === $from ) ? time() : (int) $from;
 		$hour    = self::hour();
-		$per_day = max( 1, (int) Blogcraft_Settings::get( 'autopilot_per_day' ) );
+		$per_day = self::per_day();
+
+		// Same reading of zero as tick(): none means none, so there is nothing
+		// to draw. This used to read it as one and project a schedule that
+		// would never happen.
+		if ( $per_day < 1 ) {
+			return array();
+		}
 
 		// Today's allowance is already partly spent.
 		$remaining_today = self::in_window( $from ) ? max( 0, $per_day - self::generated_today() ) : 0;
@@ -195,6 +202,31 @@ class Blogcraft_Autopilot {
 	}
 
 	/**
+	 * The daily limit, as a number that means the same thing everywhere.
+	 *
+	 * @return int Posts allowed per day; zero means none.
+	 */
+	public static function per_day() {
+		return max( 0, (int) Blogcraft_Settings::get( 'autopilot_per_day' ) );
+	}
+
+	/**
+	 * Which day the counter is counting, in the site's own timezone.
+	 *
+	 * The schedule is chosen in site time — "Tuesdays from 9am" means 9am as
+	 * the person setting it experiences it, and in_window() reads it that way.
+	 * The counter used to roll over at UTC midnight regardless, so on a site
+	 * far from UTC the daily allowance reset in the middle of the working day
+	 * and the calendar's projection disagreed with what actually ran.
+	 *
+	 * @param int|null $now Timestamp, defaults to now.
+	 * @return string
+	 */
+	private static function today( $now = null ) {
+		return (string) wp_date( 'Y-m-d', ( null === $now ) ? time() : (int) $now );
+	}
+
+	/**
 	 * How many posts have already been queued today.
 	 *
 	 * @return int
@@ -208,7 +240,7 @@ class Blogcraft_Autopilot {
 
 		list( $day, $count ) = explode( '|', $raw, 2 );
 
-		return ( gmdate( 'Y-m-d' ) === $day ) ? (int) $count : 0;
+		return ( self::today() === $day ) ? (int) $count : 0;
 	}
 
 	/**
@@ -219,7 +251,7 @@ class Blogcraft_Autopilot {
 	private static function increment_today() {
 		update_option(
 			self::COUNTER_OPTION,
-			gmdate( 'Y-m-d' ) . '|' . ( self::generated_today() + 1 ),
+			self::today() . '|' . ( self::generated_today() + 1 ),
 			false
 		);
 	}
@@ -289,9 +321,12 @@ class Blogcraft_Autopilot {
 			return false;
 		}
 
-		$cap = (int) Blogcraft_Settings::get( 'autopilot_per_day' );
-
-		if ( $cap > 0 && self::generated_today() >= $cap ) {
+		// Zero means write nothing, which is what anyone typing 0 into a field
+		// labelled "maximum posts per day" is asking for. It used to mean the
+		// opposite here — the cap was skipped entirely, so 0 permitted a post
+		// every hour — while plan() read the same 0 as 1 and drew a calendar
+		// showing one. Nobody sets a maximum of zero hoping for twenty-four.
+		if ( self::generated_today() >= self::per_day() ) {
 			return false;
 		}
 

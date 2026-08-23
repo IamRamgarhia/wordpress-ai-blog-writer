@@ -68,6 +68,15 @@ class Blogcraft_Worker {
 			$budget_seconds = (int) Blogcraft_Settings::get( 'queue_time_budget' );
 		}
 
+		// Recorded here rather than in the WP-Cron callback, because that was
+		// only one of three ways the queue gets drained. The plugin's own
+		// documentation recommends driving it from a real system cron via
+		// `wp blogcraft run` — and on exactly that setup the heartbeat was
+		// never written, so the health check decided the queue had stopped and
+		// showed "Blogcraft has not processed its queue recently" forever,
+		// while the queue was in fact being processed on schedule.
+		Blogcraft_Cron_Health::record_heartbeat();
+
 		$started  = time();
 		$executed = 0;
 

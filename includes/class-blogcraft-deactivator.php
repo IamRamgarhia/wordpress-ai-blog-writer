@@ -24,5 +24,14 @@ class Blogcraft_Deactivator {
 		if ( class_exists( 'Blogcraft_Scheduler' ) ) {
 			Blogcraft_Scheduler::unschedule();
 		}
+
+		// Both schedules, not just the queue one. WordPress keeps rescheduling
+		// a recurring event whose callback no longer exists, so an autopilot
+		// tick left behind here does not stop — it fires hourly, forever,
+		// finds nothing registered, and does nothing, on a site whose owner
+		// switched the plugin off precisely to make it stop.
+		if ( class_exists( 'Blogcraft_Autopilot' ) ) {
+			Blogcraft_Autopilot::unschedule();
+		}
 	}
 }

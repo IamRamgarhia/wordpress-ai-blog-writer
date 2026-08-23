@@ -266,6 +266,51 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		$this->assertSame( array(), $missed, 'uninstall leaves these behind: ' . implode( ', ', $missed ) );
 	}
 
+	public function test_uninstall_names_every_option_the_plugin_writes() {
+		// The sibling above checked post meta and found four keys missing.
+		// Nothing checked options, and four of those were missing too — the
+		// blueprint store among them, so deleting the plugin and installing it
+		// again handed the next owner the last one's writing rules.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'uninstall.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$written = array();
+
+		foreach ( (array) glob( BLOGCRAFT_PATH . 'includes/*.php' ) as $path ) {
+			$body = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			// Matching how a name is used rather than how it looks. The plugin
+			// is full of blogcraft_-prefixed strings that are not options —
+			// nonce actions, admin-post actions, cron hooks, transient
+			// prefixes — and a list of those to ignore would need extending
+			// every time somebody adds a button. These two patterns are what
+			// an option actually looks like: passed to the option functions,
+			// or declared as the constant that will be.
+			if ( preg_match_all( "/(?:get|update|add|delete)_option\(\s*'(blogcraft_[a-z_]+)'/", $body, $hits ) ) {
+				foreach ( $hits[1] as $key ) {
+					$written[ $key ] = $key;
+				}
+			}
+
+			if ( preg_match_all( "/const\s+\w*OPTION\w*\s*=\s*'(blogcraft_[a-z_]+)'/", $body, $hits ) ) {
+				foreach ( $hits[1] as $key ) {
+					$written[ $key ] = $key;
+				}
+			}
+		}
+
+		$missed = array();
+
+		foreach ( $written as $key ) {
+			if ( false === strpos( $source, "'" . $key . "'" ) ) {
+				$missed[] = $key;
+			}
+		}
+
+		sort( $missed );
+
+		$this->assertSame( array(), $missed, 'uninstall leaves these options behind: ' . implode( ', ', $missed ) );
+	}
+
 	public function test_provider_addresses_come_from_the_data_file() {
 		$text = Blogcraft_Endpoints::text();
 

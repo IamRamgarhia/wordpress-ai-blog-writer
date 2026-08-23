@@ -91,7 +91,8 @@ class Blogcraft_Scheduler {
 	 * @return void
 	 */
 	public static function run_queue() {
-		Blogcraft_Cron_Health::record_heartbeat();
+		// The heartbeat is Blogcraft_Worker::run()'s job now, so that every
+		// route into the queue records one rather than only this one.
 		Blogcraft_Queue::reclaim_stale();
 		Blogcraft_Worker::run();
 		Blogcraft_Logger::rotate( 1000 );

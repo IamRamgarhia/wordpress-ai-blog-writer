@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.33.0
+Stable tag: 0.34.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,6 +143,17 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.34.0 =
+* A post is never published twice. Publishing inserts the post and then spends minutes fetching pictures, which was long enough to cross the stale-job cutoff and be reclaimed while still running — and the re-run wrote a second copy. The post is now claimed the moment it exists, in two places that fail differently, and a resumed job finishes the one it already made
+* Pictures are no longer re-fetched on a resumed job. Every generating service bills per image, so an interrupted attempt used to be charged for twice
+* A job is no longer treated as dead after ten minutes. A single stage can legitimately take longer than that on a slow host — three provider attempts alone can reach four minutes — so reclaiming that early started a second copy of a live job rather than rescuing a stuck one. The window is now an hour, which is past every timeout the plugin permits
+* A daily maximum of zero now writes nothing. It used to skip the cap entirely and allow a post every hour, while the calendar read the same zero as one and drew a schedule that would never happen
+* The daily counter rolls over in your timezone, not UTC. On a site far from UTC the allowance used to reset in the middle of the working day
+* Switching the plugin off now stops the automatic-writing schedule too. Only the queue schedule was being cleared, and WordPress keeps re-arming a recurring event whose plugin is gone
+* "Blogcraft has not processed its queue recently" no longer shows forever on sites driven by a real system cron or WP-CLI — the arrangement the plugin's own documentation recommends. Only the WordPress-cron route recorded a heartbeat
+* Plugin updates now bring the database up to date. Schema changes previously arrived only through the activation hook, which a one-click update never fires
+* Deleting the plugin now removes the blueprint store and three other options it had been leaving behind, despite promising to remove every trace. Reinstalling handed the next owner the previous one's writing rules
 
 = 0.33.0 =
 * Every provider now says whether it costs money. The writing providers are marked free, "free tier" or paid, and the picture services the same way, so the first question anyone has about a list of fifteen names is answered before they pick one instead of after the first bill

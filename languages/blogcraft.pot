@@ -163,7 +163,7 @@ msgid "A finished post is a normal WordPress post. It is written as real blocks,
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:573
-msgid "A low number is safer. Volume without review is what search engines penalise."
+msgid "A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule."
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:779
@@ -1231,7 +1231,7 @@ msgstr ""
 msgid "Job"
 msgstr ""
 
-#: includes/class-blogcraft-queue.php:297
+#: includes/class-blogcraft-queue.php:336
 msgid "Job reclaimed after an interrupted run."
 msgstr ""
 
@@ -2984,7 +2984,7 @@ msgstr ""
 msgid "Unknown action."
 msgstr ""
 
-#: includes/class-blogcraft-pipeline.php:920
+#: includes/class-blogcraft-pipeline.php:937
 msgid "Untitled"
 msgstr ""
 

@@ -401,6 +401,14 @@ class Blogcraft_Images {
 			return 0;
 		}
 
+		// Publishing can be re-run after an interrupted attempt, and this
+		// writes blocks into the post body rather than setting a field, so a
+		// second pass would wedge a duplicate picture under every heading and
+		// bill for each one. The marker below is what makes it safe to repeat.
+		if ( get_post_meta( (int) $post_id, '_blogcraft_section_images', true ) ) {
+			return 0;
+		}
+
 		$content = (string) $post->post_content;
 		$added   = 0;
 
@@ -469,6 +477,11 @@ class Blogcraft_Images {
 			);
 		}
 
+		// Set whatever happened, including when nothing could be placed: the
+		// question this answers is "has this post been through here already",
+		// and a run that found no home for a picture has still been through.
+		update_post_meta( (int) $post_id, '_blogcraft_section_images', 1 );
+
 		return $added;
 	}
 
@@ -483,6 +496,14 @@ class Blogcraft_Images {
 	public static function attach_featured( $post_id, $title, $topic = '' ) {
 		if ( ! Blogcraft_Settings::get( 'images_enabled' ) ) {
 			return 0;
+		}
+
+		// A post that already has one does not need another. This matters
+		// beyond tidiness: publishing can be re-run after an interrupted
+		// attempt, and every generating picture service bills per image, so
+		// without this a crash part-way through would be charged for twice.
+		if ( has_post_thumbnail( (int) $post_id ) ) {
+			return (int) get_post_thumbnail_id( (int) $post_id );
 		}
 
 		require_once ABSPATH . 'wp-admin/includes/file.php';

@@ -910,6 +910,23 @@ class Blogcraft_Pipeline {
 		$article = isset( $payload['article'] ) ? $payload['article'] : array();
 		$outline = isset( $payload['outline'] ) ? $payload['outline'] : array();
 
+		// This stage inserts a post and then spends minutes fetching pictures,
+		// which is long enough to cross the stale-job cutoff and be reclaimed
+		// while it is still running. Without this, the re-run inserts the post
+		// again — the failure a competing plugin has a public review for,
+		// reading "flooded my blog with hundreds of duplicate posts".
+		$existing = self::published_post_for( $job );
+
+		if ( $existing > 0 ) {
+			Blogcraft_Logger::info(
+				'This job had already created its post; finishing the rest rather than writing a second one.',
+				array( 'post_id' => $existing ),
+				(int) $job->id
+			);
+
+			return self::finish_publish( $job, $existing, $payload, $article );
+		}
+
 		$title = '';
 
 		if ( ! empty( $outline['title'] ) ) {
@@ -954,14 +971,84 @@ class Blogcraft_Pipeline {
 
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
 
+		// Stamped before anything that can take minutes or fail, and written
+		// straight to the job row rather than waiting for this stage to
+		// return, so a reclaim after a crash can find this post instead of
+		// writing another one. Two records because they fail differently: the
+		// payload is the fast path, the post meta survives even if the job row
+		// write is the thing that died.
+		update_post_meta( $post_id, '_blogcraft_job', (int) $job->id );
+
+		$payload['post_id'] = (int) $post_id;
+		Blogcraft_Queue::save_payload( (int) $job->id, $payload );
+
+		Blogcraft_Logger::info(
+			'Generated post created.',
+			array( 'post_id' => (int) $post_id ),
+			(int) $job->id
+		);
+
+		return self::finish_publish( $job, (int) $post_id, $payload, $article );
+	}
+
+	/**
+	 * The post id this job already created, if it created one.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return int Zero when this job has not inserted a post yet.
+	 */
+	private static function published_post_for( $job ) {
+		$payload = $job->payload;
+
+		if ( ! empty( $payload['post_id'] ) && get_post( (int) $payload['post_id'] ) ) {
+			return (int) $payload['post_id'];
+		}
+
+		// The payload had nothing, but the job row write could itself have been
+		// what failed. The post carries the job id too, so ask the posts table.
+		$found = get_posts(
+			array(
+				'post_type'        => 'post',
+				'post_status'      => 'any',
+				'posts_per_page'   => 1,
+				'fields'           => 'ids',
+				'suppress_filters' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_key'         => '_blogcraft_job',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_value'       => (string) (int) $job->id,
+			)
+		);
+
+		return empty( $found ) ? 0 : (int) $found[0];
+	}
+
+	/**
+	 * Everything after the post exists: meta, pictures, back-links.
+	 *
+	 * Split from the insert so a reclaimed job can run it against the post it
+	 * already made. Every step is safe to repeat — the meta writes overwrite,
+	 * and the image helpers skip a post that already has what they would add.
+	 *
+	 * @param Blogcraft_Job $job     Current job.
+	 * @param int           $post_id The post this job created.
+	 * @param array         $payload Job payload.
+	 * @param array         $article Article structure.
+	 * @return array
+	 */
+	private static function finish_publish( $job, $post_id, $payload, $article ) {
+		$post  = get_post( $post_id );
+		$title = ( $post instanceof WP_Post ) ? $post->post_title : '';
+
+		$outline    = isset( $payload['outline'] ) ? $payload['outline'] : array();
 		$faq_schema = Blogcraft_Seo::build_faq_schema( $article );
 
 		if ( ! empty( $faq_schema ) ) {
-			update_post_meta( (int) $post_id, '_blogcraft_faq_schema', $faq_schema );
+			update_post_meta( $post_id, '_blogcraft_faq_schema', $faq_schema );
 		}
 
 		Blogcraft_Seo::write_seo_meta(
-			(int) $post_id,
+			$post_id,
 			$title,
 			isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : ''
 		);
@@ -980,10 +1067,10 @@ class Blogcraft_Pipeline {
 		}
 
 		// A missing image must never fail a finished post, so this is best-effort.
-		Blogcraft_Images::add_section_images( (int) $post_id, $article, 3 );
+		Blogcraft_Images::add_section_images( $post_id, $article, 3 );
 
 		Blogcraft_Images::attach_featured(
-			(int) $post_id,
+			$post_id,
 			$title,
 			isset( $payload['topic'] ) ? (string) $payload['topic'] : ''
 		);
@@ -992,18 +1079,12 @@ class Blogcraft_Pipeline {
 		// Point older related posts at this one. Every competing tool links only
 		// forward, leaving existing content unaware the new post exists.
 		Blogcraft_Backlinks::link_back(
-			(int) $post_id,
+			$post_id,
 			isset( $payload['topic'] ) ? (string) $payload['topic'] : $title,
 			3
 		);
 
-		Blogcraft_Logger::info(
-			'Generated post created.',
-			array( 'post_id' => (int) $post_id ),
-			(int) $job->id
-		);
-
-		$payload['post_id'] = (int) $post_id;
+		$payload['post_id'] = $post_id;
 
 		return array(
 			'next'    => null,

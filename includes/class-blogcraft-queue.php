@@ -19,11 +19,31 @@ class Blogcraft_Queue {
 	/**
 	 * How long a job may sit in 'running' before it is considered stranded.
 	 *
-	 * Comfortably longer than any single stage should take, so a job this
-	 * old is presumed to have survived a PHP fatal, an OOM kill, or a killed
-	 * FPM worker rather than merely being slow.
+	 * A job this old is presumed to have died with a PHP fatal, an OOM kill,
+	 * or a killed FPM worker, rather than merely being slow — so this has to
+	 * sit above the slowest stage that can legitimately still be working.
+	 *
+	 * The old value of 600 did not. Adding up the worst case a single stage
+	 * is allowed to reach, from the constants that actually govern it:
+	 *
+	 * - a provider call is 3 attempts at a 60s timeout, plus two waits capped
+	 *   at 30s each (Blogcraft_Http::MAX_ATTEMPTS, MAX_RETRY_AFTER_SECONDS),
+	 *   so 240s for one call
+	 * - research adds a search on the same budget plus up to MAX_SOURCES page
+	 *   fetches at 12s
+	 * - verify HEADs up to MAX_LINKS addresses at 8s, so ~96s
+	 * - publishing sideloads up to four pictures at a 45s download each,
+	 *   after generating them
+	 *
+	 * Any one of those can pass 600s on a slow host without anything being
+	 * wrong. Reclaiming then does not rescue a dead job: it starts a second
+	 * copy of a live one, doubling what the provider is asked to bill and,
+	 * before the guard in Pipeline::stage_publish, publishing the post twice.
+	 * An hour is comfortably past every figure above, and the cost of waiting
+	 * too long is a job that looks stuck for a while — visible in Activity,
+	 * and recoverable — against a cost of being too eager that is silent.
 	 */
-	const RECLAIM_AFTER_SECONDS = 600;
+	const RECLAIM_AFTER_SECONDS = 3600;
 
 	/**
 	 * Wpdb format specifier for each column update() may write.
@@ -159,6 +179,25 @@ class Blogcraft_Queue {
 				'available_at' => current_time( 'mysql', true ),
 			)
 		);
+	}
+
+	/**
+	 * Write a job's payload without moving it off its current stage.
+	 *
+	 * Payloads are normally persisted once, when a stage returns. That is
+	 * fine for work that can simply be redone, and wrong for anything a stage
+	 * does to the outside world part-way through: if the stage dies after
+	 * that and the job is later reclaimed, the re-run has no memory of what
+	 * already happened. Publishing is the case that matters — it inserts a
+	 * post and then spends minutes fetching images — so it records the post
+	 * id here the moment it exists, rather than waiting to return.
+	 *
+	 * @param int   $job_id  Job id.
+	 * @param array $payload Payload to store.
+	 * @return void
+	 */
+	public static function save_payload( $job_id, $payload ) {
+		self::update( $job_id, array( 'payload' => wp_json_encode( $payload ) ) );
 	}
 
 	/**

@@ -570,7 +570,7 @@ class Blogcraft_Connection {
 			__( 'Consider a post stale after', 'blogcraft' ),
 			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'blogcraft' )
 		);
-		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Volume without review is what search engines penalise.', 'blogcraft' ) );
+		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'blogcraft' ) );
 
 		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft' ) . '</label></th><td>';
 		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
