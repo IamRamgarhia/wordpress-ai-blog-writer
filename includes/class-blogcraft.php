@@ -56,6 +56,14 @@ class Blogcraft {
 
 		$this->booted = true;
 
+		// Without this, every one of the plugin's translatable strings stays
+		// in English on any site not served translations by wordpress.org —
+		// which includes anyone who installed a language pack by hand, and
+		// anyone running it before it is listed there. The .pot file, the
+		// translator comments and the _n() calls were all being maintained
+		// for a file nothing ever loaded.
+		add_action( 'init', array( __CLASS__, 'load_textdomain' ) );
+
 		Blogcraft_Scheduler::init();
 		Blogcraft_Pipeline::register();
 		Blogcraft_Refresh::register();
@@ -73,6 +81,13 @@ class Blogcraft {
 			// writes to the tables before an admin screen or a cron tick.
 			add_action( 'admin_init', array( __CLASS__, 'migrate_if_needed' ) );
 
+			// Schedules are armed at activation and never checked again, so a
+			// cron event cleared by a migration, a staging copy, a security
+			// plugin or a hosting panel stayed cleared — and the queue simply
+			// stopped running, with nothing on any screen saying so. Both
+			// helpers already no-op when the event exists.
+			add_action( 'admin_init', array( __CLASS__, 'heal_schedules' ) );
+
 			Blogcraft_Admin::init();
 			Blogcraft_Connection::init();
 			Blogcraft_Generate::init();
@@ -82,6 +97,35 @@ class Blogcraft {
 			Blogcraft_Activity::init();
 			Blogcraft_Docs::init();
 		}
+	}
+
+	/**
+	 * Re-arm the scheduled events if something has cleared them.
+	 *
+	 * @return void
+	 */
+	public static function heal_schedules() {
+		Blogcraft_Scheduler::schedule();
+
+		// Only when the reader actually wants automatic writing. Arming this
+		// on a site with it switched off would put an hourly event back that
+		// they may well have cleared on purpose.
+		if ( Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
+			Blogcraft_Autopilot::schedule();
+		}
+	}
+
+	/**
+	 * Load the translation files.
+	 *
+	 * @return void
+	 */
+	public static function load_textdomain() {
+		load_plugin_textdomain(
+			'blogcraft',
+			false,
+			dirname( plugin_basename( BLOGCRAFT_FILE ) ) . '/languages'
+		);
 	}
 
 	/**

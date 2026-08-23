@@ -183,6 +183,23 @@ class Blogcraft_Editorial {
 	private static function fold( $text ) {
 		$text = (string) $text;
 
+		// Smart punctuation folded to plain before anything is compared. Every
+		// phrase list in this file is written with straight quotes, while a
+		// model writing prose produces curly ones and WordPress converts what
+		// is left — so "let's face it" was matched and "let’s face it" sailed
+		// past, which is the version that actually gets written.
+		$text = strtr(
+			$text,
+			array(
+				"\xE2\x80\x98" => "'",
+				"\xE2\x80\x99" => "'",
+				"\xE2\x80\x9C" => '"',
+				"\xE2\x80\x9D" => '"',
+				"\xE2\x80\x93" => '-',
+				"\xE2\x80\x94" => '-',
+			)
+		);
+
 		return function_exists( 'mb_strtolower' ) ? mb_strtolower( $text, 'UTF-8' ) : strtolower( $text );
 	}
 
@@ -543,6 +560,26 @@ class Blogcraft_Editorial {
 	}
 
 	/**
+	 * How long a string is to a reader, rather than to the disk.
+	 *
+	 * Falls back to counting UTF-8 sequences by hand where mb_strlen() is
+	 * absent, rather than to strlen(), which would quietly reintroduce the
+	 * byte-counting bug on exactly the hosts that lack the extension.
+	 *
+	 * @param string $text Text to measure.
+	 * @return int
+	 */
+	private static function characters( $text ) {
+		$text = (string) $text;
+
+		if ( function_exists( 'mb_strlen' ) ) {
+			return (int) mb_strlen( $text, 'UTF-8' );
+		}
+
+		return (int) strlen( (string) preg_replace( '/[\x80-\xBF]/', '', $text ) );
+	}
+
+	/**
 	 * Title length against the blueprint.
 	 *
 	 * @param string $title     Post title.
@@ -550,8 +587,15 @@ class Blogcraft_Editorial {
 	 * @return array
 	 */
 	private static function title_length( $title, $blueprint ) {
-		$max    = max( 20, (int) $blueprint['meta_title_max'] );
-		$length = strlen( $title );
+		$max = max( 20, (int) $blueprint['meta_title_max'] );
+
+		// Characters, not bytes. The prompt asks for a limit in characters and
+		// the setting is labelled in characters, so counting bytes failed a
+		// title for using an accent, an em dash or a pound sign — and failed
+		// every title in Greek, Hindi, Japanese or Arabic outright, since
+		// those run two to four bytes per character and would blow a 60-byte
+		// ceiling at roughly twenty letters.
+		$length = self::characters( $title );
 		$pass   = ( $length >= 20 && $length <= $max );
 
 		return self::check(
@@ -598,7 +642,7 @@ class Blogcraft_Editorial {
 	private static function meta_description( $description, $blueprint ) {
 		$description = trim( (string) $description );
 		$max         = max( 80, (int) $blueprint['meta_desc_max'] );
-		$length      = strlen( $description );
+		$length      = self::characters( $description );
 		$pass        = ( $length >= 70 && $length <= $max );
 
 		if ( 0 === $length ) {

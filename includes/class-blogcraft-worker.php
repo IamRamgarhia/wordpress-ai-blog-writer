@@ -112,25 +112,24 @@ class Blogcraft_Worker {
 
 		try {
 			$result = call_user_func( self::$stages[ $key ], $job );
-		} catch ( Throwable $e ) {
-			$message = $e->getMessage();
-
+		} catch ( Blogcraft_Rate_Limited $e ) {
 			// A provider saying "too many requests" is asking us to come back,
 			// not telling us the work is wrong. Spending attempts on it loses
-			// whatever the job had already written.
-			if ( false !== strpos( $message, 'HTTP 429' ) || false !== stripos( $message, 'exceeded your current quota' ) ) {
-				Blogcraft_Queue::defer( $job->id, 30 * MINUTE_IN_SECONDS, $message );
+			// whatever the job had already written. Recognised by type: this
+			// used to search the message for "HTTP 429", which is assembled
+			// from a translated format string and therefore stopped matching
+			// on any site not running in English.
+			Blogcraft_Queue::defer( $job->id, 30 * MINUTE_IN_SECONDS, $e->getMessage() );
 
-				Blogcraft_Logger::info(
-					'Provider is rate limiting; the job will wait rather than fail.',
-					array( 'reason' => $message ),
-					(int) $job->id
-				);
+			Blogcraft_Logger::info(
+				'Provider is rate limiting; the job will wait rather than fail.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
 
-				return true;
-			}
-
-			Blogcraft_Queue::fail( $job->id, $message );
+			return true;
+		} catch ( Throwable $e ) {
+			Blogcraft_Queue::fail( $job->id, $e->getMessage() );
 
 			return;
 		}

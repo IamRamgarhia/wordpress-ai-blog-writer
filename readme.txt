@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.36.0
+Stable tag: 0.37.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -157,6 +157,20 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.37.0 =
+* Translations are now loaded. Every string in the plugin was written to be translatable and the translation file is rebuilt on every release, but nothing ever loaded it, so all of it stayed in English no matter what language the site was in
+* A provider asking you to slow down is recognised by its status code rather than by reading its error message. The message is itself translated, so on a site in any other language a rate limit was mistaken for a failure and the post lost one of its three attempts to something that only needed a wait
+* Title and description lengths are counted in characters, not bytes. An accent or an em dash cost extra, and a title in Greek, Hindi, Japanese or Arabic hit a sixty-character ceiling at about twenty letters
+* Stock opening phrases are caught with a curly apostrophe as well as a straight one — the curly one being what actually gets written
+* A banned word is matched as a whole word. "Delve" was flagged inside any longer word that happened to contain it
+* Removing a dead link no longer damages a longer live link on the same domain, and if the removal cannot be done safely the log says so instead of reporting success
+* API keys can be removed. A blank field means "keep what is saved", correctly, but that left no way to take a key out short of editing the database
+* If a key cannot be encrypted — which happens on hosts without PHP's sodium extension — the screen now says so instead of reporting "Settings saved" over a key that was not stored
+* The Gemini key travels as a header rather than in the address. In the address it was written into any proxy or server log along the way; the picture route already did this correctly
+* Posts are no longer told they are missing an FAQ or key takeaways when the blueprint deliberately switched those off
+* Scheduled work re-arms itself if something clears it. Schedules were set once at activation, so a migration, a staging copy or a security plugin could stop the queue with nothing on any screen saying why
+* Removed two methods nothing called
 
 = 0.36.0 =
 * A byline readers can actually see. The author, reviewer and organisation markup was real and correct and entirely invisible: it spoke to parsers and said nothing to the person reading. Generated posts now end with the author's name, their bio and their profile links, taken from their own WordPress profile rather than from yet another settings field

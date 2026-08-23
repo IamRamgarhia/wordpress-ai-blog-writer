@@ -48,11 +48,12 @@ class Blogcraft_Provider_Gemini extends Blogcraft_Provider {
 
 		$body = $this->build_request_body( $messages, $options );
 
-		$result = Blogcraft_Http::post_json( $this->endpoint( 'generateContent' ), $body, array() );
+		$result = Blogcraft_Http::post_json( $this->endpoint( 'generateContent' ), $body, $this->auth_headers() );
 
 		$api_error = $this->extract_error_message( $result['body'] );
 		if ( '' !== $api_error ) {
-			$response->error = $this->format_api_error( $api_error, $result['code'] );
+			$response->error        = $this->format_api_error( $api_error, $result['code'] );
+			$response->rate_limited = ( 429 === (int) $result['code'] );
 			return $response;
 		}
 
@@ -91,7 +92,7 @@ class Blogcraft_Provider_Gemini extends Blogcraft_Provider {
 	 * @return array Empty when discovery is unsupported or fails.
 	 */
 	public function list_models() {
-		$result = Blogcraft_Http::get_json( $this->authed_url( $this->endpoint_base( 'models' ) ) );
+		$result = Blogcraft_Http::get_json( $this->endpoint_base( 'models' ), $this->auth_headers() );
 
 		if ( '' !== $result['error'] || empty( $result['body']['models'] ) || ! is_array( $result['body']['models'] ) ) {
 			return array();
@@ -198,21 +199,24 @@ class Blogcraft_Provider_Gemini extends Blogcraft_Provider {
 	private function endpoint( $action ) {
 		$model = rawurlencode( (string) $this->config( 'model', '' ) );
 
-		return $this->authed_url( $this->endpoint_base( 'models/' . $model ) . ':' . $action );
+		return $this->endpoint_base( 'models/' . $model ) . ':' . $action;
 	}
 
 	/**
-	 * Append the API key to a URL as the `key` query parameter, the way Gemini
-	 * authenticates. The resulting URL carries a live secret; callers must
-	 * never persist, log, or echo it back into an error string. This adapter
-	 * never does so itself — Blogcraft_Http is the only place the URL is
-	 * handed to, and only for making the actual HTTP call.
+	 * The header Gemini accepts the key in.
 	 *
-	 * @param string $url Base URL, no query string.
-	 * @return string
+	 * Gemini takes the key either as a `key` query parameter or as this
+	 * header, and this adapter used the query string. A URL is the part of a
+	 * request that gets written down: proxies, load balancers and access logs
+	 * record it as a matter of course, so the key ended up in plain text in
+	 * files nobody thinks of as holding secrets, on machines between here and
+	 * Google. A header is not logged that way. The image route already made
+	 * this choice and said why; the text route now agrees with it.
+	 *
+	 * @return array
 	 */
-	private function authed_url( $url ) {
-		return add_query_arg( 'key', (string) $this->config( 'api_key', '' ), $url );
+	private function auth_headers() {
+		return array( 'x-goog-api-key' => (string) $this->config( 'api_key', '' ) );
 	}
 
 	/**

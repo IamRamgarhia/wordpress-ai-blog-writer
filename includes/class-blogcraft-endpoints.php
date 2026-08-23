@@ -77,29 +77,6 @@ class Blogcraft_Endpoints {
 	}
 
 	/**
-	 * One text provider, or an empty spec.
-	 *
-	 * @param string $id Provider id.
-	 * @return array
-	 */
-	public static function provider( $id ) {
-		$all = self::text();
-		$id  = (string) $id;
-
-		if ( isset( $all[ $id ] ) && is_array( $all[ $id ] ) ) {
-			return $all[ $id ];
-		}
-
-		return array(
-			'adapter'  => 'custom',
-			'base_url' => '',
-			'help'     => '',
-			'key_url'  => '',
-			'docs_url' => '',
-		);
-	}
-
-	/**
 	 * One image service's addresses.
 	 *
 	 * @param string $id Service id.

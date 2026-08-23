@@ -67,7 +67,8 @@ class Blogcraft_Provider_Openai extends Blogcraft_Provider {
 
 		$api_error = $this->extract_error_message( $result['body'] );
 		if ( '' !== $api_error ) {
-			$response->error = $this->format_api_error( $api_error, $result['code'] );
+			$response->error        = $this->format_api_error( $api_error, $result['code'] );
+			$response->rate_limited = ( 429 === (int) $result['code'] );
 			return $response;
 		}
 

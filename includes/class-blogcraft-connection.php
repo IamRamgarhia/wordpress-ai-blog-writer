@@ -399,6 +399,7 @@ class Blogcraft_Connection {
 			esc_attr( '' === $key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $key ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		echo self::clear_key_control( 'provider_api_key', $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		self::render_provider_help( $type );
 		echo '</td></tr>';
 
@@ -493,6 +494,7 @@ class Blogcraft_Connection {
 			esc_attr( '' === $research_key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $research_key ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		echo self::clear_key_control( 'research_api_key', $research_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '</td></tr>';
 
 		self::textarea_row(
@@ -1017,12 +1019,37 @@ class Blogcraft_Connection {
 		$stored = (string) Blogcraft_Settings::get( $name );
 
 		printf(
-			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p></td></tr>',
+			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p>%6$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $stored ) ),
 			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ),
-			esc_attr( $row_class )
+			esc_attr( $row_class ),
+			self::clear_key_control( $name, $stored ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		);
+	}
+
+	/**
+	 * The control that removes a stored key.
+	 *
+	 * Shown only when there is something to remove. A blank field means "keep
+	 * what is there", which is right — the field can only render a mask, so
+	 * blank-means-clear would wipe a key every time an unrelated setting was
+	 * saved. That left no way to remove one at all, which is this.
+	 *
+	 * @param string $name   Setting key.
+	 * @param string $stored Currently stored value.
+	 * @return string
+	 */
+	private static function clear_key_control( $name, $stored ) {
+		if ( '' === $stored ) {
+			return '';
+		}
+
+		return sprintf(
+			'<label class="blogcraft-clear-key"><input type="checkbox" name="clear_%1$s" value="1" /> %2$s</label>',
+			esc_attr( $name ),
+			esc_html__( 'Remove this key', 'blogcraft' )
 		);
 	}
 
@@ -1154,7 +1181,14 @@ class Blogcraft_Connection {
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		Blogcraft_Request::verify_or_die( self::SAVE_ACTION, $nonce );
 
-		list( $was_usable, $submitted_key ) = self::apply_submitted_settings();
+		list( $was_usable, $submitted_key, $failed ) = self::apply_submitted_settings();
+
+		if ( ! empty( $failed ) ) {
+			self::redirect_back(
+				false,
+				__( 'Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP\'s sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected.', 'blogcraft' )
+			);
+		}
 
 		self::redirect_back( true, self::save_message( '' !== $submitted_key, $was_usable ) );
 	}
@@ -1251,28 +1285,58 @@ class Blogcraft_Connection {
 			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
-		// An empty key field means "leave unchanged": the form renders a mask rather
-		// than the real value, so treating blank as "clear" would wipe the stored key
-		// every time an unrelated field was saved.
-		foreach ( array( 'fal_api_key', 'openai_image_key', 'image_key_gemini', 'image_key_xai', 'pexels_api_key', 'pixabay_api_key' ) as $secret ) {
+		// An empty key field means "leave unchanged": the form renders a mask
+		// rather than the real value, so treating blank as "clear" would wipe
+		// the stored key every time an unrelated field was saved. Removing one
+		// is done with the tick beside it, which is the only way to say so
+		// deliberately — and without it there was no way to remove a key at
+		// all, short of editing the database.
+		$failed = array();
+
+		foreach ( self::secret_fields() as $secret ) {
+			if ( isset( $_POST[ 'clear_' . $secret ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				Blogcraft_Settings::delete( $secret );
+
+				continue;
+			}
+
 			$value = isset( $_POST[ $secret ] ) ? trim( (string) wp_unslash( $_POST[ $secret ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 
-			if ( '' !== $value ) {
-				Blogcraft_Settings::set( $secret, $value );
+			if ( '' === $value ) {
+				continue;
+			}
+
+			// set() returns false when a secret could not be encrypted, which
+			// is what happens on a host without the sodium extension. That
+			// result was discarded, so the screen said "Settings saved." over
+			// a key that had not been stored, and the next run failed to
+			// authenticate for no reason anybody could see.
+			if ( ! Blogcraft_Settings::set( $secret, $value ) ) {
+				$failed[] = $secret;
 			}
 		}
 
-		$research_key = isset( $_POST['research_api_key'] ) ? trim( (string) wp_unslash( $_POST['research_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		if ( '' !== $research_key ) {
-			Blogcraft_Settings::set( 'research_api_key', $research_key );
-		}
-
 		$submitted_key = isset( $_POST['provider_api_key'] ) ? trim( (string) wp_unslash( $_POST['provider_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		if ( '' !== $submitted_key ) {
-			Blogcraft_Settings::set( 'provider_api_key', $submitted_key );
-		}
 
-		return array( $was_usable, $submitted_key );
+		return array( $was_usable, $submitted_key, $failed );
+	}
+
+	/**
+	 * Every setting held as an encrypted secret.
+	 *
+	 * @return array
+	 */
+	private static function secret_fields() {
+		return array(
+			'provider_api_key',
+			'research_api_key',
+			'fal_api_key',
+			'openai_image_key',
+			'image_key_gemini',
+			'image_key_xai',
+			'pexels_api_key',
+			'pixabay_api_key',
+		);
 	}
 
 	/**

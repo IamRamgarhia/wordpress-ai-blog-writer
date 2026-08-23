@@ -218,6 +218,7 @@ class Blogcraft_Pipeline {
 	 * @param array $messages Chat messages.
 	 * @param array $options  Provider options.
 	 * @return array Parsed payload.
+	 * @throws Blogcraft_Rate_Limited When the provider asks us to come back later.
 	 * @throws RuntimeException When no provider is configured, the cap is hit, or the call fails.
 	 */
 	private static function ask( $messages, $options = array() ) {
@@ -241,6 +242,12 @@ class Blogcraft_Pipeline {
 		$response = $provider->complete( $messages, $options );
 
 		if ( $response->is_error() ) {
+			// Typed, so the worker can tell "come back later" from "this will
+			// never work" without reading the sentence.
+			if ( $response->rate_limited ) {
+				throw new Blogcraft_Rate_Limited( esc_html( $response->error ) );
+			}
+
 			throw new RuntimeException( esc_html( $response->error ) );
 		}
 
@@ -559,7 +566,7 @@ class Blogcraft_Pipeline {
 	 *
 	 * @param Blogcraft_Job $job Current job.
 	 * @return array
-	 * @throws RuntimeException When the provider is rate limiting, so the worker can wait.
+	 * @throws Blogcraft_Rate_Limited When the provider is rate limiting, so the worker can wait.
 	 */
 	public static function stage_faq( $job ) {
 		$payload   = $job->payload;
@@ -590,14 +597,13 @@ class Blogcraft_Pipeline {
 			);
 
 			$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
-		} catch ( RuntimeException $e ) {
+		} catch ( Blogcraft_Rate_Limited $e ) {
 			// A rate limit still has to reach the worker, which knows to wait
-			// rather than fail. Only genuine content failures are shrugged off.
-			if ( false !== strpos( $e->getMessage(), 'HTTP 429' )
-				|| false !== stripos( $e->getMessage(), 'exceeded your current quota' ) ) {
-				throw $e;
-			}
-
+			// rather than fail. Rethrown by type: matching the message text
+			// meant this stopped working in any language but English, and the
+			// job lost an attempt over something that only needed a wait.
+			throw $e;
+		} catch ( RuntimeException $e ) {
 			$payload['article']['faq'] = array();
 
 			Blogcraft_Logger::error(
@@ -626,7 +632,7 @@ class Blogcraft_Pipeline {
 	 *
 	 * @param Blogcraft_Job $job Current job.
 	 * @return array
-	 * @throws RuntimeException When the provider is rate limiting, so the worker can wait.
+	 * @throws Blogcraft_Rate_Limited When the provider is rate limiting, so the worker can wait.
 	 */
 	public static function stage_extras( $job ) {
 		$payload   = $job->payload;
@@ -668,15 +674,14 @@ class Blogcraft_Pipeline {
 					$payload['article'][ $key ] = $result[ $key ];
 				}
 			}
-		} catch ( RuntimeException $e ) {
+		} catch ( Blogcraft_Rate_Limited $e ) {
 			// A rate limit still has to reach the worker, which knows to wait.
+			// Recognised by type rather than by reading the message, which is
+			// translated and so matched only in English.
+			throw $e;
+		} catch ( RuntimeException $e ) {
 			// Everything else loses the extras and keeps the article, which is
 			// the right trade: these are additions, not the post.
-			if ( false !== strpos( $e->getMessage(), 'HTTP 429' )
-				|| false !== stripos( $e->getMessage(), 'exceeded your current quota' ) ) {
-				throw $e;
-			}
-
 			Blogcraft_Logger::error(
 				'The extra sections could not be written; publishing the article without them.',
 				array( 'reason' => $e->getMessage() ),
@@ -866,14 +871,28 @@ class Blogcraft_Pipeline {
 		$links = Blogcraft_Verify::check_links( $article );
 
 		if ( ! empty( $links['dead'] ) ) {
-			$article            = Blogcraft_Verify::strip_dead_links( $article, $links['dead'] );
-			$payload['article'] = $article;
+			$stripped = Blogcraft_Verify::strip_dead_links( $article, $links['dead'] );
 
-			Blogcraft_Logger::info(
-				'Removed links that did not resolve.',
-				array( 'count' => count( $links['dead'] ) ),
-				(int) $job->id
-			);
+			// strip_dead_links() returns the article untouched when it cannot
+			// safely rewrite it. Comparing rather than assuming means the log
+			// says which of those two happened, instead of reporting success
+			// most loudly in the one case where nothing was removed.
+			if ( $stripped === $article ) {
+				Blogcraft_Logger::error(
+					'Some links did not resolve and could not be removed; they are still in the post.',
+					array( 'count' => count( $links['dead'] ) ),
+					(int) $job->id
+				);
+			} else {
+				$article            = $stripped;
+				$payload['article'] = $article;
+
+				Blogcraft_Logger::info(
+					'Removed links that did not resolve.',
+					array( 'count' => count( $links['dead'] ) ),
+					(int) $job->id
+				);
+			}
 		}
 
 		$blueprint = self::blueprint( $job );

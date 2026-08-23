@@ -113,6 +113,20 @@ class Blogcraft_Verify {
 			return $article;
 		}
 
+		// Longest first. These are plain string replacements, so removing
+		// "https://example.com" before "https://example.com/guide" cuts the
+		// front off the longer address and leaves "/guide" embedded in the
+		// prose — corrupting a live link because a shorter one on the same
+		// domain happened to be dead.
+		$dead = array_values( array_unique( array_map( 'strval', $dead ) ) );
+
+		usort(
+			$dead,
+			function ( $a, $b ) {
+				return strlen( $b ) - strlen( $a );
+			}
+		);
+
 		foreach ( $dead as $url ) {
 			$encoded = str_replace( wp_json_encode( $url ), '""', $encoded );
 			$encoded = str_replace( $url, '', $encoded );
@@ -120,6 +134,11 @@ class Blogcraft_Verify {
 
 		$decoded = json_decode( $encoded, true );
 
+		// A failed decode means the replacements produced something that is no
+		// longer JSON, so the original is returned with its dead links intact.
+		// That is the safe outcome, but the caller was logging "Removed links
+		// that did not resolve" either way — so the one case where nothing was
+		// removed is the case that claimed most loudly to have worked.
 		return is_array( $decoded ) ? $decoded : $article;
 	}
 
@@ -183,12 +202,20 @@ class Blogcraft_Verify {
 			$reasons[] = __( 'Under 600 words.', 'blogcraft' );
 		}
 
-		if ( empty( $article['faq'] ) ) {
+		// Only counted against a post that was supposed to have them. The
+		// blueprint can switch both off — the opinion archetype does, on
+		// purpose — and this docked five points each and told the reader the
+		// post was missing a section they had deliberately removed. A check
+		// that reports the absence of something nobody asked for teaches
+		// people to stop reading the checks.
+		$blueprint = Blogcraft_Blueprint::get();
+
+		if ( ! empty( $blueprint['faq'] ) && empty( $article['faq'] ) ) {
 			$score    -= 5;
 			$reasons[] = __( 'No FAQ section.', 'blogcraft' );
 		}
 
-		if ( empty( $article['key_takeaways'] ) ) {
+		if ( ! empty( $blueprint['takeaways'] ) && empty( $article['key_takeaways'] ) ) {
 			$score    -= 5;
 			$reasons[] = __( 'No key takeaways.', 'blogcraft' );
 		}
@@ -198,7 +225,13 @@ class Blogcraft_Verify {
 		$haystack = strtolower( (string) wp_json_encode( $article ) );
 
 		foreach ( Blogcraft_Voice::banned_words() as $banned ) {
-			if ( false !== strpos( $haystack, strtolower( $banned ) ) ) {
+			// Whole words. A bare substring search flagged "delve" inside
+			// "delved" — which is arguably fine — but also inside "delveport"
+			// or any surname containing it, and docked ten points for a word
+			// nobody banned. Blogcraft_Metrics::phrase_count() already applies
+			// the boundary rule the rest of the plugin uses, so this uses the
+			// same one rather than inventing a second.
+			if ( Blogcraft_Metrics::phrase_count( $haystack, $banned ) > 0 ) {
 				$score -= 10;
 				/* translators: %s: the banned word or phrase found in the draft. */
 				$reasons[] = sprintf( __( 'Contains a banned phrase: "%s".', 'blogcraft' ), $banned );
@@ -223,18 +256,5 @@ class Blogcraft_Verify {
 			'score'   => max( 0, min( 100, $score ) ),
 			'reasons' => $reasons,
 		);
-	}
-
-	/**
-	 * Whether an article clears the configured quality bar.
-	 *
-	 * @param array $article Article structure.
-	 * @return bool
-	 */
-	public static function passes( $article ) {
-		$threshold = (int) Blogcraft_Settings::get( 'quality_threshold' );
-		$result    = self::score( $article );
-
-		return $result['score'] >= $threshold;
 	}
 }
