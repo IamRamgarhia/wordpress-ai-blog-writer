@@ -140,9 +140,14 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 
 	// -------------------------------------------------------------- research.
 
-	public function test_the_free_sources_are_on_by_default() {
+	public function test_the_free_sources_gather_when_switched_on() {
+		// What "on by default" used to be pinned to here now lives in
+		// Test_Blogcraft_Consent, asserting the reverse: nothing is contacted
+		// until somebody asks. This keeps the other half — that asking works.
 		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $key ) {
-			$this->assertTrue( (bool) Blogcraft_Settings::get( $key ), $key . ' is off by default' );
+			Blogcraft_Settings::set( $key, true );
+
+			$this->assertTrue( (bool) Blogcraft_Settings::get( $key ), $key . ' will not turn on' );
 		}
 	}
 
