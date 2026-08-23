@@ -496,12 +496,29 @@ class Blogcraft_Research {
 		$out  = array();
 		$read = 0;
 
+		// Only pages a search actually returned. With no search provider
+		// configured, gather() falls back to this site's own posts — and
+		// reading those as "what the competition covers" is both wrong and a
+		// waste of the requests, since the outline is for this same site.
+		if ( 'none' === (string) Blogcraft_Settings::get( 'research_provider' ) ) {
+			return $out;
+		}
+
+		$home = wp_parse_url( home_url(), PHP_URL_HOST );
+
 		foreach ( $sources as $source ) {
 			if ( $read >= (int) $pages || count( $out ) >= self::MAX_HEADINGS ) {
 				break;
 			}
 
 			if ( empty( $source['url'] ) ) {
+				continue;
+			}
+
+			// Our own pages are not rivals either, however they got in here.
+			$host = wp_parse_url( (string) $source['url'], PHP_URL_HOST );
+
+			if ( is_string( $host ) && is_string( $home ) && $host === $home ) {
 				continue;
 			}
 

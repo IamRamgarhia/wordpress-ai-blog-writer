@@ -116,6 +116,8 @@ class Test_Blogcraft_Visibility extends WP_UnitTestCase {
 	// --------------------------------------------------- reading the rivals.
 
 	public function test_competitor_headings_are_read_from_the_ranking_pages() {
+		Blogcraft_Settings::set( 'research_provider', 'serpapi' );
+
 		add_filter(
 			'pre_http_request',
 			function () {
@@ -147,6 +149,49 @@ class Test_Blogcraft_Visibility extends WP_UnitTestCase {
 		$this->assertNotContains( 'Site navigation menu', $found );
 		$this->assertNotContains( 'Related posts you might like', $found );
 		$this->assertNotContains( 'Short', $found );
+	}
+
+	public function test_no_pages_are_opened_when_there_is_no_search_provider() {
+		// Without one, gather() falls back to this site's own posts. Reading
+		// those as "what the competition covers" is wrong — the outline is for
+		// this same site — and it spends a request per post to be wrong. CI
+		// caught this as an off-by-one in unrelated pipeline tests, because
+		// the fetches were eating their canned provider responses.
+		$called = false;
+
+		add_filter(
+			'pre_http_request',
+			function () use ( &$called ) {
+				$called = true;
+
+				return array(
+					'response' => array( 'code' => 200 ),
+					'body'     => '<h2>A heading long enough to count</h2>',
+					'headers'  => array(),
+				);
+			},
+			10,
+			3
+		);
+
+		$found = Blogcraft_Research::competitor_headings(
+			array( array( 'url' => 'https://example.com/anything' ) ),
+			1
+		);
+
+		$this->assertSame( array(), $found );
+		$this->assertFalse( $called );
+	}
+
+	public function test_our_own_pages_are_never_treated_as_rivals() {
+		Blogcraft_Settings::set( 'research_provider', 'serpapi' );
+
+		$found = Blogcraft_Research::competitor_headings(
+			array( array( 'url' => home_url( '/some-post/' ) ) ),
+			1
+		);
+
+		$this->assertSame( array(), $found );
 	}
 
 	public function test_the_outline_prompt_is_told_what_is_already_covered() {
