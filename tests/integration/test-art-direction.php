@@ -155,7 +155,7 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		Blogcraft_Settings::set( 'fal_model', '' );
 
 		$this->assertFalse( Blogcraft_Image_Models::is_configured() );
-		$this->assertSame( '', Blogcraft_Image_Models::generate( 'a kettle', array() ) );
+		$this->assertSame( Blogcraft_Image_Models::nothing(), Blogcraft_Image_Models::generate( 'a kettle', array() ) );
 	}
 
 	public function test_a_reached_image_cap_stops_paid_generation() {
@@ -343,6 +343,21 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		$this->assertStringEndsWith( '.webp', Blogcraft_Images::filename_for( 'A title', 'image/webp' ) );
 		$this->assertStringEndsWith( '.jpg', Blogcraft_Images::filename_for( 'A title' ) );
 		$this->assertStringEndsWith( '.jpg', Blogcraft_Images::filename_for( 'A title', 'image/jpeg' ) );
+	}
+
+	public function test_every_picture_service_names_the_settings_it_reads() {
+		// A setting reached by building its name from a prefix is invisible to
+		// a search of the source and to the test that checks nothing is dead.
+		$schema = Blogcraft_Settings_Schema::all();
+
+		foreach ( array_keys( Blogcraft_Image_Models::providers() ) as $service ) {
+			$settings = Blogcraft_Image_Models::settings_for( $service );
+
+			$this->assertNotSame( '', $settings['key'], $service . ' names no key setting' );
+			$this->assertNotSame( '', $settings['model'], $service . ' names no model setting' );
+			$this->assertArrayHasKey( $settings['key'], $schema );
+			$this->assertArrayHasKey( $settings['model'], $schema );
+		}
 	}
 
 	public function test_every_generated_service_is_offered_and_routable() {

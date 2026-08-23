@@ -68,7 +68,7 @@ class Blogcraft_Image_Models {
 
 		if ( in_array( $provider, array( 'gemini', 'xai' ), true ) ) {
 			return '' !== self::key_for( $provider )
-				&& '' !== trim( (string) Blogcraft_Settings::get( 'image_model_' . $provider ) );
+				&& '' !== trim( (string) Blogcraft_Settings::get( self::settings_for( $provider )['model'] ) );
 		}
 
 		if ( 'openai' === $provider ) {
@@ -109,27 +109,61 @@ class Blogcraft_Image_Models {
 	 * @return string Empty when no usable key is stored.
 	 */
 	public static function key_for( $service ) {
-		$own = trim( (string) Blogcraft_Settings::get( 'image_key_' . $service ) );
+		$settings = self::settings_for( (string) $service );
 
-		if ( '' !== $own ) {
-			return $own;
-		}
+		if ( '' !== $settings['key'] ) {
+			$own = trim( (string) Blogcraft_Settings::get( $settings['key'] ) );
 
-		// One legacy field predates the shared naming and is still what the
-		// settings screen writes for OpenAI.
-		if ( 'openai' === $service ) {
-			$legacy = trim( (string) Blogcraft_Settings::get( 'openai_image_key' ) );
-
-			if ( '' !== $legacy ) {
-				return $legacy;
+			if ( '' !== $own ) {
+				return $own;
 			}
 		}
 
-		if ( (string) Blogcraft_Settings::get( 'provider_type' ) === $service ) {
+		if ( (string) Blogcraft_Settings::get( 'provider_type' ) === (string) $service ) {
 			return trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
 		}
 
 		return '';
+	}
+
+	/**
+	 * Which settings hold the key and the model for one picture service.
+	 *
+	 * Written out in full rather than built from a prefix. A key assembled by
+	 * concatenation is invisible to a search of the source and to the test that
+	 * checks every setting is read by something — which is how six settings on
+	 * the provider screen went unnoticed, and how these two were caught doing
+	 * exactly the same thing.
+	 *
+	 * @param string $service Service id.
+	 * @return array Keys: key, model.
+	 */
+	public static function settings_for( $service ) {
+		$map = array(
+			'openai' => array(
+				'key'   => 'openai_image_key',
+				'model' => 'openai_image_model',
+			),
+			'gemini' => array(
+				'key'   => 'image_key_gemini',
+				'model' => 'image_model_gemini',
+			),
+			'xai'    => array(
+				'key'   => 'image_key_xai',
+				'model' => 'image_model_xai',
+			),
+			'fal'    => array(
+				'key'   => 'fal_api_key',
+				'model' => 'fal_model',
+			),
+		);
+
+		$service = (string) $service;
+
+		return isset( $map[ $service ] ) ? $map[ $service ] : array(
+			'key'   => '',
+			'model' => '',
+		);
 	}
 
 	/**
@@ -387,7 +421,7 @@ class Blogcraft_Image_Models {
 		unset( $blueprint );
 
 		$key   = self::key_for( 'gemini' );
-		$model = trim( (string) Blogcraft_Settings::get( 'image_model_gemini' ) );
+		$model = trim( (string) Blogcraft_Settings::get( self::settings_for( 'gemini' )['model'] ) );
 		$base  = (string) Blogcraft_Endpoints::image( 'gemini' )['endpoint'];
 
 		if ( '' === $key || '' === $model || '' === $base ) {
@@ -454,7 +488,7 @@ class Blogcraft_Image_Models {
 		unset( $blueprint );
 
 		$key      = self::key_for( 'xai' );
-		$model    = trim( (string) Blogcraft_Settings::get( 'image_model_xai' ) );
+		$model    = trim( (string) Blogcraft_Settings::get( self::settings_for( 'xai' )['model'] ) );
 		$endpoint = (string) Blogcraft_Endpoints::image( 'xai' )['endpoint'];
 
 		if ( '' === $key || '' === $model || '' === $endpoint ) {
