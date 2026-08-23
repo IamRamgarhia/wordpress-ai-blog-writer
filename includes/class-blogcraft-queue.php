@@ -572,7 +572,12 @@ class Blogcraft_Queue {
 		// a half-written article and a lock nobody releases. Anything running
 		// finishes, and the reader can cancel it on the next tick if they still
 		// want to.
-		if ( ! in_array( (string) $status, array( 'pending', 'deferred', 'failed' ), true ) ) {
+		//
+		// 'ready' belongs here too: a finished draft waiting to be read holds
+		// no lock and is spending nothing, and discarding one is the whole
+		// point of the Discard button on the library screen. Leaving it out
+		// made that button silently do nothing.
+		if ( ! in_array( (string) $status, array( 'pending', 'deferred', 'failed', 'ready' ), true ) ) {
 			return false;
 		}
 

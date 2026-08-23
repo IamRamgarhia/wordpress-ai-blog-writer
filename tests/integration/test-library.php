@@ -67,7 +67,10 @@ class Test_Blogcraft_Library extends WP_UnitTestCase {
 		// Activity log lie by omission.
 		$job_id = $this->held_draft( 'Unwanted', 40 );
 
-		Blogcraft_Queue::cancel( $job_id );
+		// A held draft holds no lock and is spending nothing, so it is safe to
+		// cancel — but cancel() only listed the three statuses that existed
+		// before drafts could be held, which made the Discard button a no-op.
+		$this->assertTrue( Blogcraft_Queue::cancel( $job_id ), 'a held draft could not be discarded' );
 
 		$this->assertSame( 0, Blogcraft_Queue::held_count() );
 		$this->assertNotNull( Blogcraft_Queue::find( $job_id ), 'the job row was destroyed' );
