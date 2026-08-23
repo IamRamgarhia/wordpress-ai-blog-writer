@@ -3,3 +3,7 @@ node_modules/
 .phpunit.result.cache
 *.log
 .superpowers/
+
+# Build artifacts. Rebuilt by bin/build.py from whatever is committed,
+# so a copy in git is only ever a stale duplicate of the source beside it.
+*.zip
