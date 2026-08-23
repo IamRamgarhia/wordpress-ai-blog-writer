@@ -272,7 +272,15 @@ class Blogcraft_Provider_Registry {
 			return false;
 		}
 
-		$has_key  = '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
+		// A key saved for a different provider is not a key for this one.
+		// Keys live in one shared setting, so switching provider leaves the
+		// previous one's key behind — and counting it as configured means the
+		// checklist says "ready", the first post starts, and it fails several
+		// stages in with an authentication error nothing explains.
+		$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
+		$key_fits = ( '' === $owner || $owner === $type );
+
+		$has_key  = $key_fits && '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
 		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) )
 			|| '' !== self::default_base_url( $type );
 

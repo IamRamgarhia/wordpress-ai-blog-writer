@@ -91,6 +91,25 @@ class Test_Blogcraft_Readiness extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_a_key_saved_for_another_provider_does_not_count_as_configured() {
+		// Keys live in one shared setting, so switching provider leaves the
+		// previous one's behind. Counting it meant the checklist said "ready"
+		// and the first post failed several stages in on authentication.
+		Blogcraft_Settings::set( 'provider_type', 'gemini' );
+		Blogcraft_Settings::set( 'provider_model', 'gemini-2.5-flash' );
+		Blogcraft_Settings::set( 'provider_api_key', 'a-gemini-key' );
+		Blogcraft_Settings::set( 'provider_key_owner', 'gemini' );
+
+		$this->assertTrue( Blogcraft_Provider_Registry::is_configured() );
+
+		Blogcraft_Settings::set( 'provider_type', 'anthropic' );
+
+		$this->assertFalse(
+			Blogcraft_Provider_Registry::is_configured(),
+			'a key belonging to another provider counted as a working setup'
+		);
+	}
+
 	public function test_asking_about_an_empty_topic_calls_no_provider() {
 		$called = false;
 
