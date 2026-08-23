@@ -96,6 +96,30 @@ class Blogcraft_Worker {
 	}
 
 	/**
+	 * Advance one named job by exactly one stage.
+	 *
+	 * For a person watching their post being written, rather than a cron tick
+	 * draining whatever is queued. Runs in the browser's request, so it works
+	 * on a site where WP-Cron never fires — which is most staging
+	 * environments, and a good number of quiet live ones.
+	 *
+	 * @param int $job_id Job to advance.
+	 * @return bool Whether a stage was executed.
+	 */
+	public static function run_job( $job_id ) {
+		$job = Blogcraft_Queue::claim_job( (int) $job_id );
+
+		if ( null === $job ) {
+			return false;
+		}
+
+		Blogcraft_Cron_Health::record_heartbeat();
+		self::execute( $job );
+
+		return true;
+	}
+
+	/**
 	 * Run one job's current stage.
 	 *
 	 * @param Blogcraft_Job $job Claimed job.
@@ -136,6 +160,13 @@ class Blogcraft_Worker {
 
 		$next    = isset( $result['next'] ) ? $result['next'] : null;
 		$payload = isset( $result['payload'] ) && is_array( $result['payload'] ) ? $result['payload'] : array();
+
+		// A held job has already written its own row and is deliberately not
+		// finished — it is waiting for a person. Marking it complete here
+		// would erase that distinction and lose the draft.
+		if ( ! empty( $result['held'] ) ) {
+			return;
+		}
 
 		if ( null === $next || '' === $next ) {
 			Blogcraft_Queue::complete( $job->id );

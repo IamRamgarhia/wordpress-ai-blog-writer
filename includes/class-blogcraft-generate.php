@@ -1146,7 +1146,10 @@ class Blogcraft_Generate {
 		$evidence     = isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$overrides    = self::overrides_from( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
 		$placement    = self::placement_from( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is cast or sanitised inside placement_from().
-		$job_id       = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides, $evidence, $placement );
+		// Written by hand means somebody is sitting there waiting, so the draft
+		// is shown to them before it becomes a post. Autopilot passes false —
+		// unattended writing has the quality gate and the review queue instead.
+		$job_id = Blogcraft_Pipeline::enqueue_topic( $topic, $status, $instructions, $overrides, $evidence, $placement, true );
 
 		if ( $job_id <= 0 ) {
 			$clash = Blogcraft_Settings::get( 'duplicate_check_enabled' )
@@ -1167,7 +1170,22 @@ class Blogcraft_Generate {
 			self::back( false, __( 'The topic could not be queued.', 'blogcraft' ) );
 		}
 
-		self::back( true, __( 'Queued. The post will be written in the background.', 'blogcraft' ) );
+		// Straight to the screen that writes it, rather than a notice saying
+		// something is happening somewhere else. "Queued, it will be written
+		// in the background" is only true if cron fires, which on a staging
+		// site or a quiet blog it frequently does not — and even when it is
+		// true it leaves the reader with nothing to look at and no way to tell
+		// working from stuck.
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page' => Blogcraft_Progress::PAGE_SLUG,
+					'job'  => (int) $job_id,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
 	}
 
 	/**

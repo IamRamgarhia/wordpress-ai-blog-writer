@@ -96,6 +96,7 @@ class Blogcraft {
 			Blogcraft_Calendar::init();
 			Blogcraft_Activity::init();
 			Blogcraft_Docs::init();
+			Blogcraft_Progress::init();
 		}
 	}
 

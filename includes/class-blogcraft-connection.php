@@ -47,6 +47,87 @@ class Blogcraft_Connection {
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
 		add_action( 'wp_ajax_blogcraft_learn_voice', array( __CLASS__, 'handle_learn' ) );
+		add_action( 'wp_ajax_blogcraft_list_models', array( __CLASS__, 'handle_list_models' ) );
+	}
+
+	/**
+	 * Ask the configured provider which models this account can actually use.
+	 *
+	 * Every adapter has been able to do this since they were written, and
+	 * nothing ever called it — so the model id was a free-text box, and a
+	 * free-text box asking for "the model id exactly as your provider writes
+	 * it" invites the name of the key, the name of the product, or a model
+	 * that was retired last year. All three fail identically at generation
+	 * time, hours later, with an error from the provider that does not say
+	 * "you typed the wrong kind of thing here".
+	 *
+	 * Asking the provider is also the only approach that stays correct: no
+	 * list is bundled, so nothing needs updating when models change.
+	 *
+	 * @return void
+	 */
+	public static function handle_list_models() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+		}
+
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+		}
+
+		// Read from the form rather than from storage: the reader may be
+		// typing a key right now and have saved nothing yet, which is exactly
+		// the moment they want to see the list.
+		$type = isset( $_POST['provider_type'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$key  = isset( $_POST['api_key'] ) ? trim( (string) wp_unslash( $_POST['api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		$base = isset( $_POST['base_url'] ) ? esc_url_raw( trim( (string) wp_unslash( $_POST['base_url'] ) ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- esc_url_raw is the sanitiser for a URL.
+
+		if ( '' === $key ) {
+			$key = (string) Blogcraft_Settings::get( 'provider_api_key' );
+		}
+
+		if ( '' === $base ) {
+			$base = trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) );
+		}
+
+		if ( '' === $base ) {
+			$base = Blogcraft_Provider_Registry::default_base_url( $type );
+		}
+
+		$provider = Blogcraft_Provider_Registry::make(
+			$type,
+			array(
+				'base_url' => $base,
+				'endpoint' => $base,
+				'api_key'  => $key,
+				'model'    => '',
+			)
+		);
+
+		if ( null === $provider ) {
+			wp_send_json_error( array( 'message' => __( 'Choose a provider first.', 'blogcraft' ) ), 400 );
+		}
+
+		$models = array();
+
+		try {
+			$models = (array) $provider->list_models();
+		} catch ( Throwable $e ) {
+			$models = array();
+		}
+
+		if ( empty( $models ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Could not read a model list. Check the key is right, or type the model id yourself — the link beside this field goes to your provider\'s list.', 'blogcraft' ),
+				),
+				200
+			);
+		}
+
+		wp_send_json_success( array( 'models' => array_values( $models ) ) );
 	}
 
 	/**
@@ -82,19 +163,24 @@ class Blogcraft_Connection {
 			'blogcraft-admin',
 			'blogcraftProviders',
 			array(
-				'help'     => Blogcraft_Provider_Registry::help_map(),
-				'bases'    => Blogcraft_Provider_Registry::base_url_map(),
+				'help'      => Blogcraft_Provider_Registry::help_map(),
+				'bases'     => Blogcraft_Provider_Registry::base_url_map(),
 				/* translators: %s: default API address for the selected provider. */
-				'baseText' => __( 'Leave blank to use %s.', 'blogcraft' ),
-				'baseNone' => __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ),
-				'baseTail' => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'blogcraft' ),
+				'baseText'  => __( 'Leave blank to use %s.', 'blogcraft' ),
+				'baseNone'  => __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ),
+				'baseTail'  => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'blogcraft' ),
 				/* translators: %s: provider name, such as OpenAI. */
-				'keyText'  => __( 'Get a key from %s', 'blogcraft' ),
-				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( self::SAVE_ACTION ),
-				'learning' => __( 'Reading your posts...', 'blogcraft' ),
-				'learned'  => __( 'Learn from my posts', 'blogcraft' ),
-				'failed'   => __( 'Your posts could not be read. Fill the fields in yourself.', 'blogcraft' ),
+				'keyText'   => __( 'Get a key from %s', 'blogcraft' ),
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( self::SAVE_ACTION ),
+				'learning'  => __( 'Reading your posts...', 'blogcraft' ),
+				'learned'   => __( 'Learn from my posts', 'blogcraft' ),
+				'failed'    => __( 'Your posts could not be read. Fill the fields in yourself.', 'blogcraft' ),
+				'asking'    => __( 'Asking your provider...', 'blogcraft' ),
+				'askModel'  => __( 'Show the models on my account', 'blogcraft' ),
+				/* translators: %d: how many models the provider returned. */
+				'gotModels' => __( '%d models on your account. Pick one and it fills the box above.', 'blogcraft' ),
+				'pickModel' => __( 'Pick a model...', 'blogcraft' ),
 			)
 		);
 	}
@@ -391,6 +477,14 @@ class Blogcraft_Connection {
 				$field[1],
 				'provider_base_url' === $name ? $default_base : ''
 			);
+
+			// The model field gets a way to ask the provider what this account
+			// can actually use, because "type the id exactly" is an invitation
+			// to type the name of the key instead — and that failure only
+			// surfaces hours later as an error from the provider.
+			if ( 'provider_model' === $name ) {
+				self::render_model_picker();
+			}
 		}
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
@@ -1026,6 +1120,29 @@ class Blogcraft_Connection {
 			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ),
 			esc_attr( $row_class ),
 			self::clear_key_control( $name, $stored ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		);
+	}
+
+	/**
+	 * A control that fills the model field from the provider's own list.
+	 *
+	 * Deliberately additive rather than a replacement: the text field stays,
+	 * because a custom endpoint, a self-hosted runtime, or a model too new to
+	 * appear in a list all need somewhere to type. This just means nobody
+	 * *has* to.
+	 *
+	 * @return void
+	 */
+	private static function render_model_picker() {
+		printf(
+			'<tr class="bc-model-picker-row"><th scope="row"></th><td>'
+			. '<button type="button" class="button" id="blogcraft-fetch-models">%1$s</button> '
+			. '<select id="blogcraft-model-choices" class="bc-model-choices" hidden><option value="">%2$s</option></select>'
+			. '<p class="description" id="blogcraft-model-status">%3$s</p>'
+			. '</td></tr>',
+			esc_html__( 'Show the models on my account', 'blogcraft' ),
+			esc_html__( 'Pick a model…', 'blogcraft' ),
+			esc_html__( 'Asks your provider which models your key can use, and fills the box above. Nothing is bundled, so this list is never out of date.', 'blogcraft' )
 		);
 	}
 

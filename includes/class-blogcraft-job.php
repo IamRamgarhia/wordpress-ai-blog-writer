@@ -65,6 +65,17 @@ class Blogcraft_Job {
 	public $max_attempts = 3;
 
 	/**
+	 * Why the last attempt stopped, when one did.
+	 *
+	 * Carried so a screen can say what went wrong without a second query. The
+	 * column has always held this; the value object simply never read it, so
+	 * anything wanting to show a reason had to go back to the database for it.
+	 *
+	 * @var string
+	 */
+	public $last_error = '';
+
+	/**
 	 * Build a job from a database row.
 	 *
 	 * @param array $row Associative row from the jobs table.
@@ -78,6 +89,7 @@ class Blogcraft_Job {
 		$job->status       = isset( $row['status'] ) ? (string) $row['status'] : 'pending';
 		$job->attempts     = isset( $row['attempts'] ) ? (int) $row['attempts'] : 0;
 		$job->max_attempts = isset( $row['max_attempts'] ) ? (int) $row['max_attempts'] : 3;
+		$job->last_error   = isset( $row['last_error'] ) ? (string) $row['last_error'] : '';
 
 		$decoded      = isset( $row['payload'] ) ? json_decode( (string) $row['payload'], true ) : array();
 		$job->payload = is_array( $decoded ) ? $decoded : array();

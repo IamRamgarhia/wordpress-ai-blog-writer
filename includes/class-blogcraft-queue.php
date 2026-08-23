@@ -142,6 +142,117 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * Claim one specific job, rather than whatever is next in line.
+	 *
+	 * The ordinary claim() takes the oldest pending job, which is right for a
+	 * cron tick draining a queue. It is wrong for a person watching one post
+	 * being written: they pressed a button about *this* post, and advancing
+	 * somebody else's would leave their screen reporting progress that is not
+	 * theirs. Same atomic conditional UPDATE, narrowed to one row.
+	 *
+	 * @param int $job_id Job to claim.
+	 * @return Blogcraft_Job|null Null when it is not available to claim.
+	 */
+	public static function claim_job( $job_id ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+		$token = wp_generate_password( 32, false );
+		$now   = current_time( 'mysql', true );
+
+		$updated = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"UPDATE {$table} SET status = 'running', lock_token = %s, locked_at = %s, updated_at = %s WHERE id = %d AND status = 'pending' AND available_at <= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$token,
+				$now,
+				$now,
+				(int) $job_id,
+				$now
+			)
+		);
+
+		if ( ! $updated ) {
+			return null;
+		}
+
+		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE lock_token = %s LIMIT 1", $token ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			ARRAY_A
+		);
+
+		return is_array( $row ) ? Blogcraft_Job::from_row( $row ) : null;
+	}
+
+	/**
+	 * One job, whatever state it is in.
+	 *
+	 * @param int $job_id Job id.
+	 * @return Blogcraft_Job|null
+	 */
+	public static function find( $job_id ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d LIMIT 1", (int) $job_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			ARRAY_A
+		);
+
+		return is_array( $row ) ? Blogcraft_Job::from_row( $row ) : null;
+	}
+
+	/**
+	 * Park a finished draft and wait for a person to look at it.
+	 *
+	 * The distinction this draws is the one the plugin was missing: a job can
+	 * be *done writing* without being *done*. Everything up to and including
+	 * verify has run, the article and its score are on the payload, and the
+	 * only thing left is a decision nobody but the author can make. The stage
+	 * is left pointing at publish, so approving is just letting it continue.
+	 *
+	 * @param int   $job_id  Job id.
+	 * @param array $payload Payload carrying the finished article.
+	 * @return void
+	 */
+	public static function hold( $job_id, $payload ) {
+		self::update(
+			$job_id,
+			array(
+				'status'     => 'ready',
+				'stage'      => 'publish',
+				'payload'    => wp_json_encode( $payload ),
+				'lock_token' => null,
+				'locked_at'  => null,
+			)
+		);
+	}
+
+	/**
+	 * Let a held job finish.
+	 *
+	 * @param int $job_id Job id.
+	 * @return bool Whether it was released.
+	 */
+	public static function approve( $job_id ) {
+		$job = self::find( $job_id );
+
+		if ( null === $job || 'ready' !== $job->status ) {
+			return false;
+		}
+
+		self::update(
+			$job_id,
+			array(
+				'status'       => 'pending',
+				'available_at' => current_time( 'mysql', true ),
+			)
+		);
+
+		return true;
+	}
+
+	/**
 	 * Mark a job finished.
 	 *
 	 * @param int $job_id Job id.

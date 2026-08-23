@@ -49,9 +49,10 @@ class Blogcraft_Pipeline {
 	 * @param array  $overrides    Blueprint fields to change for this post only.
 	 * @param string $evidence     The writer's own figures and findings, used as fact.
 	 * @param array  $placement    Where the finished post lands: category, tags, author, publish_at.
+	 * @param bool   $await_review Stop when the draft is written and wait to be looked at.
 	 * @return int Job id, or 0 on failure.
 	 */
-	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '', $placement = array() ) {
+	public static function enqueue_topic( $topic, $status = 'draft', $instructions = '', $overrides = array(), $evidence = '', $placement = array(), $await_review = false ) {
 		// Near-identical posts are what search engines treat as scaled content
 		// abuse, so a repeat is refused before it costs any tokens.
 		if ( Blogcraft_Settings::get( 'duplicate_check_enabled' ) ) {
@@ -79,6 +80,10 @@ class Blogcraft_Pipeline {
 				// cannot produce, so it is carried separately from guidance and
 				// treated as fact rather than suggestion.
 				'evidence'     => (string) $evidence,
+				// Set when a person is watching and wants the last word. The
+				// verify stage reads it and parks the finished draft instead
+				// of creating a post.
+				'await_review' => (bool) $await_review,
 				// Where the finished post lands. Carried on the job rather than
 				// applied at queue time because the post does not exist yet.
 				'placement'    => is_array( $placement ) ? $placement : array(),
@@ -941,6 +946,29 @@ class Blogcraft_Pipeline {
 		$payload['metrics']      = $scorecard['metrics'];
 		$payload['needs_review'] = $scorecard['score'] < (int) Blogcraft_Settings::get( 'quality_threshold' );
 
+		// Stop here and wait, when the reader asked to see it first. Writing is
+		// finished — article, score and every check are on the payload — and
+		// the only step left is a decision about somebody's own site, which is
+		// not a decision this plugin should make silently while nobody is
+		// looking. Held rather than completed: the stage stays pointed at
+		// publish, so approving is just letting it carry on.
+		if ( ! empty( $payload['await_review'] ) ) {
+			Blogcraft_Queue::hold( (int) $job->id, $payload );
+
+			Blogcraft_Logger::info(
+				'The draft is written and waiting to be looked at.',
+				array( 'score' => (int) $scorecard['score'] ),
+				(int) $job->id
+			);
+
+			// Nothing further to advance: hold() has already written the row.
+			return array(
+				'next'    => null,
+				'payload' => $payload,
+				'held'    => true,
+			);
+		}
+
 		return array(
 			'next'    => 'publish',
 			'payload' => $payload,
@@ -995,6 +1023,8 @@ class Blogcraft_Pipeline {
 			throw new RuntimeException( 'The generated article was empty.' );
 		}
 
+		$content = self::for_editor( $content );
+
 		$postarr = array(
 			'post_title'   => $title,
 			'post_content' => $content,
@@ -1038,6 +1068,49 @@ class Blogcraft_Pipeline {
 		);
 
 		return self::finish_publish( $job, (int) $post_id, $payload, $article );
+	}
+
+	/**
+	 * Match the content to whichever editor this site actually uses.
+	 *
+	 * Block markup is a set of HTML comments wrapped around ordinary HTML, so
+	 * it renders correctly on the front end either way. The difference is what
+	 * happens when somebody opens the post to edit it: in the Classic editor
+	 * those comments are visible clutter in the text area, sitting between
+	 * every paragraph. Stripping them there costs nothing — the markup inside
+	 * is the same HTML the blocks were wrapping.
+	 *
+	 * Detected rather than configured, because the site already knows: the
+	 * Classic Editor plugin, a `use_block_editor_for_post_type` filter, or a
+	 * theme opting out all answer this question, and asking the reader to
+	 * answer it again is asking them to keep two settings in sync.
+	 *
+	 * @param string $content Block markup.
+	 * @return string Content suited to the active editor.
+	 */
+	private static function for_editor( $content ) {
+		$blocks = function_exists( 'use_block_editor_for_post_type' )
+			? use_block_editor_for_post_type( 'post' )
+			: true;
+
+		/**
+		 * Whether to write block markup.
+		 *
+		 * @param bool $blocks Whether the block editor is in use for posts.
+		 */
+		if ( apply_filters( 'blogcraft_use_block_markup', $blocks ) ) {
+			return $content;
+		}
+
+		// Only the delimiters go. Every tag between them is kept exactly as it
+		// was, so the post reads identically on the front end.
+		$stripped = (string) preg_replace( '#<!--\s*/?wp:.*?-->#s', '', $content );
+
+		// Collapse the blank lines the delimiters leave behind, so the Classic
+		// editor does not open on a wall of gaps.
+		$stripped = (string) preg_replace( "/\n{3,}/", "\n\n", $stripped );
+
+		return trim( $stripped );
 	}
 
 	/**

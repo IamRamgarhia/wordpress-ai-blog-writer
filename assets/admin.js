@@ -314,3 +314,94 @@
 			} );
 	} );
 }() );
+
+/**
+ * Fill the model box from the provider's own list.
+ *
+ * The model field asks for an id "exactly as your provider writes it", which
+ * is a reasonable instruction and still gets the name of the API key typed
+ * into it — the two things sit side by side in every provider's console. That
+ * mistake is invisible until generation runs and the provider rejects it.
+ *
+ * Every adapter has always been able to list models; nothing called it.
+ */
+( function () {
+	'use strict';
+
+	var button = document.getElementById( 'blogcraft-fetch-models' );
+	var choices = document.getElementById( 'blogcraft-model-choices' );
+	var status = document.getElementById( 'blogcraft-model-status' );
+	var field = document.getElementById( 'blogcraft_provider_model' );
+	var config = window.blogcraftProviders || {};
+
+	if ( ! button || ! choices || ! field ) {
+		return;
+	}
+
+	function value( id ) {
+		var el = document.getElementById( id );
+
+		return el ? el.value : '';
+	}
+
+	choices.addEventListener( 'change', function () {
+		if ( choices.value ) {
+			field.value = choices.value;
+		}
+	} );
+
+	button.addEventListener( 'click', function () {
+		button.disabled = true;
+		button.textContent = config.asking || 'Asking your provider...';
+
+		var body = new FormData();
+		body.append( 'action', 'blogcraft_list_models' );
+		body.append( '_blogcraft_nonce', config.nonce || '' );
+		body.append( 'provider_type', value( 'blogcraft_provider_type' ) );
+		body.append( 'base_url', value( 'blogcraft_provider_base_url' ) );
+
+		// Sent only when freshly typed; blank means "use the saved one", which
+		// the handler resolves server-side. The key never round-trips back.
+		body.append( 'api_key', value( 'blogcraft_provider_api_key' ) );
+
+		fetch( config.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body } )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( payload ) {
+				button.disabled = false;
+				button.textContent = config.askModel || 'Show the models on my account';
+
+				var models = payload && payload.data && payload.data.models;
+
+				if ( ! payload || ! payload.success || ! models || ! models.length ) {
+					if ( status ) {
+						status.textContent = ( payload && payload.data && payload.data.message ) || '';
+					}
+
+					return;
+				}
+
+				while ( choices.options.length > 1 ) {
+					choices.remove( 1 );
+				}
+
+				for ( var i = 0; i < models.length; i++ ) {
+					var option = document.createElement( 'option' );
+					option.value = models[ i ];
+					option.textContent = models[ i ];
+					choices.appendChild( option );
+				}
+
+				choices.hidden = false;
+
+				if ( status ) {
+					status.textContent = ( config.gotModels || '%d models on your account.' ).replace( '%d', models.length );
+				}
+			} )
+			.catch( function () {
+				button.disabled = false;
+				button.textContent = config.askModel || 'Show the models on my account';
+			} );
+	} );
+}() );
