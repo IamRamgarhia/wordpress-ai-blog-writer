@@ -278,9 +278,20 @@ class Blogcraft_Connection {
 	 *
 	 * @return array
 	 */
+	private static function picture_toggles() {
+		return array(
+			'images_enabled'     => __( 'Give each post a featured image', 'blogcraft' ),
+			'images_per_section' => __( 'Also put a picture under each section heading', 'blogcraft' ),
+		);
+	}
+
+	/**
+	 * Boolean feature toggles.
+	 *
+	 * @return array
+	 */
 	private static function toggle_fields() {
 		return array(
-			'images_enabled'          => __( 'Generate a featured image', 'blogcraft' ),
 			'internal_links_enabled'  => __( 'Add links to your existing posts', 'blogcraft' ),
 			'verify_links_enabled'    => __( 'Check that links resolve before publishing', 'blogcraft' ),
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
@@ -405,6 +416,46 @@ class Blogcraft_Connection {
 
 		self::open_card(
 			'02',
+			__( 'Connect a picture service', 'blogcraft' ),
+			__( 'Pictures come from a different kind of service than the writing does. One of them is free and needs no key, so this card can be left exactly as it is.', 'blogcraft' ),
+			'pictures'
+		);
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		foreach ( self::picture_toggles() as $name => $label ) {
+			self::checkbox_row( $name, $label );
+		}
+
+		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'blogcraft' ) . '</label></th><td>';
+		echo '<select name="image_provider" id="blogcraft_image_provider">';
+		foreach ( Blogcraft_Images::providers() as $id => $label ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $id ),
+				selected( (string) Blogcraft_Settings::get( 'image_provider' ), $id, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft' ) . '</p>';
+		echo '</td></tr>';
+
+		self::number_row(
+			'monthly_image_cap',
+			__( 'Most paid images per month', 'blogcraft' ),
+			__( 'Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'blogcraft' )
+		);
+
+		self::image_model_rows();
+
+		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft' ) );
+		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft' ) );
+
+		echo '</tbody></table>';
+		self::close_card();
+
+		self::open_card(
+			'03',
 			__( 'Research', 'blogcraft' ),
 			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft' ),
 			'research'
@@ -447,7 +498,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 		self::close_card();
 
-		self::open_card( '03', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ), 'voice' );
+		self::open_card( '04', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ), 'voice' );
 		if ( Blogcraft_Learn::sample( 1 ) ) {
 			printf(
 				'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
@@ -490,7 +541,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '04', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ), 'automation' );
+		self::open_card( '05', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ), 'automation' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -509,31 +560,6 @@ class Blogcraft_Connection {
 			__( 'Hold posts scoring below', 'blogcraft' ),
 			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft' )
 		);
-		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Image source', 'blogcraft' ) . '</label></th><td>';
-		echo '<select name="image_provider" id="blogcraft_image_provider">';
-		foreach ( Blogcraft_Images::providers() as $id => $label ) {
-			printf(
-				'<option value="%s"%s>%s</option>',
-				esc_attr( $id ),
-				selected( (string) Blogcraft_Settings::get( 'image_provider' ), $id, false ),
-				esc_html( $label )
-			);
-		}
-		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft' ) . '</p>';
-		echo '</td></tr>';
-
-		self::number_row(
-			'monthly_image_cap',
-			__( 'Most generated images per month', 'blogcraft' ),
-			__( 'Only counts pictures made by a paid service. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'blogcraft' )
-		);
-
-		self::image_model_rows();
-
-		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft' ) );
-		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft' ) );
-
 		self::number_row(
 			'refresh_after_days',
 			__( 'Consider a post stale after', 'blogcraft' ),
@@ -564,7 +590,7 @@ class Blogcraft_Connection {
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '05', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
+		self::open_card( '06', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
@@ -635,6 +661,15 @@ class Blogcraft_Connection {
 					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'blogcraft' ),
 					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'blogcraft' ),
 					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'blogcraft' ),
+				),
+			),
+			'pictures'   => array(
+				'anchor' => 'pictures',
+				'lines'  => array(
+					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required: Pollinations needs no key and is what runs if you change nothing.', 'blogcraft' ),
+					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'blogcraft' ),
+					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'blogcraft' ),
+					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'blogcraft' ),
 				),
 			),
 			'research'   => array(
@@ -735,6 +770,7 @@ class Blogcraft_Connection {
 	private static function render_jump() {
 		$sections = array(
 			'provider'   => array( __( 'Connect a provider', 'blogcraft' ), __( 'Key, model, spending cap', 'blogcraft' ) ),
+			'pictures'   => array( __( 'Connect a picture service', 'blogcraft' ), __( 'Who draws them, and what it costs', 'blogcraft' ) ),
 			'research'   => array( __( 'Research', 'blogcraft' ), __( 'Where facts come from', 'blogcraft' ) ),
 			'voice'      => array( __( 'Describe your voice', 'blogcraft' ), __( 'Subject, reader, style', 'blogcraft' ) ),
 			'automation' => array( __( 'Automation', 'blogcraft' ), __( 'Schedule, images, links, quality', 'blogcraft' ) ),
@@ -1160,6 +1196,10 @@ class Blogcraft_Connection {
 
 		// An unchecked checkbox posts nothing, so absence means false.
 		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $toggle ) {
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		foreach ( array_keys( self::picture_toggles() ) as $toggle ) {
 			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 

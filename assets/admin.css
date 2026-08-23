@@ -1150,3 +1150,72 @@ body[class*="page_blogcraft"] #wpcontent {
 .blogcraft-step {
 	display: inline-block;
 }
+
+/* ------------------------------------------------------- the how panel. */
+
+.bc-how {
+	margin: 16px 0 4px;
+	padding: 0;
+	list-style: none;
+	counter-reset: bc-how;
+}
+
+.bc-how li {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	margin: 0;
+	padding: 14px 0;
+	border-top: 1px solid var(--bc-glass-edge);
+	counter-increment: bc-how;
+}
+
+.bc-how li:first-child {
+	border-top: 0;
+}
+
+.bc-how li::before {
+	content: counter(bc-how);
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: var(--bc-accent-soft);
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 24px;
+	text-align: center;
+	color: var(--bc-accent);
+}
+
+.blogcraft-step-text {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.blogcraft-step-text strong {
+	display: block;
+	margin-bottom: 3px;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--bc-ink);
+}
+
+.blogcraft-step-text span {
+	display: block;
+	max-width: 76ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-muted);
+}
+
+.bc-how li .button {
+	flex: 0 0 auto;
+	margin-top: 2px;
+}
+
+@media (max-width: 782px) {
+	.bc-how li {
+		flex-wrap: wrap;
+	}
+}

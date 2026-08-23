@@ -404,6 +404,32 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		$this->assertGreaterThan( 50, Blogcraft_Seo::word_count( get_post( $post_id ) ) );
 	}
 
+	public function test_both_picture_switches_are_reachable() {
+		// images_per_section was read by the pipeline and rendered nowhere, so
+		// there was no way to turn body images on at all.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		foreach ( array( 'images_enabled', 'images_per_section' ) as $toggle ) {
+			$this->assertStringContainsString( "'" . $toggle . "'", $source, $toggle . ' has no control' );
+		}
+	}
+
+	public function test_every_settings_card_that_has_a_help_panel_has_a_docs_section() {
+		// The picture card is new; every card that offers to explain itself has
+		// to have somewhere to send the reader.
+		$source   = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$sections = Blogcraft_Docs::sections();
+
+		preg_match_all( "/'anchor'\s*=>\s*'([a-z-]+)'/", $source, $hits );
+
+		$this->assertNotEmpty( $hits[1] );
+		$this->assertContains( 'pictures', $hits[1], 'the picture card explains nothing' );
+
+		foreach ( $hits[1] as $anchor ) {
+			$this->assertArrayHasKey( $anchor, $sections, $anchor . ' has no documentation section' );
+		}
+	}
+
 	public function test_every_extra_section_can_actually_be_rendered() {
 		// A switch that produces no markup is the same failure in a different
 		// place, so each one is asserted to reach the page.

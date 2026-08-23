@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.28.0
+Stable tag: 0.29.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,6 +138,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.29.0 =
+* Pictures now have their own settings card next to the one for writing, instead of being buried three cards down under Automation
+* Fixed: the switch for putting a picture under each section heading was read by the pipeline and rendered nowhere, so it could not be turned on
+* Overview explains how the plugin is used in four steps, and keeps explaining it after the setup checklist has gone
 
 = 0.28.0 =
 * Google Gemini and xAI Grok can now draw the pictures. If you already write with either, the same key does both

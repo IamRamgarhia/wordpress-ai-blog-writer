@@ -40,6 +40,7 @@ class Blogcraft_Overview {
 		echo '</div>';
 
 		self::render_setup();
+		self::render_how();
 		self::render_attention();
 		self::render_numbers();
 		self::render_recent();
@@ -141,6 +142,95 @@ class Blogcraft_Overview {
 				'action' => __( 'Write one', 'blogcraft' ),
 			),
 		);
+	}
+
+	/**
+	 * What using this actually looks like.
+	 *
+	 * Four steps, always present, folded shut once the setup checklist has
+	 * gone. The checklist answers "what have I not done yet" and stops being
+	 * useful the moment it is complete; this answers "how do I use this", which
+	 * stays useful and is what somebody returning after a fortnight wants.
+	 *
+	 * @return void
+	 */
+	private static function render_how() {
+		$steps = array(
+			array(
+				__( 'Connect a provider, and a picture service', 'blogcraft' ),
+				__( 'The writing needs a key from an AI provider — yours, billed to you. Pictures come from a separate service, and the one that runs by default needs no key at all.', 'blogcraft' ),
+				admin_url( 'admin.php?page=blogcraft-settings' ),
+				__( 'Settings', 'blogcraft' ),
+			),
+			array(
+				__( 'Tell it how you write', 'blogcraft' ),
+				__( 'Start from a shape — a guide, a listicle, a review — or paste an article you admire and it will measure how that one is built. If you already have posts here, it can read them and describe your voice for you.', 'blogcraft' ),
+				admin_url( 'admin.php?page=blogcraft-blueprint' ),
+				__( 'How it writes', 'blogcraft' ),
+			),
+			array(
+				__( 'Give it a topic, and anything only you know', 'blogcraft' ),
+				__( 'The topic is the only field you have to fill in. The one worth filling in anyway is what you know that nobody else does: your own figures and results are used as fact and checked against the finished draft.', 'blogcraft' ),
+				admin_url( 'admin.php?page=blogcraft-write' ),
+				__( 'Write a post', 'blogcraft' ),
+			),
+			array(
+				__( 'Read it before anything goes out', 'blogcraft' ),
+				__( 'Posts are saved as drafts. Every draft is measured first and anything below your threshold is held for review, so nothing is published that has not been looked at.', 'blogcraft' ),
+				admin_url( 'edit.php?post_status=draft&post_type=post' ),
+				__( 'Your drafts', 'blogcraft' ),
+			),
+		);
+
+		// Open while there is still setup to do, shut afterwards.
+		$open = ! self::setup_done();
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'How this works', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Four steps, once. After that it is a topic and a look at the draft.', 'blogcraft' ) . '</p>';
+
+		printf(
+			'<button type="button" class="bc-help-toggle" aria-expanded="%1$s" aria-controls="bc-how"><span aria-hidden="true">?</span>%2$s</button>',
+			$open ? 'true' : 'false',
+			esc_html__( 'Show the steps', 'blogcraft' )
+		);
+
+		echo '</header>';
+
+		printf( '<ol class="blogcraft-steps bc-how" id="bc-how"%s>', $open ? '' : ' hidden' );
+
+		foreach ( $steps as $step ) {
+			printf(
+				'<li><div class="blogcraft-step-text"><strong>%1$s</strong><span>%2$s</span></div><a class="button" href="%3$s">%4$s</a></li>',
+				esc_html( $step[0] ),
+				esc_html( $step[1] ),
+				esc_url( $step[2] ),
+				esc_html( $step[3] )
+			);
+		}
+
+		echo '</ol>';
+		printf(
+			'<p class="blogcraft-hint"><a href="%1$s">%2$s</a></p>',
+			esc_url( Blogcraft_Docs::url() ),
+			esc_html__( 'Everything else, in detail', 'blogcraft' )
+		);
+		echo '</section>';
+	}
+
+	/**
+	 * Whether every setup step is finished.
+	 *
+	 * @return bool
+	 */
+	private static function setup_done() {
+		foreach ( self::setup_steps() as $step ) {
+			if ( empty( $step['done'] ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
