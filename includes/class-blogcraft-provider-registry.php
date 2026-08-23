@@ -32,7 +32,23 @@ class Blogcraft_Provider_Registry {
 	 * @return array Machine id => spec.
 	 */
 	public static function catalogue() {
-		return array(
+		$out = array();
+
+		// Listed first when it exists, because it is the easiest route there
+		// is: no signup, no key, no model id. Left out entirely when it does
+		// not, since an option that cannot work is worse than no option.
+		if ( Blogcraft_Provider_Wpai::is_available() ) {
+			$out['wpai'] = array(
+				'label'    => __( 'WordPress AI Client — no key needed', 'blogcraft' ),
+				'adapter'  => 'wpai',
+				'base_url' => '',
+				'help'     => 'WordPress',
+				'key_url'  => '',
+				'docs_url' => 'https://developer.wordpress.org/plugins/ai/',
+			);
+		}
+
+		return $out + array(
 			'openai'     => array(
 				'label'    => __( 'OpenAI — GPT', 'blogcraft' ),
 				'adapter'  => 'openai',
@@ -188,6 +204,8 @@ class Blogcraft_Provider_Registry {
 		}
 
 		switch ( $catalogue[ $type ]['adapter'] ) {
+			case 'wpai':
+				return new Blogcraft_Provider_Wpai( $config );
 			case 'gemini':
 				return new Blogcraft_Provider_Gemini( $config );
 			case 'anthropic':
@@ -309,11 +327,19 @@ class Blogcraft_Provider_Registry {
 	 * @return bool
 	 */
 	public static function is_configured() {
+		$type = (string) Blogcraft_Settings::get( 'provider_type' );
+
+		// The AI Client needs neither key nor model id: WordPress holds the
+		// credentials and picks the model. What it does need is a provider
+		// plugin actually installed behind it, which is a different question
+		// from whether the function exists.
+		if ( 'wpai' === $type ) {
+			return Blogcraft_Provider_Wpai::is_ready();
+		}
+
 		if ( '' === trim( (string) Blogcraft_Settings::get( 'provider_model' ) ) ) {
 			return false;
 		}
-
-		$type = (string) Blogcraft_Settings::get( 'provider_type' );
 
 		$has_key  = '' !== trim( (string) Blogcraft_Settings::get( 'provider_api_key' ) );
 		$has_base = '' !== trim( (string) Blogcraft_Settings::get( 'provider_base_url' ) )

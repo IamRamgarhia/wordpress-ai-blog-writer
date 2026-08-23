@@ -2,9 +2,9 @@
 Contributors: dicecodes
 Tags: ai content generator, ai writer, autoblogging, content generator, seo content
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.25.0
+Stable tag: 0.26.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,10 @@ Blogcraft contacts no servers of its own. It collects no analytics and sends not
 
 It contacts only the services you configure, and only when generating a post:
 
+**The WordPress AI Client** — on WordPress 7.0 and later, if a provider plugin is installed, Blogcraft can route everything through WordPress instead. No key here and no signup: the credentials live in WordPress and the request goes wherever your site already sends AI requests. It is offered in the provider list only when it is genuinely available.
+
+Blogcraft still talks to providers directly as well, and will keep doing so. It supports WordPress 6.0, where the AI Client does not exist; the AI Client needs a separate provider plugin, so a 7.0 site can have it and still have nothing behind it; and naming fourteen providers including models running on your own machine is the point of a bring-your-own-key tool.
+
 **AI providers** — one of the following, whichever you set up. The topic, your style settings and any gathered research are sent so the post can be written.
 
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
@@ -130,6 +134,11 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.26.0 =
+* Tested against WordPress 7.1
+* On WordPress 7.0 and later, Blogcraft can route through the WordPress AI Client: no key, no signup, no model id. Offered only when a provider plugin is actually installed behind it
+* Related posts no longer exclude the current post in the database query, which got slower as a site grew
 
 = 0.25.0 =
 * Five optional extra sections, written from the finished article in one extra request: who it is for and who it is not, what works and what does not, a table of the figures with their sources, mistakes worth avoiding, and the sources it was written from

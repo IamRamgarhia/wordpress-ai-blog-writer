@@ -55,9 +55,9 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 
 	public function test_hosted_providers_say_where_to_get_a_key() {
 		foreach ( Blogcraft_Provider_Registry::catalogue() as $id => $spec ) {
-			// Local runtimes need no key, and the custom endpoint is the user's
-			// own; everything else must point somewhere.
-			if ( in_array( $id, array( 'custom', 'ollama', 'lmstudio' ), true ) ) {
+			// Local runtimes need no key, the custom endpoint is the user's
+			// own, and the AI Client holds credentials in WordPress itself.
+			if ( in_array( $id, array( 'custom', 'ollama', 'lmstudio', 'wpai' ), true ) ) {
 				continue;
 			}
 
@@ -70,12 +70,49 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 
 	public function test_every_provider_but_the_custom_one_has_an_address() {
 		foreach ( array_keys( Blogcraft_Provider_Registry::catalogue() ) as $id ) {
-			if ( 'custom' === $id ) {
+			// The AI Client has no address of its own: WordPress routes it.
+			if ( in_array( $id, array( 'custom', 'wpai' ), true ) ) {
 				continue;
 			}
 
 			$this->assertNotSame( '', Blogcraft_Provider_Registry::default_base_url( $id ), $id . ' has no default address' );
 		}
+	}
+
+	public function test_the_wordpress_ai_client_is_only_offered_when_it_exists() {
+		// An option that cannot work is worse than no option, so it appears in
+		// the list only when the function really is there.
+		$offered = array_key_exists( 'wpai', Blogcraft_Provider_Registry::types() );
+
+		$this->assertSame( function_exists( 'wp_ai_client_prompt' ), $offered );
+	}
+
+	public function test_the_ai_client_adapter_is_safe_where_there_is_no_client() {
+		// The plugin supports WordPress 6.0, where none of this exists, so the
+		// adapter has to be constructible and has to answer rather than fatal.
+		$provider = new Blogcraft_Provider_Wpai( array() );
+
+		$this->assertInstanceOf( 'Blogcraft_Provider', $provider );
+		$this->assertSame( 'wpai', $provider->id() );
+		$this->assertSame( array(), $provider->list_models() );
+
+		if ( Blogcraft_Provider_Wpai::is_available() ) {
+			$this->markTestSkipped( 'This WordPress has an AI Client, so the absent case cannot be exercised.' );
+		}
+
+		$this->assertFalse( Blogcraft_Provider_Wpai::is_ready() );
+
+		$response = $provider->complete(
+			array(
+				array(
+					'role'    => 'user',
+					'content' => 'hi',
+				),
+			)
+		);
+
+		$this->assertTrue( $response->is_error() );
+		$this->assertStringContainsString( 'AI Client', $response->error );
 	}
 
 	public function test_a_local_runtime_needs_no_key_to_count_as_configured() {

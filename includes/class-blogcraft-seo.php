@@ -54,8 +54,11 @@ class Blogcraft_Seo {
 			$args['s'] = implode( ' ', $terms );
 		}
 
+		// Excluding by post__not_in makes the database do the filtering and gets
+		// slower as a site grows, which is why it is flagged. Asking for one
+		// more row and dropping the unwanted one here costs nothing and scales.
 		if ( $exclude > 0 ) {
-			$args['post__not_in'] = array( (int) $exclude );
+			++$args['posts_per_page'];
 		}
 
 		$out = self::run_query( $args );
@@ -68,7 +71,31 @@ class Blogcraft_Seo {
 			$out = self::run_query( $args );
 		}
 
-		return $out;
+		return self::without( $out, (int) $exclude, (int) $limit );
+	}
+
+	/**
+	 * Drop one post from a result set and trim it back to length.
+	 *
+	 * @param array $posts   Flattened posts.
+	 * @param int   $exclude Post id to leave out, or 0 for none.
+	 * @param int   $limit   How many to keep.
+	 * @return array
+	 */
+	private static function without( $posts, $exclude, $limit ) {
+		if ( $exclude > 0 ) {
+			$kept = array();
+
+			foreach ( $posts as $post ) {
+				if ( (int) $post['id'] !== $exclude ) {
+					$kept[] = $post;
+				}
+			}
+
+			$posts = $kept;
+		}
+
+		return array_slice( $posts, 0, max( 1, $limit ) );
 	}
 
 	/**
