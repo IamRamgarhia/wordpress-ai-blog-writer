@@ -145,16 +145,32 @@ Rules for this article:
 	/**
 	 * Messages asking for an article outline.
 	 *
-	 * @param string $topic   Topic to write about.
-	 * @param array  $sources Reference material, possibly empty.
-	 * @param string $instructions Optional guidance for this topic only.
+	 * @param string $topic          Topic to write about.
+	 * @param array  $sources        Reference material, possibly empty.
+	 * @param string $instructions   Optional guidance for this topic only.
+	 * @param array  $rival_headings Section headings used by pages already ranking.
 	 * @return array
 	 */
-	public static function outline( $topic, $sources = array(), $instructions = '' ) {
+	public static function outline( $topic, $sources = array(), $instructions = '', $rival_headings = array() ) {
 		$reference = Blogcraft_Research::to_prompt_block( $sources );
-		$user      = ( '' === $reference ? '' : $reference . '
+
+		// What the pages already ranking for this devote a section to. Given
+		// as ground to cover differently rather than a template to follow:
+		// matching their shape produces the ninth page saying what eight
+		// already say, which is the definition of a page with nothing to add.
+		$rivals = '';
+
+		if ( ! empty( $rival_headings ) ) {
+			$rivals = "Pages already covering this subject use these section headings:\n- "
+				. implode( "\n- ", array_map( 'wp_strip_all_tags', $rival_headings ) )
+				. "\n\nTreat that as the ground already covered. Where they all say the same thing, "
+				. "say it once and briefly. Where they leave something out, that is the section worth having.\n\n";
+		}
+
+		$user = ( '' === $reference ? '' : $reference . '
 
 ' )
+			. $rivals
 			. "Plan a blog post about: {$topic}\n\n"
 			. "Reply with JSON of exactly this shape:\n"
 			. '{"title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"

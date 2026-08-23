@@ -213,6 +213,18 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// Off until asked for: switching it on is what tells Blogcraft it
+			// may announce your URLs to Microsoft's indexing service.
+			'indexnow_enabled'                => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'indexnow_key'                    => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'autopilot_enabled'               => array(
 				'default' => false,
 				'type'    => 'bool',

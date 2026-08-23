@@ -62,6 +62,7 @@ class Blogcraft {
 		Blogcraft_Cli::register();
 		Blogcraft_Seo::init();
 		Blogcraft_Autopilot::init();
+		Blogcraft_Indexnow::init();
 
 		if ( is_admin() ) {
 			// Schema changes used to arrive only through the activation hook,

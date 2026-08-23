@@ -293,6 +293,22 @@ class Blogcraft_Pipeline {
 		// search a second time.
 		$payload['questions'] = Blogcraft_Research::last_questions();
 
+		// How the pages already ranking for this are organised, so the outline
+		// can cover what they leave out instead of arriving at the same shape
+		// independently. Best-effort: these are other people's servers, and an
+		// outline is worth a few seconds but not a stalled job.
+		try {
+			$payload['rival_headings'] = Blogcraft_Research::competitor_headings( $sources );
+		} catch ( Throwable $e ) {
+			$payload['rival_headings'] = array();
+
+			Blogcraft_Logger::info(
+				'Could not read how competing pages are organised; planning without that.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
+
 		// Terms the pages already covering this subject all mention. Derived
 		// from research this stage has already fetched, so it costs nothing
 		// extra, and it only fills in when the user has not named terms of
@@ -337,7 +353,14 @@ class Blogcraft_Pipeline {
 		Blogcraft_Prompts::use_blueprint( self::blueprint( $job ) );
 		Blogcraft_Prompts::use_evidence( self::evidence( $job ) );
 
-		$outline = self::ask( Blogcraft_Prompts::outline( $topic, $sources, self::instructions( $job ) ) );
+		$outline = self::ask(
+			Blogcraft_Prompts::outline(
+				$topic,
+				$sources,
+				self::instructions( $job ),
+				isset( $job->payload['rival_headings'] ) ? (array) $job->payload['rival_headings'] : array()
+			)
+		);
 
 		$payload            = $job->payload;
 		$payload['outline'] = $outline;
@@ -1090,6 +1113,10 @@ class Blogcraft_Pipeline {
 			isset( $payload['topic'] ) ? (string) $payload['topic'] : $title,
 			3
 		);
+
+		// Tell the crawlers that take being told. Does nothing unless switched
+		// on, and never fails a post that is already written and saved.
+		Blogcraft_Indexnow::submit( $post_id );
 
 		$payload['post_id'] = $post_id;
 

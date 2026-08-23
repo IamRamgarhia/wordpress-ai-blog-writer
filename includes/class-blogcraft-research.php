@@ -40,6 +40,11 @@ class Blogcraft_Research {
 	const MAX_QUESTIONS = 8;
 
 	/**
+	 * Most competitor headings carried forward for one post.
+	 */
+	const MAX_HEADINGS = 20;
+
+	/**
 	 * Questions the most recent search returned, if any.
 	 *
 	 * @var array
@@ -467,6 +472,96 @@ class Blogcraft_Research {
 	 */
 	public static function last_questions() {
 		return self::$last_questions;
+	}
+
+	/**
+	 * The section headings the pages already ranking for a topic use.
+	 *
+	 * Search results carry a title and a snippet, which says what a page is
+	 * about but not how it is organised. The headings are the organisation,
+	 * and knowing what the existing coverage devotes a section to is what
+	 * lets an outline cover something they missed rather than reproducing
+	 * the same shape as everyone else.
+	 *
+	 * Bounded hard. Each page is a separate request against a server nobody
+	 * here controls, so this reads the first few results only and gives up
+	 * quickly on anything slow — an outline is worth a few seconds, not a
+	 * stalled job.
+	 *
+	 * @param array $sources Output of search(), already ordered by rank.
+	 * @param int   $pages   How many results to open.
+	 * @return array List of heading strings.
+	 */
+	public static function competitor_headings( $sources, $pages = 3 ) {
+		$out  = array();
+		$read = 0;
+
+		foreach ( $sources as $source ) {
+			if ( $read >= (int) $pages || count( $out ) >= self::MAX_HEADINGS ) {
+				break;
+			}
+
+			if ( empty( $source['url'] ) ) {
+				continue;
+			}
+
+			$response = wp_remote_get(
+				(string) $source['url'],
+				array(
+					'timeout'    => 8,
+					'user-agent' => 'Blogcraft/' . BLOGCRAFT_VERSION . '; ' . home_url(),
+				)
+			);
+
+			++$read;
+
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				continue;
+			}
+
+			foreach ( self::headings_in( (string) wp_remote_retrieve_body( $response ) ) as $heading ) {
+				$out[ strtolower( $heading ) ] = $heading;
+
+				if ( count( $out ) >= self::MAX_HEADINGS ) {
+					break;
+				}
+			}
+		}
+
+		return array_values( $out );
+	}
+
+	/**
+	 * Pull the h2 text out of a page.
+	 *
+	 * @param string $html Raw page markup.
+	 * @return array
+	 */
+	private static function headings_in( $html ) {
+		// The furniture first, or every result contributes "Navigation",
+		// "Related posts" and a cookie banner.
+		$html = (string) preg_replace( '#<(script|style|nav|footer|header|aside)[^>]*>.*?</\1>#is', ' ', $html );
+
+		$out = array();
+
+		if ( ! preg_match_all( '#<h2[^>]*>(.*?)</h2>#is', $html, $hits ) ) {
+			return $out;
+		}
+
+		foreach ( $hits[1] as $raw ) {
+			$heading = trim( wp_strip_all_tags( $raw ) );
+			$heading = trim( (string) preg_replace( '/\s+/', ' ', $heading ) );
+
+			// Very short ones are almost always a widget label rather than a
+			// section; very long ones are a paragraph in a heading tag.
+			if ( strlen( $heading ) < 12 || strlen( $heading ) > 120 ) {
+				continue;
+			}
+
+			$out[] = $heading;
+		}
+
+		return $out;
 	}
 
 	/**

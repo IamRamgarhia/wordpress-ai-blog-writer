@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.35.0
+Stable tag: 0.36.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,8 @@ You can also store your own anecdotes and experience, which is the one thing AI 
 * Rewrites your older posts in place when they go stale, keeping the same URL
 * Adds a featured image, alt text, structured data and a contents outline
 * Publishes author, reviewer, organisation and breadcrumb markup, which is what search and answer engines read as an expertise signal
+* Adds a byline readers can see, with the author's own bio and profile links from their WordPress profile — the same signal in a form a person can read, rather than only a machine
+* Plans around what is already ranking: the pages covering a topic are opened, their section headings read, and the outline aimed at what they leave out
 * Fills in Yoast, Rank Math or SEOPress fields when one of those is active, and writes the description and sharing tags into the page itself when none of them is
 
 **What it does not do**
@@ -112,7 +114,13 @@ If you already write with OpenAI, Google or xAI, choosing the same one for pictu
 
 fal.ai, OpenAI, Gemini and Grok charge for each image they generate. Blogcraft never falls back to them: they are used only when you have chosen one of them, so an image is never billed to you by accident.
 
-Blogcraft may also fetch any URL you explicitly add to its research list, to read it as source material.
+**Search engine notification** — off unless you switch it on under Blogcraft, Settings, Automation.
+
+* IndexNow — https://www.bing.com/indexnow and https://www.microsoft.com/privacy/privacystatement
+
+When it is on, the address of each post is sent as it goes live, so Bing, Yandex, Seznam and Naver come and look rather than waiting to find it. Only the address is sent, never the post. Google has said it does not take part.
+
+Blogcraft may also fetch any URL you explicitly add to its research list, to read it as source material. When a search provider is configured, it also opens the first few results for a topic to read how they are organised, which is used to plan a post that covers what they leave out.
 
 == Frequently Asked Questions ==
 
@@ -149,6 +157,15 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.36.0 =
+* A byline readers can actually see. The author, reviewer and organisation markup was real and correct and entirely invisible: it spoke to parsers and said nothing to the person reading. Generated posts now end with the author's name, their bio and their profile links, taken from their own WordPress profile rather than from yet another settings field
+* Posts are planned around what is already ranking. The pages covering a topic are opened, their section headings read, and the outline aimed at what they leave out — rather than arriving independently at the same shape as everybody else
+* Optional IndexNow notification, off unless you switch it on. Bing, Yandex, Seznam and Naver come and look rather than waiting to find the post. Only the address is sent, never the post, and Google has said it does not take part
+* Refreshing an existing post is now judged by the same rules that published it. A rewrite was scored by a superseded, older system, so the bar an existing post had to clear to be improved was a different bar, measuring different things — and nobody could tell, because both produced a number out of 100
+* A refresh now weaves internal links into the sentences before scoring, as a new post does, instead of only appending a list underneath afterwards
+* A post too long to show the model in full is now refused rather than trimmed. The rewrite replaces the whole post, so showing half of one and saving what came back silently deleted the half it never saw — on any post over roughly a thousand words, which is most of what this plugin writes
+* The review screen's checks are rewritten after a refresh, so they describe the post as it now stands rather than as it was first written
 
 = 0.35.0 =
 * The meta description now reaches the page on sites with no SEO plugin. It was being written for every post, stored, and measured by the quality checks, and then never emitted, because WordPress prints no description tag of its own — so on a bare theme the most carefully checked sentence in the post did nothing at all. Facebook and X sharing tags come with it

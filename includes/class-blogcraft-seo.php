@@ -498,6 +498,43 @@ class Blogcraft_Seo {
 	public static function init() {
 		add_action( 'wp_head', array( __CLASS__, 'print_schema' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'print_head_meta' ), 5 );
+		add_filter( 'the_content', array( __CLASS__, 'append_author_box' ), 20 );
+		add_action( 'wp_head', array( __CLASS__, 'print_author_box_styles' ), 6 );
+	}
+
+	/**
+	 * The few rules the byline block needs to not look broken.
+	 *
+	 * Inline rather than a stylesheet, because a separate file would cost
+	 * every visitor a request for roughly a dozen declarations. Deliberately
+	 * minimal and colour-free: it inherits the theme's type and palette, so
+	 * it reads as part of the page rather than as something bolted on.
+	 *
+	 * @return void
+	 */
+	public static function print_author_box_styles() {
+		if ( ! is_singular( 'post' ) ) {
+			return;
+		}
+
+		$post_id = get_the_ID();
+
+		if ( ! $post_id || ! get_post_meta( $post_id, self::GENERATED_META, true ) ) {
+			return;
+		}
+
+		if ( ! apply_filters( 'blogcraft_show_author_box', true, $post_id ) ) {
+			return;
+		}
+
+		echo '<style id="blogcraft-author-box">'
+			. '.blogcraft-author-box{margin:2.5em 0 0;padding:1.25em 0 0;border-top:1px solid currentColor;opacity:.85}'
+			. '.blogcraft-author-box p{margin:0 0 .4em}'
+			. '.blogcraft-author-name{font-weight:600}'
+			. '.blogcraft-author-role{font-weight:400;opacity:.75}'
+			. '.blogcraft-author-bio,.blogcraft-author-reviewer,.blogcraft-author-links{font-size:.9em;opacity:.8}'
+			. '.blogcraft-author-links a{margin-right:.25em}'
+			. '</style>';
 	}
 
 	/**
@@ -720,6 +757,17 @@ class Blogcraft_Seo {
 				$person['jobTitle'] = $credentials;
 			}
 
+			// Profiles elsewhere are how an entity is identified as the same
+			// person across the web, which is the part a name on its own
+			// cannot establish. Taken from the author's own WordPress profile
+			// rather than a setting: the fields are already there, already
+			// per-author, and already the place someone would think to look.
+			$same_as = self::author_profiles( (int) $post->post_author );
+
+			if ( ! empty( $same_as ) ) {
+				$person['sameAs'] = $same_as;
+			}
+
 			$graph['author'] = $person;
 		}
 
@@ -752,6 +800,150 @@ class Blogcraft_Seo {
 		}
 
 		return $graph;
+	}
+
+	/**
+	 * An author's profiles elsewhere on the web.
+	 *
+	 * WordPress ships a website field on every user, and most profile plugins
+	 * add their own contact methods to the same place. Both are read here, so
+	 * this works on a bare install and gets better on one where the site
+	 * already keeps that information.
+	 *
+	 * @param int $author_id User id.
+	 * @return array List of URLs.
+	 */
+	public static function author_profiles( $author_id ) {
+		$out = array();
+
+		$site = trim( (string) get_the_author_meta( 'user_url', $author_id ) );
+
+		if ( '' !== $site ) {
+			$out[] = $site;
+		}
+
+		foreach ( array_keys( wp_get_user_contact_methods( null ) ) as $field ) {
+			$value = trim( (string) get_the_author_meta( $field, $author_id ) );
+
+			// Contact methods hold handles as often as addresses, and a bare
+			// handle is not something sameAs can point at.
+			if ( '' !== $value && 0 === strpos( $value, 'http' ) ) {
+				$out[] = $value;
+			}
+		}
+
+		return array_values( array_unique( array_map( 'esc_url_raw', $out ) ) );
+	}
+
+	/**
+	 * Append a byline block readers can actually see.
+	 *
+	 * The author markup above is real and correct, and it is also invisible:
+	 * it speaks to parsers and says nothing to the person reading. Google's
+	 * own guidance on helpful content asks whether a reader can tell who
+	 * wrote something and find out about them — which is a question about the
+	 * page, not about its JSON-LD.
+	 *
+	 * @param string $content Post content.
+	 * @return string
+	 */
+	public static function append_author_box( $content ) {
+		if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
+			return $content;
+		}
+
+		$post_id = get_the_ID();
+
+		if ( ! $post_id || ! get_post_meta( $post_id, self::GENERATED_META, true ) ) {
+			return $content;
+		}
+
+		/**
+		 * Whether to append the byline block to a generated post.
+		 *
+		 * Themes that already print an author box want this off rather than
+		 * two of them stacked.
+		 *
+		 * @param bool $enabled Whether to append.
+		 * @param int  $post_id Post being rendered.
+		 */
+		if ( ! apply_filters( 'blogcraft_show_author_box', true, $post_id ) ) {
+			return $content;
+		}
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return $content;
+		}
+
+		$author_id = (int) $post->post_author;
+		$name      = trim( (string) get_the_author_meta( 'display_name', $author_id ) );
+
+		if ( '' === $name ) {
+			return $content;
+		}
+
+		$bio         = trim( (string) get_the_author_meta( 'description', $author_id ) );
+		$credentials = trim( (string) Blogcraft_Settings::get( 'author_credentials' ) );
+		$reviewer    = trim( (string) Blogcraft_Settings::get( 'reviewer_name' ) );
+
+		$box = '<div class="blogcraft-author-box">';
+
+		$box .= '<p class="blogcraft-author-name">' . sprintf(
+			/* translators: %s: author name. */
+			esc_html__( 'Written by %s', 'blogcraft' ),
+			'<a href="' . esc_url( get_author_posts_url( $author_id ) ) . '" rel="author">' . esc_html( $name ) . '</a>'
+		);
+
+		if ( '' !== $credentials ) {
+			$box .= ' <span class="blogcraft-author-role">' . esc_html( $credentials ) . '</span>';
+		}
+
+		$box .= '</p>';
+
+		if ( '' !== $bio ) {
+			$box .= '<p class="blogcraft-author-bio">' . esc_html( $bio ) . '</p>';
+		}
+
+		if ( '' !== $reviewer ) {
+			$reviewer_credentials = trim( (string) Blogcraft_Settings::get( 'reviewer_credentials' ) );
+
+			$box .= '<p class="blogcraft-author-reviewer">' . esc_html(
+				'' === $reviewer_credentials
+					? sprintf(
+						/* translators: %s: reviewer name. */
+						__( 'Reviewed by %s', 'blogcraft' ),
+						$reviewer
+					)
+					: sprintf(
+						/* translators: 1: reviewer name. 2: their role or credentials. */
+						__( 'Reviewed by %1$s, %2$s', 'blogcraft' ),
+						$reviewer,
+						$reviewer_credentials
+					)
+			) . '</p>';
+		}
+
+		$links = self::author_profiles( $author_id );
+
+		if ( ! empty( $links ) ) {
+			$rendered = array();
+
+			foreach ( array_slice( $links, 0, 4 ) as $link ) {
+				$host = wp_parse_url( $link, PHP_URL_HOST );
+
+				$rendered[] = '<a href="' . esc_url( $link ) . '" rel="nofollow noopener me" target="_blank">'
+					. esc_html( is_string( $host ) ? preg_replace( '/^www\./', '', $host ) : $link )
+					. '</a>';
+			}
+
+			$box .= '<p class="blogcraft-author-links">' . implode( ' · ', $rendered ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+
+		$box .= '</div>';
+
+		return $content . $box;
 	}
 
 	/**

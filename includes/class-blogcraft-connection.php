@@ -298,6 +298,7 @@ class Blogcraft_Connection {
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
+			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'blogcraft' ),
 		);
 	}
 
@@ -552,6 +553,11 @@ class Blogcraft_Connection {
 		foreach ( self::toggle_fields() as $name => $label ) {
 			self::checkbox_row( $name, $label );
 		}
+
+		printf(
+			'<tr><th scope="row"></th><td><p class="description">%s</p></td></tr>',
+			esc_html__( 'Announcing a post sends its address to IndexNow, which is Microsoft\'s open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way.', 'blogcraft' )
+		);
 
 		self::textarea_row(
 			'autopilot_topics',
