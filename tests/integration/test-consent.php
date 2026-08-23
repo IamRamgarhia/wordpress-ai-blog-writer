@@ -104,6 +104,23 @@ class Test_Blogcraft_Consent extends WP_UnitTestCase {
 		}
 	}
 
+	// ----------------------------------------------------- asking only once.
+
+	public function test_a_default_is_not_an_answer() {
+		// The overview checklist asks about research once and then stops. It
+		// cannot use get() to decide whether the question was answered, because
+		// get() returns false both for "no thank you" and for "never asked".
+		$this->assertFalse( Blogcraft_Settings::was_chosen( 'research_wikipedia' ) );
+		$this->assertFalse( (bool) Blogcraft_Settings::get( 'research_wikipedia' ) );
+	}
+
+	public function test_saying_no_counts_as_having_answered() {
+		Blogcraft_Settings::set( 'research_wikipedia', false );
+
+		$this->assertTrue( Blogcraft_Settings::was_chosen( 'research_wikipedia' ) );
+		$this->assertFalse( (bool) Blogcraft_Settings::get( 'research_wikipedia' ) );
+	}
+
 	public function test_the_community_source_no_longer_reaches_reddit() {
 		// Reddit wants a registered application for automated reading, and
 		// refuses anonymous requests from datacentre addresses, which is most

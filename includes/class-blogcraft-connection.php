@@ -666,7 +666,7 @@ class Blogcraft_Connection {
 			'pictures'   => array(
 				'anchor' => 'pictures',
 				'lines'  => array(
-					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required: Pollinations needs no key and is what runs if you change nothing.', 'blogcraft' ),
+					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'blogcraft' ),
 					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'blogcraft' ),
 					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'blogcraft' ),
 					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'blogcraft' ),

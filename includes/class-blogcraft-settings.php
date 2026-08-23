@@ -95,6 +95,20 @@ class Blogcraft_Settings {
 	}
 
 	/**
+	 * Whether somebody has actually decided this setting.
+	 *
+	 * A default is what happens in the absence of a decision, so reading one
+	 * back cannot tell you whether the decision was made. Anything that wants
+	 * to ask a question once and then stop asking needs this rather than get().
+	 *
+	 * @param string $key Setting key.
+	 * @return bool Whether a value has been stored for it.
+	 */
+	public static function was_chosen( $key ) {
+		return array_key_exists( $key, self::raw() );
+	}
+
+	/**
 	 * Write a setting value.
 	 *
 	 * Guard: If the setting is a secret and the incoming value is non-empty,

@@ -119,6 +119,21 @@ class Blogcraft_Overview {
 
 		$written = self::written_count() > 0;
 
+		// Either answer counts. Research is off until asked for, which is the
+		// only honest default when switching it on is what tells Blogcraft it
+		// may contact somebody — but that also means a first post is written
+		// from memory unless the reader knows the setting exists. So the
+		// checklist raises it once, and a deliberate no clears the step just
+		// as a yes does.
+		$decided = '' !== trim( (string) Blogcraft_Settings::get( 'research_provider' ) );
+
+		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $source ) {
+			if ( Blogcraft_Settings::was_chosen( $source ) ) {
+				$decided = true;
+				break;
+			}
+		}
+
 		return array(
 			array(
 				'title'  => __( 'Connect a provider', 'blogcraft' ),
@@ -126,6 +141,13 @@ class Blogcraft_Overview {
 				'done'   => Blogcraft_Provider_Registry::is_configured(),
 				'url'    => admin_url( 'admin.php?page=blogcraft-settings' ),
 				'action' => __( 'Set it up', 'blogcraft' ),
+			),
+			array(
+				'title'  => __( 'Choose what it may read', 'blogcraft' ),
+				'detail' => __( 'Nothing is contacted until you say so. Wikipedia and Hacker News need no key.', 'blogcraft' ),
+				'done'   => $decided,
+				'url'    => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
+				'action' => __( 'Choose', 'blogcraft' ),
 			),
 			array(
 				'title'  => __( 'Say who you write for', 'blogcraft' ),
