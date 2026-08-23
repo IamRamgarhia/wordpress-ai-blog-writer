@@ -1219,3 +1219,192 @@ body[class*="page_blogcraft"] #wpcontent {
 		flex-wrap: wrap;
 	}
 }
+
+/* ---------------------------------------------------------- writing a post.
+ * The progress screen. Without a visible state for the step that is running,
+ * the list looked identical whether the pipeline was working or hung — which
+ * is the same problem the screen was built to solve, one level down.
+ */
+
+.bc-progress-bar {
+	position: relative;
+	height: 8px;
+	margin: 4px 0 6px;
+	border-radius: 999px;
+	background: var(--bc-line);
+	overflow: hidden;
+}
+
+.bc-progress-bar span {
+	display: block;
+	height: 100%;
+	width: 0;
+	border-radius: 999px;
+	background: var(--bc-accent, #2271b1);
+	transition: width .4s ease;
+}
+
+.bc-progress-meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	font-size: 12.5px;
+	color: var(--bc-muted);
+}
+
+/* The step being worked on right now. A ring that fills and empties, so the
+ * page is visibly alive during a provider call that can take many seconds. */
+.blogcraft-steps .is-now .blogcraft-step-mark {
+	border-color: var(--bc-accent, #2271b1);
+	animation: bc-pulse 1.4s ease-in-out infinite;
+}
+
+.blogcraft-steps .is-now .blogcraft-step-text strong {
+	color: var(--bc-ink);
+	font-weight: 700;
+}
+
+.blogcraft-steps .is-todo .blogcraft-step-text strong {
+	color: var(--bc-muted);
+	font-weight: 400;
+}
+
+@keyframes bc-pulse {
+	0%, 100% { box-shadow: 0 0 0 0 rgba(34, 113, 177, .45); }
+	50%      { box-shadow: 0 0 0 6px rgba(34, 113, 177, 0); }
+}
+
+/* Respect a reader who has asked the OS for less movement. */
+@media ( prefers-reduced-motion: reduce ) {
+	.blogcraft-steps .is-now .blogcraft-step-mark { animation: none; }
+	.bc-progress-bar span { transition: none; }
+}
+
+.blogcraft-preview {
+	max-width: 46em;
+	padding: 16px 20px;
+	border: 1px solid var(--bc-line);
+	border-radius: 8px;
+	background: #fff;
+}
+
+.blogcraft-preview h2,
+.blogcraft-preview h3 {
+	margin: 1.2em 0 .4em;
+}
+
+.blogcraft-preview p {
+	line-height: 1.65;
+}
+
+/* ------------------------------------------------ the review screen proper.
+ * This is the page people will spend the most time on, and it was inheriting
+ * a full-bleed admin width: the score table stretched two thousand pixels to
+ * put "Wanted" against the right edge of a monitor, and the draft ran at a
+ * line length nobody can read a paragraph in.
+ */
+
+.bc-score-card,
+.bc-draft-card {
+	max-width: 900px;
+}
+
+.bc-score-head {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+/* The score as a number worth looking at, rather than a sentence to find. */
+.bc-score-dial {
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 92px;
+	height: 92px;
+	border-radius: 50%;
+	border: 3px solid var(--bc-line);
+	line-height: 1.1;
+}
+
+.bc-score-dial strong {
+	font-size: 30px;
+	font-weight: 700;
+	color: var(--bc-ink);
+}
+
+.bc-score-dial span {
+	font-size: 10.5px;
+	color: var(--bc-muted);
+	text-transform: uppercase;
+	letter-spacing: .04em;
+}
+
+.bc-score-dial.is-ok      { border-color: var(--bc-ok); }
+.bc-score-dial.is-under   { border-color: var(--bc-warn, #b26b00); }
+
+.bc-score-words h2 { margin: 0 0 4px; }
+.bc-score-words p  { margin: 0; color: var(--bc-muted); }
+
+.bc-check-heading {
+	margin: 22px 0 8px;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--bc-muted);
+}
+
+.bc-checks {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-checks li {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	padding: 9px 0;
+	border-bottom: 1px solid var(--bc-line);
+	font-size: 13px;
+}
+
+.bc-checks li:last-child { border-bottom: 0; }
+
+.bc-check-mark  { flex: none; width: 14px; }
+.is-pass .bc-check-mark { color: var(--bc-ok); }
+.is-fail .bc-check-mark { color: var(--bc-warn, #b26b00); }
+
+.bc-check-name   { flex: 1; color: var(--bc-ink); }
+.bc-check-values { color: var(--bc-muted); text-align: right; }
+
+.bc-check-fold {
+	margin-top: 18px;
+	padding-top: 14px;
+	border-top: 1px solid var(--bc-line);
+}
+
+.bc-check-fold summary {
+	cursor: pointer;
+	font-size: 13px;
+	color: var(--bc-muted);
+}
+
+.bc-field {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	margin: 0 0 18px;
+}
+
+.bc-draft-editor {
+	margin-top: 6px;
+}
+
+/* The editor's own body, set to a measure a paragraph can be read at. */
+.bc-draft-editor .wp-editor-area {
+	font-size: 14px;
+	line-height: 1.7;
+}

@@ -173,6 +173,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'int',
 				'secret'  => false,
 			),
+			// Blank means "use the main model for everything", which is what
+			// every install did before this existed and what most should keep
+			// doing. Filled in, it is used for the stages that are bulk
+			// execution of a plan rather than judgement — see
+			// Blogcraft_Pipeline::model_for().
+			'provider_draft_model'            => array(
+				'default' => '',
+				'type'    => 'string',
+				'secret'  => false,
+			),
 			'research_provider'               => array(
 				'default' => 'none',
 				'type'    => 'string',

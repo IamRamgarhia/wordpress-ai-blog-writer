@@ -17,6 +17,9 @@
 	var config = window.blogcraftProgress || {};
 	var steps = document.getElementById( 'blogcraft-progress-steps' );
 	var note = document.getElementById( 'blogcraft-progress-note' );
+	var fill = document.getElementById( 'blogcraft-progress-fill' );
+	var count = document.getElementById( 'blogcraft-progress-count' );
+	var clock = document.getElementById( 'blogcraft-progress-clock' );
 
 	if ( ! steps || ! config.job ) {
 		return;
@@ -24,21 +27,67 @@
 
 	// Already finished when the page loaded — the server rendered the outcome,
 	// so there is nothing to drive and nothing to poll.
-	if ( document.querySelector( '.blogcraft-steps .is-now' ) === null ) {
+	if ( null === document.querySelector( '.blogcraft-steps .is-now' ) ) {
 		return;
 	}
 
 	var failures = 0;
+	var startedAt = Date.now();
+	var stepsDone = 0;
 
-	function paint( stage ) {
+	function seconds( ms ) {
+		return Math.max( 0, Math.round( ms / 1000 ) );
+	}
+
+	function clockText( elapsed, remaining ) {
+		var text = ( config.elapsed || '%s elapsed' ).replace( '%s', human( elapsed ) );
+
+		// Only once a couple of steps have actually been timed. An estimate
+		// drawn from a single sample is a guess wearing a number, and this
+		// plugin has a standing rule against those.
+		if ( null !== remaining && stepsDone >= 2 ) {
+			text += ' · ' + ( config.remaining || 'about %s left' ).replace( '%s', human( remaining ) );
+		}
+
+		return text;
+	}
+
+	function human( secs ) {
+		if ( secs < 60 ) {
+			return secs + 's';
+		}
+
+		var mins = Math.floor( secs / 60 );
+		var rest = secs % 60;
+
+		return rest ? mins + 'm ' + rest + 's' : mins + 'm';
+	}
+
+	function tick() {
+		if ( ! clock ) {
+			return;
+		}
+
+		var elapsed = seconds( Date.now() - startedAt );
+		var remaining = null;
+
+		if ( stepsDone > 0 ) {
+			var perStep = elapsed / stepsDone;
+			var left = Math.max( 0, ( config.total || 10 ) - stepsDone );
+			remaining = Math.round( perStep * left );
+		}
+
+		clock.textContent = clockText( elapsed, remaining );
+	}
+
+	function paint( state ) {
 		var items = steps.querySelectorAll( 'li' );
 		var seen = false;
 
 		for ( var i = 0; i < items.length; i++ ) {
 			var item = items[ i ];
-			var isCurrent = item.getAttribute( 'data-step' ) === stage;
 
-			if ( isCurrent ) {
+			if ( item.getAttribute( 'data-step' ) === state.stage ) {
 				seen = true;
 				item.className = 'is-now';
 			} else if ( ! seen ) {
@@ -46,6 +95,23 @@
 			} else {
 				item.className = 'is-todo';
 			}
+		}
+
+		var total = state.total || 10;
+		var at = state.step || 0;
+
+		if ( fill ) {
+			fill.style.width = Math.round( ( at / total ) * 100 ) + '%';
+		}
+
+		if ( count ) {
+			count.textContent = ( config.stepOf || 'Step %1$d of %2$d' )
+				.replace( '%1$d', Math.min( at + 1, total ) )
+				.replace( '%2$d', total );
+		}
+
+		if ( note && state.label ) {
+			note.textContent = state.label;
 		}
 	}
 
@@ -75,7 +141,9 @@
 					return;
 				}
 
-				paint( state.stage );
+				stepsDone++;
+				paint( state );
+				tick();
 				failures = 0;
 				window.setTimeout( advance, 400 );
 			} )
@@ -101,5 +169,7 @@
 		note.textContent = config.working || 'Working...';
 	}
 
+	window.setInterval( tick, 1000 );
+	tick();
 	advance();
 }() );

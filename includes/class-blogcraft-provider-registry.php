@@ -283,10 +283,12 @@ class Blogcraft_Provider_Registry {
 	/**
 	 * Build the provider configured in plugin settings.
 	 *
+	 * @param string $model Model id to use instead of the configured one, for
+	 *                      a stage that should run on something cheaper.
 	 * @return Blogcraft_Provider|null Null when no provider type is stored, or the
 	 *                                 stored type is not recognised.
 	 */
-	public static function from_settings() {
+	public static function from_settings( $model = '' ) {
 		$type = (string) Blogcraft_Settings::get( 'provider_type' );
 
 		if ( '' === $type || ! array_key_exists( $type, self::types() ) ) {
@@ -307,7 +309,10 @@ class Blogcraft_Provider_Registry {
 			'base_url' => $base_url,
 			'endpoint' => $base_url,
 			'api_key'  => Blogcraft_Settings::get( 'provider_api_key' ),
-			'model'    => Blogcraft_Settings::get( 'provider_model' ),
+			// Same key, same account, same address — only the model id
+			// changes, so a caller asking for a cheaper model for one stage
+			// does not need a second provider configured.
+			'model'    => ( '' !== trim( (string) $model ) ) ? trim( (string) $model ) : Blogcraft_Settings::get( 'provider_model' ),
 		);
 
 		// The custom adapter reads six more keys, and nothing was passing them.

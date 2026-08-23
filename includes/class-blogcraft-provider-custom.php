@@ -268,10 +268,10 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 				/* translators: 1: HTTP status code, 2: error message reported by the provider. */
 				__( 'HTTP %1$d: %2$s', 'blogcraft' ),
 				$code,
-				$message
+				$this->explain( $message )
 			);
 		}
 
-		return $message;
+		return $this->explain( $message );
 	}
 }

@@ -484,6 +484,7 @@ class Blogcraft_Connection {
 			// surfaces hours later as an error from the provider.
 			if ( 'provider_model' === $name ) {
 				self::render_model_picker();
+				self::render_draft_model_row();
 			}
 		}
 
@@ -1124,6 +1125,25 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * The optional cheaper model for the bulk of the writing.
+	 *
+	 * Its own row rather than a line in the main model's description, because
+	 * leaving it blank has to be an obviously fine choice: blank means one
+	 * model does everything, which is what every install did before this
+	 * existed and what most should keep doing.
+	 *
+	 * @return void
+	 */
+	private static function render_draft_model_row() {
+		self::text_row(
+			'provider_draft_model',
+			__( 'Cheaper model for the bulk', 'blogcraft' ),
+			'',
+			__( 'Optional, and the same key and provider — only the model id differs. Most of a post\'s words are the section-by-section writing, which is carrying out a plan the outline already made. Naming a cheaper model here uses it for those sections, the questions and the extra blocks, while the outline, the opening, the critique and the rewrite stay on the model above, because those are the steps where judgement changes the result. Leave it blank to use one model for everything.', 'blogcraft' )
+		);
+	}
+
+	/**
 	 * A control that fills the model field from the provider's own list.
 	 *
 	 * Deliberately additive rather than a replacement: the text field stays,
@@ -1332,7 +1352,7 @@ class Blogcraft_Connection {
 			array_keys( self::custom_fields() ),
 			array_keys( self::voice_text_fields() ),
 			array_keys( self::voice_area_fields() ),
-			array( 'provider_type', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model', 'image_model_gemini', 'image_model_xai', 'author_credentials', 'reviewer_name', 'reviewer_credentials' )
+			array( 'provider_type', 'provider_draft_model', 'provider_request_template', 'autopilot_topics', 'autopilot_status', 'research_provider', 'research_base_url', 'research_urls', 'image_provider', 'fal_model', 'openai_image_model', 'image_model_gemini', 'image_model_xai', 'author_credentials', 'reviewer_name', 'reviewer_credentials' )
 		);
 
 		foreach ( $plain as $key ) {

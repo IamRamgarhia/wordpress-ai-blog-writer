@@ -115,6 +115,44 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * The stages that are execution rather than judgement.
+	 *
+	 * Drafting a section is carrying out a plan somebody else already made:
+	 * the outline fixed the argument, the heading fixes the subject, and the
+	 * blueprint fixes the voice. Most of a post's words — and so most of its
+	 * cost — are written here. Questions and the optional extras are the same
+	 * shape of work.
+	 *
+	 * Everything absent from this list stays on the main model on purpose.
+	 * The outline sets a structure every later stage inherits, so a weak one
+	 * is paid for in every section. The opening is the most heavily measured
+	 * paragraph in the post. Critique has to notice what is wrong with prose
+	 * that reads fluently, which is the hardest thing asked of the model
+	 * anywhere in the pipeline, and revise has to act on what critique found.
+	 *
+	 * @return array
+	 */
+	private static function bulk_stages() {
+		return array( 'section', 'faq', 'extras' );
+	}
+
+	/**
+	 * Which model a given stage should use.
+	 *
+	 * @param string $stage Stage name.
+	 * @return string Empty to use the configured main model.
+	 */
+	private static function model_for( $stage ) {
+		$draft = trim( (string) Blogcraft_Settings::get( 'provider_draft_model' ) );
+
+		if ( '' === $draft || ! in_array( (string) $stage, self::bulk_stages(), true ) ) {
+			return '';
+		}
+
+		return $draft;
+	}
+
+	/**
 	 * Render an article to the exact markup that will be published.
 	 *
 	 * Built once, at verify, so the scorecard and the published post always
@@ -237,11 +275,15 @@ class Blogcraft_Pipeline {
 			throw new RuntimeException( 'No AI provider is set up yet. Add a model and an API key under Blogcraft, Settings.' );
 		}
 
-		$provider = Blogcraft_Provider_Registry::from_settings();
+		$provider = Blogcraft_Provider_Registry::from_settings( isset( $options['model'] ) ? (string) $options['model'] : '' );
 
 		if ( null === $provider ) {
 			throw new RuntimeException( 'No AI provider is configured.' );
 		}
+
+		// The model is chosen when the provider is built, not sent as a
+		// generation option — adapters read it from their own config.
+		unset( $options['model'] );
 
 		$options  = array_merge( array( 'json_mode' => true ), $options );
 		$response = $provider->complete( $messages, $options );
@@ -397,10 +439,14 @@ class Blogcraft_Pipeline {
 	 * is a better lever anyway: it counts words rather than tokens, and it can
 	 * ask for a rewrite instead of truncating mid-sentence.
 	 *
+	 * @param string $stage Stage asking, so the bulk stages can use a cheaper
+	 *                      model when one is configured.
 	 * @return array
 	 */
-	private static function draft_options() {
-		return array();
+	private static function draft_options( $stage = '' ) {
+		$model = self::model_for( $stage );
+
+		return ( '' === $model ) ? array() : array( 'model' => $model );
 	}
 
 	/**
@@ -548,7 +594,7 @@ class Blogcraft_Pipeline {
 				self::instructions( $job ),
 				self::section_budget( $blueprint, count( $headings ) )
 			),
-			self::draft_options()
+			self::draft_options( 'section' )
 		);
 
 		$paragraphs = isset( $result['paragraphs'] ) ? (array) $result['paragraphs'] : array();
@@ -598,7 +644,7 @@ class Blogcraft_Pipeline {
 					(int) $blueprint['faq_count'],
 					isset( $payload['questions'] ) ? (array) $payload['questions'] : array()
 				),
-				self::draft_options()
+				self::draft_options( 'faq' )
 			);
 
 			$payload['article']['faq'] = isset( $result['faq'] ) ? (array) $result['faq'] : array();
@@ -671,7 +717,7 @@ class Blogcraft_Pipeline {
 		try {
 			$result = self::ask(
 				Blogcraft_Prompts::extras( $payload['article'], $wanted ),
-				self::draft_options()
+				self::draft_options( 'extras' )
 			);
 
 			foreach ( array( 'for_whom', 'not_for', 'pros', 'cons', 'figures', 'mistakes' ) as $key ) {

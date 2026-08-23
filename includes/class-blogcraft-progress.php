@@ -119,11 +119,18 @@ class Blogcraft_Progress {
 			'blogcraft-progress',
 			'blogcraftProgress',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( self::ACTION ),
-				'job'     => self::current_job_id(),
-				'working' => __( 'Working...', 'blogcraft' ),
-				'failed'  => __( 'Something went wrong. The Activity screen has the details.', 'blogcraft' ),
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( self::ACTION ),
+				'job'       => self::current_job_id(),
+				'working'   => __( 'Working...', 'blogcraft' ),
+				'failed'    => __( 'Something went wrong. The Activity screen has the details.', 'blogcraft' ),
+				'total'     => count( self::steps() ),
+				/* translators: 1: step number reached. 2: steps in total. */
+				'stepOf'    => __( 'Step %1$d of %2$d', 'blogcraft' ),
+				/* translators: %s: a duration such as "40s" or "2m 10s". */
+				'elapsed'   => __( '%s elapsed', 'blogcraft' ),
+				/* translators: %s: a duration such as "40s" or "2m 10s". */
+				'remaining' => __( 'about %s left', 'blogcraft' ),
 			)
 		);
 	}
@@ -188,6 +195,10 @@ class Blogcraft_Progress {
 
 		$finished = in_array( $job->status, array( 'complete', 'failed', 'cancelled', 'ready' ), true );
 
+		$order = array_keys( self::steps() );
+		$at    = array_search( $job->stage, $order, true );
+		$at    = ( false === $at ) ? 0 : (int) $at;
+
 		return array(
 			'status' => $job->status,
 			'stage'  => $job->stage,
@@ -197,6 +208,11 @@ class Blogcraft_Progress {
 			'done'   => $finished,
 			'ready'  => 'ready' === $job->status,
 			'postId' => isset( $job->payload['post_id'] ) ? (int) $job->payload['post_id'] : 0,
+			// Position, so the bar and the counter move without the page
+			// having to work it out from the stage name a second time.
+			'step'   => $finished ? count( $order ) : $at,
+			'total'  => count( $order ),
+			'label'  => isset( self::steps()[ $job->stage ] ) ? self::steps()[ $job->stage ] : '',
 		);
 	}
 
@@ -210,6 +226,10 @@ class Blogcraft_Progress {
 		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
 
 		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( $job_id > 0 ) {
+			self::apply_edits( $job_id );
+		}
 
 		if ( $job_id > 0 && Blogcraft_Queue::approve( $job_id ) ) {
 			Blogcraft_Worker::run_job( $job_id );
@@ -234,6 +254,57 @@ class Blogcraft_Progress {
 			)
 		);
 		exit;
+	}
+
+	/**
+	 * Carry the writer's edits into the job before it is published.
+	 *
+	 * The edited body arrives as plain HTML, because that is what the editor
+	 * returns. Blogcraft_Blocks::from_html() puts the block delimiters back so
+	 * a block-editor site gets real, individually editable blocks rather than
+	 * one enormous Classic block reported as unexpected content.
+	 *
+	 * Written onto the payload as 'content', which stage_publish already
+	 * prefers over re-rendering — so the edited version is what gets created,
+	 * and the render path is not duplicated here.
+	 *
+	 * @param int $job_id Job being approved.
+	 * @return void
+	 */
+	private static function apply_edits( $job_id ) {
+		$job = Blogcraft_Queue::find( $job_id );
+
+		if ( null === $job || 'ready' !== $job->status ) {
+			return;
+		}
+
+		$payload = $job->payload;
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- nonce verified by the caller; the markup is narrowed by wp_kses_post() below, which is the sanitiser for post content and the only one that can keep the writer's formatting.
+		$body = isset( $_POST['draft_body'] ) ? (string) wp_unslash( $_POST['draft_body'] ) : '';
+
+		if ( '' !== trim( wp_strip_all_tags( $body ) ) ) {
+			// wp_kses_post first: this is writer-supplied markup arriving over
+			// a form, so it is narrowed to what a post may contain before
+			// anything is done with it.
+			$payload['content'] = Blogcraft_Blocks::from_html( wp_kses_post( $body ) );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by the caller.
+		$title = isset( $_POST['draft_title'] ) ? sanitize_text_field( wp_unslash( $_POST['draft_title'] ) ) : '';
+
+		if ( '' !== $title ) {
+			$payload['outline']['title'] = $title;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by the caller.
+		$meta = isset( $_POST['draft_meta'] ) ? sanitize_textarea_field( wp_unslash( $_POST['draft_meta'] ) ) : '';
+
+		if ( '' !== $meta ) {
+			$payload['outline']['meta_description'] = $meta;
+		}
+
+		Blogcraft_Queue::save_payload( $job_id, $payload );
 	}
 
 	/**
@@ -295,8 +366,32 @@ class Blogcraft_Progress {
 		$current = ( false === $current ) ? 0 : (int) $current;
 		$held    = ( 'ready' === $job->status );
 
+		$total = count( $steps );
+		$done  = $held ? $total : $current;
+
 		echo '<section class="blogcraft-card" id="blogcraft-progress-card"><header>';
 		echo '<h2>' . esc_html__( 'What it is doing', 'blogcraft' ) . '</h2>';
+
+		printf(
+			'<div class="bc-progress-bar"><span id="blogcraft-progress-fill" style="width:%d%%"></span></div>',
+			(int) ( $total > 0 ? round( ( $done / $total ) * 100 ) : 0 )
+		);
+
+		echo '<div class="bc-progress-meta">';
+		printf(
+			'<span id="blogcraft-progress-count">%s</span>',
+			esc_html(
+				sprintf(
+					/* translators: 1: steps finished. 2: steps in total. */
+					__( 'Step %1$d of %2$d', 'blogcraft' ),
+					(int) min( $done + ( $held ? 0 : 1 ), $total ),
+					(int) $total
+				)
+			)
+		);
+		printf( '<span id="blogcraft-progress-clock"></span>' );
+		echo '</div>';
+
 		printf(
 			'<p id="blogcraft-progress-note">%s</p>',
 			esc_html(
@@ -364,49 +459,119 @@ class Blogcraft_Progress {
 	 */
 	private static function render_score( $score, $checks ) {
 		$threshold = (int) Blogcraft_Settings::get( 'quality_threshold' );
+		$clears    = ( $score >= $threshold );
 
-		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'How it scored', 'blogcraft' ) . '</h2>';
-		printf(
-			'<p>%s</p>',
-			esc_html(
-				sprintf(
-					/* translators: 1: score out of 100. 2: the threshold set in settings. */
-					__( '%1$d out of 100. Your bar is %2$d.', 'blogcraft' ),
-					$score,
-					$threshold
-				)
-			)
-		);
-		echo '</header>';
-
-		if ( empty( $checks ) ) {
-			echo '<p>' . esc_html__( 'No checks were recorded for this draft.', 'blogcraft' ) . '</p></section>';
-
-			return;
-		}
-
-		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th>' . esc_html__( 'Check', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Found', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Wanted', 'blogcraft' ) . '</th>';
-		echo '</tr></thead><tbody>';
+		$failed = array();
+		$passed = array();
 
 		foreach ( $checks as $check ) {
 			if ( ! is_array( $check ) ) {
 				continue;
 			}
 
+			if ( empty( $check['pass'] ) ) {
+				$failed[] = $check;
+			} else {
+				$passed[] = $check;
+			}
+		}
+
+		echo '<section class="blogcraft-card bc-score-card">';
+		echo '<div class="bc-score-head">';
+
+		printf(
+			'<div class="bc-score-dial %1$s"><strong>%2$d</strong><span>%3$s</span></div>',
+			esc_attr( $clears ? 'is-ok' : 'is-under' ),
+			(int) $score,
+			esc_html__( 'out of 100', 'blogcraft' )
+		);
+
+		echo '<div class="bc-score-words">';
+		echo '<h2>' . esc_html__( 'How it scored', 'blogcraft' ) . '</h2>';
+		printf(
+			'<p>%s</p>',
+			esc_html(
+				$clears
+					? sprintf(
+						/* translators: 1: number of checks passed. 2: checks in total. 3: the threshold set in settings. */
+						__( 'Passed %1$d of %2$d checks, and clears your bar of %3$d.', 'blogcraft' ),
+						count( $passed ),
+						count( $passed ) + count( $failed ),
+						$threshold
+					)
+					: sprintf(
+						/* translators: 1: number of checks passed. 2: checks in total. 3: the threshold set in settings. */
+						__( 'Passed %1$d of %2$d checks, which is under your bar of %3$d. You can still create it — it lands as a draft.', 'blogcraft' ),
+						count( $passed ),
+						count( $passed ) + count( $failed ),
+						$threshold
+					)
+			)
+		);
+		echo '</div></div>';
+
+		if ( empty( $failed ) && empty( $passed ) ) {
+			echo '<p>' . esc_html__( 'No checks were recorded for this draft.', 'blogcraft' ) . '</p></section>';
+
+			return;
+		}
+
+		// Failures first and expanded, passes folded away. A flat list of
+		// twenty-odd rows buries the four that need a decision among the
+		// sixteen that do not.
+		if ( ! empty( $failed ) ) {
+			echo '<h3 class="bc-check-heading">' . esc_html__( 'Worth a look', 'blogcraft' ) . '</h3>';
+			self::render_check_list( $failed, false );
+		}
+
+		if ( ! empty( $passed ) ) {
 			printf(
-				'<tr><td>%1$s %2$s</td><td>%3$s</td><td>%4$s</td></tr>',
-				empty( $check['pass'] ) ? '<span aria-hidden="true">✕</span>' : '<span aria-hidden="true">✓</span>',
+				'<details class="bc-check-fold"><summary>%s</summary>',
+				esc_html(
+					sprintf(
+						/* translators: %d: how many checks passed. */
+						_n( '%d check passed', '%d checks passed', count( $passed ), 'blogcraft' ),
+						count( $passed )
+					)
+				)
+			);
+			self::render_check_list( $passed, true );
+			echo '</details>';
+		}
+
+		echo '</section>';
+	}
+
+	/**
+	 * One group of checks.
+	 *
+	 * @param array $checks Checks to show.
+	 * @param bool  $passed Whether these are the passing ones.
+	 * @return void
+	 */
+	private static function render_check_list( $checks, $passed ) {
+		echo '<ul class="bc-checks">';
+
+		foreach ( $checks as $check ) {
+			printf(
+				'<li class="%1$s"><span class="bc-check-mark" aria-hidden="true">%2$s</span>'
+				. '<span class="bc-check-name">%3$s</span>'
+				. '<span class="bc-check-values">%4$s</span></li>',
+				esc_attr( $passed ? 'is-pass' : 'is-fail' ),
+				$passed ? '&#10003;' : '&#10007;',
 				esc_html( isset( $check['label'] ) ? $check['label'] : '' ),
-				esc_html( isset( $check['actual'] ) ? (string) $check['actual'] : '' ),
-				esc_html( isset( $check['target'] ) ? (string) $check['target'] : '' )
+				esc_html(
+					sprintf(
+						/* translators: 1: what the check measured. 2: what it wanted. */
+						__( '%1$s — wanted %2$s', 'blogcraft' ),
+						isset( $check['actual'] ) ? (string) $check['actual'] : '',
+						isset( $check['target'] ) ? (string) $check['target'] : ''
+					)
+				)
 			);
 		}
 
-		echo '</tbody></table></section>';
+		echo '</ul>';
 	}
 
 	/**
@@ -417,29 +582,52 @@ class Blogcraft_Progress {
 	 * @return void
 	 */
 	private static function render_preview( $article, $outline ) {
-		echo '<section class="blogcraft-card"><header>';
+		echo '<section class="blogcraft-card bc-draft-card"><header>';
 		echo '<h2>' . esc_html__( 'The draft', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Read it before it becomes a post. Nothing here is on your site yet.', 'blogcraft' ) . '</p>';
+		echo '<p>' . esc_html__( 'Edit anything here before it becomes a post. Use Add Media to put a picture between the paragraphs. Nothing is on your site until you create it.', 'blogcraft' ) . '</p>';
 		echo '</header>';
 
-		if ( ! empty( $outline['title'] ) ) {
-			echo '<h3>' . esc_html( (string) $outline['title'] ) . '</h3>';
-		}
+		printf(
+			'<p class="bc-field"><label for="blogcraft-draft-title"><strong>%1$s</strong></label>'
+			. '<input type="text" id="blogcraft-draft-title" name="draft_title" class="large-text" value="%2$s" form="blogcraft-approve" /></p>',
+			esc_html__( 'Title', 'blogcraft' ),
+			esc_attr( isset( $outline['title'] ) ? (string) $outline['title'] : '' )
+		);
 
-		if ( ! empty( $outline['meta_description'] ) ) {
-			printf(
-				'<p class="description"><strong>%1$s</strong> %2$s</p>',
-				esc_html__( 'Search description:', 'blogcraft' ),
-				esc_html( (string) $outline['meta_description'] )
-			);
-		}
+		printf(
+			'<p class="bc-field"><label for="blogcraft-draft-meta"><strong>%1$s</strong></label>'
+			. '<textarea id="blogcraft-draft-meta" name="draft_meta" class="large-text" rows="2" form="blogcraft-approve">%2$s</textarea>'
+			. '<span class="description">%3$s</span></p>',
+			esc_html__( 'Search description', 'blogcraft' ),
+			esc_textarea( isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : '' ),
+			esc_html__( 'What shows under the title in search results.', 'blogcraft' )
+		);
 
-		// Rendered through the same block renderer that builds the post, then
-		// escaped down to a safe subset — so what is read here is what gets
-		// created, not a separate preview that could drift from it.
+		// The same renderer that builds the post, so what is edited here is
+		// what gets created — not a separate preview that could drift.
 		$rendered = Blogcraft_Blocks::render( $article );
 
-		echo '<div class="blogcraft-preview">' . wp_kses_post( $rendered ) . '</div>';
+		// wp_editor rather than a textarea of markup: it is the editor this
+		// person already knows, and its Add Media button is the whole image
+		// story for free — the media library, uploads, and anything a stock
+		// photo plugin has put there.
+		echo '<div class="bc-draft-editor">';
+		wp_editor(
+			$rendered,
+			'blogcraft_draft_body',
+			array(
+				'textarea_name' => 'draft_body',
+				'textarea_rows' => 24,
+				'media_buttons' => true,
+				'teeny'         => false,
+				'editor_class'  => 'bc-draft-body',
+				'tinymce'       => array(
+					'toolbar1' => 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink,wp_add_media,undo,redo',
+					'toolbar2' => '',
+				),
+			)
+		);
+		echo '</div>';
 		echo '</section>';
 	}
 
@@ -466,7 +654,7 @@ class Blogcraft_Progress {
 		echo '</header>';
 
 		printf(
-			'<form method="post" action="%s">',
+			'<form method="post" action="%s" id="blogcraft-approve">',
 			esc_url( admin_url( 'admin-post.php' ) )
 		);
 		echo '<input type="hidden" name="action" value="blogcraft_approve_draft" />';
