@@ -1143,6 +1143,26 @@ class Blogcraft_Connection {
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		Blogcraft_Request::verify_or_die( self::SAVE_ACTION, $nonce );
 
+		list( $was_usable, $submitted_key ) = self::apply_submitted_settings();
+
+		self::redirect_back( true, self::save_message( '' !== $submitted_key, $was_usable ) );
+	}
+
+	/**
+	 * Read every settings-screen field out of $_POST and store it.
+	 *
+	 * Split out from handle_save() so the actual writing can be exercised
+	 * directly: handle_save() ends in wp_safe_redirect() + exit, which a test
+	 * cannot call through safely. This is the part worth pinning — it is
+	 * exactly the part that silently dropped two fields for as long as it did,
+	 * because nothing could reach it to notice.
+	 *
+	 * @return array array( $was_usable, $submitted_key ) — whether the provider
+	 *               already worked before this save, and the raw provider key
+	 *               submitted (empty string when the masked field was left
+	 *               alone), both needed for the save notice.
+	 */
+	private static function apply_submitted_settings() {
 		$was_usable = Blogcraft_Provider_Registry::is_configured();
 
 		$plain = array_merge(
@@ -1170,6 +1190,19 @@ class Blogcraft_Connection {
 
 		if ( isset( $_POST['autopilot_per_day'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			Blogcraft_Settings::set( 'autopilot_per_day', (int) $_POST['autopilot_per_day'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		// Both are plain number inputs rendered by number_row() alongside the
+		// fields above, but neither was ever in a list this method reads —
+		// the value the user typed was shown back to them as "Settings saved."
+		// and then thrown away. The threshold in particular is load-bearing:
+		// it is what "held for review instead of published" means.
+		if ( isset( $_POST['quality_threshold'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'quality_threshold', max( 0, min( 100, (int) $_POST['quality_threshold'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		}
+
+		if ( isset( $_POST['refresh_after_days'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'refresh_after_days', max( 1, (int) $_POST['refresh_after_days'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
 		if ( isset( $_POST['autopilot_hour'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -1228,7 +1261,7 @@ class Blogcraft_Connection {
 			Blogcraft_Settings::set( 'provider_api_key', $submitted_key );
 		}
 
-		self::redirect_back( true, self::save_message( '' !== $submitted_key, $was_usable ) );
+		return array( $was_usable, $submitted_key );
 	}
 
 	/**

@@ -759,7 +759,12 @@ class Blogcraft_Blueprint_Screen {
 			. self::toggle( 'block_proscons', $bp['block_proscons'], __( 'What works and what does not', 'blogcraft' ) )
 			. self::toggle( 'block_figures', $bp['block_figures'], __( 'A table of the figures, with sources', 'blogcraft' ) )
 			. self::toggle( 'block_mistakes', $bp['block_mistakes'], __( 'Mistakes worth avoiding', 'blogcraft' ) )
-			. self::toggle( 'block_sources', $bp['block_sources'], __( 'The sources it was written from', 'blogcraft' ) )
+		);
+
+		self::row(
+			__( 'Sources', 'blogcraft' ),
+			__( 'Real links to what the article was actually researched from, listed at the end. On by default, unlike the extras above: nothing lets the model invent a citation link, so this is the only honest way the "Sources cited" check below can pass. Turn it off only if you also lower that target to 0.', 'blogcraft' ),
+			self::toggle( 'block_sources', $bp['block_sources'], __( 'The sources it was written from', 'blogcraft' ) )
 		);
 
 		self::row(

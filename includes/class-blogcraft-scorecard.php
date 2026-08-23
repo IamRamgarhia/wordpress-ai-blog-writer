@@ -408,12 +408,16 @@ class Blogcraft_Scorecard {
 		$actual = (int) $metrics['external_links'];
 		$pass   = ( $actual >= $target );
 
-		$repair = $pass ? '' : sprintf(
-			'There are %1$d outbound links and %2$d were asked for. Cite a reputable source for the strongest factual claims.',
-			$actual,
-			$target
-		);
-
+		// No repair text: every prompt in this plugin forbids the model from
+		// writing markdown or HTML, so it has no way to add a working link by
+		// rewriting prose, and asking it to "cite a source" anyway just spends
+		// a revise-pass instruction on something impossible to act on. The
+		// only real link source is the Sources block, built from research
+		// results rather than anything the model writes (see Blocks::sources())
+		// — so a failing check here means "The sources it was written from" is
+		// off, or research found fewer sources than this target, not that the
+		// draft needs rewriting. That is exactly what showing 0 or a low count
+		// against the target already tells whoever reads the scorecard.
 		return self::check(
 			'external_links',
 			__( 'Sources cited', 'blogcraft' ),
@@ -421,7 +425,7 @@ class Blogcraft_Scorecard {
 			sprintf( '%d', $actual ),
 			sprintf( '%d+', $target ),
 			5,
-			$repair
+			''
 		);
 	}
 

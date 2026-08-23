@@ -110,6 +110,52 @@ class Blogcraft_Pipeline {
 	}
 
 	/**
+	 * Render an article to the exact markup that will be published.
+	 *
+	 * Built once, at verify, so the scorecard and the published post always
+	 * agree: internal links are real WP_Query targets, never anything the
+	 * model invented, and weaving them in is what turns a naked mention of a
+	 * related topic into something a reader can actually follow.
+	 *
+	 * @param array $article   Article structure.
+	 * @param array $blueprint Blueprint the job is being written to.
+	 * @param array $payload   Job payload, for the topic and title fallback.
+	 * @return string Final block markup.
+	 */
+	private static function final_content( $article, $blueprint, $payload ) {
+		$title = '';
+
+		if ( ! empty( $payload['outline']['title'] ) ) {
+			$title = (string) $payload['outline']['title'];
+		}
+
+		$content = Blogcraft_Seo::render_toc( $article, ! empty( $blueprint['toc'] ) ) . Blogcraft_Blocks::render( $article );
+
+		if ( '' === $content || ! Blogcraft_Settings::get( 'internal_links_enabled' ) ) {
+			return $content;
+		}
+
+		$topic_for_links = isset( $payload['topic'] ) ? (string) $payload['topic'] : $title;
+		$related         = Blogcraft_Seo::related_posts( $topic_for_links, 4 );
+
+		// A link inside a sentence is worth more than the same link in a list
+		// at the bottom that nobody scrolls to. Whatever could not be placed
+		// in the prose still gets listed, so nothing is lost.
+		$woven   = Blogcraft_Seo::link_in_text( $content, $related, 3 );
+		$content = $woven['content'];
+
+		$leftover = array();
+
+		foreach ( $related as $item ) {
+			if ( ! in_array( (int) $item['id'], array_map( 'intval', $woven['linked'] ), true ) ) {
+				$leftover[] = $item;
+			}
+		}
+
+		return $content . Blogcraft_Seo::render_related_block( $leftover );
+	}
+
+	/**
 	 * What the editorial checks need beyond the prose.
 	 *
 	 * The title and meta description live on the outline and the sources on the
@@ -800,11 +846,21 @@ class Blogcraft_Pipeline {
 			);
 		}
 
+		$blueprint = self::blueprint( $job );
+
+		// Built here rather than at publish, and scored as-is, so the internal
+		// link count this stage measures is the one the published post will
+		// actually carry. It used to be built after scoring: the scorecard
+		// always saw zero internal links, no matter how many ended up woven
+		// in, because publish wove them into a render this stage never saw.
+		$content = self::final_content( $article, $blueprint, $payload );
+
+		$payload['content'] = $content;
+
 		// Score against the blueprint rather than the old generic heuristic, so
 		// the number that decides publish-or-hold is the same one measured
 		// during critique, against the rules this post was actually written to.
-		$blueprint  = self::blueprint( $job );
-		$scorecard  = Blogcraft_Scorecard::evaluate( Blogcraft_Blocks::render( $article ), $blueprint, self::context( $job ) );
+		$scorecard  = Blogcraft_Scorecard::evaluate( $content, $blueprint, self::context( $job ) );
 		$assessment = Blogcraft_Verify::score( $article );
 
 		$reasons = array();
@@ -864,33 +920,13 @@ class Blogcraft_Pipeline {
 			$title = sanitize_text_field( isset( $payload['topic'] ) ? (string) $payload['topic'] : __( 'Untitled', 'blogcraft' ) );
 		}
 
-		$content = Blogcraft_Seo::render_toc( $article ) . Blogcraft_Blocks::render( $article );
+		// Built at verify and scored there; reused as-is so the post that gets
+		// published is the one the score describes, not a fresh render that
+		// picks up whatever changed since (internal links, most notably).
+		$content = isset( $payload['content'] ) ? (string) $payload['content'] : self::final_content( $article, self::blueprint( $job ), $payload );
 
 		if ( '' === $content ) {
 			throw new RuntimeException( 'The generated article was empty.' );
-		}
-
-		// Link targets come from the site's real posts, never from the model, which
-		// would confidently invent URLs that 404.
-		if ( Blogcraft_Settings::get( 'internal_links_enabled' ) ) {
-			$topic_for_links = isset( $payload['topic'] ) ? (string) $payload['topic'] : $title;
-			$related         = Blogcraft_Seo::related_posts( $topic_for_links, 4 );
-
-			// A link inside a sentence is worth more than the same link in a
-			// list at the bottom that nobody scrolls to. Whatever could not be
-			// placed in the prose still gets listed, so nothing is lost.
-			$woven   = Blogcraft_Seo::link_in_text( $content, $related, 3 );
-			$content = $woven['content'];
-
-			$leftover = array();
-
-			foreach ( $related as $item ) {
-				if ( ! in_array( (int) $item['id'], array_map( 'intval', $woven['linked'] ), true ) ) {
-					$leftover[] = $item;
-				}
-			}
-
-			$content .= Blogcraft_Seo::render_related_block( $leftover );
 		}
 
 		$postarr = array(

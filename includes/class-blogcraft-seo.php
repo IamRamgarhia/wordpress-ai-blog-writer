@@ -446,10 +446,15 @@ class Blogcraft_Seo {
 	 * outline, which is what a reader uses it for.
 	 *
 	 * @param array $article Article structure.
+	 * @param bool  $enabled Whether the blueprint actually asked for one.
 	 * @param int   $minimum Fewest sections worth a contents list.
 	 * @return string Block markup, empty when not worth rendering.
 	 */
-	public static function render_toc( $article, $minimum = 4 ) {
+	public static function render_toc( $article, $enabled, $minimum = 4 ) {
+		if ( ! $enabled ) {
+			return '';
+		}
+
 		if ( empty( $article['sections'] ) || ! is_array( $article['sections'] ) ) {
 			return '';
 		}

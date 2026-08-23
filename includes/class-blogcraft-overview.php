@@ -341,7 +341,7 @@ class Blogcraft_Overview {
 		if ( array_key_exists( $image_provider, Blogcraft_Image_Models::providers() ) && ! Blogcraft_Image_Models::is_configured() ) {
 			$items[] = array(
 				'text' => __( 'The picture service you chose is missing a key or a model name, so free images are being used instead.', 'blogcraft' ),
-				'url'  => admin_url( 'admin.php?page=blogcraft-settings#bc-card-automation' ),
+				'url'  => admin_url( 'admin.php?page=blogcraft-settings#bc-card-pictures' ),
 				'link' => __( 'Finish it', 'blogcraft' ),
 				'kind' => 'wait',
 			);

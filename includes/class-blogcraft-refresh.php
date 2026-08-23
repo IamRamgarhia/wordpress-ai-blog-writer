@@ -170,7 +170,7 @@ class Blogcraft_Refresh {
 		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
 		$article = isset( $payload['article'] ) ? $payload['article'] : array();
 
-		$content = Blogcraft_Seo::render_toc( $article ) . Blogcraft_Blocks::render( $article );
+		$content = Blogcraft_Seo::render_toc( $article, ! empty( Blogcraft_Blueprint::get()['toc'] ) ) . Blogcraft_Blocks::render( $article );
 
 		// Refusing to save an empty rewrite matters more here than anywhere else:
 		// this overwrites a post that already existed and was working.

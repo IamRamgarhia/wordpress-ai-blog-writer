@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.31.0
+Stable tag: 0.32.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,15 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.32.0 =
+* The quality threshold and refresh-after-days settings are now actually saved. Both were rendered on the settings screen and read everywhere the pipeline needs them, but nothing in between wrote them to the database — the number typed in was shown back as "Settings saved" and then discarded, so every post was gated against 60 regardless of what was chosen
+* The table of contents toggle is now honoured. It previously had no effect on a published post; every article with four or more sections got one whether the setting was on or off
+* Sources cited now defaults on. It is the only way a real citation link can appear at all, since every prompt in this plugin forbids the model from writing markdown or HTML, so with it off the "Sources cited" check could never pass no matter what a post said
+* Fixed a second bug hiding behind that one: five per-post extras, including sources, had no control on the Write screen but were still in the list the composer reads to decide what was switched off — so every single post written through the composer forced sources off regardless of the blueprint, even after the default above was fixed
+* Internal links are now woven into an article before it is scored, not after. The check that counts them previously always measured a draft with none yet, so it could never pass; the review screen showed 0 internal links on every post no matter how many the published version actually carried
+* A per-post picture or citation count deliberately set to zero is no longer silently discarded and replaced with the blueprint default
+* Two "Finish it" links pointed at the wrong settings card
 
 = 0.31.0 =
 * Research sources and pictures now start switched off. Blogcraft contacts nothing until you turn a source on; turning it on is how you say yes to it

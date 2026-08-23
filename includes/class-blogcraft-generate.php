@@ -361,11 +361,13 @@ class Blogcraft_Generate {
 				'require_statistics',
 				'image_describe',
 				'image_allow_text',
-				'block_audience',
-				'block_proscons',
-				'block_figures',
-				'block_mistakes',
-				'block_sources',
+				// The five block_* extras are deliberately absent here. None of
+				// them has a checkbox in this form, and a toggle with no control
+				// gets read as "absent, so switched off" by overrides_from()
+				// below — which silently forced every one of them, including
+				// block_sources, to false on every post the composer wrote,
+				// regardless of what the blueprint said. Add a real control
+				// before adding a key back to this list.
 			),
 			'multi'  => array( 'literary_devices' ),
 		);
@@ -888,7 +890,7 @@ class Blogcraft_Generate {
 	 * @return string
 	 */
 	private static function pictures_note() {
-		$link = admin_url( 'admin.php?page=blogcraft-settings#bc-card-automation' );
+		$link = admin_url( 'admin.php?page=blogcraft-settings#bc-card-pictures' );
 
 		if ( ! Blogcraft_Settings::get( 'images_enabled' ) ) {
 			return sprintf(

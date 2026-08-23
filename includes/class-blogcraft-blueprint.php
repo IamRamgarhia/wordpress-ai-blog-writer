@@ -199,7 +199,10 @@ class Blogcraft_Blueprint {
 			'block_proscons'        => array( 'bool', false ),
 			'block_figures'         => array( 'bool', false ),
 			'block_mistakes'        => array( 'bool', false ),
-			'block_sources'         => array( 'bool', false ),
+			// On by default, unlike the other block_* extras: nothing lets the
+			// model invent a citation link (see Blocks::sources()), so this is
+			// the only honest way the external-links check can ever pass.
+			'block_sources'         => array( 'bool', true ),
 
 			// SEO.
 			'primary_keyword'       => array( 'string', '' ),
@@ -380,11 +383,27 @@ class Blogcraft_Blueprint {
 	}
 
 	/**
+	 * Fields where the composer offers a slider rather than a text box.
+	 *
+	 * A slider always submits a real number — it cannot be left blank the way
+	 * a text field can — so its far-left end, zero, is a deliberate choice
+	 * ("no pictures this time", "nothing to cite this time") and must reach
+	 * the blueprint rather than being read as "the field was empty."
+	 *
+	 * @return array
+	 */
+	private static function zero_is_meaningful_for() {
+		return array( 'images_target', 'external_links_target' );
+	}
+
+	/**
 	 * Apply per-post overrides on top of a blueprint.
 	 *
 	 * Empty strings and zeroes mean "not overridden" rather than "set to
 	 * nothing", because a blank override field on the write screen is the
-	 * normal state and must not wipe a considered default.
+	 * normal state and must not wipe a considered default. The exception is
+	 * the composer's sliders (see zero_is_meaningful_for()): those can't be
+	 * blank, so their zero is not the "normal state", it's a choice.
 	 *
 	 * @param array $blueprint Base blueprint.
 	 * @param array $overrides Sparse field values.
@@ -395,7 +414,8 @@ class Blogcraft_Blueprint {
 			return $blueprint;
 		}
 
-		$fields = self::fields();
+		$fields  = self::fields();
+		$sliders = self::zero_is_meaningful_for();
 
 		foreach ( $overrides as $key => $value ) {
 			if ( ! isset( $fields[ $key ] ) ) {
@@ -406,7 +426,9 @@ class Blogcraft_Blueprint {
 				continue;
 			}
 
-			if ( in_array( $fields[ $key ][0], array( 'int', 'float' ), true ) && 0 === (int) $value ) {
+			$is_zero = in_array( $fields[ $key ][0], array( 'int', 'float' ), true ) && 0 === (int) $value;
+
+			if ( $is_zero && ! in_array( $key, $sliders, true ) ) {
 				continue;
 			}
 
