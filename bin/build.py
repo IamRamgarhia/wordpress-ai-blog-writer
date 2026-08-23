@@ -13,7 +13,7 @@ import sys
 import zipfile
 
 SRC = 'D:/calude/Wordpress plugin - blog writing'
-ROOTS = ['blogcraft.php', 'uninstall.php', 'readme.txt', 'includes', 'assets', 'languages']
+ROOTS = ['blogcraft.php', 'uninstall.php', 'readme.txt', 'includes', 'assets', 'languages', 'data']
 
 
 def version():

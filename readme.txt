@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, content generator, seo cont
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.26.0
+Stable tag: 0.27.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,12 @@ Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.27.0 =
+* The documentation now ships with the plugin, under Blogcraft, Help. The help panels used to link to a page that did not exist
+* Provider addresses moved into a data file, and other plugins can now add a provider with the blogcraft_providers filter
+* Word count for structured data is stored against the post instead of being recalculated with regular expressions on every single page view
+* Uninstall now removes the nine post meta keys it always claimed to
 
 = 0.26.0 =
 * Tested against WordPress 7.1

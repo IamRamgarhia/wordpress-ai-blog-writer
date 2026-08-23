@@ -32,6 +32,28 @@ class Blogcraft_Provider_Registry {
 	 * @return array Machine id => spec.
 	 */
 	public static function catalogue() {
+		// Labels stay here because a translator needs them as literals; the
+		// addresses live in data/providers.json so the list can be filtered and
+		// changed without a release. Everything in that file is disclosed in
+		// readme.txt under External Services.
+		$labels = array(
+			'openai'     => __( 'OpenAI — GPT', 'blogcraft' ),
+			'anthropic'  => __( 'Anthropic — Claude', 'blogcraft' ),
+			'gemini'     => __( 'Google — Gemini', 'blogcraft' ),
+			'xai'        => __( 'xAI — Grok', 'blogcraft' ),
+			'moonshot'   => __( 'Moonshot — Kimi', 'blogcraft' ),
+			'deepseek'   => __( 'DeepSeek', 'blogcraft' ),
+			'groq'       => __( 'Groq — fast, free tier', 'blogcraft' ),
+			'openrouter' => __( 'OpenRouter — many models, one key', 'blogcraft' ),
+			'mistral'    => __( 'Mistral', 'blogcraft' ),
+			'together'   => __( 'Together AI', 'blogcraft' ),
+			'fireworks'  => __( 'Fireworks AI', 'blogcraft' ),
+			'cerebras'   => __( 'Cerebras', 'blogcraft' ),
+			'ollama'     => __( 'Ollama — on this machine, no key', 'blogcraft' ),
+			'lmstudio'   => __( 'LM Studio — on this machine, no key', 'blogcraft' ),
+			'custom'     => __( 'Anything else — enter the address yourself', 'blogcraft' ),
+		);
+
 		$out = array();
 
 		// Listed first when it exists, because it is the easiest route there
@@ -48,128 +70,25 @@ class Blogcraft_Provider_Registry {
 			);
 		}
 
-		return $out + array(
-			'openai'     => array(
-				'label'    => __( 'OpenAI — GPT', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.openai.com/v1',
-				'help'     => 'OpenAI',
-				'key_url'  => 'https://platform.openai.com/api-keys',
-				'docs_url' => 'https://platform.openai.com/docs/models',
-			),
-			'anthropic'  => array(
-				'label'    => __( 'Anthropic — Claude', 'blogcraft' ),
-				'adapter'  => 'anthropic',
-				'base_url' => 'https://api.anthropic.com/v1',
-				'help'     => 'Anthropic Console',
-				'key_url'  => 'https://console.anthropic.com/settings/keys',
-				'docs_url' => 'https://docs.anthropic.com/en/docs/about-claude/models',
-			),
-			'gemini'     => array(
-				'label'    => __( 'Google — Gemini', 'blogcraft' ),
-				'adapter'  => 'gemini',
-				'base_url' => 'https://generativelanguage.googleapis.com/v1beta',
-				'help'     => 'Google AI Studio',
-				'key_url'  => 'https://aistudio.google.com/app/apikey',
-				'docs_url' => 'https://ai.google.dev/gemini-api/docs/models',
-			),
-			'xai'        => array(
-				'label'    => __( 'xAI — Grok', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.x.ai/v1',
-				'help'     => 'xAI Console',
-				'key_url'  => 'https://console.x.ai/',
-				'docs_url' => 'https://docs.x.ai/docs/models',
-			),
-			'moonshot'   => array(
-				'label'    => __( 'Moonshot — Kimi', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.moonshot.ai/v1',
-				'help'     => 'Moonshot Platform',
-				'key_url'  => 'https://platform.moonshot.ai/console/api-keys',
-				'docs_url' => 'https://platform.moonshot.ai/docs/intro',
-			),
-			'deepseek'   => array(
-				'label'    => __( 'DeepSeek', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.deepseek.com/v1',
-				'help'     => 'DeepSeek Platform',
-				'key_url'  => 'https://platform.deepseek.com/api_keys',
-				'docs_url' => 'https://api-docs.deepseek.com/quick_start/pricing',
-			),
-			'groq'       => array(
-				'label'    => __( 'Groq — fast, free tier', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.groq.com/openai/v1',
-				'help'     => 'Groq Console',
-				'key_url'  => 'https://console.groq.com/keys',
-				'docs_url' => 'https://console.groq.com/docs/models',
-			),
-			'openrouter' => array(
-				'label'    => __( 'OpenRouter — many models, one key', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://openrouter.ai/api/v1',
-				'help'     => 'OpenRouter',
-				'key_url'  => 'https://openrouter.ai/keys',
-				'docs_url' => 'https://openrouter.ai/models',
-			),
-			'mistral'    => array(
-				'label'    => __( 'Mistral', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.mistral.ai/v1',
-				'help'     => 'Mistral Console',
-				'key_url'  => 'https://console.mistral.ai/api-keys/',
-				'docs_url' => 'https://docs.mistral.ai/getting-started/models/models_overview/',
-			),
-			'together'   => array(
-				'label'    => __( 'Together AI', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.together.xyz/v1',
-				'help'     => 'Together AI',
-				'key_url'  => 'https://api.together.xyz/settings/api-keys',
-				'docs_url' => 'https://docs.together.ai/docs/serverless-models',
-			),
-			'fireworks'  => array(
-				'label'    => __( 'Fireworks AI', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.fireworks.ai/inference/v1',
-				'help'     => 'Fireworks AI',
-				'key_url'  => 'https://fireworks.ai/account/api-keys',
-				'docs_url' => 'https://fireworks.ai/models',
-			),
-			'cerebras'   => array(
-				'label'    => __( 'Cerebras', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'https://api.cerebras.ai/v1',
-				'help'     => 'Cerebras Cloud',
-				'key_url'  => 'https://cloud.cerebras.ai/',
-				'docs_url' => 'https://inference-docs.cerebras.ai/models/overview',
-			),
-			'ollama'     => array(
-				'label'    => __( 'Ollama — on this machine, no key', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'http://localhost:11434/v1',
-				'help'     => 'Ollama',
-				'key_url'  => '',
-				'docs_url' => 'https://ollama.com/library',
-			),
-			'lmstudio'   => array(
-				'label'    => __( 'LM Studio — on this machine, no key', 'blogcraft' ),
-				'adapter'  => 'openai',
-				'base_url' => 'http://localhost:1234/v1',
-				'help'     => 'LM Studio',
-				'key_url'  => '',
-				'docs_url' => 'https://lmstudio.ai/docs/app/api/endpoints/openai',
-			),
-			'custom'     => array(
-				'label'    => __( 'Anything else — enter the address yourself', 'blogcraft' ),
-				'adapter'  => 'custom',
-				'base_url' => '',
-				'help'     => '',
-				'key_url'  => '',
-				'docs_url' => '',
-			),
-		);
+		foreach ( Blogcraft_Endpoints::text() as $id => $spec ) {
+			if ( ! is_array( $spec ) ) {
+				continue;
+			}
+
+			$out[ $id ] = array_merge(
+				array(
+					'label'    => isset( $labels[ $id ] ) ? $labels[ $id ] : $id,
+					'adapter'  => 'openai',
+					'base_url' => '',
+					'help'     => '',
+					'key_url'  => '',
+					'docs_url' => '',
+				),
+				$spec
+			);
+		}
+
+		return $out;
 	}
 
 	/**

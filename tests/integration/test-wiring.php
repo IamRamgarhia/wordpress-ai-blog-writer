@@ -235,6 +235,148 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_uninstall_names_every_post_meta_key_the_plugin_writes() {
+		// The note at the top of uninstall.php promises every trace is removed.
+		// It listed none of these until it was checked.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'uninstall.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$written = array();
+
+		foreach ( (array) glob( BLOGCRAFT_PATH . 'includes/*.php' ) as $path ) {
+			$body = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			if ( preg_match_all( "/'(_blogcraft_[a-z_]+)'/", $body, $hits ) ) {
+				foreach ( $hits[1] as $key ) {
+					$written[ $key ] = $key;
+				}
+			}
+		}
+
+		// The nonce field is request data, not something stored on a post.
+		unset( $written['_blogcraft_nonce'] );
+
+		$missed = array();
+
+		foreach ( $written as $key ) {
+			if ( false === strpos( $source, "'" . $key . "'" ) ) {
+				$missed[] = $key;
+			}
+		}
+
+		$this->assertSame( array(), $missed, 'uninstall leaves these behind: ' . implode( ', ', $missed ) );
+	}
+
+	public function test_provider_addresses_come_from_the_data_file() {
+		$text = Blogcraft_Endpoints::text();
+
+		$this->assertArrayHasKey( 'openai', $text );
+		$this->assertNotSame( '', $text['openai']['base_url'] );
+		$this->assertNotSame( '', Blogcraft_Endpoints::image( 'fal' )['endpoint'] );
+	}
+
+	public function test_another_plugin_can_add_a_provider() {
+		// Endpoints being data rather than literals is what makes this possible,
+		// and a filter nobody can use is not a feature.
+		$added = function ( $providers ) {
+			$providers['acme'] = array(
+				'adapter'  => 'openai',
+				'base_url' => 'https://example.test/v1',
+				'help'     => 'Acme',
+				'key_url'  => 'https://example.test/keys',
+				'docs_url' => 'https://example.test/models',
+			);
+
+			return $providers;
+		};
+
+		add_filter( 'blogcraft_providers', $added );
+
+		$types = Blogcraft_Provider_Registry::types();
+
+		remove_filter( 'blogcraft_providers', $added );
+
+		$this->assertArrayHasKey( 'acme', $types );
+	}
+
+	public function test_a_missing_data_file_does_not_fatal() {
+		// Every caller has to survive the file being absent or unreadable.
+		$empty = function () {
+			return array();
+		};
+
+		add_filter( 'blogcraft_providers', $empty, 99 );
+
+		$types = Blogcraft_Provider_Registry::types();
+
+		remove_filter( 'blogcraft_providers', $empty, 99 );
+
+		$this->assertIsArray( $types );
+		$this->assertSame( '', Blogcraft_Provider_Registry::default_base_url( 'openai' ) );
+	}
+
+	public function test_the_documentation_ships_with_the_plugin() {
+		// Help panels used to link to a page on a website that did not exist,
+		// so the one control offering to explain more returned a 404.
+		$sections = Blogcraft_Docs::sections();
+
+		$this->assertNotEmpty( $sections );
+
+		foreach ( $sections as $anchor => $section ) {
+			$this->assertNotSame( '', $section['title'], $anchor . ' has no title' );
+			$this->assertNotEmpty( $section['body'], $anchor . ' says nothing' );
+		}
+
+		$this->assertStringContainsString( 'page=blogcraft-help', Blogcraft_Docs::url() );
+		$this->assertStringContainsString( '#providers', Blogcraft_Docs::url( 'providers' ) );
+	}
+
+	public function test_every_help_panel_points_at_a_section_that_exists() {
+		$sections = Blogcraft_Docs::sections();
+		$source   = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		if ( ! preg_match_all( "/'anchor'\s*=>\s*'([a-z-]+)'/", $source, $hits ) ) {
+			$this->fail( 'no help anchors found to check' );
+		}
+
+		foreach ( $hits[1] as $anchor ) {
+			$this->assertArrayHasKey( $anchor, $sections, 'a help panel links to "' . $anchor . '", which no section provides' );
+		}
+	}
+
+	public function test_a_word_count_is_not_recalculated_on_every_view() {
+		$post_id = self::factory()->post->create(
+			array( 'post_content' => '<p>' . str_repeat( 'One two three four five. ', 40 ) . '</p>' )
+		);
+
+		$post  = get_post( $post_id );
+		$first = Blogcraft_Seo::word_count( $post );
+
+		$this->assertGreaterThan( 100, $first );
+
+		$stored = get_post_meta( $post_id, Blogcraft_Seo::WORDS_META, true );
+
+		$this->assertSame( $first, (int) $stored['words'] );
+		$this->assertSame( $post->post_modified_gmt, $stored['at'] );
+		$this->assertSame( $first, Blogcraft_Seo::word_count( $post ) );
+	}
+
+	public function test_editing_a_post_recounts_it() {
+		$post_id = self::factory()->post->create( array( 'post_content' => '<p>Four words exactly here.</p>' ) );
+
+		Blogcraft_Seo::word_count( get_post( $post_id ) );
+
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => '<p>' . str_repeat( 'Many more words now. ', 30 ) . '</p>',
+			)
+		);
+
+		clean_post_cache( $post_id );
+
+		$this->assertGreaterThan( 50, Blogcraft_Seo::word_count( get_post( $post_id ) ) );
+	}
+
 	public function test_every_extra_section_can_actually_be_rendered() {
 		// A switch that produces no markup is the same failure in a different
 		// place, so each one is asserted to reach the page.

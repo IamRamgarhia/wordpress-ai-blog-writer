@@ -71,6 +71,7 @@ class Blogcraft {
 			Blogcraft_Blueprint_Screen::init();
 			Blogcraft_Calendar::init();
 			Blogcraft_Activity::init();
+			Blogcraft_Docs::init();
 		}
 	}
 }

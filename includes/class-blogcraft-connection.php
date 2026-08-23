@@ -701,9 +701,12 @@ class Blogcraft_Connection {
 			printf( '<p>%s</p>', esc_html( $line ) );
 		}
 
+		// The documentation ships with the plugin. It used to link to a page on
+		// a website that did not exist, so the one control offering to explain
+		// more returned a 404.
 		printf(
-			'<p class="bc-help-more"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a></p>',
-			esc_url( BLOGCRAFT_DOCS_URL . '#' . $all[ $slug ]['anchor'] ),
+			'<p class="bc-help-more"><a href="%1$s">%2$s</a></p>',
+			esc_url( Blogcraft_Docs::url( $all[ $slug ]['anchor'] ) ),
 			esc_html__( 'Read the full documentation', 'blogcraft' )
 		);
 

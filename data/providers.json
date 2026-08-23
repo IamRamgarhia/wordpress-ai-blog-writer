@@ -1,0 +1,124 @@
+{
+  "_comment": "Endpoints and links for the services Blogcraft can talk to. Kept as data rather than PHP so the list can be filtered by other plugins and changed without a code release. Every one of these is disclosed in readme.txt under External Services.",
+  "text": {
+    "openai": {
+      "adapter": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "help": "OpenAI",
+      "key_url": "https://platform.openai.com/api-keys",
+      "docs_url": "https://platform.openai.com/docs/models"
+    },
+    "anthropic": {
+      "adapter": "anthropic",
+      "base_url": "https://api.anthropic.com/v1",
+      "help": "Anthropic Console",
+      "key_url": "https://console.anthropic.com/settings/keys",
+      "docs_url": "https://docs.anthropic.com/en/docs/about-claude/models"
+    },
+    "gemini": {
+      "adapter": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "help": "Google AI Studio",
+      "key_url": "https://aistudio.google.com/app/apikey",
+      "docs_url": "https://ai.google.dev/gemini-api/docs/models"
+    },
+    "xai": {
+      "adapter": "openai",
+      "base_url": "https://api.x.ai/v1",
+      "help": "xAI Console",
+      "key_url": "https://console.x.ai/",
+      "docs_url": "https://docs.x.ai/docs/models"
+    },
+    "moonshot": {
+      "adapter": "openai",
+      "base_url": "https://api.moonshot.ai/v1",
+      "help": "Moonshot Platform",
+      "key_url": "https://platform.moonshot.ai/console/api-keys",
+      "docs_url": "https://platform.moonshot.ai/docs/intro"
+    },
+    "deepseek": {
+      "adapter": "openai",
+      "base_url": "https://api.deepseek.com/v1",
+      "help": "DeepSeek Platform",
+      "key_url": "https://platform.deepseek.com/api_keys",
+      "docs_url": "https://api-docs.deepseek.com/quick_start/pricing"
+    },
+    "groq": {
+      "adapter": "openai",
+      "base_url": "https://api.groq.com/openai/v1",
+      "help": "Groq Console",
+      "key_url": "https://console.groq.com/keys",
+      "docs_url": "https://console.groq.com/docs/models"
+    },
+    "openrouter": {
+      "adapter": "openai",
+      "base_url": "https://openrouter.ai/api/v1",
+      "help": "OpenRouter",
+      "key_url": "https://openrouter.ai/keys",
+      "docs_url": "https://openrouter.ai/models"
+    },
+    "mistral": {
+      "adapter": "openai",
+      "base_url": "https://api.mistral.ai/v1",
+      "help": "Mistral Console",
+      "key_url": "https://console.mistral.ai/api-keys/",
+      "docs_url": "https://docs.mistral.ai/getting-started/models/models_overview/"
+    },
+    "together": {
+      "adapter": "openai",
+      "base_url": "https://api.together.xyz/v1",
+      "help": "Together AI",
+      "key_url": "https://api.together.xyz/settings/api-keys",
+      "docs_url": "https://docs.together.ai/docs/serverless-models"
+    },
+    "fireworks": {
+      "adapter": "openai",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "help": "Fireworks AI",
+      "key_url": "https://fireworks.ai/account/api-keys",
+      "docs_url": "https://fireworks.ai/models"
+    },
+    "cerebras": {
+      "adapter": "openai",
+      "base_url": "https://api.cerebras.ai/v1",
+      "help": "Cerebras Cloud",
+      "key_url": "https://cloud.cerebras.ai/",
+      "docs_url": "https://inference-docs.cerebras.ai/models/overview"
+    },
+    "ollama": {
+      "adapter": "openai",
+      "base_url": "http://localhost:11434/v1",
+      "help": "Ollama",
+      "key_url": "",
+      "docs_url": "https://ollama.com/library"
+    },
+    "lmstudio": {
+      "adapter": "openai",
+      "base_url": "http://localhost:1234/v1",
+      "help": "LM Studio",
+      "key_url": "",
+      "docs_url": "https://lmstudio.ai/docs/app/api/endpoints/openai"
+    },
+    "custom": {
+      "adapter": "custom",
+      "base_url": "",
+      "help": "",
+      "key_url": "",
+      "docs_url": ""
+    }
+  },
+  "images": {
+    "fal": {
+      "endpoint": "https://fal.run/",
+      "help": "fal.ai",
+      "key_url": "https://fal.ai/dashboard/keys",
+      "docs_url": "https://fal.ai/models?categories=text-to-image"
+    },
+    "openai": {
+      "endpoint": "https://api.openai.com/v1/images/generations",
+      "help": "OpenAI",
+      "key_url": "https://platform.openai.com/api-keys",
+      "docs_url": "https://platform.openai.com/docs/guides/images"
+    }
+  }
+}

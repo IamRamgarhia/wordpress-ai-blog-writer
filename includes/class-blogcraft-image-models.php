@@ -41,22 +41,14 @@ class Blogcraft_Image_Models {
 	 * @return array Keys: label, key_url, models_url.
 	 */
 	public static function help( $provider ) {
-		$map = array(
-			'fal'    => array(
-				'label'      => 'fal.ai',
-				'key_url'    => 'https://fal.ai/dashboard/keys',
-				'models_url' => 'https://fal.ai/models?categories=text-to-image',
-			),
-			'openai' => array(
-				'label'      => 'OpenAI',
-				'key_url'    => 'https://platform.openai.com/api-keys',
-				'models_url' => 'https://platform.openai.com/docs/guides/images',
-			),
-		);
-
 		$provider = (string) $provider;
+		$spec     = Blogcraft_Endpoints::image( '' === $provider ? 'fal' : $provider );
 
-		return isset( $map[ $provider ] ) ? $map[ $provider ] : $map['fal'];
+		return array(
+			'label'      => (string) $spec['help'],
+			'key_url'    => (string) $spec['key_url'],
+			'models_url' => (string) $spec['docs_url'],
+		);
 	}
 
 	/**
@@ -160,11 +152,15 @@ class Blogcraft_Image_Models {
 			return '';
 		}
 
+		if ( '' === (string) Blogcraft_Endpoints::image( 'fal' )['endpoint'] ) {
+			return '';
+		}
+
 		$shape = isset( $blueprint['image_shape'] ) ? (string) $blueprint['image_shape'] : '16:9';
 		$size  = Blogcraft_Art_Direction::dimensions( $shape );
 
 		$result = Blogcraft_Http::post_json(
-			'https://fal.run/' . ltrim( $model, '/' ),
+			Blogcraft_Endpoints::image( 'fal' )['endpoint'] . ltrim( $model, '/' ),
 			array(
 				'prompt'                => $prompt,
 				'num_images'            => 1,
@@ -223,10 +219,14 @@ class Blogcraft_Image_Models {
 			return '';
 		}
 
+		if ( '' === (string) Blogcraft_Endpoints::image( 'openai' )['endpoint'] ) {
+			return '';
+		}
+
 		$shape = isset( $blueprint['image_shape'] ) ? (string) $blueprint['image_shape'] : '16:9';
 
 		$result = Blogcraft_Http::post_json(
-			'https://api.openai.com/v1/images/generations',
+			Blogcraft_Endpoints::image( 'openai' )['endpoint'],
 			array(
 				'model'  => $model,
 				'prompt' => $prompt,
