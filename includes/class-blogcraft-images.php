@@ -444,13 +444,21 @@ class Blogcraft_Images {
 				$heading
 			);
 
-			$attachment_id = self::sideload( (int) $post_id, $brief['prompt'], $heading, $brief['search'] );
+			// Alt text describes the picture, not the section it sits under.
+			// The heading was what got used, which meant a screen reader heard
+			// the same words twice in a row — once as the heading, once as the
+			// image — and learned nothing about the image either time. The
+			// brief's subject is literally the answer to "what does this
+			// picture show", so it is the sentence that belongs here.
+			$alt = ( '' === trim( (string) $brief['subject'] ) ) ? $heading : $brief['subject'];
+
+			$attachment_id = self::sideload( (int) $post_id, $brief['prompt'], $alt, $brief['search'] );
 
 			if ( 0 === $attachment_id ) {
 				continue;
 			}
 
-			$block = self::image_block( $attachment_id, $heading );
+			$block = self::image_block( $attachment_id, $alt );
 
 			if ( '' === $block ) {
 				continue;
@@ -527,12 +535,17 @@ class Blogcraft_Images {
 			return 0;
 		}
 
+		// Same reasoning as the in-body pictures: the title is already the
+		// page's heading, so repeating it as the featured image's alt tells a
+		// screen reader nothing it has not just been told.
+		$alt = ( '' === trim( (string) $brief['subject'] ) ) ? $title : $brief['subject'];
+
 		$file = array(
 			'name'     => self::filename_for( $title, $made['mime'] ),
 			'tmp_name' => $tmp,
 		);
 
-		$attachment_id = media_handle_sideload( $file, (int) $post_id, wp_strip_all_tags( $title ) );
+		$attachment_id = media_handle_sideload( $file, (int) $post_id, wp_strip_all_tags( $alt ) );
 
 		if ( is_wp_error( $attachment_id ) ) {
 			// media_handle_sideload cleans up on success only.
@@ -550,7 +563,7 @@ class Blogcraft_Images {
 		}
 
 		// Alt text is a real accessibility and image-SEO signal, and costs nothing here.
-		update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
+		update_post_meta( $attachment_id, '_wp_attachment_image_alt', wp_strip_all_tags( $alt ) );
 		set_post_thumbnail( (int) $post_id, (int) $attachment_id );
 
 		return (int) $attachment_id;

@@ -176,8 +176,11 @@ class Test_Blogcraft_Welcome_And_Outline extends WP_UnitTestCase {
 		// Deactivating and reactivating a working install is a routine thing to
 		// do while debugging something else. It should not open a wizard.
 		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_model', 'gpt-4o' );
 		Blogcraft_Settings::set( 'provider_api_key', 'a-key' );
 		Blogcraft_Settings::set( 'provider_key_owner', 'openai' );
+
+		$this->assertTrue( Blogcraft_Provider_Registry::is_configured() );
 
 		Blogcraft_Welcome::arm();
 

@@ -230,6 +230,30 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'no watermarks', $brief['search'] );
 	}
 
+	public function test_alt_text_describes_the_picture_not_the_heading_above_it() {
+		// The section heading used to be the alt text, so a screen reader read
+		// the same words twice in a row — once as the heading, once as the
+		// image — and learned nothing about the picture either time. The
+		// brief's subject is the answer to "what does this picture show".
+		$blueprint                   = $this->blueprint();
+		$blueprint['image_describe'] = false;
+
+		$brief = Blogcraft_Art_Direction::brief_for( 'How to season a pan', '', $blueprint, 'Why the first layer matters' );
+
+		$this->assertSame( 'Why the first layer matters', $brief['subject'] );
+
+		$attachment = self::factory()->attachment->create_object(
+			array(
+				'file'           => 'pan.jpg',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		$block = Blogcraft_Images::image_block( $attachment, $brief['subject'] );
+
+		$this->assertStringContainsString( 'alt="Why the first layer matters"', $block );
+	}
+
 	public function test_one_openai_key_covers_writing_and_pictures() {
 		Blogcraft_Settings::set( 'provider_type', 'openai' );
 		Blogcraft_Settings::set( 'provider_api_key', 'sk-writing' );
