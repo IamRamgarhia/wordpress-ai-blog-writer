@@ -6,7 +6,13 @@
  * every byte locally.
  */
 
-.blogcraft-page {
+/* Every colour in this file resolves through these. They were declared on
+   .blogcraft-page alone, and three screens — the progress screen, the
+   library and the welcome — use .blogcraft-wrap instead. On those, every
+   var() fell through to nothing: the navigation lost its background and
+   its border, and cards sat on the page with no edge at all. */
+.blogcraft-page,
+.blogcraft-wrap {
 	--bc-ink: #1d2327;
 	--bc-muted: #646970;
 	--bc-line: #dcdcde;
@@ -717,7 +723,7 @@ a.bc-nav-item:hover {
 /* ------------------------------------------------------------- overview. */
 
 .blogcraft-steps {
-	margin: 16px 0 0;
+	margin: 0;
 	padding: 0;
 	list-style: none;
 	counter-reset: none;
@@ -726,11 +732,31 @@ a.bc-nav-item:hover {
 .blogcraft-steps li {
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	gap: 11px;
 	margin: 0;
-	padding: 12px 0;
+	padding: 9px 0;
 	border-bottom: 1px solid var(--bc-line);
 	font-size: 13px;
+}
+
+/* The step being worked on is the one piece of this screen somebody is
+   actually looking for, and it used to be distinguished only by an unfilled
+   circle identical to the eight below it. */
+.blogcraft-steps .is-now {
+	margin: 0 -10px;
+	padding: 9px 10px;
+	border-radius: 8px;
+	border-bottom-color: transparent;
+	background: var(--bc-accent-soft);
+}
+
+.blogcraft-steps .is-now .blogcraft-step-mark {
+	border-color: var(--bc-accent);
+}
+
+.blogcraft-steps .is-now .blogcraft-step-text strong {
+	color: var(--bc-accent);
+	font-weight: 650;
 }
 
 .blogcraft-steps li:last-child {
@@ -1413,8 +1439,13 @@ body[class*="page_blogcraft"] #wpcontent {
  * machine is alive; the title and the headings say whether it is writing the
  * post you asked for, which is otherwise a several-minute wait to find out. */
 
+/* Was capped at 820px, which on any normal monitor left two thirds of the
+   screen empty beside a column of ten one-line steps — on the screen somebody
+   sits and watches for several minutes. The draft as it arrives is the
+   interesting half, so it gets the room and the steps become a rail beside
+   it. */
 #blogcraft-progress-card {
-	max-width: 820px;
+	max-width: none;
 }
 
 .bc-progress-bar,
@@ -1422,15 +1453,42 @@ body[class*="page_blogcraft"] #wpcontent {
 	width: 100%;
 }
 
-.bc-live {
-	margin: 18px 0 4px;
-	padding: 16px 18px;
-	border: 1px solid var(--bc-line);
-	border-radius: 8px;
-	background: var(--bc-surface-soft, #fbfbfc);
+.bc-run {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+	gap: 22px;
+	align-items: start;
+	margin-top: 18px;
 }
 
-.bc-live:empty { display: none; }
+.bc-run.is-held {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.bc-live {
+	min-height: 220px;
+	padding: 18px 20px;
+	border: 1px solid var(--bc-line);
+	border-radius: 10px;
+	background: var(--bc-canvas);
+}
+
+.bc-live-wait {
+	margin: 0;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-muted);
+}
+
+@media screen and (max-width: 960px) {
+	.bc-run {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.bc-live {
+		min-height: 0;
+	}
+}
 
 .bc-live h3 {
 	margin: 0;

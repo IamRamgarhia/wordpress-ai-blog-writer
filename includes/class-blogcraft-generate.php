@@ -229,65 +229,109 @@ class Blogcraft_Generate {
 
 		self::render_composer();
 
-		echo '<div class="bc-compose-actions">';
+		// The primary action, pinned so it is reachable from anywhere in a
+		// form six tab-panels deep. It used to sit below all of them, so
+		// typing a topic meant scrolling past every override to press the
+		// button — on the one screen that exists to be used quickly.
+		echo '<div class="bc-commit">';
+
+		printf(
+			'<p class="bc-commit-say">%s</p>',
+			esc_html__( 'You are taken to a live progress screen while it writes, and shown the finished draft and its score before anything reaches your site.', 'blogcraft' )
+		);
 
 		if ( Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<button type="submit" class="bc-save">%s</button>',
-				esc_html__( 'Queue this post', 'blogcraft' )
+				// "Queue" described the old behaviour, where the post was
+				// written by cron some minutes later and this screen could
+				// only promise it. Pressing this now starts the writing.
+				esc_html__( 'Write this post', 'blogcraft' )
 			);
 		} else {
 			printf(
-				'<button type="submit" class="bc-save" disabled>%1$s</button><a class="bc-compose-fix" href="%2$s">%3$s</a>',
-				esc_html__( 'Queue this post', 'blogcraft' ),
+				'<a class="bc-compose-fix" href="%1$s">%2$s</a><button type="submit" class="bc-save" disabled>%3$s</button>',
 				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-provider' ) ),
-				esc_html__( 'Connect a provider first', 'blogcraft' )
+				esc_html__( 'Connect a provider first', 'blogcraft' ),
+				esc_html__( 'Write this post', 'blogcraft' )
 			);
 		}
 
 		echo '</div>';
 		echo '</form>';
 
-		self::card_open( __( 'Queue', 'blogcraft' ), __( 'Posts are written in the background, one step per run.', 'blogcraft' ) );
-		echo '<ul class="blogcraft-stats">';
-		foreach ( array( 'pending', 'running', 'complete', 'failed' ) as $status ) {
-			printf(
-				'<li><span class="blogcraft-stat-value">%2$d</span><span class="blogcraft-stat-label">%1$s</span></li>',
-				esc_html( $status ),
-				(int) Blogcraft_Queue::count_by_status( $status )
-			);
-		}
-		echo '</ul>';
+		self::render_more();
+		echo '</div>';
+	}
 
-		echo '<p class="description">' . esc_html__( 'A step runs on its own every few minutes. Run one by hand if you would rather not wait.', 'blogcraft' ) . '</p>';
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
-		Blogcraft_Request::nonce_field( self::RUN_ACTION );
-		submit_button( __( 'Run the queue now', 'blogcraft' ), 'secondary' );
-		echo '</form>';
+	/**
+	 * The jobs that are not writing one post.
+	 *
+	 * Queueing a list and trashing a batch used to sit open on this screen,
+	 * below the composer, along with four raw queue counters that said the
+	 * same thing as the library screen only worse. So the page you visit
+	 * most often ended with a red button that trashes a day of posts.
+	 *
+	 * Folded away rather than removed: they are real jobs, they are just not
+	 * this one, and somebody looking for them knows they exist.
+	 *
+	 * @return void
+	 */
+	private static function render_more() {
+		$waiting = Blogcraft_Queue::count_by_status( 'pending' ) + Blogcraft_Queue::count_by_status( 'running' );
 
-		echo '</section>';
-		self::card_open( __( 'Add many at once', 'blogcraft' ), __( 'One topic per line, or paste a CSV column.', 'blogcraft' ) );
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<details class="bc-more">';
+		printf(
+			'<summary><span>%1$s</span><span class="bc-more-hint">%2$s</span></summary>',
+			esc_html__( 'More than one at a time', 'blogcraft' ),
+			esc_html__( 'Queue a list, run a stuck job, undo a batch', 'blogcraft' )
+		);
+
+		echo '<div class="bc-more-body">';
+
+		printf(
+			'<p class="bc-more-count">%1$s <a href="%2$s">%3$s</a></p>',
+			esc_html(
+				sprintf(
+					/* translators: %d: how many posts are queued or being written. */
+					_n( '%d post is queued or being written.', '%d posts are queued or being written.', $waiting, 'blogcraft' ),
+					$waiting
+				)
+			),
+			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
+			esc_html__( 'See everything written by AI', 'blogcraft' )
+		);
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
 		echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
 		Blogcraft_Request::nonce_field( self::BULK_ACTION );
 		printf(
-			'<label for="blogcraft_topics" class="screen-reader-text">%s</label>',
-			esc_html__( 'Topics, one per line', 'blogcraft' )
+			'<label for="blogcraft_topics"><strong>%1$s</strong></label>',
+			esc_html__( 'Queue a list of topics', 'blogcraft' )
 		);
-		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="6" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
-		echo '<p class="description">' . esc_html__( 'Repeats are skipped, whether the post already exists or is only queued. Duplicates within the list you paste are caught too.', 'blogcraft' ) . '</p>';
-		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', true );
+		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="5" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft' ) . '"></textarea>';
+		echo '<p class="description">' . esc_html__( 'These use your standing rules, not the brief above, and are written unattended. Repeats are skipped, whether the post already exists or is only queued.', 'blogcraft' ) . '</p>';
+		submit_button( __( 'Queue all of these', 'blogcraft' ), 'secondary', 'submit', false );
 		echo '</form>';
 
-		echo '</section>';
-		self::card_open( __( 'Undo a batch', 'blogcraft' ), __( 'Only touches posts Blogcraft created. Anything you wrote is left alone.', 'blogcraft' ) );
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft' ) ) . "'" ) . ');">';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
+		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
+		Blogcraft_Request::nonce_field( self::RUN_ACTION );
+		printf( '<p><strong>%s</strong></p>', esc_html__( 'Push the queue along', 'blogcraft' ) );
+		echo '<p class="description">' . esc_html__( 'Posts written here run in your browser and need none of this. It is for a queued job that has stopped moving on a site where scheduled tasks do not fire.', 'blogcraft' ) . '</p>';
+		submit_button( __( 'Run the queue now', 'blogcraft' ), 'secondary', 'submit', false );
+		echo '</form>';
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block is-danger" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft' ) ) . "'" ) . ');">';
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
 		Blogcraft_Request::nonce_field( self::ROLLBACK_ACTION );
+		printf( '<p><strong>%s</strong></p>', esc_html__( 'Undo a batch', 'blogcraft' ) );
+		echo '<p class="description">' . esc_html__( 'Trashes posts Blogcraft created in the last 24 hours. Anything you wrote yourself is left alone.', 'blogcraft' ) . '</p>';
 		submit_button( __( 'Trash the last 24 hours', 'blogcraft' ), 'delete', 'submit', false );
 		echo '</form>';
+
 		echo '</div>';
+		echo '</details>';
 	}
 
 	/**

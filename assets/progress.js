@@ -89,8 +89,16 @@
 			return;
 		}
 
+		var wait = document.getElementById( 'blogcraft-live-wait' );
+
 		if ( state.title ) {
 			title.textContent = state.title;
+
+			// The placeholder has done its job the moment there is something
+			// real to show.
+			if ( wait ) {
+				wait.remove();
+			}
 		}
 
 		var planned = state.heads || [];

@@ -485,15 +485,24 @@ class Blogcraft_Progress {
 		);
 		echo '</header>';
 
+		// Once the draft is held the live panel is hidden, and a two-column
+		// grid with one column gone leaves the steps stranded at half width
+		// beside nothing.
+		printf( '<div class="bc-run%s">', $held ? ' is-held' : '' );
+
 		// Filled in by the script as the outline and the sections arrive. It
-		// starts empty rather than hidden so the space it will occupy is not
-		// a jump when the first heading lands.
+		// starts with a line saying so rather than as an empty panel: reserving
+		// the space stopped the layout jumping when the first heading landed,
+		// but an unexplained grey slab sitting there for the first minute reads
+		// as something that has failed to load.
 		printf(
-			'<div class="bc-live" id="blogcraft-live"%s>'
+			'<div class="bc-live" id="blogcraft-live"%1$s>'
+			. '<p class="bc-live-wait" id="blogcraft-live-wait">%2$s</p>'
 			. '<h3 id="blogcraft-live-title"></h3>'
 			. '<ul class="bc-live-heads" id="blogcraft-live-heads"></ul>'
 			. '</div>',
-			$held ? ' hidden' : ''
+			$held ? ' hidden' : '',
+			esc_html__( 'The title and the headings appear here as they are decided.', 'blogcraft' )
 		);
 
 		echo '<ol class="blogcraft-steps" id="blogcraft-progress-steps">';
@@ -524,7 +533,9 @@ class Blogcraft_Progress {
 			++$index;
 		}
 
-		echo '</ol></section>';
+		echo '</ol>';
+		echo '</div>';
+		echo '</section>';
 	}
 
 	/**
