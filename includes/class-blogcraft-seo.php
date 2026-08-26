@@ -22,6 +22,16 @@ class Blogcraft_Seo {
 	const GENERATED_META = '_blogcraft_generated';
 
 	/**
+	 * Where the crafted search-result title is kept, whatever else is installed.
+	 */
+	const SEO_TITLE_META = '_blogcraft_seo_title';
+
+	/**
+	 * Where the crafted meta description is kept, whatever else is installed.
+	 */
+	const SEO_DESC_META = '_blogcraft_seo_description';
+
+	/**
 	 * Meta key holding a cached word count and a hash of the content it counted.
 	 */
 	const WORDS_META = '_blogcraft_words';
@@ -328,11 +338,28 @@ class Blogcraft_Seo {
 	}
 
 	/**
+	 * The name people know an SEO plugin by.
+	 *
+	 * @param string $id One of the ids active_seo_plugin() returns.
+	 * @return string Empty when the id is not one of ours.
+	 */
+	public static function seo_plugin_name( $id ) {
+		$names = array(
+			'yoast'    => __( 'Yoast SEO', 'blogcraft' ),
+			'rankmath' => __( 'Rank Math', 'blogcraft' ),
+			'seopress' => __( 'SEOPress', 'blogcraft' ),
+			'aioseo'   => __( 'All In One SEO', 'blogcraft' ),
+		);
+
+		return isset( $names[ $id ] ) ? $names[ $id ] : '';
+	}
+	/**
 	 * Meta keys used by the SEO plugins that store their fields as post meta.
 	 *
-	 * All In One SEO is absent deliberately: it keeps titles and descriptions in
-	 * its own table rather than post meta, so writing meta would silently do
-	 * nothing. Better to leave its fields visibly unset than to appear filled.
+	 * All In One SEO is absent because it keeps titles and descriptions in its
+	 * own table rather than post meta, so writing meta here would silently do
+	 * nothing. It is handled instead through its own documented output
+	 * filters — see filter_aioseo_title() and filter_aioseo_description().
 	 *
 	 * @return array Plugin id => array( title key, description key ).
 	 */
@@ -378,15 +405,27 @@ class Blogcraft_Seo {
 	 * @return bool Whether anything was written.
 	 */
 	public static function write_seo_meta( $post_id, $title, $description ) {
+		$title       = sanitize_text_field( (string) $title );
+		$description = sanitize_text_field( (string) $description );
+
+		// Kept on the post regardless of what is installed. Somebody who
+		// switches SEO plugin, or installs their first one next month, still
+		// has the title and description that were written for this post —
+		// and the AIOSEO filters below read from here.
+		if ( '' !== $title ) {
+			update_post_meta( (int) $post_id, self::SEO_TITLE_META, $title );
+		}
+
+		if ( '' !== $description ) {
+			update_post_meta( (int) $post_id, self::SEO_DESC_META, $description );
+		}
+
 		$plugin = self::active_seo_plugin();
 		$keys   = self::seo_meta_keys();
 
 		if ( '' === $plugin || ! isset( $keys[ $plugin ] ) ) {
 			return false;
 		}
-
-		$title       = sanitize_text_field( (string) $title );
-		$description = sanitize_text_field( (string) $description );
 
 		if ( '' !== $title ) {
 			update_post_meta( (int) $post_id, $keys[ $plugin ][0], $title );
@@ -500,6 +539,72 @@ class Blogcraft_Seo {
 		add_action( 'wp_head', array( __CLASS__, 'print_head_meta' ), 5 );
 		add_filter( 'the_content', array( __CLASS__, 'append_author_box' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'print_author_box_styles' ), 6 );
+
+		// All In One SEO keeps its fields in its own table rather than post
+		// meta, so there was nothing to write and nothing was written. It
+		// still counted as an SEO plugin being present, which stopped
+		// Blogcraft printing its own description — so an AIOSEO site got the
+		// worst of both: the crafted description was thrown away and the
+		// fields it should have filled stayed on automatic.
+		if ( 'aioseo' === self::active_seo_plugin() ) {
+			add_filter( 'aioseo_title', array( __CLASS__, 'filter_aioseo_title' ) );
+			add_filter( 'aioseo_description', array( __CLASS__, 'filter_aioseo_description' ) );
+		}
+	}
+
+	/**
+	 * Hand All In One SEO the title written for this post.
+	 *
+	 * Its own documented output filter, rather than a write into its table:
+	 * the table is another plugin's schema and could change under us, while
+	 * this is reversible the moment Blogcraft is switched off.
+	 *
+	 * The cost of doing it this way is honest and worth stating — AIOSEO's
+	 * editor sidebar still shows its automatic value, because nothing has
+	 * been saved into its record. What the search engine reads is correct.
+	 *
+	 * @param string $title Title AIOSEO was going to output.
+	 * @return string
+	 */
+	public static function filter_aioseo_title( $title ) {
+		return self::ours_or( $title, self::SEO_TITLE_META );
+	}
+
+	/**
+	 * Hand All In One SEO the description written for this post.
+	 *
+	 * @param string $description Description AIOSEO was going to output.
+	 * @return string
+	 */
+	public static function filter_aioseo_description( $description ) {
+		return self::ours_or( $description, self::SEO_DESC_META );
+	}
+
+	/**
+	 * Our stored value for the post being viewed, or whatever was passed in.
+	 *
+	 * Only ever on a single post Blogcraft wrote. An archive, a page, or a
+	 * post somebody typed themselves is left entirely alone — this is here
+	 * to fill a gap, not to take over another plugin's job.
+	 *
+	 * @param string $fallback What to return when we have nothing.
+	 * @param string $key      Meta key holding our value.
+	 * @return string
+	 */
+	private static function ours_or( $fallback, $key ) {
+		if ( ! is_singular( 'post' ) ) {
+			return $fallback;
+		}
+
+		$post_id = get_the_ID();
+
+		if ( ! $post_id || ! get_post_meta( $post_id, self::GENERATED_META, true ) ) {
+			return $fallback;
+		}
+
+		$ours = trim( (string) get_post_meta( $post_id, $key, true ) );
+
+		return ( '' === $ours ) ? $fallback : $ours;
 	}
 
 	/**

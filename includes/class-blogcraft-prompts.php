@@ -173,13 +173,20 @@ Rules for this article:
 			. $rivals
 			. "Plan a blog post about: {$topic}\n\n"
 			. "Reply with JSON of exactly this shape:\n"
-			. '{"title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"
+			. '{"title":"","seo_title":"","slug":"","meta_description":"","sections":[{"heading":""}]}' . "\n\n"
 			. "Rules:\n"
 			// Both limits are measured on the finished post, so they are taken
 			// from the blueprint rather than hardcoded here. Asking for one
 			// number and checking against another is how a setting comes to do
 			// nothing.
 			. sprintf( "- title: compelling, %d characters at most, no colon-subtitle pattern\n", self::limit( 'meta_title_max', 60 ) )
+			// The heading on the page and the line in a search result are read
+			// in different places for different reasons. One is read by somebody
+			// who has already arrived; the other has to earn the click against
+			// nine others and gets cut off at about sixty characters. Asking for
+			// one string and using it for both means one of the two jobs is
+			// always being done badly.
+			. sprintf( "- seo_title: the same page, written to earn a click in a list of search results. %d characters at most, front-loaded with the subject. May differ from the title; repeat it if nothing better fits\n", self::limit( 'meta_title_max', 60 ) )
 			. "- slug: lowercase, hyphenated, no stop words\n"
 			. sprintf( "- meta_description: between 70 and %d characters, describing what the reader gains\n", self::limit( 'meta_desc_max', 155 ) )
 			. '- sections: headings that build an argument, not a list of synonyms'

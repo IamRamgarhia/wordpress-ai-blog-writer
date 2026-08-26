@@ -44,16 +44,18 @@ class Blogcraft_Progress {
 	 */
 	public static function steps() {
 		return array(
-			'research' => __( 'Reading what is already out there', 'blogcraft' ),
-			'outline'  => __( 'Planning the shape of the post', 'blogcraft' ),
-			'draft'    => __( 'Writing the opening', 'blogcraft' ),
-			'section'  => __( 'Writing each section', 'blogcraft' ),
-			'faq'      => __( 'Answering the questions readers ask', 'blogcraft' ),
-			'extras'   => __( 'Adding the extra sections', 'blogcraft' ),
-			'critique' => __( 'Reading its own draft back critically', 'blogcraft' ),
-			'revise'   => __( 'Rewriting what it found wrong', 'blogcraft' ),
-			'verify'   => __( 'Checking links and scoring the result', 'blogcraft' ),
-			'publish'  => __( 'Creating the post', 'blogcraft' ),
+			'research'  => __( 'Reading what is already out there', 'blogcraft' ),
+			'outline'   => __( 'Planning the shape of the post', 'blogcraft' ),
+			'draft'     => __( 'Writing the opening', 'blogcraft' ),
+			'section'   => __( 'Writing each section', 'blogcraft' ),
+			'faq'       => __( 'Answering the questions readers ask', 'blogcraft' ),
+			'extras'    => __( 'Adding the extra sections', 'blogcraft' ),
+			'critique'  => __( 'Reading its own draft back critically', 'blogcraft' ),
+			'revise'    => __( 'Rewriting what it found wrong', 'blogcraft' ),
+			'verify'    => __( 'Checking links and scoring the result', 'blogcraft' ),
+			'publish'   => __( 'Creating the post', 'blogcraft' ),
+			'pictures'  => __( 'Finding the pictures', 'blogcraft' ),
+			'finishing' => __( 'Linking it up and telling the crawlers', 'blogcraft' ),
 		);
 	}
 
@@ -122,6 +124,12 @@ class Blogcraft_Progress {
 				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 				'nonce'     => wp_create_nonce( self::ACTION ),
 				'job'       => self::current_job_id(),
+				// The clock used to count from when the page loaded, so
+				// refreshing a job that had been running four minutes said
+				// it had been running none. Both of these are measured from
+				// the job itself, so a reload picks up where it was.
+				'elapsedAt' => self::elapsed_for( self::current_job_id() ),
+				'stepsAt'   => self::steps_done_for( self::current_job_id() ),
 				'working'   => __( 'Working...', 'blogcraft' ),
 				'failed'    => __( 'Something went wrong. The Activity screen has the details.', 'blogcraft' ),
 				'total'     => count( self::steps() ),
@@ -136,6 +144,53 @@ class Blogcraft_Progress {
 	}
 
 	/**
+	 * How long this job has been going, in seconds.
+	 *
+	 * @param int $job_id Job.
+	 * @return int Zero when there is no job or no usable timestamp.
+	 */
+	private static function elapsed_for( $job_id ) {
+		$job = $job_id > 0 ? Blogcraft_Queue::find( (int) $job_id ) : null;
+
+		if ( null === $job || empty( $job->created_at ) ) {
+			return 0;
+		}
+
+		// Stored as UTC by the queue, which is why the suffix is needed:
+		// read as site-local it would be hours out either way.
+		$started = strtotime( (string) $job->created_at . ' UTC' );
+
+		if ( false === $started ) {
+			return 0;
+		}
+
+		return max( 0, time() - $started );
+	}
+
+	/**
+	 * How many stages this job has already got through.
+	 *
+	 * The estimate divides elapsed time by steps finished. Counting only
+	 * the steps this page happened to watch, against time measured from
+	 * the job's start, would make the estimate nonsense after a reload.
+	 *
+	 * @param int $job_id Job.
+	 * @return int
+	 */
+	private static function steps_done_for( $job_id ) {
+		$job = $job_id > 0 ? Blogcraft_Queue::find( (int) $job_id ) : null;
+
+		if ( null === $job ) {
+			return 0;
+		}
+
+		$order = array_keys( self::steps() );
+		$at    = array_search( $job->stage, $order, true );
+
+		return ( false === $at ) ? 0 : (int) $at;
+	}
+
+	/**
 	 * The job this screen is showing.
 	 *
 	 * @return int
@@ -143,7 +198,18 @@ class Blogcraft_Progress {
 	private static function current_job_id() {
 		// Read-only screen selection, not a state change: the nonce that
 		// matters guards the AJAX advance and the approve handler.
-		return isset( $_GET['job'] ) ? (int) $_GET['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$asked = isset( $_GET['job'] ) ? (int) $_GET['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( $asked > 0 ) {
+			return $asked;
+		}
+
+		// This screen is only ever reached by an id in the address, and it
+		// has no menu entry. So refreshing the page, or coming back to the
+		// tab, landed on "there is no post here" while the post was still
+		// being written. Falling back to whatever is in flight makes the
+		// bare address work.
+		return Blogcraft_Queue::newest_open_job();
 	}
 
 	/**

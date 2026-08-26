@@ -27,6 +27,21 @@ class Blogcraft_Http {
 	const MAX_ATTEMPTS = 3;
 
 	/**
+	 * Longest one call may spend across all of its attempts, in seconds.
+	 *
+	 * Three attempts at a sixty-second timeout, with a retry wait of up to
+	 * thirty between them, is four minutes inside a single stage. PHP on
+	 * ordinary shared hosting kills the request long before that, so the
+	 * later attempts never ran — they only guaranteed the process died
+	 * mid-stage instead of returning an error somebody could read.
+	 *
+	 * Retrying stops when the budget is gone. What is already known is
+	 * returned as a normal failure, which the queue can log, back off and
+	 * try again later.
+	 */
+	const TOTAL_BUDGET_SECONDS = 150;
+
+	/**
 	 * Upper bound on an honoured Retry-After delay, in seconds.
 	 *
 	 * Longer than any legitimate per-attempt backoff, but short enough that
@@ -86,8 +101,9 @@ class Blogcraft_Http {
 	 * @return array array( 'code' => int, 'body' => array, 'error' => string ).
 	 */
 	private static function request( $url, $args ) {
-		$code  = 0;
-		$error = '';
+		$code    = 0;
+		$error   = '';
+		$started = time();
 
 		for ( $attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++ ) {
 			$response = wp_remote_request( $url, $args );
@@ -104,7 +120,7 @@ class Blogcraft_Http {
 					)
 				);
 
-				if ( $attempt >= self::MAX_ATTEMPTS ) {
+				if ( $attempt >= self::MAX_ATTEMPTS || self::out_of_time( $started ) ) {
 					break;
 				}
 
@@ -150,7 +166,7 @@ class Blogcraft_Http {
 
 			$retryable = ( 429 === $code || $code >= 500 );
 
-			if ( ! $retryable || $attempt >= self::MAX_ATTEMPTS ) {
+			if ( ! $retryable || $attempt >= self::MAX_ATTEMPTS || self::out_of_time( $started ) ) {
 				return array(
 					'code'  => $code,
 					'body'  => $body,
@@ -166,6 +182,22 @@ class Blogcraft_Http {
 			'body'  => array(),
 			'error' => $error,
 		);
+	}
+
+	/**
+	 * Whether this call has spent its whole budget already.
+	 *
+	 * Retrying past this point does not help: the request is running inside
+	 * one pipeline stage, and PHP will kill the process before the extra
+	 * attempt can finish. Stopping means the caller gets an error it can
+	 * log and back off from, instead of the job dying mid-stage with
+	 * nothing written down.
+	 *
+	 * @param int $started When this call began.
+	 * @return bool
+	 */
+	private static function out_of_time( $started ) {
+		return ( time() - (int) $started ) >= self::TOTAL_BUDGET_SECONDS;
 	}
 
 	/**

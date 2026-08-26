@@ -27,15 +27,16 @@ class Blogcraft_Nav {
 	 */
 	public static function screens() {
 		$screens = array(
-			Blogcraft_Admin::MENU_SLUG => __( 'Overview', 'blogcraft' ),
-			'blogcraft-write'          => __( 'Write a post', 'blogcraft' ),
-			'blogcraft-blueprint'      => __( 'How it writes', 'blogcraft' ),
-			'blogcraft-calendar'       => __( 'Calendar', 'blogcraft' ),
-			'blogcraft-library'        => __( 'Written by AI', 'blogcraft' ),
-			'blogcraft-review'         => __( 'Needs review', 'blogcraft' ),
-			'blogcraft-activity'       => __( 'Activity', 'blogcraft' ),
-			'blogcraft-settings'       => __( 'Settings', 'blogcraft' ),
-			'blogcraft-help'           => __( 'Help', 'blogcraft' ),
+			Blogcraft_Admin::MENU_SLUG    => __( 'Overview', 'blogcraft' ),
+			'blogcraft-write'             => __( 'Write a post', 'blogcraft' ),
+			Blogcraft_Progress::PAGE_SLUG => __( 'Being written', 'blogcraft' ),
+			'blogcraft-blueprint'         => __( 'How it writes', 'blogcraft' ),
+			'blogcraft-calendar'          => __( 'Calendar', 'blogcraft' ),
+			'blogcraft-library'           => __( 'Written by AI', 'blogcraft' ),
+			'blogcraft-review'            => __( 'Needs review', 'blogcraft' ),
+			'blogcraft-activity'          => __( 'Activity', 'blogcraft' ),
+			'blogcraft-settings'          => __( 'Settings', 'blogcraft' ),
+			'blogcraft-help'              => __( 'Help', 'blogcraft' ),
 		);
 
 		// A tab for an empty queue is a tab that is never worth clicking. It
@@ -43,6 +44,14 @@ class Blogcraft_Nav {
 		// you are standing on is worse than showing an empty one.
 		if ( ! Blogcraft_Review::has_pending() && 'blogcraft-review' !== self::current() ) {
 			unset( $screens['blogcraft-review'] );
+		}
+
+		// The progress screen is reached by an id in the address and has no
+		// menu entry, so refreshing or closing the tab left a post being
+		// written with nothing anywhere pointing back at it. It appears only
+		// while there is something to point at.
+		if ( Blogcraft_Queue::newest_open_job() <= 0 && Blogcraft_Progress::PAGE_SLUG !== self::current() ) {
+			unset( $screens[ Blogcraft_Progress::PAGE_SLUG ] );
 		}
 
 		return $screens;

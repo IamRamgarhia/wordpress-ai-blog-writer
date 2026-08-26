@@ -32,8 +32,13 @@
 	}
 
 	var failures = 0;
-	var startedAt = Date.now();
-	var stepsDone = 0;
+
+	// Anchored to when the job started, not when this page loaded.
+	// Refreshing a post that had been writing for four minutes used to
+	// report nine seconds, which made a long run look like a fresh one
+	// and a stuck one look healthy.
+	var startedAt = Date.now() - ( ( config.elapsedAt || 0 ) * 1000 );
+	var stepsDone = config.stepsAt || 0;
 
 	function seconds( ms ) {
 		return Math.max( 0, Math.round( ms / 1000 ) );
@@ -73,8 +78,12 @@
 
 		if ( stepsDone > 0 ) {
 			var perStep = elapsed / stepsDone;
-			var left = Math.max( 0, ( config.total || 10 ) - stepsDone );
-			remaining = Math.round( perStep * left );
+			var left = ( config.total || 10 ) - stepsDone;
+
+			// On the last step there is nothing left to divide by, and the
+			// honest answer is not "about 0s left" — which is what a job
+			// that had genuinely stopped was cheerfully reporting.
+			remaining = ( left > 0 ) ? Math.round( perStep * left ) : null;
 		}
 
 		clock.textContent = clockText( elapsed, remaining );
@@ -161,8 +170,26 @@
 		body.append( '_blogcraft_nonce', config.nonce || '' );
 		body.append( 'job', config.job );
 
-		fetch( config.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body } )
+		// fetch() waits for ever by default. A stage that hangs — a picture
+		// service that accepts the connection and never answers, a provider
+		// gone quiet — left this page showing a half-filled bar with no way
+		// to tell it apart from one still working. Long enough that a slow
+		// step is not cut off, short enough that a dead one is admitted to.
+		var stop = ( 'undefined' === typeof AbortController ) ? null : new AbortController();
+		var giveUp = stop ? window.setTimeout( function () {
+			stop.abort();
+		}, 180000 ) : 0;
+
+		var options = { method: 'POST', credentials: 'same-origin', body: body };
+
+		if ( stop ) {
+			options.signal = stop.signal;
+		}
+
+		fetch( config.ajaxUrl, options )
 			.then( function ( response ) {
+				window.clearTimeout( giveUp );
+
 				return response.json();
 			} )
 			.then( function ( payload ) {
@@ -192,6 +219,7 @@
 				window.setTimeout( advance, 400 );
 			} )
 			.catch( function () {
+				window.clearTimeout( giveUp );
 				failures++;
 
 				// A provider hiccup or a dropped request should not abandon a

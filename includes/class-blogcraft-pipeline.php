@@ -23,6 +23,11 @@ class Blogcraft_Pipeline {
 	const NAME = 'write_post';
 
 	/**
+	 * How many section headings get a picture of their own.
+	 */
+	const SECTION_PICTURES = 3;
+
+	/**
 	 * Register every stage handler.
 	 *
 	 * @return void
@@ -38,6 +43,8 @@ class Blogcraft_Pipeline {
 		Blogcraft_Worker::register_stage( self::NAME, 'revise', array( __CLASS__, 'stage_revise' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'verify', array( __CLASS__, 'stage_verify' ) );
 		Blogcraft_Worker::register_stage( self::NAME, 'publish', array( __CLASS__, 'stage_publish' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'pictures', array( __CLASS__, 'stage_pictures' ) );
+		Blogcraft_Worker::register_stage( self::NAME, 'finishing', array( __CLASS__, 'stage_finishing' ) );
 	}
 
 	/**
@@ -1272,9 +1279,17 @@ class Blogcraft_Pipeline {
 			update_post_meta( $post_id, '_blogcraft_faq_schema', $faq_schema );
 		}
 
+		// The search-result title, which is not the same string as the heading
+		// on the page: one is read by somebody who has already arrived, the
+		// other has to earn the click and is cut off around sixty characters.
+		// The post title is the fallback, which is what used to be passed
+		// unconditionally — so the SEO field was a copy of the H1 and added
+		// nothing an SEO plugin would not have defaulted to anyway.
+		$seo_title = isset( $outline['seo_title'] ) ? trim( (string) $outline['seo_title'] ) : '';
+
 		Blogcraft_Seo::write_seo_meta(
 			$post_id,
-			$title,
+			( '' === $seo_title ) ? $title : $seo_title,
 			isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : ''
 		);
 
@@ -1291,41 +1306,179 @@ class Blogcraft_Pipeline {
 			}
 		}
 
-		// A missing image must never fail a finished post, so this is
-		// best-effort — which the comment claimed and the code did not do.
-		// A broken format string in the image block threw a ValueError from
-		// here on PHP 8, and it took the whole publish stage down with it on
-		// a post that was otherwise finished and correct.
-		try {
-			Blogcraft_Images::add_section_images( $post_id, $article, 3 );
-		} catch ( Throwable $e ) {
-			Blogcraft_Logger::error(
-				'The in-body pictures could not be added, so the post was published without them.',
-				array( 'reason' => $e->getMessage() ),
-				null
+		update_post_meta( $post_id, '_blogcraft_topic', isset( $payload['topic'] ) ? (string) $payload['topic'] : '' );
+
+		$payload['post_id'] = $post_id;
+
+		// Everything above is a meta write and returns in milliseconds. What
+		// used to follow it here was four picture downloads, three post
+		// rewrites and an HTTP submission — minutes of work inside a single
+		// request, on a screen whose whole design is one short step per call.
+		// It read as a job stuck on "Creating the post" with nothing to say.
+		return array(
+			'next'    => 'pictures',
+			'payload' => $payload,
+		);
+	}
+
+	/**
+	 * One picture per run, until the post has the ones it is getting.
+	 *
+	 * Fetching an image means an HTTP download and then WordPress generating
+	 * every registered size of it. Four of those in one stage is how a
+	 * finished post sat at the last step for minutes with nothing to say;
+	 * one is a step like any other, and the reader watches them land.
+	 *
+	 * A picture is worth less than the post, so nothing here may fail the
+	 * job — every failure is logged and the queue moves on.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_pictures( $job ) {
+		$payload = $job->payload;
+		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
+
+		if ( $post_id <= 0 ) {
+			return array(
+				'next'    => 'finishing',
+				'payload' => $payload,
 			);
 		}
 
-		Blogcraft_Images::attach_featured(
-			$post_id,
-			$title,
-			isset( $payload['topic'] ) ? (string) $payload['topic'] : ''
+		$article = isset( $payload['article'] ) ? (array) $payload['article'] : array();
+		$at      = isset( $payload['picture_index'] ) ? (int) $payload['picture_index'] : -1;
+
+		// Below zero is the featured image, which is the one worth having if
+		// only one ever arrives.
+		if ( $at < 0 ) {
+			$post  = get_post( $post_id );
+			$title = ( $post instanceof WP_Post ) ? $post->post_title : '';
+
+			try {
+				Blogcraft_Images::attach_featured(
+					$post_id,
+					$title,
+					isset( $payload['topic'] ) ? (string) $payload['topic'] : ''
+				);
+			} catch ( Throwable $e ) {
+				self::note_picture_failure( $job, 'featured', $e );
+			}
+
+			$payload['picture_index'] = 0;
+
+			return array(
+				'next'    => 'pictures',
+				'payload' => $payload,
+			);
+		}
+
+		$sections = isset( $article['sections'] ) ? (array) $article['sections'] : array();
+		$wanted   = min( count( $sections ), self::SECTION_PICTURES );
+
+		if ( $at >= $wanted ) {
+			// Stamped only now. The marker means "this post has been all the
+			// way through here", and setting it on the first of several runs
+			// would make every later run skip.
+			update_post_meta( $post_id, '_blogcraft_section_images', 1 );
+
+			return array(
+				'next'    => 'finishing',
+				'payload' => $payload,
+			);
+		}
+
+		$done = (int) get_post_meta( $post_id, '_blogcraft_section_images_done', true );
+
+		// A job reclaimed mid-run repeats its stage. Without this the repeat
+		// wedges a second picture under the same heading and bills for it.
+		if ( $at >= $done ) {
+			try {
+				Blogcraft_Images::add_section_images( $post_id, $article, self::SECTION_PICTURES, $at );
+				update_post_meta( $post_id, '_blogcraft_section_images_done', $at + 1 );
+			} catch ( Throwable $e ) {
+				self::note_picture_failure( $job, 'section', $e );
+			}
+		}
+
+		$payload['picture_index'] = $at + 1;
+
+		return array(
+			'next'    => 'pictures',
+			'payload' => $payload,
 		);
-		update_post_meta( $post_id, '_blogcraft_topic', isset( $payload['topic'] ) ? (string) $payload['topic'] : '' );
+	}
 
-		// Point older related posts at this one. Every competing tool links only
-		// forward, leaving existing content unaware the new post exists.
-		Blogcraft_Backlinks::link_back(
-			$post_id,
-			isset( $payload['topic'] ) ? (string) $payload['topic'] : $title,
-			3
+	/**
+	 * Record a picture that could not be fetched, without failing the post.
+	 *
+	 * @param Blogcraft_Job $job   Current job.
+	 * @param string        $which Which picture it was.
+	 * @param Throwable     $e     What went wrong.
+	 * @return void
+	 */
+	private static function note_picture_failure( $job, $which, $e ) {
+		Blogcraft_Logger::error(
+			'A picture could not be added, so the post was left without it.',
+			array(
+				'picture' => $which,
+				'reason'  => $e->getMessage(),
+			),
+			(int) $job->id
 		);
+	}
 
-		// Tell the crawlers that take being told. Does nothing unless switched
-		// on, and never fails a post that is already written and saved.
-		Blogcraft_Indexnow::submit( $post_id );
+	/**
+	 * The last of it: older posts pointed here, and the crawlers told.
+	 *
+	 * Both used to sit at the end of publish, where a slow one held up a post
+	 * that was already written and saved. Neither may fail the job, for the
+	 * same reason: the post exists and is correct either way.
+	 *
+	 * @param Blogcraft_Job $job Current job.
+	 * @return array
+	 */
+	public static function stage_finishing( $job ) {
+		$payload = $job->payload;
+		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
 
-		$payload['post_id'] = $post_id;
+		if ( $post_id <= 0 ) {
+			return array(
+				'next'    => null,
+				'payload' => $payload,
+			);
+		}
+
+		$post  = get_post( $post_id );
+		$title = ( $post instanceof WP_Post ) ? $post->post_title : '';
+
+		try {
+			// Point older related posts at this one. Every competing tool links
+			// only forward, leaving existing content unaware the post exists.
+			Blogcraft_Backlinks::link_back(
+				$post_id,
+				isset( $payload['topic'] ) ? (string) $payload['topic'] : $title,
+				3
+			);
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error(
+				'Older posts could not be pointed at this one.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
+
+		try {
+			// Tell the crawlers that take being told. Does nothing unless it
+			// has been switched on.
+			Blogcraft_Indexnow::submit( $post_id );
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error(
+				'The search engines could not be told about this post.',
+				array( 'reason' => $e->getMessage() ),
+				(int) $job->id
+			);
+		}
 
 		return array(
 			'next'    => null,

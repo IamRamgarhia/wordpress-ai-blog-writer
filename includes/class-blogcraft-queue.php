@@ -680,6 +680,30 @@ class Blogcraft_Queue {
 	}
 
 	/**
+	 * The newest job that has not finished with the reader yet.
+	 *
+	 * The progress screen is reached by an id in the address, and it has no
+	 * menu entry of its own. So refreshing without that id, or coming back
+	 * to the tab later, landed on "there is no post here" while the post was
+	 * still being written — and nothing anywhere linked back to it.
+	 *
+	 * Ready counts as unfinished: the draft is written but it is waiting for
+	 * somebody to decide, which is the state it is most annoying to lose.
+	 *
+	 * @return int Job id, or 0 when nothing is in flight.
+	 */
+	public static function newest_open_job() {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$id = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT id FROM {$table} WHERE status IN ( 'ready', 'running', 'pending' ) ORDER BY id DESC LIMIT 1" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		return (int) $id;
+	}
+	/**
 	 * The provider's own words, if it has recently asked us to slow down.
 	 *
 	 * There is no general way to ask a provider how much quota is left —

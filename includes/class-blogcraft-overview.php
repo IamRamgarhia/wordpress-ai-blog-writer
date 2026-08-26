@@ -347,6 +347,30 @@ class Blogcraft_Overview {
 			);
 		}
 
+		// Which SEO plugin the crafted title and description are being handed
+		// to is invisible otherwise: it happens at publish, on another screen,
+		// into fields somebody has to go and look at.
+		$seo_plugin = Blogcraft_Seo::active_seo_plugin();
+
+		if ( '' === $seo_plugin ) {
+			$items[] = array(
+				'text' => __( 'No SEO plugin found, so Blogcraft writes the description and the sharing tags into the page itself.', 'blogcraft' ),
+				'url'  => '',
+				'link' => '',
+				'kind' => 'good',
+			);
+		} else {
+			$items[] = array(
+				'text' => sprintf(
+					/* translators: %s: name of the SEO plugin that is active. */
+					__( '%s is handling search, so each post\'s title and description are written into its fields instead.', 'blogcraft' ),
+					Blogcraft_Seo::seo_plugin_name( $seo_plugin )
+				),
+				'url'  => '',
+				'link' => '',
+				'kind' => 'good',
+			);
+		}
 		if ( empty( $items ) ) {
 			return;
 		}

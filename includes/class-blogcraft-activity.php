@@ -163,7 +163,29 @@ class Blogcraft_Activity {
 			$status = (string) $job['status'];
 
 			echo '<tr>';
-			printf( '<td>%d</td>', (int) $job['id'] );
+
+			// A job still moving, or waiting for a decision, has a screen of its
+			// own — and that screen was reachable only from the redirect that
+			// created it. This table listed the job as Running and gave no way
+			// to get back to watching it.
+			if ( in_array( $status, array( 'pending', 'running', 'ready' ), true ) ) {
+				printf(
+					'<td><a href="%1$s">%2$d</a></td>',
+					esc_url(
+						add_query_arg(
+							array(
+								'page' => Blogcraft_Progress::PAGE_SLUG,
+								'job'  => (int) $job['id'],
+							),
+							admin_url( 'admin.php' )
+						)
+					),
+					(int) $job['id']
+				);
+			} else {
+				printf( '<td>%d</td>', (int) $job['id'] );
+			}
+
 			printf( '<td>%s</td>', esc_html( self::topic_of( $job ) ) );
 			printf( '<td>%s</td>', esc_html( str_replace( '_', ' ', (string) $job['stage'] ) ) );
 			printf(

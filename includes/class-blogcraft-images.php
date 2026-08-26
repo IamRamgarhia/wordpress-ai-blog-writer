@@ -388,9 +388,13 @@ class Blogcraft_Images {
 	 * @param int   $post_id Post to illustrate.
 	 * @param array $article Article structure.
 	 * @param int   $limit   Most images to add.
+	 * @param int   $only    Index of the single section to illustrate, or -1 for all.
+	 *                       One at a time is how the pipeline calls this: fetching
+	 *                       four pictures inside one request is minutes of work in
+	 *                       a stage that is supposed to be one short step.
 	 * @return int Number added.
 	 */
-	public static function add_section_images( $post_id, $article, $limit = 3 ) {
+	public static function add_section_images( $post_id, $article, $limit = 3, $only = -1 ) {
 		if ( ! Blogcraft_Settings::get( 'images_per_section' ) ) {
 			return 0;
 		}
@@ -415,10 +419,17 @@ class Blogcraft_Images {
 
 		$content = (string) $post->post_content;
 		$added   = 0;
+		$seen    = -1;
 
 		foreach ( $article['sections'] as $section ) {
 			if ( $added >= (int) $limit ) {
 				break;
+			}
+
+			++$seen;
+
+			if ( $only >= 0 && $seen !== (int) $only ) {
+				continue;
 			}
 
 			if ( ! is_array( $section ) || empty( $section['heading'] ) ) {
@@ -492,7 +503,13 @@ class Blogcraft_Images {
 		// Set whatever happened, including when nothing could be placed: the
 		// question this answers is "has this post been through here already",
 		// and a run that found no home for a picture has still been through.
-		update_post_meta( (int) $post_id, '_blogcraft_section_images', 1 );
+		//
+		// Not stamped when a single section was asked for, because the post
+		// has only been part of the way through and the next call would find
+		// the marker and do nothing.
+		if ( $only < 0 ) {
+			update_post_meta( (int) $post_id, '_blogcraft_section_images', 1 );
+		}
 
 		return $added;
 	}
