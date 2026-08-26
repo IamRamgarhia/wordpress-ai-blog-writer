@@ -48,6 +48,8 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_option( 'blogcraft_active_blueprint' );
 		delete_option( 'blogcraft_blueprints_migrated' );
 		delete_option( 'blogcraft_db_version' );
+		delete_option( 'blogcraft_welcomed' );
+		delete_option( 'blogcraft_welcome_pending' );
 
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 

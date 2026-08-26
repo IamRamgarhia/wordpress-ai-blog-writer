@@ -1492,3 +1492,115 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: 11.5px;
 	word-break: break-word;
 }
+
+/* ---------------------------------------------------------------------
+   The first five minutes.
+
+   Wider line length and larger type than the settings screen: this is
+   read once, in order, and the reasons matter more than the fields.
+   --------------------------------------------------------------------- */
+.bc-welcome {
+	max-width: 760px;
+}
+
+.bc-welcome-lead {
+	margin: 4px 0 22px;
+	font-size: 15px;
+	line-height: 1.65;
+	color: var(--bc-ink-soft, #50575e);
+}
+
+.bc-welcome-rail {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 0 18px;
+	padding: 0;
+	list-style: none;
+	counter-reset: none;
+}
+
+.bc-welcome-rail li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 7px 13px 7px 8px;
+	border: 1px solid var(--bc-line, #dcdcde);
+	border-radius: 999px;
+	background: var(--bc-surface, #fff);
+	font-size: 12.5px;
+	line-height: 1.3;
+	color: var(--bc-ink-soft, #50575e);
+}
+
+.bc-welcome-rail span {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--bc-surface-soft, #f0f0f1);
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--bc-ink-soft, #50575e);
+}
+
+.bc-welcome-rail .is-now {
+	border-color: var(--bc-accent, #2271b1);
+	color: var(--bc-ink, #1d2327);
+	font-weight: 600;
+}
+
+.bc-welcome-rail .is-now span {
+	background: var(--bc-accent, #2271b1);
+	color: #fff;
+}
+
+.bc-welcome-rail .is-done span {
+	background: var(--bc-ok, #007017);
+	color: #fff;
+}
+
+.bc-welcome-card {
+	padding: 24px 26px 22px;
+}
+
+.bc-welcome-card h2 {
+	margin: 0 0 10px;
+	font-size: 20px;
+	line-height: 1.3;
+}
+
+.bc-welcome-card p {
+	max-width: 62ch;
+	font-size: 14px;
+	line-height: 1.65;
+}
+
+.bc-welcome-card .bc-field label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.bc-welcome-card .submit,
+.bc-welcome-card .button {
+	margin-top: 6px;
+}
+
+.bc-welcome-ok {
+	padding: 9px 12px;
+	border-left: 3px solid var(--bc-ok, #007017);
+	background: var(--bc-surface-soft, #fbfbfc);
+	font-size: 13px;
+}
+
+.bc-welcome-skip {
+	margin: 12px 0 0;
+	font-size: 12.5px;
+}
+
+.bc-welcome-skip a {
+	color: var(--bc-ink-soft, #50575e);
+}

@@ -417,12 +417,69 @@ class Blogcraft_Pipeline {
 		);
 
 		$payload            = $job->payload;
-		$payload['outline'] = $outline;
+		$payload['outline'] = self::enforce_outline( $outline, self::blueprint( $job ) );
 
 		return array(
 			'next'    => 'draft',
 			'payload' => $payload,
 		);
+	}
+
+	/**
+	 * Hold the outline to the shape that was asked for.
+	 *
+	 * The blueprint says how many sections a post should have, the prompt says
+	 * so plainly, and the scorecard penalises the finished article when it is
+	 * wrong. A real run still came back with ten sections against a ceiling of
+	 * seven — so the reader was shown a failed check for a rule the plugin had
+	 * requested politely and then accepted anyway.
+	 *
+	 * Requesting is not enforcing. Everything downstream is built from this
+	 * outline — one provider call per section — so an over-long one costs real
+	 * money on sections that were never wanted and then loses marks for having
+	 * them. Trimming here is deterministic, free, and happens before any of
+	 * that is spent.
+	 *
+	 * Trimmed rather than re-asked: the sections are already ordered by the
+	 * argument they build, so the ones past the ceiling are the tail, and a
+	 * second outline call would cost another request to get a list that might
+	 * be wrong again.
+	 *
+	 * @param array $outline   Outline as returned by the model.
+	 * @param array $blueprint Blueprint this post is written to.
+	 * @return array
+	 */
+	private static function enforce_outline( $outline, $blueprint ) {
+		if ( ! is_array( $outline ) || empty( $outline['sections'] ) || ! is_array( $outline['sections'] ) ) {
+			return is_array( $outline ) ? $outline : array();
+		}
+
+		$sections = array();
+
+		foreach ( $outline['sections'] as $section ) {
+			if ( is_array( $section ) && ! empty( $section['heading'] ) ) {
+				$sections[] = $section;
+			}
+		}
+
+		$max = max( 1, (int) $blueprint['sections_max'] );
+
+		if ( count( $sections ) > $max ) {
+			Blogcraft_Logger::info(
+				'The outline came back longer than the blueprint allows, so the tail was dropped.',
+				array(
+					'returned' => count( $sections ),
+					'kept'     => $max,
+				),
+				null
+			);
+
+			$sections = array_slice( $sections, 0, $max );
+		}
+
+		$outline['sections'] = $sections;
+
+		return $outline;
 	}
 
 	/**

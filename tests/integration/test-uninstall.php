@@ -63,4 +63,18 @@ class Test_Blogcraft_Uninstall extends WP_UnitTestCase {
 		$this->assertFalse( get_option( Blogcraft_Cost::OPTION ) );
 		$this->assertSame( 0, Blogcraft_Cost::month_totals()['requests'] );
 	}
+
+	public function test_cleanup_forgets_that_the_introduction_was_seen() {
+		// Otherwise deleting the plugin and installing it again would skip the
+		// introduction entirely, and the second owner of the site would never
+		// be shown it.
+		Blogcraft_Activator::activate();
+		update_option( Blogcraft_Welcome::DONE_OPTION, 1, false );
+
+		require_once dirname( dirname( __DIR__ ) ) . '/uninstall.php';
+		blogcraft_uninstall_cleanup();
+
+		$this->assertFalse( get_option( Blogcraft_Welcome::DONE_OPTION, false ) );
+		$this->assertFalse( get_option( Blogcraft_Welcome::PENDING_OPTION, false ) );
+	}
 }

@@ -98,6 +98,7 @@ class Blogcraft {
 			Blogcraft_Docs::init();
 			Blogcraft_Progress::init();
 			Blogcraft_Library::init();
+			Blogcraft_Welcome::init();
 		}
 	}
 

@@ -24,7 +24,35 @@ class Blogcraft_Admin {
 	 */
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( BLOGCRAFT_FILE ), array( __CLASS__, 'action_links' ) );
 		Blogcraft_Notices::init();
+	}
+
+	/**
+	 * Add shortcuts to the plugin's row on the Plugins screen.
+	 *
+	 * Someone who has just activated the plugin is looking at that row, not at
+	 * the sidebar, and "Blogcraft" under an editing icon is not an obvious
+	 * next click when a dozen other plugins were installed the same afternoon.
+	 *
+	 * @param array $links Existing action links.
+	 * @return array
+	 */
+	public static function action_links( $links ) {
+		$ours = array(
+			sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Welcome::PAGE_SLUG ) ),
+				esc_html__( 'Set up', 'blogcraft' )
+			),
+			sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
+				esc_html__( 'Settings', 'blogcraft' )
+			),
+		);
+
+		return array_merge( $ours, (array) $links );
 	}
 
 	/**
