@@ -97,7 +97,7 @@ class Test_Blogcraft_Progress extends WP_UnitTestCase {
 
 		$this->assertTrue( Blogcraft_Queue::approve( $job_id ) );
 
-		Blogcraft_Worker::run_job( $job_id );
+		$this->drain_job( $job_id );
 
 		$this->assertSame( 1, $this->generated_post_count() );
 		$this->assertSame( 'complete', Blogcraft_Queue::find( $job_id )->status );
@@ -227,9 +227,11 @@ class Test_Blogcraft_Progress extends WP_UnitTestCase {
 
 		$job_id = Blogcraft_Pipeline::enqueue_topic( 'cold brew', 'draft', '', array(), '', array(), $await_review );
 
-		for ( $i = 0; $i < 10; $i++ ) {
-			Blogcraft_Worker::run_job( $job_id );
-		}
+		// Driven until the job stops moving rather than a fixed number of
+		// turns. A hardcoded count has broken once for every stage added to
+		// the pipeline, and the failure always reads "expected 1, got 0"
+		// about a post that was two turns from existing.
+		$this->drain_job( $job_id );
 
 		return $job_id;
 	}
@@ -323,5 +325,24 @@ class Test_Blogcraft_Progress extends WP_UnitTestCase {
 	 */
 	private function generated_post_count() {
 		return count( $this->generated_posts() );
+	}
+
+
+	/**
+	 * Run one job until it stops moving.
+	 *
+	 * @param int $job_id Job.
+	 * @param int $cap    Most turns to take, so a stage that returns
+	 *                    itself for ever fails rather than hangs.
+	 * @return void
+	 */
+	private function drain_job( $job_id, $cap = 40 ) {
+		for ( $i = 0; $i < $cap; $i++ ) {
+			if ( ! Blogcraft_Worker::run_job( $job_id ) ) {
+				return;
+			}
+		}
+
+		$this->fail( 'job ' . $job_id . ' never settled after ' . $cap . ' turns' );
 	}
 }

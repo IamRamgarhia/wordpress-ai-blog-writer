@@ -60,10 +60,25 @@ class Blogcraft_Blueprint_Screen {
 			return;
 		}
 
+		// The base stylesheet was never loaded here, and this screen renders
+		// the shared navigation — which is styled in it. So the nav bar on
+		// the two screens people use most had no background, no border and
+		// no current-tab highlight, while every other screen had all three.
+		//
+		// It is also where the colour palette is declared. blueprint.css
+		// names its own shades but resolves them against that palette, so
+		// loading it alone leaves every var() empty.
+		wp_enqueue_style(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.css',
+			array(),
+			BLOGCRAFT_VERSION
+		);
+
 		wp_enqueue_style(
 			'blogcraft-blueprint',
 			BLOGCRAFT_URL . 'assets/blueprint.css',
-			array(),
+			array( 'blogcraft-admin' ),
 			BLOGCRAFT_VERSION
 		);
 

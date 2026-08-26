@@ -11,19 +11,30 @@
  * nobody is allowed to download.
  */
 
+/* The aliases below resolve against the palette declared in admin.css.
+   Both of these wrappers already carry it: .blogcraft-page directly, and
+   .blogcraft-blueprint through the .blogcraft-page on the same element. */
 .blogcraft-blueprint,
 .blogcraft-page.blogcraft-compose-page {
-	--bp-ink: #16181d;
-	--bp-graphite: #5b616e;
-	--bp-faint: #8b909b;
-	--bp-line: #e2e4e9;
-	--bp-hair: #eef0f3;
-	--bp-paper: #fff;
-	--bp-wash: #f7f8fa;
-	--bp-accent: #4338ca;
-	--bp-accent-soft: #eef0fd;
-	--bp-measure: #92400e;
-	--bp-measure-soft: #fdf6ec;
+	/* These were a second, separate palette: a different ink, a different
+	   line, a different accent, all for the same roles. The navigation at
+	   the top of the Write screen is painted from the other set, so the bar
+	   and the card under it disagreed about what grey is — which is most of
+	   why these screens read as unfinished rather than plain.
+
+	   They are aliases now. One palette, defined in admin.css, and these
+	   names kept so that several hundred rules did not have to move. */
+	--bp-ink: var(--bc-ink);
+	--bp-graphite: var(--bc-muted);
+	--bp-faint: var(--bc-faint);
+	--bp-line: var(--bc-line);
+	--bp-hair: var(--bc-hair);
+	--bp-paper: var(--bc-surface);
+	--bp-wash: var(--bc-canvas);
+	--bp-accent: var(--bc-accent);
+	--bp-accent-soft: var(--bc-accent-soft);
+	--bp-measure: var(--bc-warn);
+	--bp-measure-soft: var(--bc-warn-soft);
 
 	max-width: 1500px;
 	margin-right: 20px;
@@ -54,7 +65,7 @@
 	margin: 0 0 20px;
 	padding: 18px 22px;
 	border: 1px solid var(--bp-line);
-	border-radius: 14px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.05), 0 8px 24px -16px rgba(22, 24, 29, 0.35);
 }
@@ -80,7 +91,7 @@
 	flex: none;
 	padding: 10px 20px;
 	border: 0;
-	border-radius: 9px;
+	border-radius: var(--bc-r-md);
 	background: var(--bp-accent);
 	color: #fff;
 	font-size: 13.5px;
@@ -125,7 +136,7 @@
 	padding: 9px 12px;
 	border: 0;
 	border-left: 2px solid transparent;
-	border-radius: 0 7px 7px 0;
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: none;
 	font-size: 13.5px;
 	font-weight: 500;
@@ -157,7 +168,7 @@
 .bc-pane {
 	padding: 6px 26px 10px;
 	border: 1px solid var(--bp-line);
-	border-radius: 14px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
 }
@@ -215,7 +226,7 @@
 	max-width: 460px;
 	padding: 8px 11px;
 	border: 1px solid var(--bp-line);
-	border-radius: 8px;
+	border-radius: var(--bc-r-md);
 	background: var(--bp-paper);
 	font-size: 13.5px;
 	color: var(--bp-ink);
@@ -241,7 +252,7 @@
 	flex-wrap: wrap;
 	padding: 3px;
 	border: 1px solid var(--bp-line);
-	border-radius: 10px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-wash);
 }
 
@@ -253,7 +264,7 @@
 
 .bc-seg label {
 	padding: 7px 14px;
-	border-radius: 7px;
+	border-radius: var(--bc-r-md);
 	font-size: 13px;
 	font-weight: 500;
 	color: var(--bp-graphite);
@@ -292,7 +303,7 @@
 	height: 4px;
 	margin: 0;
 	appearance: none;
-	border-radius: 999px;
+	border-radius: var(--bc-r-pill);
 	background: var(--bp-line);
 	cursor: pointer;
 }
@@ -325,7 +336,7 @@
 	min-width: 96px;
 	padding: 4px 9px;
 	border: 1px solid var(--bp-line);
-	border-radius: 7px;
+	border-radius: var(--bc-r-md);
 	background: var(--bp-measure-soft);
 	font-size: 12.5px;
 	font-weight: 600;
@@ -360,7 +371,7 @@
 	flex: none;
 	width: 38px;
 	height: 22px;
-	border-radius: 999px;
+	border-radius: var(--bc-r-pill);
 	background: #cdd1d8;
 	transition: background 140ms ease;
 }
@@ -408,7 +419,7 @@
 .bc-chips label {
 	padding: 7px 14px;
 	border: 1px solid var(--bp-line);
-	border-radius: 999px;
+	border-radius: var(--bc-r-pill);
 	background: var(--bp-paper);
 	font-size: 13px;
 	color: var(--bp-graphite);
@@ -442,7 +453,7 @@
 	flex-direction: column;
 	max-height: calc(100vh - 190px);
 	border: 1px solid var(--bp-line);
-	border-radius: 14px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
 	overflow: hidden;
@@ -501,7 +512,7 @@
    own frame here rather than a second panel competing with it. */
 #bc-picture-prompt {
 	border: 1px solid var(--bp-line);
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-wash);
 	max-width: 68ch;
 }
@@ -537,7 +548,7 @@
 	margin: 9px 0 0;
 	padding: 9px 13px;
 	border-left: 3px solid var(--bp-measure);
-	border-radius: 0 7px 7px 0;
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bp-measure-soft);
 	font-size: 12.5px;
 	line-height: 1.55;
@@ -550,14 +561,14 @@
 	gap: 3px;
 	padding: 4px;
 	border: 1px solid var(--bp-line);
-	border-radius: 10px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-wash);
 }
 
 .bc-tab {
 	padding: 8px 15px;
 	border: 0;
-	border-radius: 7px;
+	border-radius: var(--bc-r-md);
 	background: none;
 	font-size: 13px;
 	font-weight: 500;
@@ -600,7 +611,7 @@
 	margin: 4px 0 26px;
 	padding: 13px 18px;
 	border: 1px solid var(--bp-line);
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	box-shadow: 0 -1px 12px rgba(22, 24, 29, 0.07);
 }
@@ -633,7 +644,7 @@
 .bc-more {
 	margin: 0 0 26px;
 	border: 1px solid var(--bp-line);
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 }
 
@@ -643,7 +654,7 @@
 	align-items: baseline;
 	gap: 10px;
 	padding: 13px 18px;
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	font-size: 13.5px;
 	font-weight: 600;
 	color: var(--bp-ink);
@@ -712,7 +723,7 @@
 	position: sticky;
 	top: 60px;
 	border: 1px solid var(--bp-line);
-	border-radius: 14px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
 	overflow: hidden;
@@ -810,7 +821,7 @@
 .bc-outcome-figures > div {
 	padding: 10px 12px;
 	border: 1px solid var(--bp-line);
-	border-radius: 9px;
+	border-radius: var(--bc-r-md);
 	background: var(--bp-wash);
 }
 
@@ -834,7 +845,7 @@
 	margin: 12px 0 0;
 	padding: 9px 12px;
 	border-left: 3px solid var(--bp-measure);
-	border-radius: 0 7px 7px 0;
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bp-measure-soft);
 	font-size: 12.5px;
 	line-height: 1.55;
@@ -894,7 +905,7 @@
 
 	.bc-rail-item {
 		border-left: 0;
-		border-radius: 999px;
+		border-radius: var(--bc-r-pill);
 		border: 1px solid var(--bp-line);
 	}
 
@@ -980,7 +991,7 @@
 	gap: 5px;
 	padding: 14px 16px;
 	border: 1px solid var(--bp-line);
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
 	text-align: left;
 	cursor: pointer;
@@ -1018,7 +1029,7 @@
 	margin: 14px 0 0;
 	padding: 14px 18px;
 	border: 1px solid rgba(0, 112, 23, 0.18);
-	border-radius: 12px;
+	border-radius: var(--bc-r-lg);
 	background: rgba(0, 112, 23, 0.05);
 }
 
@@ -1076,7 +1087,7 @@
 	padding: 12px 14px;
 	border-left: 3px solid var(--bc-accent, #2271b1);
 	background: var(--bc-surface-soft, #fbfbfc);
-	border-radius: 0 6px 6px 0;
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 }
 
 .bc-suggest-lead {
@@ -1102,7 +1113,7 @@
 	margin: 0 0 16px;
 	padding: 16px 18px;
 	border: 1px solid var(--bc-warn, #b26b00);
-	border-radius: 10px;
+	border-radius: var(--bc-r-lg);
 	background: #fffaf3;
 }
 

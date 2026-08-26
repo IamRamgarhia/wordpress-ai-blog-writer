@@ -242,9 +242,11 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'standing desks', 'draft' );
 
-		for ( $i = 0; $i < 9; $i++ ) {
-			Blogcraft_Worker::run( 0 );
-		}
+		// Driven until the queue stops rather than a fixed number of turns.
+		// A hardcoded count has now broken three times, once for every stage
+		// added to the pipeline, and each time the failure said "expected 1,
+		// got 0" about a post that was two turns from existing.
+		$this->drain();
 
 		$posts = get_posts(
 			array(
@@ -319,5 +321,22 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 		$method->setAccessible( true );
 
 		$this->assertStringContainsString( '#bc-card-pictures', $method->invoke( null ) );
+	}
+
+	/**
+	 * Run the queue until nothing is left to run.
+	 *
+	 * @param int $cap Most turns to take, so a stage that returns itself
+	 *                 for ever fails the test rather than hanging it.
+	 * @return void
+	 */
+	private function drain( $cap = 40 ) {
+		for ( $i = 0; $i < $cap; $i++ ) {
+			if ( 0 === Blogcraft_Worker::run( 0 ) ) {
+				return;
+			}
+		}
+
+		$this->fail( 'the queue never settled after ' . $cap . ' turns' );
 	}
 }

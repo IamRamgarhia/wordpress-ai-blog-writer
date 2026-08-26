@@ -301,9 +301,11 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		// research, outline, draft, section, faq, extras, critique, revise,
 		// verify, publish. Research, faq and extras cost no provider call here:
 		// the blueprint turns questions off and no extra sections are asked for.
-		for ( $i = 0; $i < 10; $i++ ) {
-			Blogcraft_Worker::run( 0 );
-		}
+		// Driven until the queue stops rather than a fixed number of turns.
+		// A hardcoded count has now broken three times, once for every stage
+		// added to the pipeline, and each time the failure said "expected 1,
+		// got 0" about a post that was two turns from existing.
+		$this->drain();
 
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
 
@@ -341,9 +343,11 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		// research, outline, draft, section, faq, extras, critique, verify,
 		// publish. Three of those cost no provider call.
-		for ( $i = 0; $i < 9; $i++ ) {
-			Blogcraft_Worker::run( 0 );
-		}
+		// Driven until the queue stops rather than a fixed number of turns.
+		// A hardcoded count has now broken three times, once for every stage
+		// added to the pipeline, and each time the failure said "expected 1,
+		// got 0" about a post that was two turns from existing.
+		$this->drain();
 
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
 	}
@@ -367,9 +371,11 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'anything at all', 'draft' );
 
-		for ( $i = 0; $i < 9; $i++ ) {
-			Blogcraft_Worker::run( 0 );
-		}
+		// Driven until the queue stops rather than a fixed number of turns.
+		// A hardcoded count has now broken three times, once for every stage
+		// added to the pipeline, and each time the failure said "expected 1,
+		// got 0" about a post that was two turns from existing.
+		$this->drain();
 
 		$this->assertSame( 1, Blogcraft_Queue::count_by_status( 'complete' ) );
 
@@ -406,9 +412,11 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 
 		Blogcraft_Pipeline::enqueue_topic( 'standing desks', 'draft' );
 
-		for ( $i = 0; $i < 9; $i++ ) {
-			Blogcraft_Worker::run( 0 );
-		}
+		// Driven until the queue stops rather than a fixed number of turns.
+		// A hardcoded count has now broken three times, once for every stage
+		// added to the pipeline, and each time the failure said "expected 1,
+		// got 0" about a post that was two turns from existing.
+		$this->drain();
 
 		$posts = get_posts(
 			array(
@@ -477,5 +485,22 @@ class Test_Blogcraft_Pipeline extends WP_UnitTestCase {
 		Blogcraft_Worker::run( 0 );
 
 		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'complete' ) );
+	}
+
+	/**
+	 * Run the queue until nothing is left to run.
+	 *
+	 * @param int $cap Most turns to take, so a stage that returns itself
+	 *                 for ever fails the test rather than hanging it.
+	 * @return void
+	 */
+	private function drain( $cap = 40 ) {
+		for ( $i = 0; $i < $cap; $i++ ) {
+			if ( 0 === Blogcraft_Worker::run( 0 ) ) {
+				return;
+			}
+		}
+
+		$this->fail( 'the queue never settled after ' . $cap . ' turns' );
 	}
 }

@@ -216,9 +216,11 @@ class Test_Blogcraft_Model_Tiering extends WP_UnitTestCase {
 
 		$job_id = Blogcraft_Pipeline::enqueue_topic( 'cold brew ' . wp_generate_password( 6, false ), 'draft' );
 
-		for ( $i = 0; $i < 10; $i++ ) {
-			Blogcraft_Worker::run_job( $job_id );
-		}
+		// Driven until the job stops moving rather than a fixed number of
+		// turns. A hardcoded count has broken once for every stage added to
+		// the pipeline, and the failure always reads "expected 1, got 0"
+		// about a post that was two turns from existing.
+		$this->drain_job( $job_id );
 
 		remove_all_filters( 'pre_http_request' );
 	}
@@ -241,5 +243,24 @@ class Test_Blogcraft_Model_Tiering extends WP_UnitTestCase {
 			. 'Start there and adjust it until it suits you. '
 			. 'A cheap jar works as well as any special brewer. '
 			. 'The grind matters far more than the equipment does.';
+	}
+
+
+	/**
+	 * Run one job until it stops moving.
+	 *
+	 * @param int $job_id Job.
+	 * @param int $cap    Most turns to take, so a stage that returns
+	 *                    itself for ever fails rather than hangs.
+	 * @return void
+	 */
+	private function drain_job( $job_id, $cap = 40 ) {
+		for ( $i = 0; $i < $cap; $i++ ) {
+			if ( ! Blogcraft_Worker::run_job( $job_id ) ) {
+				return;
+			}
+		}
+
+		$this->fail( 'job ' . $job_id . ' never settled after ' . $cap . ' turns' );
 	}
 }
