@@ -252,6 +252,16 @@ class Test_Blogcraft_Art_Direction extends WP_UnitTestCase {
 		$block = Blogcraft_Images::image_block( $attachment, $brief['subject'] );
 
 		$this->assertStringContainsString( 'alt="Why the first layer matters"', $block );
+
+		// The format string lived in a double-quoted PHP string with its
+		// dollars unescaped, so %1$d was read as "%1" plus the variable $d
+		// and sprintf was handed an unknown specifier. On PHP 8 that threw,
+		// and took the publish stage with it. Parsing the result is what
+		// proves the markup is a block and not a string of text.
+		$parsed = parse_blocks( $block );
+
+		$this->assertSame( 'core/image', $parsed[0]['blockName'] );
+		$this->assertSame( (int) $attachment, (int) $parsed[0]['attrs']['id'] );
 	}
 
 	public function test_one_openai_key_covers_writing_and_pictures() {

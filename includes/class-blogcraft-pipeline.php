@@ -1291,8 +1291,20 @@ class Blogcraft_Pipeline {
 			}
 		}
 
-		// A missing image must never fail a finished post, so this is best-effort.
-		Blogcraft_Images::add_section_images( $post_id, $article, 3 );
+		// A missing image must never fail a finished post, so this is
+		// best-effort — which the comment claimed and the code did not do.
+		// A broken format string in the image block threw a ValueError from
+		// here on PHP 8, and it took the whole publish stage down with it on
+		// a post that was otherwise finished and correct.
+		try {
+			Blogcraft_Images::add_section_images( $post_id, $article, 3 );
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error(
+				'The in-body pictures could not be added, so the post was published without them.',
+				array( 'reason' => $e->getMessage() ),
+				null
+			);
+		}
 
 		Blogcraft_Images::attach_featured(
 			$post_id,

@@ -282,7 +282,11 @@ class Blogcraft_Images {
 		}
 
 		return sprintf(
-			"<!-- wp:image {\"id\":%1$d,\"sizeSlug\":\"large\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"%2$s\" alt=\"%3$s\" class=\"wp-image-%1$d\"/></figure>\n<!-- /wp:image -->\n\n",
+			// The dollars are escaped because this is a double-quoted string.
+			// Unescaped, PHP read %1$d as "%1" followed by the variable
+			// $d, and handed sprintf a format with an unknown specifier in
+			// it. Every in-body picture was lost that way.
+			"<!-- wp:image {\"id\":%1\$d,\"sizeSlug\":\"large\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"%2\$s\" alt=\"%3\$s\" class=\"wp-image-%1\$d\"/></figure>\n<!-- /wp:image -->\n\n",
 			(int) $attachment_id,
 			esc_url( $url ),
 			esc_attr( $alt )
