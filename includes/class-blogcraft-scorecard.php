@@ -51,7 +51,15 @@ class Blogcraft_Scorecard {
 			$checks[] = self::terms( $metrics );
 		}
 
-		if ( (int) $blueprint['external_links_target'] > 0 ) {
+		// Only when there is a way to pass it. The Sources block is the
+		// only place a real external link can come from — every drafting
+		// prompt forbids the model from writing markup, so it cannot add
+		// one by rewriting — and somebody who has switched that block off
+		// has chosen a post with no citations. Marking them down five
+		// points for taking an option the plugin offered, on a check
+		// nothing can satisfy, is a score that punishes reading the
+		// settings.
+		if ( (int) $blueprint['external_links_target'] > 0 && ! empty( $blueprint['block_sources'] ) ) {
 			$checks[] = self::external_links( $metrics, $blueprint );
 		}
 

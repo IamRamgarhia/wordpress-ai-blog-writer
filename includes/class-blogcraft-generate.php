@@ -273,9 +273,152 @@ class Blogcraft_Generate {
 		}
 
 		echo '</div>';
+
+		self::render_confirm();
+
 		echo '</form>';
 
 		self::render_more();
+		echo '</div>';
+	}
+
+	/**
+	 * The parts a post can be built from, and what each one is for.
+	 *
+	 * Every one of these already exists as a blueprint field. What they
+	 * did not have was a place anybody looks: they live on a Shape tab and
+	 * five of them had no control at all, so the first most people learn
+	 * of a Sources block or an FAQ is finding one in the finished draft.
+	 *
+	 * @return array Field name => array( label, why ).
+	 */
+	private static function parts() {
+		return array(
+			'takeaways'      => array(
+				__( 'Key takeaways', 'blogcraft' ),
+				__( 'A short list near the top. It is what gets quoted when a search engine answers the question without the click.', 'blogcraft' ),
+			),
+			'faq'            => array(
+				__( 'Questions and answers', 'blogcraft' ),
+				__( 'Built from what people actually ask about this subject, and marked up so it can appear as its own result.', 'blogcraft' ),
+			),
+			'toc'            => array(
+				__( 'Contents list', 'blogcraft' ),
+				__( 'Worth it on a long guide, clutter on a short answer.', 'blogcraft' ),
+			),
+			'tables'         => array(
+				__( 'Tables', 'blogcraft' ),
+				__( 'For anything with figures to compare. Prose that lists numbers is harder to read and harder to cite.', 'blogcraft' ),
+			),
+			'lists'          => array(
+				__( 'Bulleted lists', 'blogcraft' ),
+				__( 'Used where a list is genuinely a list, not as a way of avoiding paragraphs.', 'blogcraft' ),
+			),
+			'block_sources'  => array(
+				__( 'The sources it was written from', 'blogcraft' ),
+				__( 'The only real outbound links a post gets — they are the addresses research actually fetched, never ones the model wrote. Off means no citations, and the citation check is skipped rather than failed.', 'blogcraft' ),
+			),
+			'block_audience' => array(
+				__( 'Who it is for', 'blogcraft' ),
+				__( 'A line near the top saying who should read on, and who should not.', 'blogcraft' ),
+			),
+			'block_proscons' => array(
+				__( 'What works and what does not', 'blogcraft' ),
+				__( 'For reviews and comparisons. A page with no criticism in it reads as an advert.', 'blogcraft' ),
+			),
+			'block_figures'  => array(
+				__( 'The numbers', 'blogcraft' ),
+				__( 'A table of the figures the post rests on, so they can be checked rather than taken.', 'blogcraft' ),
+			),
+			'block_mistakes' => array(
+				__( 'Mistakes worth avoiding', 'blogcraft' ),
+				__( 'The part a writer who has actually done the thing can write and a summary of other pages cannot.', 'blogcraft' ),
+			),
+		);
+	}
+
+	/**
+	 * The last look before anything is written.
+	 *
+	 * Shown on every write until somebody turns it off, which is the whole
+	 * point: the parts a post is made of are decided on a tab most people
+	 * never open, and the first they hear of a Sources block is finding one
+	 * at the bottom of a finished draft.
+	 *
+	 * The switches here are the same blueprint fields as the Shape tab, so
+	 * this is a view of the brief rather than a second set of settings to
+	 * keep in sync. It is rendered inside the form for the same reason:
+	 * whatever is ticked here is what posts.
+	 *
+	 * @return void
+	 */
+	private static function render_confirm() {
+		if ( ! Blogcraft_Settings::get( 'ask_before_writing' ) ) {
+			return;
+		}
+
+		$bp = Blogcraft_Blueprint::get();
+
+		echo '<div class="bc-confirm" id="bc-confirm" hidden>';
+		echo '<div class="bc-confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="bc-confirm-title">';
+
+		echo '<div class="bc-confirm-head">';
+		echo '<h2 id="bc-confirm-title">' . esc_html__( 'What this post will include', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'These change this post only. Your standing answers are already ticked.', 'blogcraft' ) . '</p>';
+		echo '</div>';
+
+		echo '<div class="bc-confirm-body">';
+
+		// Five of these already have a switch on the Shape tab. Emitting a
+		// second input with the same name would put two answers to one
+		// question in the form, and whichever rendered last would silently
+		// win. So those rows carry no name: they drive the tab's own switch
+		// through data-for, and the form keeps exactly one input per field.
+		$on_tab = array( 'takeaways', 'faq', 'toc', 'tables', 'lists' );
+
+		foreach ( self::parts() as $field => $part ) {
+			$proxy = in_array( $field, $on_tab, true );
+
+			printf(
+				'<label class="bc-confirm-part">'
+				. '<input type="checkbox" %1$s value="1"%2$s />'
+				. '<span><strong>%3$s</strong><span>%4$s</span></span>'
+				. '</label>',
+				// The o_ prefix is not decoration: overrides_from() looks for
+				// exactly 'o_' . $key, so a bare name here would post a value
+				// nothing reads — and, because an absent toggle counts as off,
+				// every one of these would be switched off on every post.
+				$proxy
+					? 'data-for="bc_o_' . esc_attr( $field ) . '"'
+					: 'name="o_' . esc_attr( $field ) . '"',
+				checked( ! empty( $bp[ $field ] ), true, false ),
+				esc_html( $part[0] ),
+				esc_html( $part[1] )
+			);
+		}
+
+		echo '</div>';
+
+		echo '<div class="bc-confirm-foot">';
+
+		printf(
+			'<label class="bc-confirm-quiet"><input type="checkbox" name="stop_asking" value="1" /> %s</label>',
+			esc_html__( 'Stop asking me this', 'blogcraft' )
+		);
+
+		echo '<div class="bc-confirm-buttons">';
+		printf(
+			'<button type="button" class="button" id="bc-confirm-back">%s</button>',
+			esc_html__( 'Back to the brief', 'blogcraft' )
+		);
+		printf(
+			'<button type="submit" class="bc-save">%s</button>',
+			esc_html__( 'Write it', 'blogcraft' )
+		);
+		echo '</div>';
+
+		echo '</div>';
+		echo '</div>';
 		echo '</div>';
 	}
 
@@ -425,13 +568,20 @@ class Blogcraft_Generate {
 				'require_statistics',
 				'image_describe',
 				'image_allow_text',
-				// The five block_* extras are deliberately absent here. None of
-				// them has a checkbox in this form, and a toggle with no control
-				// gets read as "absent, so switched off" by overrides_from()
-				// below — which silently forced every one of them, including
-				// block_sources, to false on every post the composer wrote,
-				// regardless of what the blueprint said. Add a real control
-				// before adding a key back to this list.
+				// The five block_* extras. These were absent for a long time,
+				// and had to be: a toggle with no control is read as "absent,
+				// so switched off" by overrides_from() below, which silently
+				// forced every one of them to false on every post the composer
+				// wrote, whatever the blueprint said.
+				//
+				// They have a control now — the panel that opens before writing
+				// starts — so they can be overridden per post. If that panel is
+				// ever removed, these five come out of this list with it.
+				'block_sources',
+				'block_audience',
+				'block_proscons',
+				'block_figures',
+				'block_mistakes',
 			),
 			'multi'  => array( 'literary_devices' ),
 		);
@@ -1349,6 +1499,13 @@ class Blogcraft_Generate {
 
 		if ( '' === $topic ) {
 			self::back( false, __( 'Please enter a topic.', 'blogcraft' ) );
+		}
+
+		// Ticked inside the panel that asks what a post will include, so this
+		// is the one place it can be switched off from. Settings can turn it
+		// back on.
+		if ( isset( $_POST['stop_asking'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( 'ask_before_writing', false );
 		}
 
 		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing

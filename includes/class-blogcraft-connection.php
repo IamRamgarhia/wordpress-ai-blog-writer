@@ -402,6 +402,7 @@ class Blogcraft_Connection {
 			'verify_links_enabled'    => __( 'Check that links resolve before publishing', 'blogcraft' ),
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
+			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'blogcraft' ),
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
 			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'blogcraft' ),

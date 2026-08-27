@@ -233,6 +233,15 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// The last look before a post is written. On by default: the
+			// parts a post is built from are chosen on a tab most people
+			// never open, so the first they learn of a Sources block or a
+			// FAQ is finding one in the finished draft.
+			'ask_before_writing'              => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			// Off until asked for: switching it on is what tells Blogcraft it
 			// may announce your URLs to Microsoft's indexing service.
 			'indexnow_enabled'                => array(

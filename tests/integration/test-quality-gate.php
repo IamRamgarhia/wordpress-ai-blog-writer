@@ -90,6 +90,33 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 
 	// -------------------------------------------------------------------- C3.
 
+	public function test_turning_sources_off_skips_the_citation_check_rather_than_failing_it() {
+		// The Sources block is the only place a real external link can come
+		// from, so switching it off makes the citation check unpassable. Taking
+		// five points off somebody for choosing an option the plugin offers,
+		// on a check nothing can satisfy, is a score that punishes reading the
+		// settings.
+		$blueprint                          = Blogcraft_Blueprint::defaults();
+		$blueprint['external_links_target'] = 3;
+		$blueprint['block_sources']         = false;
+
+		$metrics = Blogcraft_Metrics::measure( '<h2>One</h2><p>Some words about coffee.</p>', $blueprint );
+		$keys    = wp_list_pluck( Blogcraft_Scorecard::checks( $metrics, $blueprint ), 'key' );
+
+		$this->assertNotContains( 'external_links', $keys );
+	}
+
+	public function test_the_citation_check_still_runs_when_sources_are_on() {
+		$blueprint                          = Blogcraft_Blueprint::defaults();
+		$blueprint['external_links_target'] = 3;
+		$blueprint['block_sources']         = true;
+
+		$metrics = Blogcraft_Metrics::measure( '<h2>One</h2><p>Some words about coffee.</p>', $blueprint );
+		$keys    = wp_list_pluck( Blogcraft_Scorecard::checks( $metrics, $blueprint ), 'key' );
+
+		$this->assertContains( 'external_links', $keys );
+	}
+
 	public function test_sources_are_on_by_default_because_nothing_else_can_satisfy_the_check() {
 		// The sources block is the only place a real, non-invented citation
 		// link can come from (Blocks::sources() builds hrefs from the research
@@ -99,18 +126,36 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 		$this->assertTrue( Blogcraft_Blueprint::defaults()['block_sources'] );
 	}
 
-	public function test_the_composer_does_not_silently_force_sources_off() {
-		// block_sources has no checkbox on the write screen. It used to sit in
-		// the same override list as toggles that do have one, and an absent
-		// toggle is read as "the user switched it off" — so every single post
-		// written through the composer forced it false regardless of what the
-		// blueprint said, no matter what this test's sibling above asserts.
+	public function test_every_overridable_toggle_has_a_control_somebody_can_reach() {
+		// An absent checkbox is read as "the user switched it off" by
+		// overrides_from(), so a field in this list with nothing to tick is
+		// forced false on every post the composer writes, whatever the
+		// blueprint says. That is exactly what happened to block_sources for
+		// several releases.
+		//
+		// The five block_* extras are in the list now because the panel that
+		// opens before writing gives them one. This checks the rule rather
+		// than the old exception: every overridable toggle must be tickable
+		// somewhere on this screen.
 		$method = new ReflectionMethod( Blogcraft_Generate::class, 'override_fields' );
 		$method->setAccessible( true );
 		$fields = $method->invoke( null );
 
-		foreach ( array( 'block_sources', 'block_audience', 'block_proscons', 'block_figures', 'block_mistakes' ) as $key ) {
-			$this->assertNotContains( $key, $fields['toggle'], $key . ' has no control on the write screen and must not be overridden' );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		Blogcraft_Capabilities::add();
+
+		ob_start();
+		Blogcraft_Generate::render();
+		$html = (string) ob_get_clean();
+
+		foreach ( $fields['toggle'] as $key ) {
+			$named = ( false !== strpos( $html, 'name="o_' . $key . '"' ) );
+			$proxy = ( false !== strpos( $html, 'data-for="bc_o_' . $key . '"' ) );
+
+			$this->assertTrue(
+				$named || $proxy,
+				$key . ' can be overridden but has nothing on the screen to tick, so it is forced off on every post'
+			);
 		}
 	}
 

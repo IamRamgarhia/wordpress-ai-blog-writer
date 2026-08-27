@@ -1165,3 +1165,128 @@
 
 .bc-readiness li strong { font-size: 13px; }
 .bc-readiness li span   { font-size: 12px; color: var(--bc-muted); line-height: 1.5; }
+
+/* ---------------------------------------------------------------------
+   The last look before anything is written.
+
+   A panel rather than a browser confirm(): the question is "what is this
+   post made of", which needs ten switches and a sentence each, and none
+   of that fits in a dialog the browser draws.
+   --------------------------------------------------------------------- */
+.bc-confirm {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgba(22, 24, 29, 0.45);
+}
+
+.bc-confirm[hidden] {
+	display: none;
+}
+
+.bc-confirm-sheet {
+	display: flex;
+	flex-direction: column;
+	width: min(680px, 100%);
+	max-height: min(84vh, 760px);
+	border-radius: var(--bc-r-lg);
+	background: var(--bp-paper);
+	box-shadow: 0 18px 48px rgba(22, 24, 29, 0.28);
+	overflow: hidden;
+}
+
+.bc-confirm-head {
+	padding: 20px 24px 14px;
+	border-bottom: 1px solid var(--bp-line);
+}
+
+.bc-confirm-head h2 {
+	margin: 0 0 4px;
+	font-size: 18px;
+	line-height: 1.3;
+	color: var(--bp-ink);
+}
+
+.bc-confirm-head p {
+	max-width: 60ch;
+	margin: 0;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bp-graphite);
+}
+
+/* The list scrolls, the buttons never do. A confirmation whose confirm
+   button is below the fold is one people close instead of reading. */
+.bc-confirm-body {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 8px 24px;
+}
+
+.bc-confirm-part {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--bp-hair);
+	cursor: pointer;
+}
+
+.bc-confirm-part:last-child {
+	border-bottom: 0;
+}
+
+.bc-confirm-part input {
+	flex: none;
+	margin-top: 2px;
+}
+
+.bc-confirm-part > span {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.bc-confirm-part strong {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--bp-ink);
+}
+
+.bc-confirm-part span span {
+	max-width: 62ch;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--bp-graphite);
+}
+
+.bc-confirm-foot {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 24px;
+	border-top: 1px solid var(--bp-line);
+	background: var(--bp-wash);
+}
+
+.bc-confirm-quiet {
+	display: inline-flex;
+	gap: 7px;
+	align-items: center;
+	font-size: 12.5px;
+	color: var(--bp-graphite);
+	cursor: pointer;
+}
+
+.bc-confirm-buttons {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
