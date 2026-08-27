@@ -63,7 +63,7 @@
 	justify-content: space-between;
 	gap: 24px;
 	margin: 0 0 20px;
-	padding: 18px 22px;
+	padding: 16px 24px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -73,7 +73,7 @@
 .bc-bar-text h1 {
 	margin: 0 0 4px;
 	padding: 0;
-	font-size: 24px;
+	font-size: var(--bc-t-2xl);
 	font-weight: 650;
 	letter-spacing: -0.02em;
 	color: var(--bp-ink);
@@ -82,19 +82,19 @@
 .bc-bar-text p {
 	margin: 0;
 	max-width: 64ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
 
 .bc-save {
 	flex: none;
-	padding: 10px 20px;
+	padding: 8px 20px;
 	border: 0;
 	border-radius: var(--bc-r-md);
 	background: var(--bp-accent);
 	color: #fff;
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	cursor: pointer;
 	transition: background 120ms ease, transform 120ms ease;
@@ -133,12 +133,12 @@
 }
 
 .bc-rail-item {
-	padding: 9px 12px;
+	padding: 8px 12px;
 	border: 0;
 	border-left: 2px solid transparent;
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: none;
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 500;
 	text-align: left;
 	color: var(--bp-graphite);
@@ -166,7 +166,7 @@
 /* ---------------------------------------------------------------- panes. */
 
 .bc-pane {
-	padding: 6px 26px 10px;
+	padding: 8px 24px 8px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -180,7 +180,7 @@
 .bc-note {
 	margin: 20px 0 0;
 	max-width: 68ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bp-graphite);
 }
@@ -189,7 +189,7 @@
 	display: grid;
 	grid-template-columns: 190px minmax(0, 1fr);
 	gap: 20px;
-	padding: 18px 0;
+	padding: 16px 0;
 	border-bottom: 1px solid var(--bp-hair);
 }
 
@@ -198,8 +198,8 @@
 }
 
 .bc-label {
-	padding-top: 7px;
-	font-size: 13.5px;
+	padding-top: 8px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	line-height: 1.4;
 	color: var(--bp-ink);
@@ -212,7 +212,7 @@
 .bc-hint {
 	margin: 8px 0 0;
 	max-width: 58ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -224,11 +224,11 @@
 .bc-select {
 	width: 100%;
 	max-width: 460px;
-	padding: 8px 11px;
+	padding: 8px 12px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-md);
 	background: var(--bp-paper);
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	color: var(--bp-ink);
 }
 
@@ -263,9 +263,9 @@
 }
 
 .bc-seg label {
-	padding: 7px 14px;
+	padding: 8px 16px;
 	border-radius: var(--bc-r-md);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	font-weight: 500;
 	color: var(--bp-graphite);
 	cursor: pointer;
@@ -293,7 +293,7 @@
 .bc-slider {
 	display: flex;
 	align-items: center;
-	gap: 14px;
+	gap: 16px;
 	max-width: 460px;
 }
 
@@ -334,11 +334,11 @@
 .bc-value {
 	flex: none;
 	min-width: 96px;
-	padding: 4px 9px;
+	padding: 4px 8px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-md);
 	background: var(--bp-measure-soft);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	font-weight: 600;
 	text-align: center;
 	color: var(--bp-measure);
@@ -349,9 +349,9 @@
 .bc-toggle {
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	margin: 0 0 11px;
-	font-size: 13.5px;
+	gap: 8px;
+	margin: 0 0 12px;
+	font-size: var(--bc-t-md);
 	color: var(--bp-ink);
 	cursor: pointer;
 }
@@ -417,11 +417,11 @@
 }
 
 .bc-chips label {
-	padding: 7px 14px;
+	padding: 8px 16px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-pill);
 	background: var(--bp-paper);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	color: var(--bp-graphite);
 	cursor: pointer;
 	transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
@@ -460,7 +460,7 @@
 }
 
 .bc-brief-head {
-	padding: 16px 18px 13px;
+	padding: 16px 16px 12px;
 	border-bottom: 1px solid var(--bp-hair);
 	background: linear-gradient(var(--bp-paper), var(--bp-wash));
 }
@@ -468,7 +468,7 @@
 .bc-brief-head h2 {
 	margin: 0 0 3px;
 	padding: 0;
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	font-weight: 700;
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
@@ -477,15 +477,15 @@
 
 .bc-brief-head p {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.5;
 	color: var(--bp-graphite);
 }
 
 .bc-brief-body {
 	margin: 0;
-	padding: 16px 18px 20px;
-	font-size: 12px;
+	padding: 16px 16px 20px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.75;
 	color: var(--bp-ink);
 	white-space: pre-wrap;
@@ -501,8 +501,8 @@
 /* ----------------------------------------------------- picture preview. */
 
 .bc-subhead {
-	margin: 28px 0 10px;
-	font-size: 13px;
+	margin: 28px 0 8px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	letter-spacing: 0.01em;
 	color: var(--bp-ink);
@@ -524,7 +524,7 @@
 	grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
 	gap: 20px;
 	align-items: start;
-	margin: 0 0 18px;
+	margin: 0 0 16px;
 }
 
 /* The sidebar column. The readiness panel and the outcome panel used to be
@@ -542,7 +542,7 @@
 .bc-compose-main {
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 16px;
 	min-width: 0;
 }
 
@@ -552,17 +552,17 @@
 
 .bc-text-lead {
 	max-width: none;
-	padding: 11px 13px;
-	font-size: 15px;
+	padding: 12px 12px;
+	font-size: var(--bc-t-lg);
 }
 
 .bc-clash {
-	margin: 9px 0 0;
-	padding: 9px 13px;
+	margin: 8px 0 0;
+	padding: 8px 12px;
 	border-left: 3px solid var(--bp-measure);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bp-measure-soft);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-ink);
 }
@@ -578,11 +578,11 @@
 }
 
 .bc-tab {
-	padding: 8px 15px;
+	padding: 8px 16px;
 	border: 0;
 	border-radius: var(--bc-r-md);
 	background: none;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	font-weight: 500;
 	color: var(--bp-graphite);
 	cursor: pointer;
@@ -618,7 +618,7 @@
 }
 
 .blogcraft-compose-page .bc-more {
-	margin-bottom: 90px;
+	margin-bottom: 88px;
 }
 
 .bc-commit {
@@ -629,9 +629,9 @@
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
-	gap: 14px;
-	margin: 4px 0 26px;
-	padding: 13px 18px;
+	gap: 16px;
+	margin: 4px 0 24px;
+	padding: 12px 16px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -642,7 +642,7 @@
 	flex: 1 1 340px;
 	margin: 0;
 	max-width: 66ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -664,7 +664,7 @@
    so the screen you use most ended in a red button that bins a day of posts.
    Folded away, not removed. */
 .bc-more {
-	margin: 0 0 26px;
+	margin: 0 0 24px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -674,10 +674,10 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
-	gap: 10px;
-	padding: 13px 18px;
+	gap: 8px;
+	padding: 12px 16px;
 	border-radius: var(--bc-r-lg);
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bp-ink);
 	cursor: pointer;
@@ -704,7 +704,7 @@
 }
 
 .bc-more-hint {
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	font-weight: 400;
 	color: var(--bp-graphite);
 }
@@ -713,20 +713,20 @@
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	gap: 20px;
-	padding: 4px 18px 18px;
+	padding: 4px 16px 16px;
 	border-top: 1px solid var(--bp-line);
 }
 
 .bc-more-count {
 	grid-column: 1 / -1;
-	margin: 14px 0 0;
-	font-size: 12.5px;
+	margin: 16px 0 0;
+	font-size: var(--bc-t-sm);
 	color: var(--bp-graphite);
 }
 
 .bc-more-block p {
 	margin: 8px 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 }
 
@@ -735,7 +735,7 @@
 }
 
 .bc-more-block.is-danger {
-	padding-left: 14px;
+	padding-left: 16px;
 	border-left: 3px solid var(--bp-measure, #b26b00);
 }
 
@@ -751,7 +751,7 @@
 }
 
 .bc-outcome-head {
-	padding: 15px 18px 12px;
+	padding: 16px 16px 12px;
 	border-bottom: 1px solid var(--bp-hair);
 	background: linear-gradient(var(--bp-paper), var(--bp-wash));
 }
@@ -759,7 +759,7 @@
 .bc-outcome-head h2 {
 	margin: 0 0 3px;
 	padding: 0;
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	font-weight: 700;
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
@@ -768,13 +768,13 @@
 
 .bc-outcome-head p {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.5;
 	color: var(--bp-graphite);
 }
 
 .bc-outcome-body {
-	padding: 14px 18px 18px;
+	padding: 16px 16px 16px;
 	transition: opacity 140ms ease;
 }
 
@@ -794,9 +794,9 @@
 	align-items: baseline;
 	gap: 8px;
 	margin: 0;
-	padding: 7px 0 7px 12px;
+	padding: 8px 0 8px 12px;
 	border-left: 2px solid var(--bp-line);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 }
 
 /* Sections are the article; the furniture around them reads quieter. */
@@ -819,14 +819,14 @@
 .bc-shape-note {
 	flex: 1;
 	min-width: 0;
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	color: var(--bp-faint);
 }
 
 .bc-shape-words {
 	margin-left: auto;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: 11.5px;
+	font-size: var(--bc-t-xs);
 	font-variant-numeric: tabular-nums;
 	color: var(--bp-measure);
 	white-space: nowrap;
@@ -835,12 +835,12 @@
 .bc-outcome-figures {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 10px;
+	gap: 8px;
 	margin: 16px 0 0;
 }
 
 .bc-outcome-figures > div {
-	padding: 10px 12px;
+	padding: 8px 12px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-md);
 	background: var(--bp-wash);
@@ -849,7 +849,7 @@
 .bc-figure {
 	display: block;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: 19px;
+	font-size: var(--bc-t-xl);
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	color: var(--bp-ink);
@@ -858,17 +858,17 @@
 .bc-figure-label {
 	display: block;
 	margin-top: 2px;
-	font-size: 11.5px;
+	font-size: var(--bc-t-xs);
 	color: var(--bp-graphite);
 }
 
 .bc-warn {
 	margin: 12px 0 0;
-	padding: 9px 12px;
+	padding: 8px 12px;
 	border-left: 3px solid var(--bp-measure);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bp-measure-soft);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-ink);
 }
@@ -906,7 +906,7 @@
 		position: static;
 		flex-direction: column;
 		align-items: stretch;
-		gap: 14px;
+		gap: 16px;
 	}
 
 	.bc-save {
@@ -921,7 +921,7 @@
 		position: static;
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 6px;
+		gap: 8px;
 	}
 
 	.bc-rail-item {
@@ -959,13 +959,13 @@
    says what it is, and sticks to the top once you scroll past it. */
 
 .bc-tabs-head {
-	margin: 22px 0 10px;
+	margin: 24px 0 8px;
 }
 
 .bc-tabs-head h2 {
 	margin: 0 0 3px;
 	padding: 0;
-	font-size: 15px;
+	font-size: var(--bc-t-lg);
 	font-weight: 600;
 	letter-spacing: -0.01em;
 	color: var(--bp-ink);
@@ -974,7 +974,7 @@
 .bc-tabs-head p {
 	margin: 0;
 	max-width: 68ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -992,8 +992,8 @@
 }
 
 .bc-compose-fix {
-	margin-left: 14px;
-	font-size: 13px;
+	margin-left: 16px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 }
 
@@ -1002,15 +1002,15 @@
 .bc-shapes {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-	gap: 10px;
+	gap: 8px;
 	margin: 0 0 8px;
 }
 
 .bc-shape {
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
-	padding: 14px 16px;
+	gap: 4px;
+	padding: 16px 16px;
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -1031,24 +1031,24 @@
 }
 
 .bc-shape strong {
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bp-ink);
 }
 
 .bc-shape span {
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.5;
 	color: var(--bp-graphite);
 }
 
 .bc-match {
-	margin-left: 10px;
+	margin-left: 8px;
 }
 
 .bc-shape-notes {
-	margin: 14px 0 0;
-	padding: 14px 18px;
+	margin: 16px 0 0;
+	padding: 16px 16px;
 	border: 1px solid rgba(0, 112, 23, 0.18);
 	border-radius: var(--bc-r-lg);
 	background: rgba(0, 112, 23, 0.05);
@@ -1060,8 +1060,8 @@
 }
 
 .bc-shape-notes p {
-	margin: 0 0 6px;
-	font-size: 13px;
+	margin: 0 0 8px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 	color: var(--bp-ink);
 }
@@ -1082,7 +1082,7 @@
 .bc-only-this {
 	margin: 8px 0 0;
 	max-width: 62ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -1094,18 +1094,18 @@
  */
 
 .bc-suggest {
-	margin: -6px 0 22px;
+	margin: -8px 0 24px;
 	padding: 0 0 0 2px;
 }
 
 .bc-suggest .description {
-	margin: 6px 0 0;
+	margin: 8px 0 0;
 	max-width: 46em;
 }
 
 .bc-suggest-out {
 	margin-top: 12px;
-	padding: 12px 14px;
+	padding: 12px 16px;
 	border-left: 3px solid var(--bc-accent, #2271b1);
 	background: var(--bc-surface-soft, #fbfbfc);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
@@ -1113,18 +1113,18 @@
 
 .bc-suggest-lead {
 	margin: 0 0 8px;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 }
 
 .bc-suggest-out ul {
 	margin: 0;
-	padding-left: 18px;
+	padding-left: 16px;
 }
 
 .bc-suggest-out li {
-	margin: 0 0 6px;
-	font-size: 13px;
+	margin: 0 0 8px;
+	font-size: var(--bc-t-md);
 	line-height: 1.5;
 }
 
@@ -1132,7 +1132,7 @@
  * is actually missing, so it disappears the moment it stops being useful. */
 .bc-readiness {
 	margin: 0 0 16px;
-	padding: 16px 18px;
+	padding: 16px 16px;
 	border: 1px solid var(--bc-warn, #b26b00);
 	border-radius: var(--bc-r-lg);
 	background: #fffaf3;
@@ -1140,12 +1140,12 @@
 
 .bc-readiness h2 {
 	margin: 0 0 4px;
-	font-size: 14px;
+	font-size: var(--bc-t-lg);
 }
 
 .bc-readiness > p {
-	margin: 0 0 10px;
-	font-size: 12.5px;
+	margin: 0 0 8px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 }
 
@@ -1163,8 +1163,8 @@
 	border-top: 1px solid rgba(178, 107, 0, .18);
 }
 
-.bc-readiness li strong { font-size: 13px; }
-.bc-readiness li span   { font-size: 12px; color: var(--bc-muted); line-height: 1.5; }
+.bc-readiness li strong { font-size: var(--bc-t-md); }
+.bc-readiness li span   { font-size: var(--bc-t-sm); color: var(--bc-muted); line-height: 1.5; }
 
 /* ---------------------------------------------------------------------
    The last look before anything is written.
@@ -1200,13 +1200,13 @@
 }
 
 .bc-confirm-head {
-	padding: 20px 24px 14px;
+	padding: 20px 24px 16px;
 	border-bottom: 1px solid var(--bp-line);
 }
 
 .bc-confirm-head h2 {
 	margin: 0 0 4px;
-	font-size: 18px;
+	font-size: var(--bc-t-xl);
 	line-height: 1.3;
 	color: var(--bp-ink);
 }
@@ -1214,7 +1214,7 @@
 .bc-confirm-head p {
 	max-width: 60ch;
 	margin: 0;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -1253,14 +1253,14 @@
 }
 
 .bc-confirm-part strong {
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bp-ink);
 }
 
 .bc-confirm-part span span {
 	max-width: 62ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -1268,26 +1268,26 @@
 .bc-confirm-foot {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 14px;
+	gap: 16px;
 	align-items: center;
 	justify-content: space-between;
-	padding: 14px 24px;
+	padding: 16px 24px;
 	border-top: 1px solid var(--bp-line);
 	background: var(--bp-wash);
 }
 
 .bc-confirm-quiet {
 	display: inline-flex;
-	gap: 7px;
+	gap: 8px;
 	align-items: center;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bp-graphite);
 	cursor: pointer;
 }
 
 .bc-confirm-buttons {
 	display: flex;
-	gap: 10px;
+	gap: 8px;
 	align-items: center;
 }
 
@@ -1296,8 +1296,8 @@
    refuses to work until twenty fields are filled is one people uninstall
    on the first attempt. */
 .bc-confirm-section {
-	margin: 18px 0 2px;
-	font-size: 11.5px;
+	margin: 16px 0 2px;
+	font-size: var(--bc-t-xs);
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -1305,13 +1305,13 @@
 }
 
 .bc-confirm-body > .bc-confirm-section:first-child {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 .bc-confirm-note {
 	max-width: 62ch;
 	margin: 0 0 4px;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-graphite);
 }
@@ -1319,8 +1319,8 @@
 .bc-gap {
 	display: grid;
 	gap: 3px;
-	margin: 10px 0;
-	padding: 11px 13px;
+	margin: 8px 0;
+	padding: 12px 12px;
 	border-left: 3px solid var(--bp-measure);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bp-measure-soft);
@@ -1331,13 +1331,13 @@
 }
 
 .bc-gap strong {
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	color: var(--bp-ink);
 }
 
 .bc-gap span {
 	max-width: 62ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.55;
 	color: var(--bp-ink);
 }
@@ -1347,6 +1347,6 @@
 	justify-self: start;
 	margin-top: 3px;
 	padding: 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	font-weight: 600;
 }

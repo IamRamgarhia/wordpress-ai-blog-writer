@@ -43,11 +43,13 @@
 	/* A spacing scale, in place of the twenty-five different padding pairs
 	   this file used to hold. Four-pixel base: every gap on a Blogcraft
 	   screen is one of these, so things line up without anybody counting. */
+	/* Every step a multiple of four. --bc-s5 was 22px, which is not, and a
+	   scale with one value off it is not a scale. */
 	--bc-s1: 4px;
 	--bc-s2: 8px;
 	--bc-s3: 12px;
 	--bc-s4: 16px;
-	--bc-s5: 22px;
+	--bc-s5: 24px;
 	--bc-s6: 32px;
 
 	/* Three radii and a pill, in place of sixteen. The sizes mean something:
@@ -58,6 +60,19 @@
 	--bc-r-md: 8px;
 	--bc-r-lg: 12px;
 	--bc-r-pill: 999px;
+
+	/* A type scale, in place of sixteen sizes that included 10.5px, 11.5px
+	   and 13.5px. Half-pixel type is the signature of a stylesheet where
+	   every rule chose a number that felt right that day, and no amount of
+	   spacing work makes a screen look considered while it is there. Seven
+	   sizes, each with a job. */
+	--bc-t-xs: 11px;        /* badges, uppercase labels */
+	--bc-t-sm: 12.5px;      /* help text, descriptions */
+	--bc-t-md: 13px;        /* body, tables, buttons */
+	--bc-t-lg: 15px;        /* lead paragraphs, the topic field */
+	--bc-t-xl: 18px;        /* card headings */
+	--bc-t-2xl: 23px;       /* page titles */
+	--bc-t-display: 30px;   /* the score, and nothing else */
 
 	/* Was 900px, which on a 1900px monitor left half the screen empty while the
 	   fields stayed cramped in a narrow column. Prose still needs a measure, so
@@ -73,7 +88,7 @@
 
 .blogcraft-head h1 {
 	margin: 0 0 4px;
-	font-size: 23px;
+	font-size: var(--bc-t-2xl);
 	font-weight: 600;
 	letter-spacing: -0.015em;
 	color: var(--bc-ink);
@@ -81,7 +96,7 @@
 
 .blogcraft-head p {
 	margin: 0;
-	font-size: 14px;
+	font-size: var(--bc-t-lg);
 	color: var(--bc-muted);
 }
 
@@ -101,11 +116,11 @@
 	align-items: center;
 	gap: 8px;
 	margin: 0;
-	padding: 7px 14px 7px 12px;
+	padding: 8px 16px 8px 12px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-pill);
 	background: var(--bc-surface);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.3;
 	color: var(--bc-muted);
 }
@@ -132,8 +147,8 @@
 
 .blogcraft-card {
 	position: relative;
-	margin: 0 0 18px;
-	padding: 22px 24px 8px 26px;
+	margin: 0 0 16px;
+	padding: 24px 24px 8px 24px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bc-surface);
@@ -159,8 +174,8 @@
 
 .blogcraft-step {
 	display: block;
-	margin-bottom: 6px;
-	font-size: 11px;
+	margin-bottom: 8px;
+	font-size: var(--bc-t-xs);
 	font-weight: 600;
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
@@ -170,7 +185,7 @@
 .blogcraft-card h2 {
 	margin: 0 0 4px;
 	padding: 0;
-	font-size: 17px;
+	font-size: var(--bc-t-xl);
 	font-weight: 600;
 	letter-spacing: -0.01em;
 	color: var(--bc-ink);
@@ -179,7 +194,7 @@
 .blogcraft-card > header p {
 	margin: 0;
 	max-width: 62ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-muted);
 }
@@ -187,13 +202,13 @@
 /* ---------------------------------------------------------------- fields. */
 
 .blogcraft-card .form-table {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 .blogcraft-card .form-table th {
 	width: 190px;
-	padding: 14px 16px 14px 0;
-	font-size: 13px;
+	padding: 16px 16px 16px 0;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bc-ink);
 }
@@ -223,7 +238,7 @@
 
 .blogcraft-card .description {
 	max-width: 62ch;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.6;
 	color: var(--bc-muted);
 }
@@ -240,11 +255,11 @@
 }
 
 .blogcraft-toggle-row td {
-	padding: 7px 0;
+	padding: 8px 0;
 }
 
 .blogcraft-toggle-row label {
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	color: var(--bc-ink);
 }
 
@@ -252,8 +267,8 @@
 .blogcraft-stats {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 10px;
-	margin: 10px 0 4px;
+	gap: 8px;
+	margin: 8px 0 4px;
 	padding: 0;
 	list-style: none;
 }
@@ -261,7 +276,7 @@
 .blogcraft-stats li {
 	flex: 1 1 120px;
 	margin: 0;
-	padding: 14px 16px;
+	padding: 16px 16px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-md);
 	background: var(--bc-canvas);
@@ -269,7 +284,7 @@
 
 .blogcraft-stat-value {
 	display: block;
-	font-size: 24px;
+	font-size: var(--bc-t-2xl);
 	font-weight: 600;
 	line-height: 1.15;
 	letter-spacing: -0.02em;
@@ -280,7 +295,7 @@
 .blogcraft-stat-label {
 	display: block;
 	margin-top: 2px;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 	text-transform: capitalize;
 }
@@ -288,13 +303,13 @@
 /* Findings that cost a draft its score. */
 .blogcraft-reasons {
 	margin: 4px 0 0;
-	padding: 0 0 0 18px;
+	padding: 0 0 0 16px;
 	list-style: disc;
 }
 
 .blogcraft-reasons li {
 	margin: 0 0 4px;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-muted);
 }
@@ -306,7 +321,7 @@
 	align-items: center;
 	gap: 12px;
 	flex-wrap: wrap;
-	margin: 22px 0 4px;
+	margin: 24px 0 4px;
 }
 
 .blogcraft-actions .button {
@@ -319,12 +334,12 @@
 
 .blogcraft-hint {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 }
 
 .blogcraft-page .notice {
-	margin: 0 0 18px;
+	margin: 0 0 16px;
 	border-radius: var(--bc-r-md);
 }
 
@@ -336,7 +351,7 @@
 /* ------------------------------------------------------ activity tables. */
 
 .blogcraft-table {
-	margin: 6px 0 18px;
+	margin: 8px 0 16px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-md);
 	border-collapse: separate;
@@ -346,8 +361,8 @@
 
 .blogcraft-table th,
 .blogcraft-table td {
-	padding: 10px 12px;
-	font-size: 13px;
+	padding: 8px 12px;
+	font-size: var(--bc-t-md);
 	vertical-align: top;
 }
 
@@ -355,17 +370,17 @@
 	font-weight: 600;
 	color: var(--bc-muted);
 	text-transform: uppercase;
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	letter-spacing: 0.06em;
 }
 
 .blogcraft-badge {
 	display: inline-block;
-	padding: 2px 9px;
+	padding: 2px 8px;
 	border-radius: var(--bc-r-pill);
 	background: var(--bc-canvas);
 	border: 1px solid var(--bc-line);
-	font-size: 11.5px;
+	font-size: var(--bc-t-xs);
 	font-weight: 600;
 	text-transform: capitalize;
 	color: var(--bc-muted);
@@ -398,7 +413,7 @@
 .blogcraft-context {
 	display: inline-block;
 	margin-top: 3px;
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.5;
 	color: var(--bc-muted);
 	word-break: break-word;
@@ -423,21 +438,21 @@
 .blogcraft-day {
 	display: inline-flex;
 	align-items: center;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	white-space: nowrap;
 }
 
 .blogcraft-day input[type="checkbox"] {
-	margin-right: 6px;
+	margin-right: 8px;
 }
 
 .blogcraft-callout {
-	margin: 0 0 14px;
-	padding: 10px 14px;
+	margin: 0 0 16px;
+	padding: 8px 16px;
 	border-left: 3px solid var(--bc-warn);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bc-canvas);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-ink);
 }
@@ -467,11 +482,11 @@
 .blogcraft-checks li {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	margin: 0;
-	padding: 9px 14px;
+	padding: 8px 16px;
 	border-bottom: 1px solid var(--bc-line);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 }
 
 .blogcraft-checks li:last-child {
@@ -510,7 +525,7 @@
 .blogcraft-check-figures {
 	flex: none;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	font-variant-numeric: tabular-nums;
 }
 
@@ -537,7 +552,7 @@
 
 .blogcraft-overrides > summary {
 	padding: 12px 0 4px;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bc-accent);
 	cursor: pointer;
@@ -568,10 +583,10 @@
 .bc-nav-item {
 	display: inline-flex;
 	align-items: center;
-	gap: 7px;
-	padding: 7px 13px;
+	gap: 8px;
+	padding: 8px 12px;
 	border-radius: var(--bc-r-md);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	font-weight: 500;
 	text-decoration: none;
 	color: var(--bc-muted);
@@ -595,23 +610,23 @@ a.bc-nav-item:hover {
 }
 
 .bc-nav-count {
-	padding: 1px 7px;
+	padding: 1px 8px;
 	border-radius: var(--bc-r-pill);
 	background: #b32121;
 	color: #fff;
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	font-weight: 700;
 }
 
 /* --------------------------------------------------------- provider help. */
 
 .blogcraft-provider-help {
-	margin: 6px 0 0;
-	font-size: 12.5px;
+	margin: 8px 0 0;
+	font-size: var(--bc-t-sm);
 }
 
 .blogcraft-provider-help a {
-	margin-right: 14px;
+	margin-right: 16px;
 }
 
 /* ------------------------------------------------- settings jump links. */
@@ -638,7 +653,7 @@ a.bc-nav-item:hover {
 	display: flex;
 	flex-direction: column;
 	gap: 1px;
-	padding: 14px;
+	padding: 16px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bc-surface);
@@ -647,7 +662,7 @@ a.bc-nav-item:hover {
 .bc-jump-title {
 	margin: 0 0 8px;
 	padding: 0;
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	font-weight: 700;
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
@@ -657,10 +672,10 @@ a.bc-nav-item:hover {
 .bc-jump-item {
 	display: flex;
 	align-items: baseline;
-	gap: 9px;
-	padding: 8px 9px;
+	gap: 8px;
+	padding: 8px 8px;
 	border-radius: var(--bc-r-md);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	text-decoration: none;
 	color: var(--bc-ink);
 	transition: background 120ms ease;
@@ -688,7 +703,7 @@ a.bc-nav-item:hover {
 }
 
 .bc-jump-sub {
-	font-size: 11.5px;
+	font-size: var(--bc-t-xs);
 	font-weight: 400;
 	color: var(--bc-muted);
 }
@@ -701,12 +716,12 @@ a.bc-nav-item:hover {
 .bc-jump-save {
 	width: 100%;
 	margin-top: 12px;
-	padding: 10px 16px;
+	padding: 8px 16px;
 	border: 0;
 	border-radius: var(--bc-r-md);
 	background: var(--bc-accent);
 	color: #fff;
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	cursor: pointer;
 	transition: background 120ms ease;
@@ -725,14 +740,14 @@ a.bc-nav-item:hover {
    without a provider and automation only makes sense once writing looks right. */
 .bc-jump-step {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	font-weight: 700;
 	color: var(--bc-muted);
 }
 
 /* Anchored cards must not land under the sticky admin bar. */
 .blogcraft-card[id] {
-	scroll-margin-top: 46px;
+	scroll-margin-top: 48px;
 }
 
 @media screen and (max-width: 1100px) {
@@ -768,19 +783,19 @@ a.bc-nav-item:hover {
 .blogcraft-steps li {
 	display: flex;
 	align-items: center;
-	gap: 11px;
+	gap: 12px;
 	margin: 0;
-	padding: 9px 0;
+	padding: 8px 0;
 	border-bottom: 1px solid var(--bc-line);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 }
 
 /* The step being worked on is the one piece of this screen somebody is
    actually looking for, and it used to be distinguished only by an unfilled
    circle identical to the eight below it. */
 .blogcraft-steps .is-now {
-	margin: 0 -10px;
-	padding: 9px 10px;
+	margin: 0 -8px;
+	padding: 8px 8px;
 	border-radius: var(--bc-r-md);
 	border-bottom-color: transparent;
 	background: var(--bc-accent-soft);
@@ -831,7 +846,7 @@ a.bc-nav-item:hover {
 }
 
 .blogcraft-step-text span {
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 }
 
@@ -845,11 +860,11 @@ a.bc-nav-item:hover {
 
 .blogcraft-attention li {
 	margin: 0 0 8px;
-	padding: 11px 14px;
+	padding: 12px 16px;
 	border-left: 3px solid var(--bc-warn);
 	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
 	background: var(--bc-canvas);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 }
 
@@ -878,7 +893,7 @@ a.bc-nav-item:hover {
 
 @media screen and (max-width: 782px) {
 	.blogcraft-card {
-		padding: 18px 16px 6px 18px;
+		padding: 16px 16px 8px 16px;
 	}
 
 	.blogcraft-card .form-table th {
@@ -973,7 +988,7 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .blogcraft-card {
-	padding: 24px 26px 12px 28px;
+	padding: 24px 24px 12px 28px;
 }
 
 /* The accent rule was a hard edge against an opaque card. On glass it reads
@@ -1025,7 +1040,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .blogcraft-card > header {
 	position: relative;
-	padding-right: 150px;
+	padding-right: 152px;
 }
 
 .bc-help-toggle {
@@ -1034,14 +1049,14 @@ body[class*="page_blogcraft"] #wpcontent {
 	right: 0;
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
 	height: 28px;
 	padding: 0 12px;
 	border: 1px solid var(--bc-glass-edge);
 	border-radius: var(--bc-r-pill);
 	background: rgba(255, 255, 255, 0.7);
 	box-shadow: inset 0 1px 0 var(--bc-glass-rim);
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	font-weight: 600;
 	line-height: 1;
 	white-space: nowrap;
@@ -1064,17 +1079,17 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-help {
-	margin: 14px 0 2px;
-	padding: 14px 18px;
+	margin: 16px 0 2px;
+	padding: 16px 16px;
 	border: 1px solid rgba(56, 88, 233, 0.16);
 	border-radius: var(--bc-r-lg);
 	background: rgba(56, 88, 233, 0.05);
 }
 
 .bc-help p {
-	margin: 0 0 10px;
+	margin: 0 0 8px;
 	max-width: 68ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.65;
 	color: var(--bc-ink);
 }
@@ -1093,7 +1108,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	margin: 4px 0 0;
 }
 
@@ -1111,8 +1126,8 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-learn-notes p {
-	margin: 0 0 6px;
-	font-size: 13px;
+	margin: 0 0 8px;
+	font-size: var(--bc-t-md);
 	line-height: 1.55;
 	color: var(--bc-ink);
 }
@@ -1192,11 +1207,11 @@ body[class*="page_blogcraft"] #wpcontent {
 /* Five numbered cards read as five things you have to do. Only the first is. */
 .bc-need {
 	display: inline-block;
-	margin: 0 0 6px 8px;
-	padding: 2px 9px;
+	margin: 0 0 8px 8px;
+	padding: 2px 8px;
 	border-radius: var(--bc-r-pill);
 	background: rgba(17, 24, 39, 0.06);
-	font-size: 10.5px;
+	font-size: var(--bc-t-xs);
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -1227,7 +1242,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	align-items: flex-start;
 	gap: 16px;
 	margin: 0;
-	padding: 14px 0;
+	padding: 16px 0;
 	border-top: 1px solid var(--bc-glass-edge);
 	counter-increment: bc-how;
 }
@@ -1243,7 +1258,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	height: 24px;
 	border-radius: 50%;
 	background: var(--bc-accent-soft);
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	font-weight: 700;
 	line-height: 24px;
 	text-align: center;
@@ -1258,7 +1273,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .blogcraft-step-text strong {
 	display: block;
 	margin-bottom: 3px;
-	font-size: 13.5px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 	color: var(--bc-ink);
 }
@@ -1266,7 +1281,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .blogcraft-step-text span {
 	display: block;
 	max-width: 76ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-muted);
 }
@@ -1291,7 +1306,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-progress-bar {
 	position: relative;
 	height: 8px;
-	margin: 4px 0 6px;
+	margin: 4px 0 8px;
 	border-radius: var(--bc-r-pill);
 	background: var(--bc-line);
 	overflow: hidden;
@@ -1310,7 +1325,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	display: flex;
 	justify-content: space-between;
 	gap: 16px;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-muted);
 }
 
@@ -1397,13 +1412,13 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-score-dial strong {
-	font-size: 30px;
+	font-size: var(--bc-t-display);
 	font-weight: 700;
 	color: var(--bc-ink);
 }
 
 .bc-score-dial span {
-	font-size: 10.5px;
+	font-size: var(--bc-t-xs);
 	color: var(--bc-muted);
 	text-transform: uppercase;
 	letter-spacing: .04em;
@@ -1416,8 +1431,8 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-score-words p  { margin: 0; color: var(--bc-muted); }
 
 .bc-check-heading {
-	margin: 22px 0 8px;
-	font-size: 13px;
+	margin: 24px 0 8px;
+	font-size: var(--bc-t-md);
 	text-transform: uppercase;
 	letter-spacing: .04em;
 	color: var(--bc-muted);
@@ -1432,10 +1447,10 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-checks li {
 	display: flex;
 	align-items: baseline;
-	gap: 10px;
-	padding: 9px 0;
+	gap: 8px;
+	padding: 8px 0;
 	border-bottom: 1px solid var(--bc-line);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 }
 
 .bc-checks li:last-child { border-bottom: 0; }
@@ -1448,31 +1463,31 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-check-values { color: var(--bc-muted); text-align: right; }
 
 .bc-check-fold {
-	margin-top: 18px;
-	padding-top: 14px;
+	margin-top: 16px;
+	padding-top: 16px;
 	border-top: 1px solid var(--bc-line);
 }
 
 .bc-check-fold summary {
 	cursor: pointer;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	color: var(--bc-muted);
 }
 
 .bc-field {
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
-	margin: 0 0 18px;
+	gap: 4px;
+	margin: 0 0 16px;
 }
 
 .bc-draft-editor {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 /* The editor's own body, set to a measure a paragraph can be read at. */
 .bc-draft-editor .wp-editor-area {
-	font-size: 14px;
+	font-size: var(--bc-t-lg);
 	line-height: 1.7;
 }
 
@@ -1497,9 +1512,9 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-run {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
-	gap: 22px;
+	gap: 24px;
 	align-items: start;
-	margin-top: 18px;
+	margin-top: 16px;
 }
 
 .bc-run.is-held {
@@ -1508,7 +1523,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .bc-live {
 	min-height: 220px;
-	padding: 18px 20px;
+	padding: 16px 20px;
 	border: 1px solid var(--bc-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bc-canvas);
@@ -1516,7 +1531,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .bc-live-wait {
 	margin: 0;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-muted);
 }
@@ -1533,7 +1548,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .bc-live h3 {
 	margin: 0;
-	font-size: 15px;
+	font-size: var(--bc-t-lg);
 	line-height: 1.4;
 	color: var(--bc-ink);
 }
@@ -1541,7 +1556,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-live h3:empty { display: none; }
 
 .bc-live-heads {
-	margin: 10px 0 0;
+	margin: 8px 0 0;
 	padding: 0;
 	list-style: none;
 }
@@ -1551,7 +1566,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-live-heads li {
 	position: relative;
 	padding: 4px 0 4px 20px;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	color: var(--bc-muted);
 }
 
@@ -1577,18 +1592,18 @@ body[class*="page_blogcraft"] #wpcontent {
 
 /* A key saved for a different provider is not a key you have. */
 .bc-key-mismatch {
-	margin: 6px 0 0;
-	padding: 8px 10px;
+	margin: 8px 0 0;
+	padding: 8px 8px;
 	border-left: 3px solid var(--bc-warn, #b26b00);
 	background: var(--bc-surface-soft, #fbfbfc);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	color: var(--bc-ink);
 }
 
 .bc-quota-notice code {
 	display: inline-block;
 	margin-top: 4px;
-	font-size: 11.5px;
+	font-size: var(--bc-t-xs);
 	word-break: break-word;
 }
 
@@ -1603,8 +1618,8 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-welcome-lead {
-	margin: 4px 0 22px;
-	font-size: 15px;
+	margin: 4px 0 24px;
+	font-size: var(--bc-t-lg);
 	line-height: 1.65;
 	color: var(--bc-ink-soft, #50575e);
 }
@@ -1613,7 +1628,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	margin: 0 0 18px;
+	margin: 0 0 16px;
 	padding: 0;
 	list-style: none;
 	counter-reset: none;
@@ -1624,11 +1639,11 @@ body[class*="page_blogcraft"] #wpcontent {
 	align-items: center;
 	gap: 8px;
 	margin: 0;
-	padding: 7px 13px 7px 8px;
+	padding: 8px 12px 8px 8px;
 	border: 1px solid var(--bc-line, #dcdcde);
 	border-radius: var(--bc-r-pill);
 	background: var(--bc-surface, #fff);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.3;
 	color: var(--bc-ink-soft, #50575e);
 }
@@ -1641,7 +1656,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	height: 20px;
 	border-radius: 50%;
 	background: var(--bc-surface-soft, #f0f0f1);
-	font-size: 11px;
+	font-size: var(--bc-t-xs);
 	font-weight: 600;
 	color: var(--bc-ink-soft, #50575e);
 }
@@ -1663,41 +1678,41 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-welcome-card {
-	padding: 24px 26px 22px;
+	padding: 24px 24px 24px;
 }
 
 .bc-welcome-card h2 {
-	margin: 0 0 10px;
-	font-size: 20px;
+	margin: 0 0 8px;
+	font-size: var(--bc-t-xl);
 	line-height: 1.3;
 }
 
 .bc-welcome-card p {
 	max-width: 62ch;
-	font-size: 14px;
+	font-size: var(--bc-t-lg);
 	line-height: 1.65;
 }
 
 .bc-welcome-card .bc-field label {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: 4px;
 }
 
 .bc-welcome-card .submit,
 .bc-welcome-card .button {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 .bc-welcome-ok {
-	padding: 9px 12px;
+	padding: 8px 12px;
 	border-left: 3px solid var(--bc-ok, #007017);
 	background: var(--bc-surface-soft, #fbfbfc);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 }
 
 .bc-welcome-skip {
 	margin: 12px 0 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 }
 
 .bc-welcome-skip a {
@@ -1720,7 +1735,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-improve-form .description {
 	max-width: 62ch;
 	margin: var(--bc-s2) 0 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.6;
 }
 
@@ -1730,7 +1745,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	padding: var(--bc-s2) var(--bc-s3);
 	border-left: 3px solid var(--bc-warn);
 	background: var(--bc-warn-soft);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.6;
 	color: var(--bc-ink);
 }
@@ -1740,7 +1755,7 @@ body[class*="page_blogcraft"] #wpcontent {
    the wins worth less. */
 .bc-score-delta {
 	margin: var(--bc-s2) 0 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	font-weight: 600;
 }
 
@@ -1782,7 +1797,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .bc-prospects h3 {
 	margin: 0 0 var(--bc-s1);
-	font-size: 14px;
+	font-size: var(--bc-t-lg);
 	line-height: 1.35;
 	color: var(--bc-ink);
 }
@@ -1790,7 +1805,7 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-prospects p {
 	max-width: 66ch;
 	margin: 0 0 var(--bc-s1);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-ink-soft);
 }
@@ -1805,7 +1820,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	margin: var(--bc-s3) 0 0;
 	padding: var(--bc-s2) var(--bc-s3);
 	border-left: 3px solid var(--bc-ok);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 }
 
@@ -1836,10 +1851,10 @@ body[class*="page_blogcraft"] #wpcontent {
 	align-items: center;
 	min-width: 40px;
 	justify-content: center;
-	padding: 3px 10px;
+	padding: 3px 8px;
 	border: 1px solid transparent;
 	border-radius: var(--bc-r-pill);
-	font-size: 12px;
+	font-size: var(--bc-t-sm);
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 }
@@ -1867,7 +1882,7 @@ body[class*="page_blogcraft"] #wpcontent {
 /* The way back into the introduction, shown only when it sent you here. */
 .bc-back-to-setup {
 	margin: var(--bc-s3) 0 0;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	font-weight: 600;
 }
 
@@ -1879,7 +1894,7 @@ body[class*="page_blogcraft"] #wpcontent {
 
 .bc-undo-form button {
 	padding: 0;
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 }
 
 /* If you delete this plugin. Deliberately not styled as a warning until
@@ -1887,7 +1902,7 @@ body[class*="page_blogcraft"] #wpcontent {
    would suggest something is wrong when nothing is. */
 .bc-removal-lead {
 	max-width: 68ch;
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.65;
 }
 
@@ -1897,7 +1912,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	padding: var(--bc-s3);
 	border-left: 3px solid var(--bc-bad);
 	background: var(--bc-surface-soft);
-	font-size: 12.5px;
+	font-size: var(--bc-t-sm);
 	line-height: 1.65;
 	color: var(--bc-ink);
 }
@@ -1911,7 +1926,7 @@ body[class*="page_blogcraft"] #wpcontent {
 	padding: var(--bc-s3);
 	border-left: 3px solid var(--bc-accent);
 	background: var(--bc-accent-soft);
-	font-size: 13px;
+	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-ink);
 }

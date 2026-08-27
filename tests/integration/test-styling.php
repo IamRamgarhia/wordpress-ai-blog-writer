@@ -157,4 +157,65 @@ class Test_Blogcraft_Styling extends WP_UnitTestCase {
 
 		$this->assertSame( 0, $loose, $loose . ' corner radii are hand-written rather than taken from the scale' );
 	}
+
+	// ------------------------------------------------- the three scales.
+
+	public function test_type_comes_from_the_scale_rather_than_being_chosen_per_rule() {
+		// Sixteen sizes, three of them half-pixel — 10.5px, 11.5px, 13.5px —
+		// is what a stylesheet looks like when every rule picked a number that
+		// felt right on the day. No amount of spacing work makes a screen read
+		// as considered while that is true, because type is the first thing
+		// anybody sees.
+		$loose = array();
+
+		foreach ( self::$css as $name => $sheet ) {
+			preg_match_all( '/font-size:\s*([0-9.]+)px/', $sheet, $found );
+
+			foreach ( $found[1] as $value ) {
+				$loose[] = $name . ': ' . $value . 'px';
+			}
+		}
+
+		$this->assertSame( array(), $loose, 'these font sizes are hand-written instead of taken from the scale' );
+	}
+
+	public function test_spacing_lands_on_the_four_pixel_grid() {
+		// Sixteen off-grid values — 7px, 9px, 11px, 13px, 18px, 22px, 26px —
+		// each invisible on its own and collectively the reason nothing quite
+		// lines up with anything else. Under five pixels is fine-tuning rather
+		// than spacing and is left alone.
+		$loose = array();
+
+		foreach ( self::$css as $name => $sheet ) {
+			preg_match_all( '/(?:padding|margin|gap|row-gap|column-gap)(?:-[a-z]+)?:\s*([^;]+);/', $sheet, $found );
+
+			foreach ( $found[1] as $value ) {
+				if ( false !== strpos( $value, 'var(' ) || false !== strpos( $value, 'calc' ) ) {
+					continue;
+				}
+
+				preg_match_all( '/([0-9]+)px/', $value, $pixels );
+
+				foreach ( $pixels[1] as $px ) {
+					if ( (int) $px >= 5 && 0 !== (int) $px % 4 ) {
+						$loose[] = $name . ': ' . trim( $value );
+					}
+				}
+			}
+		}
+
+		$this->assertSame( array(), array_values( array_unique( $loose ) ), 'this spacing is off the grid' );
+	}
+
+	public function test_the_spacing_scale_is_actually_a_grid() {
+		// A scale with one value off the grid is not a scale, and --bc-s5 was
+		// 22px for several releases.
+		preg_match_all( '/--bc-s[0-9]+:\s*([0-9]+)px/', self::$css['admin'], $found );
+
+		$this->assertNotEmpty( $found[1] );
+
+		foreach ( $found[1] as $step ) {
+			$this->assertSame( 0, (int) $step % 4, $step . 'px is not a step on a four-pixel grid' );
+		}
+	}
 }
