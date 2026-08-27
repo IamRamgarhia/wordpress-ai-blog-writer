@@ -267,4 +267,81 @@ class Test_Blogcraft_Improve extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	// ------------------------------------------------- taking it back.
+
+	public function test_the_version_before_a_pass_is_kept_so_it_can_be_restored() {
+		// The screen told people a worse rewrite could be undone from "the
+		// editor history". A held draft has no post yet, so it had no history,
+		// and the sentence was simply untrue.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'publish', array( 'topic' => 'cold brew' ) );
+
+		$first = array(
+			'topic'   => 'cold brew',
+			'article' => array( 'sections' => array( array( 'heading' => 'The good one' ) ) ),
+			'quality' => array( 'score' => 71 ),
+		);
+
+		Blogcraft_Queue::hold( $job_id, $first );
+
+		// What the improve handler keeps before it reopens the job.
+		$second            = $first;
+		$second['before']  = $first;
+		$second['article'] = array( 'sections' => array( array( 'heading' => 'The worse one' ) ) );
+		$second['quality'] = array( 'score' => 64 );
+
+		Blogcraft_Queue::hold( $job_id, $second );
+
+		$held = Blogcraft_Queue::find( $job_id );
+
+		$this->assertSame( 64, (int) $held->payload['quality']['score'] );
+		$this->assertSame( 71, (int) $held->payload['before']['quality']['score'] );
+		$this->assertSame(
+			'The good one',
+			$held->payload['before']['article']['sections'][0]['heading'],
+			'the earlier wording was not kept, so nothing can put it back'
+		);
+	}
+
+	public function test_restoring_needs_no_provider_call() {
+		// Charging somebody a second time to undo something they were charged
+		// for once is how a button stops being pressed at all.
+		$called = false;
+
+		add_filter(
+			'pre_http_request',
+			function () use ( &$called ) {
+				$called = true;
+
+				return new WP_Error( 'http_request_failed', 'should not happen' );
+			}
+		);
+
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'publish', array() );
+		$first  = array( 'topic' => 'cold brew', 'quality' => array( 'score' => 71 ) );
+
+		Blogcraft_Queue::hold( $job_id, array_merge( $first, array( 'before' => $first ) ) );
+
+		$restored = (array) Blogcraft_Queue::find( $job_id )->payload['before'];
+		Blogcraft_Queue::hold( $job_id, $restored );
+
+		$this->assertSame( 71, (int) Blogcraft_Queue::find( $job_id )->payload['quality']['score'] );
+		$this->assertFalse( $called );
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
+	public function test_the_history_does_not_chain_and_grow_the_row_each_time() {
+		// Every pass keeps a whole article. Nesting them would double the row
+		// on each press until the payload column refused it.
+		$first  = array( 'topic' => 'cold brew', 'quality' => array( 'score' => 60 ) );
+		$second = array_merge( $first, array( 'before' => $first, 'quality' => array( 'score' => 65 ) ) );
+
+		// What handle_improve() does: strip the old history before keeping it.
+		$keep = $second;
+		unset( $keep['before'] );
+		$third = array_merge( $second, array( 'before' => $keep ) );
+
+		$this->assertArrayNotHasKey( 'before', $third['before'], 'the history nests, so the row grows without limit' );
+	}
 }

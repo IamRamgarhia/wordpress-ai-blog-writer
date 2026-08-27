@@ -39,6 +39,11 @@ class Blogcraft_Progress {
 	const IMPROVE_ACTION = 'blogcraft_improve_draft';
 
 	/**
+	 * Nonce action for putting the version before the last pass back.
+	 */
+	const UNDO_ACTION = 'blogcraft_undo_improve';
+
+	/**
 	 * The stages a reader sees, in order, with what each one is doing.
 	 *
 	 * Named for what is happening rather than for the method that does it:
@@ -75,6 +80,7 @@ class Blogcraft_Progress {
 		add_action( 'wp_ajax_blogcraft_advance', array( __CLASS__, 'handle_advance' ) );
 		add_action( 'admin_post_blogcraft_approve_draft', array( __CLASS__, 'handle_approve' ) );
 		add_action( 'admin_post_blogcraft_improve_draft', array( __CLASS__, 'handle_improve' ) );
+		add_action( 'admin_post_blogcraft_undo_improve', array( __CLASS__, 'handle_undo_improve' ) );
 	}
 
 	/**
@@ -579,10 +585,20 @@ class Blogcraft_Progress {
 			$problems[] = (string) $check['repair'];
 		}
 
-		$payload['problems'] = $problems;
+		// The whole payload, not just the score. A rewrite can make a draft
+		// worse, and the screen said so while telling the reader the earlier
+		// wording was "in the editor history" — which for a held draft is a
+		// lie, because there is no post yet and so no history. Keeping the
+		// article, its score and its checks together means the sentence can
+		// be true and the button beside it can work without a request.
+		//
+		// One step deep on purpose. Chaining these would grow the row by a
+		// whole article every time somebody pressed the button.
+		$before = $payload;
+		unset( $before['before'] );
 
-		// Kept so the screen can say what the second pass actually bought,
-		// rather than showing a new number with nothing to compare it to.
+		$payload['problems']     = $problems;
+		$payload['before']       = $before;
 		$payload['score_before'] = isset( $payload['quality']['score'] ) ? (int) $payload['quality']['score'] : 0;
 
 		Blogcraft_Queue::save_payload( $job_id, $payload );
@@ -594,6 +610,57 @@ class Blogcraft_Progress {
 		Blogcraft_Logger::info(
 			'A finished draft was sent back for another pass.',
 			array( 'to_fix' => count( $problems ) ),
+			$job_id
+		);
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page' => self::PAGE_SLUG,
+					'job'  => $job_id,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Put back the draft as it was before the last pass.
+	 *
+	 * No provider call: the earlier article, its score and its checks were
+	 * all kept when the pass started, so this is a payload swap. That
+	 * matters — charging somebody a second time to undo something they
+	 * were charged for once is the sort of thing that stops people
+	 * pressing any button at all.
+	 *
+	 * @return void
+	 */
+	public static function handle_undo_improve() {
+		// Read then verify; Blogcraft_Request performs the check PHPCS cannot
+		// follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::UNDO_ACTION, $nonce );
+
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'blogcraft' ) );
+		}
+
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job    = $job_id > 0 ? Blogcraft_Queue::find( $job_id ) : null;
+
+		if ( null === $job || 'ready' !== $job->status || empty( $job->payload['before'] ) ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
+			exit;
+		}
+
+		$restored = (array) $job->payload['before'];
+
+		Blogcraft_Queue::hold( $job_id, $restored );
+
+		Blogcraft_Logger::info(
+			'The draft was put back to the version before the last pass.',
+			array( 'score' => isset( $restored['quality']['score'] ) ? (int) $restored['quality']['score'] : 0 ),
 			$job_id
 		);
 
@@ -872,7 +939,7 @@ class Blogcraft_Progress {
 			} else {
 				$line = sprintf(
 					/* translators: %d: the previous, higher score. */
-					__( 'Down from %d. The rewrite made it worse, which happens — the earlier wording is in the editor history.', 'blogcraft' ),
+					__( 'Down from %d. A rewrite is not guaranteed to improve anything, and this one did not.', 'blogcraft' ),
 					(int) $before
 				);
 			}
@@ -882,6 +949,8 @@ class Blogcraft_Progress {
 				esc_attr( $gap > 0 ? 'is-up' : ( $gap < 0 ? 'is-down' : 'is-flat' ) ),
 				esc_html( $line )
 			);
+
+			self::render_undo();
 		}
 
 		echo '</div></div>';
@@ -918,6 +987,35 @@ class Blogcraft_Progress {
 		self::render_improve( $failed );
 
 		echo '</section>';
+	}
+
+	/**
+	 * The way back to the version before the last pass.
+	 *
+	 * Only when there is one to go back to. Costs nothing to press: the
+	 * earlier article was kept when the pass started.
+	 *
+	 * @return void
+	 */
+	private static function render_undo() {
+		$job = Blogcraft_Queue::find( self::current_job_id() );
+
+		if ( null === $job || empty( $job->payload['before'] ) ) {
+			return;
+		}
+
+		printf(
+			'<form method="post" action="%s" class="bc-undo-form">',
+			esc_url( admin_url( 'admin-post.php' ) )
+		);
+		echo '<input type="hidden" name="action" value="blogcraft_undo_improve" />';
+		printf( '<input type="hidden" name="job" value="%d" />', (int) $job->id );
+		Blogcraft_Request::nonce_field( self::UNDO_ACTION );
+		printf(
+			'<button type="submit" class="button-link">%s</button>',
+			esc_html__( 'Put the earlier version back', 'blogcraft' )
+		);
+		echo '</form>';
 	}
 
 	/**

@@ -1870,3 +1870,14 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: 13px;
 	font-weight: 600;
 }
+
+/* Costs nothing to press: the earlier article was kept when the pass
+   started, so this is a payload swap and not another request. */
+.bc-undo-form {
+	margin: var(--bc-s1) 0 0;
+}
+
+.bc-undo-form button {
+	padding: 0;
+	font-size: 12.5px;
+}
