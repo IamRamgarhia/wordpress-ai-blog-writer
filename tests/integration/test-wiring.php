@@ -605,4 +605,33 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		$this->assertSame( array(), $missing, 'these prompts are handed the evidence and never pass it on' );
 	}
+
+	public function test_no_query_asks_the_database_to_exclude_a_post() {
+		// exclude and post__not_in become a NOT IN, which stops MySQL using
+		// its index on a table that only ever grows. Plugin Check warns on it,
+		// and a warning is what stands between this and being accepted.
+		//
+		// The plugin already had the right answer in the related-posts query:
+		// ask for one more row than you need and drop the unwanted one in PHP.
+		// A newer file simply did not follow it, which is what this catches.
+		$found = array();
+
+		foreach ( (array) glob( BLOGCRAFT_PATH . 'includes/*.php' ) as $path ) {
+			$body = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( explode( "
+", $body ) as $number => $line ) {
+				// Comments explaining why it is avoided are not uses of it.
+				if ( preg_match( '/^\s*(\/\/|\*)/', $line ) ) {
+					continue;
+				}
+
+				if ( preg_match( "/'(exclude|post__not_in)'\s*=>/", $line ) ) {
+					$found[] = basename( $path ) . ':' . ( $number + 1 );
+				}
+			}
+		}
+
+		$this->assertSame( array(), $found, 'these queries make the database do the excluding' );
+	}
 }

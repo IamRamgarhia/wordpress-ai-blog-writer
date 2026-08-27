@@ -127,12 +127,15 @@ class Blogcraft_Prospects {
 			return '';
 		}
 
+		// No 'exclude'. It becomes a NOT IN, which stops MySQL using the
+		// index on a table that grows for ever, and this loop is already
+		// visiting every row — so skipping one id here costs nothing and
+		// keeps the query plain.
 		$existing = get_posts(
 			array(
 				'post_type'        => 'post',
 				'post_status'      => array( 'publish', 'future' ),
 				'posts_per_page'   => 100,
-				'exclude'          => $exclude > 0 ? array( $exclude ) : array(),
 				'suppress_filters' => false,
 			)
 		);
@@ -141,6 +144,10 @@ class Blogcraft_Prospects {
 		$score = self::RIVAL_SIMILARITY;
 
 		foreach ( $existing as $post ) {
+			if ( $exclude > 0 && (int) $post->ID === (int) $exclude ) {
+				continue;
+			}
+
 			$how_alike = Blogcraft_Backlinks::similarity( $title, $post->post_title );
 
 			if ( $how_alike >= $score ) {
