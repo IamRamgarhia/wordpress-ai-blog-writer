@@ -271,4 +271,76 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 	public function test_a_post_with_no_placement_still_queues() {
 		$this->assertGreaterThan( 0, Blogcraft_Pipeline::enqueue_topic( 'something else', 'draft' ) );
 	}
+
+	// ------------------------------------------- the order of the asking.
+
+	/**
+	 * The provider card, rendered.
+	 *
+	 * @return string
+	 */
+	private function settings_html() {
+		Blogcraft_Capabilities::add();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		ob_start();
+		Blogcraft_Connection::render();
+
+		return (string) ob_get_clean();
+	}
+
+	public function test_the_key_is_asked_for_before_the_model() {
+		// The model list is read from the account, so there is nothing to
+		// offer until a key exists. Asking for the model first meant an empty
+		// box above a button that could only fail, and typing an id from
+		// memory is the commonest way to end up with a setup that looks
+		// finished and errors on the first post.
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', 'a-real-key' );
+		Blogcraft_Settings::set( 'provider_key_owner', 'openai' );
+
+		$html = $this->settings_html();
+
+		$key   = strpos( $html, 'blogcraft_provider_api_key' );
+		$model = strpos( $html, 'blogcraft_provider_model' );
+
+		$this->assertNotFalse( $key );
+		$this->assertNotFalse( $model );
+		$this->assertLessThan( $model, $key, 'the model is asked for above the key it depends on' );
+	}
+
+	public function test_no_model_field_is_offered_until_there_is_a_key() {
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', '' );
+
+		$html = $this->settings_html();
+
+		$this->assertStringNotContainsString( 'blogcraft_provider_model', $html );
+		$this->assertStringContainsString( 'bc-await-key', $html, 'nothing explains why the model field is absent' );
+	}
+
+	public function test_a_keyless_provider_is_not_made_to_wait() {
+		// Ollama and LM Studio run on your own machine and issue no keys, so
+		// there is nothing to wait for.
+		Blogcraft_Settings::set( 'provider_type', 'ollama' );
+		Blogcraft_Settings::set( 'provider_api_key', '' );
+
+		$html = $this->settings_html();
+
+		$this->assertStringContainsString( 'blogcraft_provider_model', $html );
+		$this->assertStringNotContainsString( 'bc-await-key', $html );
+	}
+
+	public function test_the_rest_of_the_screen_still_renders_without_a_key() {
+		// Skipping the model rows must not skip the spending cap or any card
+		// after this one.
+		Blogcraft_Settings::set( 'provider_type', 'openai' );
+		Blogcraft_Settings::set( 'provider_api_key', '' );
+
+		$html = $this->settings_html();
+
+		$this->assertStringContainsString( 'monthly_token_cap', $html );
+		$this->assertStringContainsString( 'bc-card-research', $html );
+		$this->assertStringContainsString( 'purge_on_delete', $html );
+	}
 }

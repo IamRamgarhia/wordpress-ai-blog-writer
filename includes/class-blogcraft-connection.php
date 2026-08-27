@@ -502,29 +502,6 @@ class Blogcraft_Connection {
 		);
 		echo '</td></tr>';
 
-		$default_base = Blogcraft_Provider_Registry::default_base_url(
-			(string) Blogcraft_Settings::get( 'provider_type' )
-		);
-
-		foreach ( self::common_fields() as $name => $field ) {
-			self::text_row(
-				$name,
-				$field[0],
-				'',
-				$field[1],
-				'provider_base_url' === $name ? $default_base : ''
-			);
-
-			// The model field gets a way to ask the provider what this account
-			// can actually use, because "type the id exactly" is an invitation
-			// to type the name of the key instead — and that failure only
-			// surfaces hours later as an error from the provider.
-			if ( 'provider_model' === $name ) {
-				self::render_model_picker();
-				self::render_draft_model_row();
-			}
-		}
-
 		// A key saved for a different provider is not a key you have. Showing
 		// its mask made the field claim otherwise, and the model list then
 		// failed against the wrong service with nothing explaining why.
@@ -557,6 +534,49 @@ class Blogcraft_Connection {
 		echo self::clear_key_control( 'provider_api_key', $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		self::render_provider_help( $type );
 		echo '</td></tr>';
+
+		$default_base = Blogcraft_Provider_Registry::default_base_url( $type );
+
+		// A provider that issues no keys — Ollama and LM Studio run on your
+		// own machine — has nothing to wait for, so it gets the model fields
+		// straight away.
+		$help    = Blogcraft_Provider_Registry::help( $type );
+		$keyless = ( '' === trim( (string) $help['key_url'] ) );
+
+		if ( ! $key_fits && ! $keyless ) {
+			// Asking which model to use before there is a key to ask with was
+			// the wrong way round. The list of models comes from the account,
+			// so until a key is saved the only thing this screen could offer
+			// was an empty box and a button that fails — and typing a model id
+			// from memory is the commonest way to end up with a setup that
+			// looks finished and errors on the first post.
+			printf(
+				'<tr><th scope="row"></th><td><p class="bc-await-key">%s</p></td></tr>',
+				esc_html__( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'blogcraft' )
+			);
+		}
+
+		// Skipped rather than returned early: the spending cap below and every
+		// card after this one are still worth showing to somebody who has not
+		// pasted a key yet.
+		foreach ( ( $key_fits || $keyless ) ? self::common_fields() : array() as $name => $field ) {
+			self::text_row(
+				$name,
+				$field[0],
+				'',
+				$field[1],
+				'provider_base_url' === $name ? $default_base : ''
+			);
+
+			// The model field gets a way to ask the provider what this account
+			// can actually use, because "type the id exactly" is an invitation
+			// to type the name of the key instead — and that failure only
+			// surfaces hours later as an error from the provider.
+			if ( 'provider_model' === $name ) {
+				self::render_model_picker();
+				self::render_draft_model_row();
+			}
+		}
 
 		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'blogcraft' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'blogcraft' ) );
 

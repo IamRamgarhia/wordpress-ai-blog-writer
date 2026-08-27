@@ -1901,3 +1901,17 @@ body[class*="page_blogcraft"] #wpcontent {
 	line-height: 1.65;
 	color: var(--bc-ink);
 }
+
+/* Waiting for a key before the model can be offered. Not an error — the
+   setup is proceeding in the right order — so it reads as instruction
+   rather than warning. */
+.bc-await-key {
+	max-width: 62ch;
+	margin: 0;
+	padding: var(--bc-s3);
+	border-left: 3px solid var(--bc-accent);
+	background: var(--bc-accent-soft);
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-ink);
+}
