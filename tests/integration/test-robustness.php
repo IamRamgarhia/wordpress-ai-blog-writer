@@ -229,22 +229,152 @@ class Test_Blogcraft_Robustness extends WP_UnitTestCase {
 
 	// ------------------------------------------------------------ i18n.
 
-	public function test_something_actually_loads_the_translations() {
-		// Every string in this plugin is wrapped, the .pot is regenerated on
-		// every release, and CI fails if it drifts — and none of it reached a
-		// reader, because nothing ever called load_plugin_textdomain().
-		//
-		// Asserting the hook rather than that a translation appears: the
-		// plugin ships a .pot and no .mo, so there is nothing to load in a
-		// test run. What broke was the wiring, and the wiring is checkable.
-		Blogcraft::instance()->run();
-
-		$this->assertNotFalse(
-			has_action( 'init', array( 'Blogcraft', 'load_textdomain' ) ),
-			'nothing is registered to load the translations'
+	/**
+	 * Every translation call whose domain is not ours.
+	 *
+	 * Tokenised rather than matched with a pattern. The domain is the last
+	 * string argument whatever the arity, and a pattern that assumes the
+	 * second one reports _x( 'Hi', 'context', 'blogcraft' ) as broken —
+	 * which is how a check like this comes to be quietly switched off.
+	 *
+	 * @param string $code PHP source.
+	 * @return array Human-readable descriptions of each bad call.
+	 */
+	private function wrong_domains( $code ) {
+		$fns = array(
+			'__',
+			'_e',
+			'_n',
+			'_x',
+			'_nx',
+			'esc_html__',
+			'esc_html_e',
+			'esc_html_x',
+			'esc_attr__',
+			'esc_attr_e',
+			'esc_attr_x',
 		);
+
+		$tokens = token_get_all( $code );
+		$count  = count( $tokens );
+		$out    = array();
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			$token = $tokens[ $i ];
+
+			if ( ! is_array( $token ) || T_STRING !== $token[0] || ! in_array( $token[1], $fns, true ) ) {
+				continue;
+			}
+
+			// A method call or a declaration is not the function meant here.
+			$prev = isset( $tokens[ $i - 1 ] ) ? $tokens[ $i - 1 ] : null;
+
+			if ( is_array( $prev ) && in_array( $prev[0], array( T_OBJECT_OPERATOR, T_DOUBLE_COLON, T_FUNCTION ), true ) ) {
+				continue;
+			}
+
+			$j = $i + 1;
+
+			while ( $j < $count && is_array( $tokens[ $j ] ) && T_WHITESPACE === $tokens[ $j ][0] ) {
+				++$j;
+			}
+
+			if ( ! isset( $tokens[ $j ] ) || '(' !== $tokens[ $j ] ) {
+				continue;
+			}
+
+			$depth = 0;
+			$last  = null;
+
+			for ( $k = $j; $k < $count; $k++ ) {
+				$inner = $tokens[ $k ];
+
+				if ( '(' === $inner ) {
+					++$depth;
+					continue;
+				}
+
+				if ( ')' === $inner ) {
+					--$depth;
+
+					if ( 0 === $depth ) {
+						break;
+					}
+
+					continue;
+				}
+
+				// Depth one only, so a string inside a nested sprintf() is not
+				// mistaken for the domain.
+				if ( 1 === $depth && is_array( $inner ) && T_CONSTANT_ENCAPSED_STRING === $inner[0] ) {
+					$last = $inner;
+				}
+			}
+
+			if ( null === $last ) {
+				continue;
+			}
+
+			$domain = trim( $last[1], "'" . '"' );
+
+			if ( 'blogcraft' !== $domain ) {
+				$out[] = $token[1] . '() on line ' . $token[2] . ' uses ' . $domain;
+			}
+		}
+
+		return $out;
 	}
 
+	public function test_the_translations_are_wired_the_way_wordpress_expects() {
+		// This used to assert that load_plugin_textdomain() was hooked, after
+		// a release where every string was wrapped, the .pot was current, and
+		// none of it reached a reader because nothing loaded it.
+		//
+		// That call is the wrong answer now, and Plugin Check fails the
+		// submission over it: WordPress has loaded translations for
+		// wordpress.org-hosted plugins by itself since 4.6, and this plugin
+		// requires 6.0.
+		//
+		// So what decides whether a translation reaches anybody is no longer
+		// a hook. It is that the header names the same domain every wrapped
+		// string passes, and that the catalogue ships where WordPress looks.
+		// Those are the two things that can drift in silence.
+		$headers = get_file_data(
+			BLOGCRAFT_PATH . 'blogcraft.php',
+			array(
+				'domain' => 'Text Domain',
+				'path'   => 'Domain Path',
+			)
+		);
+
+		$this->assertSame( 'blogcraft', $headers['domain'] );
+		$this->assertSame( '/languages', $headers['path'] );
+
+		$bad = array();
+
+		$files = array_merge(
+			(array) glob( BLOGCRAFT_PATH . 'includes/*.php' ),
+			array( BLOGCRAFT_PATH . 'blogcraft.php', BLOGCRAFT_PATH . 'uninstall.php' )
+		);
+
+		foreach ( $files as $file ) {
+			$body = (string) file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( $this->wrong_domains( $body ) as $hit ) {
+				$bad[] = basename( $file ) . ': ' . $hit;
+			}
+		}
+
+		$this->assertSame( array(), $bad, 'a string is wrapped against the wrong text domain' );
+	}
+
+	public function test_the_discouraged_loader_stays_gone() {
+		// Plugin Check warns on it, and a warning is what stands between this
+		// and being accepted on wordpress.org.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertStringNotContainsString( 'load_plugin_textdomain', $source );
+	}
 	public function test_the_translations_are_looked_for_where_they_ship() {
 		$this->assertDirectoryExists( BLOGCRAFT_PATH . 'languages' );
 		$this->assertFileExists( BLOGCRAFT_PATH . 'languages/blogcraft.pot' );
