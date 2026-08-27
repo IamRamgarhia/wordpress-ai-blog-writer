@@ -600,6 +600,45 @@ class Blogcraft_Queue {
 	 * @param int $job_id Job to retry.
 	 * @return bool Whether it was requeued.
 	 */
+	/**
+	 * Send a finished draft back for another pass.
+	 *
+	 * Only a held one. A job still working is already moving, and a
+	 * completed one has a post on the site that this would not touch.
+	 *
+	 * @param int    $job_id Job to reopen.
+	 * @param string $stage  Stage to resume at.
+	 * @return bool Whether it was reopened.
+	 */
+	public static function reopen( $job_id, $stage ) {
+		global $wpdb;
+
+		$table = Blogcraft_Migrator::table_name( 'jobs' );
+
+		$status = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( "SELECT status FROM {$table} WHERE id = %d", $job_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		if ( 'ready' !== $status ) {
+			return false;
+		}
+
+		self::update(
+			$job_id,
+			array(
+				'status'       => 'pending',
+				'stage'        => (string) $stage,
+				'attempts'     => 0,
+				'last_error'   => null,
+				'lock_token'   => null,
+				'locked_at'    => null,
+				'available_at' => current_time( 'mysql', true ),
+			)
+		);
+
+		return true;
+	}
+
 	public static function requeue( $job_id ) {
 		global $wpdb;
 

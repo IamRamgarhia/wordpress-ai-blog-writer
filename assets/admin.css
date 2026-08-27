@@ -1703,3 +1703,108 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-welcome-skip a {
 	color: var(--bc-ink-soft, #50575e);
 }
+
+/* ---------------------------------------------------------------------
+   A second pass at the measured faults.
+
+   The button is secondary on purpose. The primary action on this screen
+   is deciding what happens to a draft that is already written; another
+   rewrite is a side road, and one that costs a request.
+   --------------------------------------------------------------------- */
+.bc-improve {
+	margin-top: var(--bc-s5);
+	padding-top: var(--bc-s4);
+	border-top: 1px solid var(--bc-line);
+}
+
+.bc-improve-form .description {
+	max-width: 62ch;
+	margin: var(--bc-s2) 0 0;
+	font-size: 12.5px;
+	line-height: 1.6;
+}
+
+.bc-improve-cannot {
+	max-width: 62ch;
+	margin: var(--bc-s3) 0 0;
+	padding: var(--bc-s2) var(--bc-s3);
+	border-left: 3px solid var(--bc-warn);
+	background: var(--bc-warn-soft);
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: var(--bc-ink);
+}
+
+/* What the second pass bought. Down is a real outcome and is coloured as
+   one — a rewrite is not deterministic, and hiding the losses would make
+   the wins worth less. */
+.bc-score-delta {
+	margin: var(--bc-s2) 0 0;
+	font-size: 12.5px;
+	font-weight: 600;
+}
+
+.bc-score-delta.is-up   { color: var(--bc-ok); }
+.bc-score-delta.is-down { color: var(--bc-warn); }
+.bc-score-delta.is-flat { color: var(--bc-muted); }
+
+/* ---------------------------------------------------------------------
+   What would hold this back.
+
+   Not a prediction and styled so as not to look like one: no dial, no
+   number, no traffic light. A short list of specific things, each with
+   something to do about it.
+   --------------------------------------------------------------------- */
+.bc-prospects-card {
+	max-width: 900px;
+}
+
+.bc-prospects-head p {
+	max-width: 66ch;
+	color: var(--bc-muted);
+}
+
+.bc-prospects {
+	margin: var(--bc-s4) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-prospects li {
+	margin: 0 0 var(--bc-s4);
+	padding: 0 0 0 var(--bc-s3);
+	border-left: 3px solid var(--bc-warn);
+}
+
+.bc-prospects li:last-child {
+	margin-bottom: 0;
+}
+
+.bc-prospects h3 {
+	margin: 0 0 var(--bc-s1);
+	font-size: 14px;
+	line-height: 1.35;
+	color: var(--bc-ink);
+}
+
+.bc-prospects p {
+	max-width: 66ch;
+	margin: 0 0 var(--bc-s1);
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--bc-ink-soft);
+}
+
+.bc-prospects-fix {
+	font-weight: 600;
+	color: var(--bc-ink) !important;
+}
+
+.bc-prospects-clear {
+	max-width: 66ch;
+	margin: var(--bc-s3) 0 0;
+	padding: var(--bc-s2) var(--bc-s3);
+	border-left: 3px solid var(--bc-ok);
+	font-size: 13px;
+	line-height: 1.6;
+}

@@ -34,6 +34,11 @@ class Blogcraft_Progress {
 	const ACTION = 'blogcraft_progress';
 
 	/**
+	 * Nonce action for sending a finished draft back for another pass.
+	 */
+	const IMPROVE_ACTION = 'blogcraft_improve_draft';
+
+	/**
 	 * The stages a reader sees, in order, with what each one is doing.
 	 *
 	 * Named for what is happening rather than for the method that does it:
@@ -69,6 +74,7 @@ class Blogcraft_Progress {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 		add_action( 'wp_ajax_blogcraft_advance', array( __CLASS__, 'handle_advance' ) );
 		add_action( 'admin_post_blogcraft_approve_draft', array( __CLASS__, 'handle_approve' ) );
+		add_action( 'admin_post_blogcraft_improve_draft', array( __CLASS__, 'handle_improve' ) );
 	}
 
 	/**
@@ -479,6 +485,16 @@ class Blogcraft_Progress {
 			return;
 		}
 
+		// Read-only; the nonce that matters guarded the handler that set it.
+		$outcome = isset( $_GET['improve'] ) ? sanitize_key( wp_unslash( $_GET['improve'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( 'nothing' === $outcome ) {
+			printf(
+				'<div class="notice notice-info"><p>%s</p></div>',
+				esc_html__( 'Nothing left that another writing pass can reach, so no request was made and you were not charged for one. What is still failing is about your site rather than these words.', 'blogcraft' )
+			);
+		}
+
 		$topic = isset( $job->payload['topic'] ) ? (string) $job->payload['topic'] : '';
 
 		echo '<h1>' . esc_html( '' === $topic ? __( 'Writing a post', 'blogcraft' ) : $topic ) . '</h1>';
@@ -500,6 +516,97 @@ class Blogcraft_Progress {
 		}
 
 		echo '</div>';
+	}
+
+	/**
+	 * Send a finished draft back to be rewritten against its own scorecard.
+	 *
+	 * The pipeline already does this once, unprompted: critique measures the
+	 * draft, turns every failing check into an instruction, and revise acts
+	 * on them. So this is a second helping of a pass that has already run,
+	 * and the honest thing is to say so rather than imply a button nobody
+	 * pressed yet was the difference between a good post and a bad one.
+	 *
+	 * It is worth offering anyway. A rewrite is not deterministic, the
+	 * measurements are, and a second attempt at four specific numbered
+	 * faults lands more often than not. What it must not do is charge for a
+	 * pass that cannot change anything: if nothing failing carries a repair
+	 * instruction, no request is made.
+	 *
+	 * @return void
+	 */
+	public static function handle_improve() {
+		// Read then verify; Blogcraft_Request performs the check PHPCS cannot
+		// follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::IMPROVE_ACTION, $nonce );
+
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to do that.', 'blogcraft' ) );
+		}
+
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job    = $job_id > 0 ? Blogcraft_Queue::find( $job_id ) : null;
+
+		if ( null === $job || 'ready' !== $job->status ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
+			exit;
+		}
+
+		$payload = $job->payload;
+		$checks  = isset( $payload['checks'] ) ? (array) $payload['checks'] : array();
+		$fixable = Blogcraft_Scorecard::fixable( $checks );
+
+		if ( empty( $fixable ) ) {
+			// Nothing a rewrite owns. Spending a request here would cost real
+			// money to produce the same draft and the same score.
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'    => self::PAGE_SLUG,
+						'job'     => $job_id,
+						'improve' => 'nothing',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
+		}
+
+		$problems = array();
+
+		foreach ( $fixable as $check ) {
+			$problems[] = (string) $check['repair'];
+		}
+
+		$payload['problems'] = $problems;
+
+		// Kept so the screen can say what the second pass actually bought,
+		// rather than showing a new number with nothing to compare it to.
+		$payload['score_before'] = isset( $payload['quality']['score'] ) ? (int) $payload['quality']['score'] : 0;
+
+		Blogcraft_Queue::save_payload( $job_id, $payload );
+
+		// Straight to revise. Going back to critique would pay for a second
+		// opinion the plugin already has in writing.
+		Blogcraft_Queue::reopen( $job_id, 'revise' );
+
+		Blogcraft_Logger::info(
+			'A finished draft was sent back for another pass.',
+			array( 'to_fix' => count( $problems ) ),
+			$job_id
+		);
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page' => self::PAGE_SLUG,
+					'job'  => $job_id,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
 	}
 
 	/**
@@ -628,19 +735,70 @@ class Blogcraft_Progress {
 		$checks  = isset( $payload['checks'] ) ? (array) $payload['checks'] : array();
 		$score   = isset( $quality['score'] ) ? (int) $quality['score'] : 0;
 
-		self::render_score( $score, $checks );
+		self::render_score( $score, $checks, isset( $payload['score_before'] ) ? (int) $payload['score_before'] : 0 );
+		self::render_prospects( $job, $article, $checks );
 		self::render_preview( $article, $outline );
 		self::render_decision( $job, $score );
 	}
 
 	/**
+	 * What is working against this post being found.
+	 *
+	 * Not a prediction, and it says so on the screen. The list is only the
+	 * blockers that can be checked on this site with nothing bought and no
+	 * extra key — which is a narrower claim than a ranking estimate and the
+	 * only one that would be true.
+	 *
+	 * @param Blogcraft_Job $job     Held job.
+	 * @param array         $article Article structure.
+	 * @param array         $checks  Scorecard results.
+	 * @return void
+	 */
+	private static function render_prospects( $job, $article, $checks ) {
+		$payload = $job->payload;
+		$post_id = isset( $payload['post_id'] ) ? (int) $payload['post_id'] : 0;
+
+		$blockers = Blogcraft_Prospects::blockers( $post_id, $article, $checks, $payload );
+
+		echo '<section class="blogcraft-card bc-prospects-card">';
+		echo '<div class="bc-prospects-head">';
+		echo '<h2>' . esc_html__( 'What would hold this back', 'blogcraft' ) . '</h2>';
+		printf( '<p>%s</p>', esc_html( Blogcraft_Prospects::caveat() ) );
+		echo '</div>';
+
+		if ( empty( $blockers ) ) {
+			printf(
+				'<p class="bc-prospects-clear">%s</p>',
+				esc_html__( 'Nothing this plugin can see. It does not duplicate a post you already have, it says something that is yours, it is the length it was written to be, and your site points at it.', 'blogcraft' )
+			);
+			echo '</section>';
+
+			return;
+		}
+
+		echo '<ul class="bc-prospects">';
+
+		foreach ( $blockers as $blocker ) {
+			printf(
+				'<li><h3>%1$s</h3><p>%2$s</p><p class="bc-prospects-fix">%3$s</p></li>',
+				esc_html( $blocker['title'] ),
+				esc_html( $blocker['detail'] ),
+				esc_html( $blocker['fix'] )
+			);
+		}
+
+		echo '</ul>';
+		echo '</section>';
+	}
+	/**
 	 * The score and every check behind it.
 	 *
 	 * @param int   $score  Score out of 100.
 	 * @param array $checks Check results.
+	 * @param int   $before Score before a second pass, or 0 if there was none.
 	 * @return void
 	 */
-	private static function render_score( $score, $checks ) {
+	private static function render_score( $score, $checks, $before = 0 ) {
 		$threshold = (int) Blogcraft_Settings::get( 'quality_threshold' );
 		$clears    = ( $score >= $threshold );
 
@@ -691,6 +849,41 @@ class Blogcraft_Progress {
 					)
 			)
 		);
+		// What the second pass bought. A new number on its own tells nobody
+		// whether pressing the button was worth a request, and "it went down"
+		// is a real outcome that has to be reportable — a rewrite is not
+		// deterministic, and hiding the losses would make the wins a lie.
+		if ( $before > 0 ) {
+			$gap = (int) $score - (int) $before;
+
+			if ( 0 === $gap ) {
+				$line = sprintf(
+					/* translators: %d: the score, unchanged. */
+					__( 'The second pass left it at %d. Nothing measurable changed.', 'blogcraft' ),
+					(int) $score
+				);
+			} elseif ( $gap > 0 ) {
+				$line = sprintf(
+					/* translators: 1: previous score. 2: how many points it gained. */
+					__( 'Up from %1$d after another pass, so that one bought %2$d points.', 'blogcraft' ),
+					(int) $before,
+					(int) $gap
+				);
+			} else {
+				$line = sprintf(
+					/* translators: %d: the previous, higher score. */
+					__( 'Down from %d. The rewrite made it worse, which happens — the earlier wording is in the editor history.', 'blogcraft' ),
+					(int) $before
+				);
+			}
+
+			printf(
+				'<p class="bc-score-delta %1$s">%2$s</p>',
+				esc_attr( $gap > 0 ? 'is-up' : ( $gap < 0 ? 'is-down' : 'is-flat' ) ),
+				esc_html( $line )
+			);
+		}
+
 		echo '</div></div>';
 
 		if ( empty( $failed ) && empty( $passed ) ) {
@@ -722,7 +915,84 @@ class Blogcraft_Progress {
 			echo '</details>';
 		}
 
+		self::render_improve( $failed );
+
 		echo '</section>';
+	}
+
+	/**
+	 * The offer of a second pass, and what it cannot do.
+	 *
+	 * @param array $failed Failing checks.
+	 * @return void
+	 */
+	private static function render_improve( $failed ) {
+		if ( empty( $failed ) ) {
+			return;
+		}
+
+		$fixable = Blogcraft_Scorecard::fixable( $failed );
+		$theirs  = Blogcraft_Scorecard::needs_you( $failed );
+
+		echo '<div class="bc-improve">';
+
+		if ( ! empty( $fixable ) ) {
+			printf(
+				'<form method="post" action="%s" class="bc-improve-form">',
+				esc_url( admin_url( 'admin-post.php' ) )
+			);
+			echo '<input type="hidden" name="action" value="blogcraft_improve_draft" />';
+			printf( '<input type="hidden" name="job" value="%d" />', (int) self::current_job_id() );
+			Blogcraft_Request::nonce_field( self::IMPROVE_ACTION );
+
+			printf(
+				'<button type="submit" class="button button-secondary">%s</button>',
+				esc_html__( 'Have another go at these', 'blogcraft' )
+			);
+
+			printf(
+				'<p class="description">%s</p>',
+				esc_html(
+					sprintf(
+						/* translators: %d: how many failing checks a rewrite can act on. */
+						_n(
+							'One more writing pass, aimed at the %d fault below that a rewrite can reach. It costs one request, and the draft is measured again afterwards. The post has already been through this once, so treat it as a second attempt rather than a fix.',
+							'One more writing pass, aimed at the %d faults below that a rewrite can reach. It costs one request, and the draft is measured again afterwards. The post has already been through this once, so treat it as a second attempt rather than a fix.',
+							count( $fixable ),
+							'blogcraft'
+						),
+						count( $fixable )
+					)
+				)
+			);
+
+			echo '</form>';
+		}
+
+		if ( ! empty( $theirs ) ) {
+			$names = array();
+
+			foreach ( $theirs as $check ) {
+				$names[] = (string) $check['label'];
+			}
+
+			// Said plainly, because a button that quietly does nothing about
+			// half the list is worse than no button. Internal links is the
+			// usual one: it means the site has nothing else on the subject to
+			// point at, and no rewrite invents three related posts.
+			printf(
+				'<p class="bc-improve-cannot">%s</p>',
+				esc_html(
+					sprintf(
+						/* translators: %s: comma-separated names of checks a rewrite cannot fix. */
+						__( 'Rewriting will not change %s. That one is about your site rather than these words.', 'blogcraft' ),
+						implode( ', ', $names )
+					)
+				)
+			);
+		}
+
+		echo '</div>';
 	}
 
 	/**

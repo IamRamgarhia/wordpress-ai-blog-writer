@@ -519,6 +519,49 @@ class Blogcraft_Scorecard {
 	}
 
 	/**
+	 * The failures a rewrite can actually do something about.
+	 *
+	 * Not every failing check is a writing problem. "Internal links: 1,
+	 * wanted 3" means the site has nothing else on the subject to point
+	 * at, and no amount of rewriting invents three related posts. Those
+	 * checks carry no repair note on purpose, and the difference is what
+	 * lets the plugin offer a second pass without promising to fix
+	 * things it cannot reach.
+	 *
+	 * @param array $checks Check results.
+	 * @return array Failing checks carrying a repair instruction.
+	 */
+	public static function fixable( $checks ) {
+		$out = array();
+
+		foreach ( (array) $checks as $check ) {
+			if ( is_array( $check ) && empty( $check['pass'] ) && '' !== trim( (string) $check['repair'] ) ) {
+				$out[] = $check;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * The failures that need a person rather than another rewrite.
+	 *
+	 * @param array $checks Check results.
+	 * @return array Failing checks with no repair instruction.
+	 */
+	public static function needs_you( $checks ) {
+		$out = array();
+
+		foreach ( (array) $checks as $check ) {
+			if ( is_array( $check ) && empty( $check['pass'] ) && '' === trim( (string) $check['repair'] ) ) {
+				$out[] = $check;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
 	 * The repair instructions from every failed check, as prompt text.
 	 *
 	 * @param array $checks Checks from evaluate().
