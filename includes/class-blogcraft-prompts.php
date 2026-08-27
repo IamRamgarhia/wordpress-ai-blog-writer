@@ -83,6 +83,30 @@ class Blogcraft_Prompts {
 	}
 
 	/**
+	 * The author's own material, for a pass that is changing existing prose.
+	 *
+	 * The writing prompts are told to build a section around these figures. A
+	 * rewrite must not be: it is fixing a length or a reading score, and "use
+	 * them" invites it to add more of the same. What a rewrite needs is the
+	 * opposite instruction — these particular sentences are the one thing in
+	 * the draft that could not have been written by anybody else, so leave
+	 * them alone and cut somewhere else.
+	 *
+	 * @return string Empty when nothing was supplied.
+	 */
+	private static function evidence_guard() {
+		if ( '' === self::$evidence ) {
+			return '';
+		}
+
+		return "\n\nFacts the author supplied from their own work:\n"
+			. self::$evidence
+			. "\n\nKeep every one of these exactly as written. Do not round them, do not soften them into 'some' or 'several', and do not drop one to save words: cut somewhere else. "
+			. 'They are the only part of this post nobody else could have written, and the finished draft is judged on them more heavily than on anything else. '
+			. 'Do not invent any further figure of the same kind.';
+	}
+
+	/**
 	 * The writer's own material as a prompt block.
 	 *
 	 * Stated as fact and fenced hard. A model handed "our returns rate was 3 in
@@ -190,6 +214,12 @@ Rules for this article:
 			. "- slug: lowercase, hyphenated, no stop words\n"
 			. sprintf( "- meta_description: between 70 and %d characters, describing what the reader gains\n", self::limit( 'meta_desc_max', 155 ) )
 			. '- sections: headings that build an argument, not a list of synonyms'
+			// The shape is decided here, so this is where room gets made for
+			// the one thing nobody else can write. Handed it only from the
+			// draft stage onwards, the structure was already fixed and the
+			// author's own material had to be squeezed into somebody else's
+			// outline.
+			. self::evidence_block()
 			. self::extra( $instructions )
 			. self::structure_block();
 
@@ -419,6 +449,11 @@ Rules for this article:
 			. "- Do not ask anything the article already answers in full.\n"
 			. "- Answers of two or three sentences.\n"
 			. '- Plain text only. No markdown, no HTML.'
+			// An answer carrying the author's own figure is worth more than
+			// the same answer assembled from the pages everybody else
+			// used, and these are the entries most likely to be lifted
+			// whole into a search result.
+			. self::evidence_block()
 			. self::structure_block();
 
 		return array(
@@ -447,7 +482,12 @@ Rules for this article:
 			. 'Look for: vague claims that say nothing, repetition between sections, filler sentences, '
 			. 'cliche openings, paragraphs that restate their own heading, and any place a specific '
 			. 'example or number would be worth more than the sentence that is there. '
-			. 'If a section is genuinely fine, do not invent a problem for it.';
+			. 'If a section is genuinely fine, do not invent a problem for it.'
+			// Handed the author's own material so it can notice the one
+			// failure the scorecard measures but cannot describe: that the
+			// draft was given something nobody else has and buried it in a
+			// closing paragraph, or left it out.
+			. self::evidence_guard();
 
 		return array(
 			array(
@@ -498,6 +538,11 @@ Rules for this article:
 			. $headline . "\n"
 			. 'Reply with JSON in exactly the same shape as the draft. Keep what works; '
 			. 'change what was criticised. Do not add new sections.'
+			// stage_revise() has always set the evidence and this prompt has
+			// never emitted it, so a pass told to cut forty words could
+			// paraphrase away the author's own figures and nothing noticed
+			// until the next measurement, if at all.
+			. self::evidence_guard()
 			. self::structure_block();
 
 		return array(

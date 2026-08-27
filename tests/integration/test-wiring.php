@@ -562,4 +562,47 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( 'Invented', $html );
 	}
+
+	public function test_every_stage_handed_the_evidence_builds_a_prompt_that_carries_it() {
+		// The pipeline calls use_evidence() before seven stages. Four of the
+		// prompts those stages build never emitted it, so the value was set on
+		// a static and dropped: the outline shaped a post with no room for the
+		// author's own material, the critique could not tell whether it had
+		// survived, and the rewrite — told to cut forty words — could
+		// paraphrase a measured figure into "some" with nothing to notice.
+		//
+		// Setting it and not using it is the failure worth catching, because it
+		// looks exactly like working code at every call site.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-prompts.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		preg_match_all( '/public static function ([a-z_]+)\(/', $source, $found, PREG_OFFSET_CAPTURE );
+
+		$this->assertNotEmpty( $found[1] );
+
+		// Builders that take no evidence by design: two setters, two helpers,
+		// and the one that repairs a malformed reply rather than asking for
+		// anything.
+		$exempt = array( 'use_blueprint', 'use_evidence', 'limit', 'extra', 'extract_json' );
+
+		$missing = array();
+		$count   = count( $found[1] );
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			$name = $found[1][ $i ][0];
+
+			if ( in_array( $name, $exempt, true ) ) {
+				continue;
+			}
+
+			$from = (int) $found[1][ $i ][1];
+			$to   = ( $i + 1 < $count ) ? (int) $found[1][ $i + 1 ][1] : strlen( $source );
+			$body = substr( $source, $from, $to - $from );
+
+			if ( false === strpos( $body, 'self::evidence_block()' ) && false === strpos( $body, 'self::evidence_guard()' ) ) {
+				$missing[] = $name;
+			}
+		}
+
+		$this->assertSame( array(), $missing, 'these prompts are handed the evidence and never pass it on' );
+	}
 }
