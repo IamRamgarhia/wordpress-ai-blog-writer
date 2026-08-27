@@ -497,8 +497,19 @@ class Blogcraft_Connection {
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft' ) . '</label></th><td>';
 		$groups = Blogcraft_Provider_Registry::groups();
+		$chosen = ( '' !== $type );
 
 		echo '<select name="provider_type" id="blogcraft_provider_type">';
+
+		// A real first option rather than a default. Nineteen providers
+		// and one of them preselected is a decision made on the reader's
+		// behalf, and it was OpenAI: paid, card first, and above every
+		// route that costs nothing.
+		printf(
+			'<option value=""%1$s>%2$s</option>',
+			selected( $chosen, false, false ),
+			esc_html__( 'Choose a provider…', 'blogcraft' )
+		);
 
 		// Grouped, free first. The labels always said which were free; in
 		// a flat list of nineteen that only helped somebody who read all
@@ -568,11 +579,14 @@ class Blogcraft_Connection {
 
 		$default_base = Blogcraft_Provider_Registry::default_base_url( $type );
 
-		// A provider that issues no keys — Ollama and LM Studio run on your
-		// own machine — has nothing to wait for, so it gets the model fields
-		// straight away.
+		// A provider that issues no keys — the ones running on this machine
+		// — has nothing to wait for, so it gets the model fields straight
+		// away. An unchosen provider is not one of those: help() falls back
+		// to the custom endpoint, whose key_url is empty, so without the
+		// first test an empty select would read as "needs no key" and open
+		// the model fields before there was anything to ask.
 		$help    = Blogcraft_Provider_Registry::help( $type );
-		$keyless = ( '' === trim( (string) $help['key_url'] ) );
+		$keyless = $chosen && ( '' === trim( (string) $help['key_url'] ) );
 
 		if ( ! $key_fits && ! $keyless ) {
 			// Asking which model to use before there is a key to ask with was
@@ -583,7 +597,11 @@ class Blogcraft_Connection {
 			// looks finished and errors on the first post.
 			printf(
 				'<tr><th scope="row"></th><td><p class="bc-await-key">%s</p></td></tr>',
-				esc_html__( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'blogcraft' )
+				esc_html(
+					$chosen
+						? __( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'blogcraft' )
+						: __( 'Choose a provider above and press Save settings. Which key to paste, which address to use and which models exist all follow from that one choice, so it is the only thing this screen asks for first.', 'blogcraft' )
+				)
 			);
 		}
 

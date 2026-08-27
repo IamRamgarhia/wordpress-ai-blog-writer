@@ -380,11 +380,98 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		foreach ( $sections as $anchor => $section ) {
 			$this->assertNotSame( '', $section['title'], $anchor . ' has no title' );
-			$this->assertNotEmpty( $section['body'], $anchor . ' says nothing' );
+			$this->assertNotEmpty( $section['lead'], $anchor . ' has no opening line' );
+
+			$this->assertTrue(
+				! empty( $section['steps'] ) || ! empty( $section['points'] ),
+				$anchor . ' has nothing under its opening line'
+			);
 		}
 
 		$this->assertStringContainsString( 'page=blogcraft-help', Blogcraft_Docs::url() );
 		$this->assertStringContainsString( '#providers', Blogcraft_Docs::url( 'providers' ) );
+	}
+
+	public function test_the_help_screen_is_written_in_short_lines() {
+		// It was four to seven full paragraphs a section, which reads as an
+		// essay about the plugin rather than instructions for using it —
+		// nobody reads a help screen from the top, they arrive with a question
+		// and scan. This pins the shape rather than the wording: a ceiling on
+		// every line, so the next thing added has to be written to be scanned.
+		$sections = Blogcraft_Docs::sections();
+		$limits   = array(
+			'lead'  => 120,
+			'step'  => 130,
+			'point' => 180,
+		);
+
+		foreach ( $sections as $anchor => $section ) {
+			$this->assertLessThanOrEqual(
+				$limits['lead'],
+				mb_strlen( (string) $section['lead'] ),
+				$anchor . ' opens with a paragraph rather than a sentence'
+			);
+
+			foreach ( ( isset( $section['steps'] ) ? $section['steps'] : array() ) as $step ) {
+				$this->assertCount( 2, $step, $anchor . ' has a step that is not a name and a line' );
+
+				$this->assertLessThanOrEqual(
+					40,
+					mb_strlen( (string) $step[0] ),
+					$anchor . ' has a step name long enough to be a sentence: "' . $step[0] . '"'
+				);
+
+				$this->assertLessThanOrEqual(
+					$limits['step'],
+					mb_strlen( (string) $step[1] ),
+					$anchor . ' has a step nobody will read: "' . $step[1] . '"'
+				);
+			}
+
+			foreach ( ( isset( $section['points'] ) ? $section['points'] : array() ) as $point ) {
+				$this->assertLessThanOrEqual(
+					$limits['point'],
+					mb_strlen( (string) $point ),
+					$anchor . ' has a bullet that is really a paragraph: "' . $point . '"'
+				);
+			}
+		}
+	}
+
+	public function test_the_help_screen_opens_with_the_steps() {
+		// Somebody who has just installed this wants the order to do things
+		// in, not a section on privacy. First section, and it is the sequence.
+		$sections = Blogcraft_Docs::sections();
+		$first    = key( $sections );
+
+		$this->assertSame( 'quickstart', $first );
+		$this->assertNotEmpty( $sections['quickstart']['steps'] );
+	}
+
+	public function test_no_provider_is_chosen_for_you() {
+		// The default was 'openai': a plugin whose whole point is that you
+		// bring your own key opened with somebody else's company already
+		// selected, and a paid, card-first one at that, sitting above every
+		// route that costs nothing.
+		delete_option( 'blogcraft_settings' );
+
+		$this->assertSame( '', (string) Blogcraft_Settings::get( 'provider_type' ) );
+		$this->assertFalse( Blogcraft_Provider_Registry::is_configured() );
+		$this->assertNull( Blogcraft_Provider_Registry::from_settings() );
+	}
+
+	public function test_an_unchosen_provider_is_not_read_as_needing_no_key() {
+		// help() falls back to the custom endpoint for an unknown type, and a
+		// custom endpoint has no key_url — so the "runs on your machine, needs
+		// no key" branch would have swallowed the empty case and opened the
+		// model fields before there was anything to ask with.
+		delete_option( 'blogcraft_settings' );
+		Blogcraft_Settings::set( 'provider_base_url', 'https://example.com/v1' );
+
+		$this->assertFalse(
+			Blogcraft_Provider_Registry::is_configured(),
+			'a typed-in address counted as a configured provider'
+		);
 	}
 
 	public function test_every_help_panel_points_at_a_section_that_exists() {

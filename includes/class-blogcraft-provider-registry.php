@@ -343,6 +343,14 @@ class Blogcraft_Provider_Registry {
 	public static function is_configured() {
 		$type = (string) Blogcraft_Settings::get( 'provider_type' );
 
+		// Nothing chosen yet. Said plainly rather than left to fall
+		// through the keyless branch below, which would read an unchosen
+		// provider as one that needs no key and call a typed-in address
+		// proof of setup.
+		if ( '' === $type ) {
+			return false;
+		}
+
 		// The AI Client needs neither key nor model id: WordPress holds the
 		// credentials and picks the model. What it does need is a provider
 		// plugin actually installed behind it, which is a different question

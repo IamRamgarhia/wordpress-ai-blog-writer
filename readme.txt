@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.63.0
+Stable tag: 0.64.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -162,6 +162,10 @@ Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and 
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.64.0 =
+* No provider is chosen for you. The setting defaulted to OpenAI, so a plugin whose whole point is that you bring your own key opened with somebody else's company already selected — a paid, card-first one, sitting above every route that costs nothing. The list now starts on "Choose a provider" and waits
+* The Help screen is written to be scanned rather than read. It was twelve sections of four to seven full paragraphs, which is an essay about the plugin rather than instructions for using it. Each section now opens with one sentence and breaks into numbered steps or short lines, and a "Start here" section at the top gives the five steps in order
 
 = 0.63.0 =
 * The provider list is grouped by what it costs, free routes first. Every label already said free or paid, but in a flat list of nineteen that only helped somebody who read all nineteen — and the two at the top of it both want a card before they will answer anything

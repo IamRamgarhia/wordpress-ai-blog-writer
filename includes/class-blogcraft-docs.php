@@ -126,112 +126,181 @@ class Blogcraft_Docs {
 	 */
 	public static function sections() {
 		return array(
+			'quickstart'        => array(
+				'title' => __( 'Start here', 'blogcraft' ),
+				'lead'  => __( 'Five steps, about ten minutes. Nothing is contacted until you finish the first one.', 'blogcraft' ),
+				'steps' => array(
+					array(
+						__( 'Choose a provider', 'blogcraft' ),
+						__( 'Settings, Connect a provider. The free ones are at the top. Nothing is chosen for you.', 'blogcraft' ),
+					),
+					array(
+						__( 'Paste the key', 'blogcraft' ),
+						__( 'The link beside the field goes to the right page. A model on your own machine needs no key. Save.', 'blogcraft' ),
+					),
+					array(
+						__( 'Pick a model', 'blogcraft' ),
+						__( 'Press "Show the models on my account". Never type an id from memory.', 'blogcraft' ),
+					),
+					array(
+						__( 'Describe your voice', 'blogcraft' ),
+						__( 'Two sentences on your subject and your reader. Or press "Learn from my posts".', 'blogcraft' ),
+					),
+					array(
+						__( 'Write one post', 'blogcraft' ),
+						__( 'Give it a topic and read the score before you publish anything.', 'blogcraft' ),
+					),
+				),
+			),
 			'providers'         => array(
-				'title' => __( 'Connecting a provider', 'blogcraft' ),
-				'body'  => array(
-					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, with a key from your account, and every request is billed to you by them. Nothing passes through the plugin author.', 'blogcraft' ),
-					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked beside the field rather than copying an example — providers retire model names without notice, and a retired name fails with an error that does not say so.', 'blogcraft' ),
-					__( 'The provider list is grouped by what it costs, free first, because spending nothing is a supported way to use this plugin rather than a trial of it. Nothing is held back on a free provider — there is no paid tier here to unlock.', 'blogcraft' ),
-					__( 'The first group runs a model on this machine and contacts nobody: Ollama, LM Studio, Jan and llama.cpp. Install one, start it, pick it here and leave the key blank. The address is already filled in, and a model of around seven billion parameters is enough to write a readable post on an ordinary laptop.', 'blogcraft' ),
-					__( 'The second group wants a key but no card: Google, Groq, Mistral and Hugging Face each give away usage at no cost, and OpenRouter lists models that are free to call — on OpenRouter those are the ids ending in :free. Allowances move on the provider\'s schedule, so the link beside each choice goes to their own page rather than a figure written into a plugin.', 'blogcraft' ),
-					__( 'On WordPress 7.0 and later, if a provider plugin is installed, "WordPress AI Client" appears at the top of the list. Choosing it means no key here at all: WordPress holds the credentials and routes the request. It only appears when it can actually work.', 'blogcraft' ),
-					__( 'Leave the base URL blank unless you are pointing at a proxy or something of your own. The address shown in the empty field is what will be used.', 'blogcraft' ),
+				'title'  => __( 'Connecting a provider', 'blogcraft' ),
+				'lead'   => __( 'Blogcraft has no AI of its own. It uses your account, and your provider bills you directly.', 'blogcraft' ),
+				'steps'  => array(
+					array(
+						__( 'Provider', 'blogcraft' ),
+						__( 'Grouped by what it costs, free first. Nothing is preselected.', 'blogcraft' ),
+					),
+					array(
+						__( 'Key', 'blogcraft' ),
+						__( 'Follow the link beside the field. A local model needs none.', 'blogcraft' ),
+					),
+					array(
+						__( 'Model id', 'blogcraft' ),
+						__( 'Take it from your own account, not from an example. Retired ids fail with an error that does not say so.', 'blogcraft' ),
+					),
+				),
+				'points' => array(
+					__( 'Free, no key, no account: Ollama, LM Studio, Jan, llama.cpp. They run on this machine and contact nobody.', 'blogcraft' ),
+					__( 'Free tier, a key but no card: Google, Groq, Mistral, Hugging Face. On OpenRouter the free ids end in :free.', 'blogcraft' ),
+					__( 'Nothing is held back on a free provider. There is no paid tier here to unlock.', 'blogcraft' ),
+					__( 'On WordPress 7.0 and later, "WordPress AI Client" appears when a provider plugin is installed. No key here at all.', 'blogcraft' ),
+					__( 'Leave the base URL blank unless you are pointing at a proxy of your own.', 'blogcraft' ),
 				),
 			),
 			'research'          => array(
-				'title' => __( 'Research', 'blogcraft' ),
-				'body'  => array(
-					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft' ),
-					__( 'Everything here starts switched off, including the free sources. Blogcraft does not contact anybody you have not chosen: pasting a provider key is consent for that provider and for nothing else. Turning a source on is how you consent to it.', 'blogcraft' ),
-					__( 'Wikipedia and Hacker News need no key, so a tick is all they take. Each is a different kind of material, which is the point: a reference work gives dates and definitions, a forum gives what actually happened to people who tried the thing.', 'blogcraft' ),
-					__( 'Tavily and SerpApi are paid and return more current results. A SearXNG instance is free if you host one. You can also list URLs to be read for every post.', 'blogcraft' ),
-					__( 'Whatever is found is also used to check the finished draft. If the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft' ),
+				'title'  => __( 'Research', 'blogcraft' ),
+				'lead'   => __( 'The biggest single lever on whether a post is worth reading.', 'blogcraft' ),
+				'points' => array(
+					__( 'Off, the model writes from memory. On, it writes from current sources.', 'blogcraft' ),
+					__( 'Everything starts switched off. Turning a source on is how you consent to it.', 'blogcraft' ),
+					__( 'Wikipedia and Hacker News need no key. Tavily and SerpApi are paid and more current.', 'blogcraft' ),
+					__( 'A SearXNG instance you host is free. You can also list URLs to be read for every post.', 'blogcraft' ),
+					__( 'What is found also checks the draft: merely restating your sources costs points.', 'blogcraft' ),
 				),
 			),
 			'voice'             => array(
-				'title' => __( 'Describing your voice', 'blogcraft' ),
-				'body'  => array(
-					__( 'Everything on this card is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog.', 'blogcraft' ),
-					__( 'If you already have posts published, press "Learn from my posts". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say "I" or "you" — and drafts the descriptions from your own titles. Nothing is saved until you press Save.', 'blogcraft' ),
-					__( 'Posts Blogcraft wrote are left out of that. Learning a voice from your own output is a loop that ends with every post sounding like the first one it generated.', 'blogcraft' ),
-					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce.', 'blogcraft' ),
+				'title'  => __( 'Describing your voice', 'blogcraft' ),
+				'lead'   => __( 'Sent with every request. The reason two blogs on the same model do not read alike.', 'blogcraft' ),
+				'points' => array(
+					__( 'Two sentences on your subject and your reader is enough to start.', 'blogcraft' ),
+					__( '"Learn from my posts" measures how you actually write and fills the fields in. Nothing saves until you press Save.', 'blogcraft' ),
+					__( 'Posts Blogcraft wrote are left out of that. Learning from its own output ends with every post sounding like the first.', 'blogcraft' ),
+					__( 'The experience field is the one worth time. It is the only part of a post a model cannot produce.', 'blogcraft' ),
 				),
 			),
 			'writing-a-post'    => array(
-				'title' => __( 'Writing a post', 'blogcraft' ),
-				'body'  => array(
-					__( 'The topic is the only field you have to fill in. Everything else already has an answer, taken from your standing rules under "How it writes".', 'blogcraft' ),
-					__( 'A sentence works better than a keyword. "How to choose a standing desk for a small home office" produces a better post than "standing desks".', 'blogcraft' ),
-					__( 'The field asking what you know that nobody else does is the most valuable one on the screen. Your own figures, results and prices are used as fact, never invented beyond, and the finished draft is checked to make sure they actually reached the page.', 'blogcraft' ),
-					__( 'The tabs beneath change this post only. Pictures holds the art direction; Publishing decides the category, tags, author and when it goes live.', 'blogcraft' ),
+				'title'  => __( 'Writing a post', 'blogcraft' ),
+				'lead'   => __( 'One required field. Everything else already has an answer.', 'blogcraft' ),
+				'steps'  => array(
+					array(
+						__( 'Topic', 'blogcraft' ),
+						__( 'A sentence beats a keyword: "how to choose a standing desk for a small office".', 'blogcraft' ),
+					),
+					array(
+						__( 'What only you know', 'blogcraft' ),
+						__( 'Your figures, prices and results. Used as fact, and checked for on the finished draft.', 'blogcraft' ),
+					),
+					array(
+						__( 'The tabs beneath', 'blogcraft' ),
+						__( 'Pictures holds the art direction. Publishing sets the category, tags, author and time.', 'blogcraft' ),
+					),
+				),
+				'points' => array(
+					__( 'Stuck on the second one? A button asks you four specific questions instead. It never answers them for you.', 'blogcraft' ),
 				),
 			),
 			'how-it-writes'     => array(
-				'title' => __( 'How it writes', 'blogcraft' ),
-				'body'  => array(
-					__( 'This screen is the brief every post is written to. Start from a shape — a definitive guide, a listicle, a tutorial and so on — and each one sets around twenty fields at once, all of which stay editable.', 'blogcraft' ),
-					__( 'Or paste the address of an article you admire. Blogcraft reads it and measures how it is built: length, sections, sentence and paragraph length, tables, lists, links out, how many figures it states, whether it says "I" or "you". Those measurements become your rules. Structure only — none of the wording is copied, kept, or shown to a model.', 'blogcraft' ),
-					__( 'Anything shown in monospace is measured on the finished draft, not merely requested. The panel on the right shows the actual instructions the model receives.', 'blogcraft' ),
+				'title'  => __( 'How it writes', 'blogcraft' ),
+				'lead'   => __( 'The standing brief every post is written to.', 'blogcraft' ),
+				'points' => array(
+					__( 'Start from a shape — guide, listicle, tutorial — and about twenty fields are set at once. All stay editable.', 'blogcraft' ),
+					__( 'Or paste the address of an article you admire. Its structure is measured and becomes your rules.', 'blogcraft' ),
+					__( 'Structure only. No wording is copied, kept, or shown to a model.', 'blogcraft' ),
+					__( 'Anything shown in monospace is measured on the finished draft, not merely asked for.', 'blogcraft' ),
 				),
 			),
 			'what-is-checked'   => array(
-				'title' => __( 'What is checked, and why it matters', 'blogcraft' ),
-				'body'  => array(
-					__( 'Every draft is measured before it becomes a post, and every failed check is written back into the rewrite as an instruction rather than a number. That loop is the thing this plugin does that the others do not.', 'blogcraft' ),
-					__( 'Among the checks: whether the opening answers the question in its first two sentences, whether every section that states a figure carries a link beside it, whether the draft says anything its sources do not already say, whether the subject appears in the title and in a heading, and whether the figures you supplied actually reached the page.', 'blogcraft' ),
-					__( 'A check that cannot be assessed is skipped rather than failed. The score is what was earned out of what was offered, so a question that could not be asked costs nothing.', 'blogcraft' ),
-					__( 'Two limits worth knowing. The figure check looks for a link in the same section as a number; it does not open that link and confirm the number is on the page at the other end, which is the shape most invented citations take. And the originality check compares the draft against the source excerpts it was given, so it can only see what it was shown — it is not a plagiarism service.', 'blogcraft' ),
-					__( 'Anything scoring below your threshold is held for review instead of published, whatever you chose.', 'blogcraft' ),
+				'title'  => __( 'What is checked', 'blogcraft' ),
+				'lead'   => __( 'Every draft is measured before it becomes a post, and each failure is written back into the rewrite as an instruction.', 'blogcraft' ),
+				'points' => array(
+					__( 'Does the opening answer the question in its first two sentences?', 'blogcraft' ),
+					__( 'Does every section stating a figure carry a link beside it?', 'blogcraft' ),
+					__( 'Does the draft say anything its sources do not already say?', 'blogcraft' ),
+					__( 'Is the subject in the title, a heading, the address and the first hundred words?', 'blogcraft' ),
+					__( 'Did the figures you supplied actually reach the page?', 'blogcraft' ),
+					__( 'A check that cannot be assessed is skipped, not failed. The score is what was earned out of what was offered.', 'blogcraft' ),
+					__( 'Two limits: the figure check does not open the link to confirm the number, and the originality check only sees the sources it was given. It is not a plagiarism service.', 'blogcraft' ),
+					__( 'Anything below your threshold is held for review instead of published.', 'blogcraft' ),
 				),
 			),
 			'pictures'          => array(
-				'title' => __( 'Pictures', 'blogcraft' ),
-				'body'  => array(
-					__( 'The article decides what a picture shows; the Pictures controls decide how it looks. The model that wrote the piece describes the scene, which is the difference between a useful image and clip art of the headline.', 'blogcraft' ),
-					__( 'Which service draws it is chosen under Settings. Pollinations needs no key. fal.ai and OpenAI charge per picture and are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident.', 'blogcraft' ),
-					__( 'If your writing provider is OpenAI and you also choose OpenAI for pictures, leave the image key blank and the same key does both. A key from any other company will not work, and the screen says which case you are in.', 'blogcraft' ),
-					__( 'Text is kept out of generated images by default. Image models render lettering as convincing gibberish, and a thumbnail with misspelt words on it looks worse than one with none.', 'blogcraft' ),
+				'title'  => __( 'Pictures', 'blogcraft' ),
+				'lead'   => __( 'The article decides what a picture shows. These controls decide how it looks.', 'blogcraft' ),
+				'points' => array(
+					__( 'The model that wrote the piece describes the scene — the difference between a useful image and clip art of the headline.', 'blogcraft' ),
+					__( 'Pollinations needs no key. fal.ai, OpenAI, Gemini and Grok charge per picture and run only when you pick them.', 'blogcraft' ),
+					__( 'Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both.', 'blogcraft' ),
+					__( 'Text is kept out of generated images by default. Image models render lettering as convincing gibberish.', 'blogcraft' ),
 				),
 			),
 			'automation'        => array(
-				'title' => __( 'Automation', 'blogcraft' ),
-				'body'  => array(
-					__( 'None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before.', 'blogcraft' ),
-					__( 'Automatic posts are saved as drafts unless you say otherwise. The daily cap and the monthly token cap are both there to make a mistake cheap.', 'blogcraft' ),
-					__( 'WordPress only runs scheduled work when somebody visits the site, so a quiet morning can push a post later than the hour you chose. That is WordPress, not Blogcraft.', 'blogcraft' ),
+				'title'  => __( 'Automation', 'blogcraft' ),
+				'lead'   => __( 'Not needed to write a post by hand. Switch it on once the writing already looks right to you.', 'blogcraft' ),
+				'points' => array(
+					__( 'Automatic posts are saved as drafts unless you say otherwise.', 'blogcraft' ),
+					__( 'A daily cap and a monthly token cap are both there to make a mistake cheap.', 'blogcraft' ),
+					__( 'WordPress runs scheduled work only when somebody visits, so a quiet morning can push a post past the hour you chose.', 'blogcraft' ),
 				),
 			),
 			'removal'           => array(
-				'title' => __( 'If you delete this plugin', 'blogcraft' ),
-				'body'  => array(
-					__( 'Deleting Blogcraft leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it.', 'blogcraft' ),
-					__( 'That is deliberate. WordPress asks whether you meant to delete the plugin; it has no way to ask whether you also meant to delete the rest, and dropping database tables cannot be undone. Deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean the work should be thrown away.', 'blogcraft' ),
-					__( 'There is a box on the settings screen if you do want it all gone. Ticking it is the only confirmation there will be, so it says so plainly next to it.', 'blogcraft' ),
-					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'blogcraft' ),
+				'title'  => __( 'If you delete this plugin', 'blogcraft' ),
+				'lead'   => __( 'Deleting Blogcraft leaves your settings, your writing rules and your posts exactly where they are.', 'blogcraft' ),
+				'points' => array(
+					__( 'Install it again and everything is as you left it.', 'blogcraft' ),
+					__( 'Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.', 'blogcraft' ),
+					__( 'There is a box in Settings if you do want it all gone. Ticking it is the only confirmation there will be.', 'blogcraft' ),
+					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created.', 'blogcraft' ),
 				),
 			),
 			'checking-it-works' => array(
-				'title' => __( 'Checking it works', 'blogcraft' ),
-				'body'  => array(
-					__( 'The test on the settings screen sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.', 'blogcraft' ),
-					__( 'Saving a key runs it automatically, so a mistake is caught when you make it rather than on a scheduled run nobody is watching.', 'blogcraft' ),
-					__( 'If a post fails, Activity says why. Rate limits are waited out rather than counted as failures, so a quota that resets in an hour does not burn a job.', 'blogcraft' ),
+				'title'  => __( 'Checking it works', 'blogcraft' ),
+				'lead'   => __( 'The test on the settings screen sends one short request and reports exactly what came back.', 'blogcraft' ),
+				'points' => array(
+					__( 'It costs a fraction of a penny, and it separates a wrong key from a wrong model id from a provider that is down.', 'blogcraft' ),
+					__( 'Saving a key runs it automatically, so a mistake is caught when you make it.', 'blogcraft' ),
+					__( 'If a post fails, Activity says why.', 'blogcraft' ),
+					__( 'Rate limits are waited out rather than counted as failures.', 'blogcraft' ),
 				),
 			),
 			'where-posts-go'    => array(
-				'title' => __( 'Where posts go', 'blogcraft' ),
-				'body'  => array(
-					__( 'A finished post is a normal WordPress post. It is written as real blocks, so every paragraph and heading is editable in the editor rather than arriving as one unopenable lump.', 'blogcraft' ),
-					__( 'By default it is saved as a draft, and you will find it under Posts. Anything that scored below your threshold is set to pending instead and listed under "Needs review", which only appears when something is actually waiting.', 'blogcraft' ),
-					__( 'Images are downloaded into your Media library, not hotlinked. Alt text is set from the heading each one illustrates.', 'blogcraft' ),
+				'title'  => __( 'Where posts go', 'blogcraft' ),
+				'lead'   => __( 'A finished post is a normal WordPress post.', 'blogcraft' ),
+				'points' => array(
+					__( 'Written as real blocks, so every paragraph and heading is editable in the editor.', 'blogcraft' ),
+					__( 'Saved as a draft by default. You will find it under Posts.', 'blogcraft' ),
+					__( 'Anything below your threshold is set to pending and listed under "Needs review".', 'blogcraft' ),
+					__( 'Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates.', 'blogcraft' ),
 				),
 			),
 			'privacy'           => array(
-				'title' => __( 'What leaves your site', 'blogcraft' ),
-				'body'  => array(
-					__( 'Blogcraft contacts no servers of its own, collects no analytics, and sends nothing to the plugin author.', 'blogcraft' ),
-					__( 'It contacts only the services you configure, and only when generating a post. Your topic, your style settings and any gathered research are sent to the AI provider you chose so the post can be written. The full list of services, with their terms and privacy policies, is in the readme under External Services.', 'blogcraft' ),
-					__( 'API keys are stored encrypted where the site provides a key to encrypt with, are never rendered back into the page, and are stripped from every log line and error message.', 'blogcraft' ),
+				'title'  => __( 'What leaves your site', 'blogcraft' ),
+				'lead'   => __( 'Blogcraft contacts no servers of its own and sends nothing to the plugin author.', 'blogcraft' ),
+				'points' => array(
+					__( 'No analytics, no telemetry, nothing phoning home.', 'blogcraft' ),
+					__( 'Only the services you configure, and only while a post is being written.', 'blogcraft' ),
+					__( 'Your topic, your style settings and any gathered research go to the provider you chose.', 'blogcraft' ),
+					__( 'Keys are stored encrypted, never rendered back into the page, and stripped from every log line.', 'blogcraft' ),
+					__( 'The full list of services, with their terms and privacy policies, is in the readme under External Services.', 'blogcraft' ),
 				),
 			),
 		);
@@ -283,9 +352,7 @@ class Blogcraft_Docs {
 				esc_html( $section['title'] )
 			);
 
-			foreach ( $section['body'] as $paragraph ) {
-				printf( '<p class="bc-doc-line">%s</p>', esc_html( $paragraph ) );
-			}
+			self::render_section( $section );
 
 			echo '</section>';
 		}
@@ -296,6 +363,48 @@ class Blogcraft_Docs {
 
 		echo '</div>';
 		echo '</div>';
+	}
+
+	/**
+	 * One section's contents: a line, then steps, then points.
+	 *
+	 * These used to be four to seven full paragraphs each, which read as an
+	 * essay about the plugin rather than instructions for using it. Nobody
+	 * reads a help screen from the top; they arrive with a question and scan.
+	 * So each section now leads with one sentence, then breaks into numbered
+	 * steps where there is a real order and short lines where there is not.
+	 *
+	 * @param array $section One entry from sections().
+	 * @return void
+	 */
+	private static function render_section( $section ) {
+		if ( ! empty( $section['lead'] ) ) {
+			printf( '<p class="bc-doc-lead">%s</p>', esc_html( $section['lead'] ) );
+		}
+
+		if ( ! empty( $section['steps'] ) ) {
+			echo '<ol class="bc-doc-steps">';
+
+			foreach ( $section['steps'] as $step ) {
+				printf(
+					'<li><span class="bc-doc-step-name">%1$s</span> <span class="bc-doc-step-line">%2$s</span></li>',
+					esc_html( $step[0] ),
+					esc_html( $step[1] )
+				);
+			}
+
+			echo '</ol>';
+		}
+
+		if ( ! empty( $section['points'] ) ) {
+			echo '<ul class="bc-doc-points">';
+
+			foreach ( $section['points'] as $point ) {
+				printf( '<li>%s</li>', esc_html( $point ) );
+			}
+
+			echo '</ul>';
+		}
 	}
 
 	/**

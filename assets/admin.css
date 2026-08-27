@@ -806,6 +806,91 @@ a.bc-nav-item:hover {
 	}
 }
 
+/* ------------------------------------------------------- the help copy. */
+
+/* One sentence, set slightly larger, so a section can be judged from its
+   first line and skipped without reading the rest. */
+.bc-doc-lead {
+	margin: 0 0 16px;
+	max-width: 68ch;
+	font-size: var(--bc-t-lg);
+	line-height: 1.5;
+	color: var(--bc-ink);
+}
+
+.bc-doc-steps {
+	counter-reset: bc-step;
+	margin: 0 0 16px;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-doc-steps li {
+	counter-increment: bc-step;
+	position: relative;
+	margin: 0 0 12px;
+	padding-left: 40px;
+	max-width: 68ch;
+	line-height: 1.55;
+}
+
+.bc-doc-steps li::before {
+	content: counter(bc-step);
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: var(--bc-accent-soft);
+	color: var(--bc-accent);
+	font-size: var(--bc-t-sm);
+	font-weight: 700;
+}
+
+.bc-doc-step-name {
+	font-weight: 600;
+	color: var(--bc-ink);
+}
+
+.bc-doc-step-line {
+	color: var(--bc-ink-soft);
+}
+
+/* Short lines, one idea each. The rule they replace was four to seven
+   full paragraphs a section, which nobody reads on a help screen. */
+.bc-doc-points {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-doc-points li {
+	position: relative;
+	margin: 0 0 8px;
+	padding-left: 20px;
+	max-width: 68ch;
+	line-height: 1.55;
+}
+
+.bc-doc-points li::before {
+	content: "";
+	position: absolute;
+	left: 4px;
+	top: 0.62em;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--bc-accent);
+}
+
+.bc-doc-points li:last-child,
+.bc-doc-steps li:last-child {
+	margin-bottom: 0;
+}
+
 /* ------------------------------------------------------------- overview. */
 
 .blogcraft-steps {

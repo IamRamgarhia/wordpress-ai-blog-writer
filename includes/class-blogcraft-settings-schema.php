@@ -39,8 +39,14 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// No default. Preselecting one meant a plugin whose whole point
+			// is that you bring your own key opened with somebody else's
+			// company already chosen — and a paid, card-first one at that,
+			// sitting above every route that costs nothing. An empty value
+			// is a real state the rest of the code already handles: nothing
+			// is configured until the reader says which.
 			'provider_type'                   => array(
-				'default' => 'openai',
+				'default' => '',
 				'type'    => 'string',
 				'secret'  => false,
 			),
