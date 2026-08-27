@@ -75,6 +75,24 @@ class Blogcraft_Research {
 	}
 
 	/**
+	 * Whether a real search provider is set up.
+	 *
+	 * "none" is a provider in the list, and the one selected by default, so
+	 * reading the setting back is not the same as asking whether anything
+	 * will actually be searched.
+	 *
+	 * @return bool
+	 */
+	public static function has_search_provider() {
+		$chosen = (string) Blogcraft_Settings::get( 'research_provider' );
+
+		if ( '' === $chosen || 'none' === $chosen ) {
+			return false;
+		}
+
+		return array_key_exists( $chosen, self::providers() );
+	}
+	/**
 	 * Free sources that need no key and run alongside whatever is chosen above.
 	 *
 	 * Each is a different kind of material, which is the point. Reference works

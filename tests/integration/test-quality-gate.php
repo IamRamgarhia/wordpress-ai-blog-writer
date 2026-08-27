@@ -387,4 +387,40 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 
 		$this->fail( 'the queue never settled after ' . $cap . ' turns' );
 	}
+
+	public function test_the_script_that_opens_the_panel_can_reach_the_form() {
+		// The panel shipped, rendered, and never opened. Its listener was
+		// appended to the end of compose.js, which put it inside the last
+		// immediately-invoked function in the file — and that one owns the
+		// suggest button, not the form. `form` was undefined there, so the
+		// listener threw before it could attach and pressing the button just
+		// posted, exactly as it had before the panel existed.
+		//
+		// Nothing in PHP could catch that. What is checkable is the shape: the
+		// block that opens the panel has to look the form up in its own scope.
+		$js = (string) file_get_contents( BLOGCRAFT_PATH . 'assets/compose.js' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$at = strpos( $js, 'bc-confirm' );
+
+		$this->assertNotFalse( $at, 'nothing in the script mentions the panel' );
+
+		// Walk back to the function this block lives in, then forward to the
+		// end of it, and check the form is looked up inside those bounds.
+		$opens = strrpos( substr( $js, 0, $at ), '( function () {' );
+
+		$this->assertNotFalse( $opens );
+
+		$scope = substr( $js, $opens );
+		$ends  = strpos( $scope, '}() );' );
+
+		if ( false !== $ends ) {
+			$scope = substr( $scope, 0, $ends );
+		}
+
+		$this->assertStringContainsString(
+			"getElementById( 'blogcraft-compose' )",
+			$scope,
+			'the panel script cannot see the form it is supposed to intercept'
+		);
+	}
 }

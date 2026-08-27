@@ -250,109 +250,153 @@
 				button.textContent = config.askAgain || 'What should I write about this?';
 			} );
 	} );
+}() );
 
-	/* The last look before anything is written. */
+/**
+ * The last look before anything is written.
 
+ * Its own function, not appended to the one above. Everything in this file
+ * lives inside an immediately-invoked function, and there are several — the
+ * one that owns the form is not the one that owns the suggest button. This
+ * block landed in the second, where `form` is not declared, so it threw on
+ * every page load and the panel never opened. The button did nothing that
+ * looked like a failure: the form simply posted, as it had before the panel
+ * existed.
+ */
+( function () {
+	'use strict';
+
+	var form = document.getElementById( 'blogcraft-compose' );
 	var confirm = document.getElementById( 'bc-confirm' );
 
-	if ( confirm ) {
-		var sheet = confirm.querySelector( '.bc-confirm-sheet' );
-		var back = document.getElementById( 'bc-confirm-back' );
-		var armed = false;
+	if ( ! form || ! confirm ) {
+		return;
+	}
+	var sheet = confirm.querySelector( '.bc-confirm-sheet' );
+	var back = document.getElementById( 'bc-confirm-back' );
+	var armed = false;
 
-		// Rows for a field that already has a switch on the Shape tab carry no
-		// name of their own, because two inputs answering one question would
-		// mean the form silently keeping whichever rendered last. They drive
-		// the real switch instead, and read from it on the way in so the panel
-		// never shows a stale answer.
-		var proxies = confirm.querySelectorAll( 'input[data-for]' );
+	// Rows for a field that already has a switch on the Shape tab carry no
+	// name of their own, because two inputs answering one question would
+	// mean the form silently keeping whichever rendered last. They drive
+	// the real switch instead, and read from it on the way in so the panel
+	// never shows a stale answer.
+	var proxies = confirm.querySelectorAll( 'input[data-for]' );
 
-		function realFor( box ) {
-			return document.getElementById( box.getAttribute( 'data-for' ) );
-		}
+	function realFor( box ) {
+		return document.getElementById( box.getAttribute( 'data-for' ) );
+	}
 
-		function sync() {
-			for ( var i = 0; i < proxies.length; i++ ) {
-				var real = realFor( proxies[ i ] );
+	function sync() {
+		for ( var i = 0; i < proxies.length; i++ ) {
+			var real = realFor( proxies[ i ] );
 
-				if ( real ) {
-					proxies[ i ].checked = real.checked;
-				}
+			if ( real ) {
+				proxies[ i ].checked = real.checked;
 			}
 		}
+	}
 
-		for ( var p = 0; p < proxies.length; p++ ) {
-			proxies[ p ].addEventListener( 'change', function ( event ) {
-				var real = realFor( event.target );
+	for ( var p = 0; p < proxies.length; p++ ) {
+		proxies[ p ].addEventListener( 'change', function ( event ) {
+			var real = realFor( event.target );
 
-				if ( real ) {
-					real.checked = event.target.checked;
+			if ( real ) {
+				real.checked = event.target.checked;
 
-					// The outcome panel listens on the real control, so it has to
-					// hear about a change made through the proxy.
-					real.dispatchEvent( new Event( 'change', { bubbles: true } ) );
-				}
-			} );
-		}
-
-		function open() {
-			sync();
-			confirm.hidden = false;
-
-			var first = confirm.querySelector( 'input' );
-
-			if ( first ) {
-				first.focus();
-			}
-		}
-
-		function close() {
-			confirm.hidden = true;
-		}
-
-		form.addEventListener( 'submit', function ( event ) {
-			// Armed once the panel's own button has been pressed. Without this
-			// the panel would reopen on top of itself and nothing could ever be
-			// written.
-			if ( armed ) {
-				return;
-			}
-
-			// The browser's own required-field check has to run first, or the
-			// panel opens over an empty topic and the message about it is
-			// hidden behind the panel.
-			if ( form.checkValidity && ! form.checkValidity() ) {
-				return;
-			}
-
-			event.preventDefault();
-			open();
-		} );
-
-		if ( sheet ) {
-			sheet.addEventListener( 'click', function ( event ) {
-				if ( 'submit' === event.target.type ) {
-					armed = true;
-				}
-			} );
-		}
-
-		if ( back ) {
-			back.addEventListener( 'click', close );
-		}
-
-		// Clicking the dimmed area behind the panel, and Escape, both mean
-		// "not yet" rather than "write it".
-		confirm.addEventListener( 'click', function ( event ) {
-			if ( event.target === confirm ) {
-				close();
-			}
-		} );
-
-		document.addEventListener( 'keydown', function ( event ) {
-			if ( 'Escape' === event.key && ! confirm.hidden ) {
-				close();
+				// The outcome panel listens on the real control, so it has to
+				// hear about a change made through the proxy.
+				real.dispatchEvent( new Event( 'change', { bubbles: true } ) );
 			}
 		} );
 	}
+
+	// The evidence box is on this screen, so whether it is empty is only
+	// knowable at the moment the panel opens — not when the page was built.
+	function checkEvidence() {
+		var row = document.getElementById( 'bc-gap-evidence' );
+		var box = document.getElementById( 'bc_evidence' );
+
+		if ( ! row || ! box ) {
+			return;
+		}
+
+		row.hidden = ( '' !== box.value.trim() );
+	}
+
+	var evidenceGo = document.getElementById( 'bc-gap-evidence-go' );
+
+	if ( evidenceGo ) {
+		evidenceGo.addEventListener( 'click', function () {
+			var box = document.getElementById( 'bc_evidence' );
+
+			close();
+
+			if ( box ) {
+				box.scrollIntoView( { block: 'center' } );
+				box.focus();
+			}
+		} );
+	}
+
+	function open() {
+		sync();
+		checkEvidence();
+		confirm.hidden = false;
+
+		var first = confirm.querySelector( 'input' );
+
+		if ( first ) {
+			first.focus();
+		}
+	}
+
+	function close() {
+		confirm.hidden = true;
+	}
+
+	form.addEventListener( 'submit', function ( event ) {
+		// Armed once the panel's own button has been pressed. Without this
+		// the panel would reopen on top of itself and nothing could ever be
+		// written.
+		if ( armed ) {
+			return;
+		}
+
+		// The browser's own required-field check has to run first, or the
+		// panel opens over an empty topic and the message about it is
+		// hidden behind the panel.
+		if ( form.checkValidity && ! form.checkValidity() ) {
+			return;
+		}
+
+		event.preventDefault();
+		open();
+	} );
+
+	if ( sheet ) {
+		sheet.addEventListener( 'click', function ( event ) {
+			if ( 'submit' === event.target.type ) {
+				armed = true;
+			}
+		} );
+	}
+
+	if ( back ) {
+		back.addEventListener( 'click', close );
+	}
+
+	// Clicking the dimmed area behind the panel, and Escape, both mean
+	// "not yet" rather than "write it".
+	confirm.addEventListener( 'click', function ( event ) {
+		if ( event.target === confirm ) {
+			close();
+		}
+	} );
+
+	document.addEventListener( 'keydown', function ( event ) {
+		if ( 'Escape' === event.key && ! confirm.hidden ) {
+			close();
+		}
+	} );
 }() );

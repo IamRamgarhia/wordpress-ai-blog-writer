@@ -322,6 +322,36 @@ class Blogcraft_Blueprint {
 	}
 
 	/**
+	 * Whether the writing rules have ever been changed from the shipped ones.
+	 *
+	 * Not "does the option exist": activation writes one, so its presence
+	 * proves nothing. This compares the active blueprint against the
+	 * defaults, which is the only thing that answers "has anybody actually
+	 * decided how this blog should read".
+	 *
+	 * @return bool
+	 */
+	public static function was_edited() {
+		$active   = self::get();
+		$defaults = self::defaults();
+
+		foreach ( $defaults as $key => $value ) {
+			if ( ! array_key_exists( $key, $active ) ) {
+				continue;
+			}
+
+			// Loose on purpose: these round-trip through form posts and the
+			// options table, so a 1 comes back as '1' and an int as a string.
+			// A strict comparison would report every install as edited.
+			if ( is_scalar( $value ) && is_scalar( $active[ $key ] ) && (string) $value !== (string) $active[ $key ] ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Every stored blueprint, keyed by slug.
 	 *
 	 * @return array

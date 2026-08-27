@@ -338,6 +338,101 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * The things that have never been decided, and what each costs.
+	 *
+	 * A default is what happens when nobody chose, so reading one back
+	 * cannot tell you whether anybody did — which is why this asks
+	 * was_chosen() rather than get(). Somebody who has never opened the
+	 * voice settings and somebody who deliberately left them empty look
+	 * identical to get(), and only one of them wants telling.
+	 *
+	 * Nothing here blocks anything. Every row is a link and a sentence,
+	 * and the button underneath writes the post either way. A plugin that
+	 * refuses to work until twenty fields are filled is one people
+	 * uninstall on the first attempt.
+	 *
+	 * @return void
+	 */
+	private static function render_gaps() {
+		$gaps = array();
+
+		$niche    = trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
+		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
+
+		if ( '' === $niche || '' === $audience ) {
+			$gaps[] = array(
+				'title' => __( 'Nobody has said who this blog is for', 'blogcraft' ),
+				'why'   => __( 'This is sent with every request and it is the single biggest reason two blogs using the same model do not read the same. Without it the model writes for nobody in particular, which is what generic sounds like.', 'blogcraft' ),
+				'url'   => admin_url( 'admin.php?page=blogcraft-settings#bc-card-voice' ),
+				'link'  => __( 'Describe it', 'blogcraft' ),
+			);
+		}
+
+		// Shape, tone and length all come from the blueprint. Untouched, it
+		// is a sensible general-purpose brief rather than a wrong one — so
+		// this says "never adjusted", not "broken".
+		if ( ! Blogcraft_Blueprint::was_edited() ) {
+			$gaps[] = array(
+				'title' => __( 'The writing rules have never been adjusted', 'blogcraft' ),
+				'why'   => __( 'Shape, length, tone, reading level and what counts as a finished post are all set on one screen, and it still holds the defaults. They are reasonable defaults, not right ones: a hands-on review and a definitive guide are not the same shape.', 'blogcraft' ),
+				'url'   => admin_url( 'admin.php?page=blogcraft-blueprint' ),
+				'link'  => __( 'Choose a shape', 'blogcraft' ),
+			);
+		}
+
+		// Research is the difference between writing from current sources
+		// and writing from memory, and it contacts nothing until asked.
+		$researching = false;
+
+		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $source ) {
+			if ( Blogcraft_Settings::get( $source ) ) {
+				$researching = true;
+			}
+		}
+
+		if ( ! $researching && ! Blogcraft_Research::has_search_provider() ) {
+			$gaps[] = array(
+				'title' => __( 'It has nothing to read but its own memory', 'blogcraft' ),
+				'why'   => __( 'With research on, the model is handed current sources and the finished draft is checked against them. With everything off it writes from training data, which dates badly and can cite nothing. The two free sources need no account.', 'blogcraft' ),
+				'url'   => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
+				'link'  => __( 'Switch one on', 'blogcraft' ),
+			);
+		}
+
+		// Filled in on this screen, so it is checked in the browser rather
+		// than here — but the row has to exist for the script to show it.
+		printf(
+			'<div class="bc-gap is-evidence" id="bc-gap-evidence" hidden>'
+			. '<strong>%1$s</strong><span>%2$s</span>'
+			. '<button type="button" class="button-link" id="bc-gap-evidence-go">%3$s</button>'
+			. '</div>',
+			esc_html__( 'You have not said anything only you know', 'blogcraft' ),
+			esc_html__( 'The heaviest check on the finished post, and the one part a model cannot produce. Your own numbers, prices, results, or what went wrong when you tried it. One or two sentences is enough.', 'blogcraft' ),
+			esc_html__( 'Go and add it', 'blogcraft' )
+		);
+
+		if ( empty( $gaps ) ) {
+			return;
+		}
+
+		printf(
+			'<h3 class="bc-confirm-section">%s</h3>',
+			esc_html__( 'Worth setting first', 'blogcraft' )
+		);
+
+		foreach ( $gaps as $gap ) {
+			printf(
+				'<div class="bc-gap"><strong>%1$s</strong><span>%2$s</span>'
+				. '<a href="%3$s">%4$s</a></div>',
+				esc_html( $gap['title'] ),
+				esc_html( $gap['why'] ),
+				esc_url( $gap['url'] ),
+				esc_html( $gap['link'] )
+			);
+		}
+	}
+
+	/**
 	 * The last look before anything is written.
 	 *
 	 * Shown on every write until somebody turns it off, which is the whole
@@ -363,11 +458,22 @@ class Blogcraft_Generate {
 		echo '<div class="bc-confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="bc-confirm-title">';
 
 		echo '<div class="bc-confirm-head">';
-		echo '<h2 id="bc-confirm-title">' . esc_html__( 'What this post will include', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'These change this post only. Your standing answers are already ticked.', 'blogcraft' ) . '</p>';
+		echo '<h2 id="bc-confirm-title">' . esc_html__( 'Before it writes', 'blogcraft' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Everything here is what the model is told before a word is written. It is the whole difference between a post that answers a question properly and one that reads like every other AI post — which is why it is worth thirty seconds rather than being buried in a settings tab.', 'blogcraft' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="bc-confirm-body">';
+
+		self::render_gaps();
+
+		printf(
+			'<h3 class="bc-confirm-section">%s</h3>',
+			esc_html__( 'What this post will include', 'blogcraft' )
+		);
+		printf(
+			'<p class="bc-confirm-note">%s</p>',
+			esc_html__( 'These change this post only. Your standing answers are already ticked.', 'blogcraft' )
+		);
 
 		// Five of these already have a switch on the Shape tab. Emitting a
 		// second input with the same name would put two answers to one
@@ -413,7 +519,7 @@ class Blogcraft_Generate {
 		);
 		printf(
 			'<button type="submit" class="bc-save">%s</button>',
-			esc_html__( 'Write it', 'blogcraft' )
+			esc_html__( 'Write it now', 'blogcraft' )
 		);
 		echo '</div>';
 
