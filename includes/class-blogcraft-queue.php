@@ -595,12 +595,6 @@ class Blogcraft_Queue {
 	}
 
 	/**
-	 * Put a failed job back in the queue.
-	 *
-	 * @param int $job_id Job to retry.
-	 * @return bool Whether it was requeued.
-	 */
-	/**
 	 * Send a finished draft back for another pass.
 	 *
 	 * Only a held one. A job still working is already moving, and a
@@ -639,6 +633,12 @@ class Blogcraft_Queue {
 		return true;
 	}
 
+	/**
+	 * Put a failed job back in the queue.
+	 *
+	 * @param int $job_id Job to retry.
+	 * @return bool Whether it was requeued.
+	 */
 	public static function requeue( $job_id ) {
 		global $wpdb;
 
