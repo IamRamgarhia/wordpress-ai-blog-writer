@@ -22,7 +22,15 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 	private function sources( $skip = array() ) {
 		$out = array();
 
-		foreach ( (array) glob( BLOGCRAFT_PATH . 'includes/*.php' ) as $path ) {
+		// The two files at the root count. uninstall.php reads settings of its
+		// own — whether deleting the plugin should delete what it stored — and
+		// scanning only includes/ reported that one as dead code.
+		$paths = array_merge(
+			(array) glob( BLOGCRAFT_PATH . 'includes/*.php' ),
+			array( BLOGCRAFT_PATH . 'blogcraft.php', BLOGCRAFT_PATH . 'uninstall.php' )
+		);
+
+		foreach ( $paths as $path ) {
 			$name = basename( $path );
 
 			if ( in_array( $name, $skip, true ) ) {

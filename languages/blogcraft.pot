@@ -199,7 +199,7 @@ msgstr ""
 msgid "A described voice and reader"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:157
+#: includes/class-blogcraft-docs.php:166
 msgid "A finished post is a normal WordPress post. It is written as real blocks, so every paragraph and heading is editable in the editor rather than arriving as one unopenable lump."
 msgstr ""
 
@@ -280,7 +280,7 @@ msgstr ""
 msgid "API key missing"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:167
+#: includes/class-blogcraft-docs.php:176
 msgid "API keys are stored encrypted where the site provides a key to encrypt with, are never rendered back into the page, and are stripped from every log line and error message."
 msgstr ""
 
@@ -619,7 +619,7 @@ msgstr ""
 msgid "Blogcraft can read them and fill this in from how you actually write."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:165
+#: includes/class-blogcraft-docs.php:174
 msgid "Blogcraft contacts no servers of its own, collects no analytics, and sends nothing to the plugin author."
 msgstr ""
 
@@ -694,7 +694,7 @@ msgstr ""
 msgid "Bulleted lists"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:158
+#: includes/class-blogcraft-docs.php:167
 msgid "By default it is saved as a draft, and you will find it under Posts. Anything that scored below your threshold is set to pending instead and listed under \"Needs review\", which only appears when something is actually waiting."
 msgstr ""
 
@@ -730,7 +730,7 @@ msgstr ""
 msgid "Check that links resolve before publishing"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:147
+#: includes/class-blogcraft-docs.php:156
 msgid "Checking it works"
 msgstr ""
 
@@ -921,6 +921,10 @@ msgstr ""
 
 #: includes/class-blogcraft-connection.php:769
 msgid "Delete all of it instead, when the plugin is deleted"
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:149
+msgid "Deleting Blogcraft leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:765
@@ -1132,7 +1136,7 @@ msgstr ""
 msgid "Everything on this card is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:190
+#: includes/class-blogcraft-docs.php:199
 msgid "Everything the plugin does, and why it does it that way. Shipped with the plugin, so it is never out of date with the version you have installed."
 msgstr ""
 
@@ -1359,7 +1363,7 @@ msgstr ""
 msgid "Held for review"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:189
+#: includes/class-blogcraft-docs.php:198
 #: includes/class-blogcraft-docs.php:58
 #: includes/class-blogcraft-docs.php:59
 #: includes/class-blogcraft-nav.php:39
@@ -1423,7 +1427,7 @@ msgstr ""
 msgid "How to choose a standing desk for a small home office"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:151
+#: includes/class-blogcraft-docs.php:160
 msgid "If a post fails, Activity says why. Rate limits are waited out rather than counted as failures, so a quota that resets in an hour does not burn a job."
 msgstr ""
 
@@ -1441,6 +1445,7 @@ msgstr ""
 
 #: includes/class-blogcraft-connection.php:761
 #: includes/class-blogcraft-connection.php:970
+#: includes/class-blogcraft-docs.php:147
 msgid "If you delete this plugin"
 msgstr ""
 
@@ -1476,7 +1481,7 @@ msgstr ""
 msgid "Image models render lettering as convincing gibberish, so text is excluded by default. Turn this on only with a model that handles typography."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:159
+#: includes/class-blogcraft-docs.php:168
 msgid "Images are downloaded into your Media library, not hotlinked. Alt text is set from the heading each one illustrates."
 msgstr ""
 
@@ -1517,7 +1522,7 @@ msgstr ""
 msgid "Isometric"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:166
+#: includes/class-blogcraft-docs.php:175
 msgid "It contacts only the services you configure, and only when generating a post. Your topic, your style settings and any gathered research are sent to the AI provider you chose so the post can be written. The full list of services, with their terms and privacy policies, is in the readme under External Services."
 msgstr ""
 
@@ -2755,7 +2760,7 @@ msgstr ""
 msgid "Saved. Every post from now on is written to this brief."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:150
+#: includes/class-blogcraft-docs.php:159
 msgid "Saving a key runs it automatically, so a mistake is caught when you make it rather than on a scheduled run nobody is watching."
 msgstr ""
 
@@ -2839,7 +2844,7 @@ msgstr ""
 msgid "Section briefs"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:193
+#: includes/class-blogcraft-docs.php:202
 #: includes/class-blogcraft-scorecard.php:156
 msgid "Sections"
 msgstr ""
@@ -3207,6 +3212,10 @@ msgstr ""
 msgid "That form has expired. Reload the page."
 msgstr ""
 
+#: includes/class-blogcraft-docs.php:150
+msgid "That is deliberate. WordPress asks whether you meant to delete the plugin; it has no way to ask whether you also meant to delete the rest, and dropping database tables cannot be undone. Deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean the work should be thrown away."
+msgstr ""
+
 #: includes/class-blogcraft-activity.php:445
 msgid "That job could not be queued again."
 msgstr ""
@@ -3407,7 +3416,7 @@ msgstr ""
 msgid "The takeaways and questions take up most of the word budget, leaving little for the article itself."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:149
+#: includes/class-blogcraft-docs.php:158
 msgid "The test on the settings screen sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down."
 msgstr ""
 
@@ -3453,6 +3462,10 @@ msgstr ""
 
 #: includes/class-blogcraft-calendar.php:213
 msgid "There are topics waiting, but no weekdays are selected, so none of them have a date. Choose at least one day under Settings."
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:151
+msgid "There is a box on the settings screen if you do want it all gone. Ticking it is the only confirmation there will be, so it says so plainly next to it."
 msgstr ""
 
 #: includes/class-blogcraft-welcome.php:339
@@ -3826,7 +3839,7 @@ msgstr ""
 msgid "What it shows"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:163
+#: includes/class-blogcraft-docs.php:172
 msgid "What leaves your site"
 msgstr ""
 
@@ -3921,7 +3934,7 @@ msgstr ""
 msgid "Where it came from"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:155
+#: includes/class-blogcraft-docs.php:164
 msgid "Where posts go"
 msgstr ""
 
@@ -4204,7 +4217,7 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:149
 #: includes/class-blogcraft-calendar.php:91
 #: includes/class-blogcraft-connection.php:438
-#: includes/class-blogcraft-docs.php:180
+#: includes/class-blogcraft-docs.php:189
 #: includes/class-blogcraft-generate.php:212
 #: includes/class-blogcraft-overview.php:30
 #: includes/class-blogcraft-review.php:130
@@ -4261,6 +4274,7 @@ msgid "Your own numbers, results, prices, or what happened when you tried it. Th
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:881
+#: includes/class-blogcraft-docs.php:152
 msgid "Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin."
 msgstr ""
 

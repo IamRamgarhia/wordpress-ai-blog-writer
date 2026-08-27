@@ -143,6 +143,15 @@ class Blogcraft_Docs {
 					__( 'WordPress only runs scheduled work when somebody visits the site, so a quiet morning can push a post later than the hour you chose. That is WordPress, not Blogcraft.', 'blogcraft' ),
 				),
 			),
+			'removal'           => array(
+				'title' => __( 'If you delete this plugin', 'blogcraft' ),
+				'body'  => array(
+					__( 'Deleting Blogcraft leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it.', 'blogcraft' ),
+					__( 'That is deliberate. WordPress asks whether you meant to delete the plugin; it has no way to ask whether you also meant to delete the rest, and dropping database tables cannot be undone. Deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean the work should be thrown away.', 'blogcraft' ),
+					__( 'There is a box on the settings screen if you do want it all gone. Ticking it is the only confirmation there will be, so it says so plainly next to it.', 'blogcraft' ),
+					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'blogcraft' ),
+				),
+			),
 			'checking-it-works' => array(
 				'title' => __( 'Checking it works', 'blogcraft' ),
 				'body'  => array(
