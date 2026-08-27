@@ -412,6 +412,7 @@ class Blogcraft_Connection {
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
 			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'blogcraft' ),
+			'ai_disclosure'           => __( 'Say on each post that AI helped write it', 'blogcraft' ),
 
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
@@ -739,6 +740,13 @@ class Blogcraft_Connection {
 		foreach ( self::toggle_fields() as $name => $label ) {
 			self::checkbox_row( $name, $label );
 		}
+
+		self::text_row(
+			'ai_disclosure_text',
+			__( 'Wording of that line', 'blogcraft' ),
+			'',
+			__( 'Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it.', 'blogcraft' )
+		);
 
 		printf(
 			'<tr><th scope="row"></th><td><p class="description">%s</p></td></tr>',

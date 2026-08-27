@@ -439,6 +439,34 @@ class Blogcraft_Seo {
 	}
 
 	/**
+	 * Say that a machine was involved, because Google asks for it.
+	 *
+	 * Its guidance names three things a reader should be able to find:
+	 * that automation was used, how it was used, and why that was useful
+	 * to them. Not a legal notice and not an apology — a sentence in the
+	 * byline, where somebody wondering who wrote this is already looking.
+	 *
+	 * The default wording says the part that is actually true of this
+	 * plugin: a model drafted it from named sources and a person kept or
+	 * changed it. Anybody whose process differs can write their own.
+	 *
+	 * @return string Empty when switched off.
+	 */
+	private static function disclosure_line() {
+		if ( ! Blogcraft_Settings::get( 'ai_disclosure' ) ) {
+			return '';
+		}
+
+		$own = trim( (string) Blogcraft_Settings::get( 'ai_disclosure_text' ) );
+
+		$line = ( '' === $own )
+			? __( 'This article was drafted with AI from the sources listed, then checked and edited before publication.', 'blogcraft' )
+			: $own;
+
+		return '<p class="blogcraft-author-disclosure">' . esc_html( $line ) . '</p>';
+	}
+
+	/**
 	 * Build FAQPage structured data from an article's FAQ entries.
 	 *
 	 * @param array $article Article structure.
@@ -1029,6 +1057,8 @@ class Blogcraft_Seo {
 					)
 			) . '</p>';
 		}
+
+		$box .= self::disclosure_line();
 
 		$links = self::author_profiles( $author_id );
 

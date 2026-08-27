@@ -420,11 +420,24 @@ class Blogcraft_Editorial {
 
 			if ( '' !== $keyword ) {
 				$checks[] = self::keyword_in_title( $title, $keyword );
+				$checks[] = self::keyword_early_in_title( $title, $keyword );
 			}
+		}
+
+		if ( '' !== $keyword ) {
+			$checks[] = self::keyword_in_opening( $text, $keyword );
+		}
+
+		if ( '' !== $keyword && array_key_exists( 'slug', $context ) ) {
+			$checks[] = self::keyword_in_slug( (string) $context['slug'], $keyword );
 		}
 
 		if ( array_key_exists( 'meta_description', $context ) ) {
 			$checks[] = self::meta_description( (string) $context['meta_description'], $blueprint );
+
+			if ( '' !== $keyword ) {
+				$checks[] = self::keyword_in_description( (string) $context['meta_description'], $keyword );
+			}
 		}
 
 		if ( '' !== $keyword ) {
@@ -609,6 +622,139 @@ class Blogcraft_Editorial {
 				? sprintf( 'The title is %1$d characters and will be cut off after about %2$d. Shorten it without dropping the subject.', $length, $max )
 				: 'The title is too short to say what the article is about. Give it a subject and a promise.'
 		);
+	}
+
+	/**
+	 * Whether the subject arrives early in the title.
+	 *
+	 * Present is not the same as prominent. A title that reaches its
+	 * subject in the last three words is competing on the half a reader
+	 * actually scans, and on the half that survives truncation in a
+	 * result list.
+	 *
+	 * Measured in characters rather than words because that is what gets
+	 * cut off, and generously — the first half of a sixty-character title
+	 * is a low bar that a title written to any of the usual shapes clears.
+	 *
+	 * @param string $title   Post title.
+	 * @param string $keyword Primary keyword.
+	 * @return array
+	 */
+	private static function keyword_early_in_title( $title, $keyword ) {
+		$at   = self::position_of( $title, $keyword );
+		$half = (int) max( 1, round( self::characters( $title ) / 2 ) );
+		$pass = ( $at >= 0 && $at <= $half );
+
+		return self::check(
+			'keyword_early_in_title',
+			__( 'Subject early in the title', 'blogcraft' ),
+			$pass,
+			$at < 0 ? __( 'missing', 'blogcraft' ) : sprintf( 'character %d', (int) $at ),
+			sprintf( '1–%d', $half ),
+			4,
+			$at < 0
+				? sprintf( 'The title never says "%s". Rewrite it so the subject is unmistakable at a glance.', $keyword )
+				: sprintf( 'The title does not reach "%s" until character %d. Move it nearer the front — that is the half a reader scans and the half that survives truncation.', $keyword, (int) $at )
+		);
+	}
+
+	/**
+	 * Whether the opening says what the page is about.
+	 *
+	 * Every current guide agrees on this one, and it is the same idea as
+	 * answering the question first: somebody who has just clicked a result
+	 * needs confirming, within a sentence or two, that they have landed in
+	 * the right place. A page that takes four paragraphs to arrive at its
+	 * subject is one people leave.
+	 *
+	 * @param string $text    Plain text of the article.
+	 * @param string $keyword Primary keyword.
+	 * @return array
+	 */
+	private static function keyword_in_opening( $text, $keyword ) {
+		$words   = preg_split( '/\s+/', trim( $text ), -1, PREG_SPLIT_NO_EMPTY );
+		$words   = is_array( $words ) ? $words : array();
+		$opening = implode( ' ', array_slice( $words, 0, 100 ) );
+		$pass    = self::mentions( $opening, $keyword );
+
+		return self::check(
+			'keyword_in_opening',
+			__( 'Subject in the first 100 words', 'blogcraft' ),
+			$pass,
+			$pass ? __( 'present', 'blogcraft' ) : __( 'missing', 'blogcraft' ),
+			$keyword,
+			5,
+			sprintf( 'The first hundred words never say "%s". Somebody who has just clicked a search result needs telling within a sentence or two that they are in the right place.', $keyword )
+		);
+	}
+
+	/**
+	 * Whether the address says what the page is about.
+	 *
+	 * The slug is written once, at the outline, and is the one part of a
+	 * post that is painful to change afterwards: editing it breaks every
+	 * link anybody has made to the page. So it is worth getting right
+	 * before publishing rather than noticing later.
+	 *
+	 * No repair note. The slug lives on the outline, not in the prose, and
+	 * a rewrite of the article cannot reach it.
+	 *
+	 * @param string $slug    Post slug.
+	 * @param string $keyword Primary keyword.
+	 * @return array
+	 */
+	private static function keyword_in_slug( $slug, $keyword ) {
+		$slug = trim( (string) $slug );
+		$want = sanitize_title( $keyword );
+		$pass = ( '' !== $want && false !== strpos( sanitize_title( $slug ), $want ) );
+
+		return self::check(
+			'keyword_in_slug',
+			__( 'Subject in the address', 'blogcraft' ),
+			$pass,
+			'' === $slug ? __( 'not set', 'blogcraft' ) : $slug,
+			$want,
+			3,
+			''
+		);
+	}
+
+	/**
+	 * Whether the search-result line names the subject.
+	 *
+	 * Search engines bold the words a reader searched for, so a description
+	 * carrying the subject looks like an answer to the question in a list
+	 * where most entries do not.
+	 *
+	 * @param string $description Meta description.
+	 * @param string $keyword     Primary keyword.
+	 * @return array
+	 */
+	private static function keyword_in_description( $description, $keyword ) {
+		$pass = self::mentions( $description, $keyword );
+
+		return self::check(
+			'keyword_in_description',
+			__( 'Subject in the description', 'blogcraft' ),
+			$pass,
+			$pass ? __( 'present', 'blogcraft' ) : __( 'missing', 'blogcraft' ),
+			$keyword,
+			3,
+			sprintf( 'The meta description never says "%s". Search engines bold the words somebody searched for, so a description carrying the subject reads as an answer where the others do not.', $keyword )
+		);
+	}
+
+	/**
+	 * Where a phrase first appears, in characters.
+	 *
+	 * @param string $haystack Text to search.
+	 * @param string $needle   Phrase to find.
+	 * @return int Zero-based position, or -1 when absent.
+	 */
+	private static function position_of( $haystack, $needle ) {
+		$at = stripos( $haystack, trim( $needle ) );
+
+		return ( false === $at ) ? -1 : (int) $at;
 	}
 
 	/**

@@ -386,4 +386,97 @@ class Test_Blogcraft_Editorial extends WP_UnitTestCase {
 		$this->assertLessThanOrEqual( 100, $assessment['score'] );
 		$this->assertNotEmpty( $assessment['checks'] );
 	}
+
+	// --------------------------------- what the current guides all agree on.
+
+	/**
+	 * Run the editorial checks and return them keyed by name.
+	 *
+	 * @param string $content Block markup.
+	 * @param array  $context Title, description, slug and the rest.
+	 * @return array
+	 */
+	private function checks_for( $content, $context ) {
+		$blueprint                    = Blogcraft_Blueprint::defaults();
+		$blueprint['primary_keyword'] = 'cold brew coffee';
+
+		$out = array();
+
+		foreach ( Blogcraft_Editorial::checks( $content, $blueprint, $context ) as $check ) {
+			$out[ $check['key'] ] = $check;
+		}
+
+		return $out;
+	}
+
+	public function test_the_subject_has_to_arrive_in_the_first_hundred_words() {
+		// Somebody who has just clicked a search result needs telling within a
+		// sentence or two that they are in the right place. Every current guide
+		// says so, and nothing measured it.
+		$filler = str_repeat( 'Some words about something else entirely. ', 30 );
+
+		$late = $this->checks_for( '<p>' . $filler . '</p><p>Cold brew coffee, at last.</p>', array() );
+		$this->assertFalse( $late['keyword_in_opening']['pass'] );
+
+		$early = $this->checks_for( '<p>Cold brew coffee is made without heat.</p><p>' . $filler . '</p>', array() );
+		$this->assertTrue( $early['keyword_in_opening']['pass'] );
+	}
+
+	public function test_present_in_the_title_is_not_the_same_as_early_in_it() {
+		$late = $this->checks_for(
+			'<p>Anything.</p>',
+			array( 'title' => 'A long and winding introduction to cold brew coffee' )
+		);
+
+		$this->assertTrue( $late['keyword_in_title']['pass'], 'the keyword is in the title' );
+		$this->assertFalse( $late['keyword_early_in_title']['pass'], 'but it arrives far too late in it' );
+
+		$early = $this->checks_for(
+			'<p>Anything.</p>',
+			array( 'title' => 'Cold brew coffee: a short guide' )
+		);
+
+		$this->assertTrue( $early['keyword_early_in_title']['pass'] );
+	}
+
+	public function test_the_address_is_measured_before_it_is_too_late_to_change() {
+		$wrong = $this->checks_for( '<p>Anything.</p>', array( 'slug' => 'my-latest-post' ) );
+		$this->assertFalse( $wrong['keyword_in_slug']['pass'] );
+
+		$right = $this->checks_for( '<p>Anything.</p>', array( 'slug' => 'cold-brew-coffee-guide' ) );
+		$this->assertTrue( $right['keyword_in_slug']['pass'] );
+	}
+
+	public function test_the_slug_check_asks_nothing_of_the_writer() {
+		// The slug lives on the outline, not in the prose, so a rewrite cannot
+		// reach it. A repair note here would spend an instruction on something
+		// impossible to act on.
+		$checks = $this->checks_for( '<p>Anything.</p>', array( 'slug' => 'my-latest-post' ) );
+
+		$this->assertSame( '', $checks['keyword_in_slug']['repair'] );
+	}
+
+	public function test_the_search_result_line_has_to_name_the_subject() {
+		$without = $this->checks_for( '<p>Anything.</p>', array( 'meta_description' => 'A guide to making a very nice drink at home without any heat at all.' ) );
+		$this->assertFalse( $without['keyword_in_description']['pass'] );
+
+		$with = $this->checks_for( '<p>Anything.</p>', array( 'meta_description' => 'How to make cold brew coffee at home, and what changes if you leave it longer.' ) );
+		$this->assertTrue( $with['keyword_in_description']['pass'] );
+	}
+
+	public function test_none_of_the_new_checks_run_without_a_keyword_to_check() {
+		// A site that never set a primary keyword must not be marked down on
+		// four checks it cannot possibly pass.
+		$blueprint                    = Blogcraft_Blueprint::defaults();
+		$blueprint['primary_keyword'] = '';
+
+		$keys = wp_list_pluck(
+			Blogcraft_Editorial::checks( '<p>Anything.</p>', $blueprint, array( 'title' => 'A title', 'slug' => 'a-slug' ) ),
+			'key'
+		);
+
+		foreach ( array( 'keyword_in_opening', 'keyword_early_in_title', 'keyword_in_slug', 'keyword_in_description' ) as $key ) {
+			$this->assertNotContains( $key, $keys, $key . ' runs with no keyword to look for' );
+		}
+	}
 }

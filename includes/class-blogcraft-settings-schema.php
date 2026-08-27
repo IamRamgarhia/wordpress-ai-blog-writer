@@ -254,6 +254,20 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// On, because Google asks for it in as many words: say that
+			// automation was involved, say how, and say why it was useful.
+			// A plugin that writes posts and stays quiet about it is asking
+			// its users to fail a stated guideline on its behalf.
+			'ai_disclosure'                   => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
+			'ai_disclosure_text'              => array(
+				'default' => '',
+				'type'    => 'text',
+				'secret'  => false,
+			),
 			// Off until asked for: switching it on is what tells Blogcraft it
 			// may announce your URLs to Microsoft's indexing service.
 			'indexnow_enabled'                => array(

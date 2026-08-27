@@ -223,6 +223,10 @@ class Blogcraft_Pipeline {
 		return array(
 			'title'            => isset( $outline['title'] ) ? (string) $outline['title'] : '',
 			'meta_description' => isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : '',
+			// The address is decided at the outline and is the one part of a
+			// post that is painful to change later, so it is worth measuring
+			// before publishing rather than after somebody has linked to it.
+			'slug'             => isset( $outline['slug'] ) ? (string) $outline['slug'] : '',
 			'sources'          => isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array(),
 			'evidence'         => self::evidence( $job ),
 		);
