@@ -249,11 +249,11 @@ class Blogcraft_Library {
 			return;
 		}
 
-		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th>' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'What now', 'blogcraft' ) . '</th>';
+		echo '<table class="widefat striped blogcraft-table bc-library-table"><thead><tr>';
+		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'What now', 'blogcraft' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $held as $row ) {
@@ -272,15 +272,16 @@ class Blogcraft_Library {
 
 			echo '<tr>';
 			printf( '<td><strong>%s</strong></td>', esc_html( '' === $title ? __( 'Untitled', 'blogcraft' ) : $title ) );
-			printf(
-				'<td>%s</td>',
-				esc_html( null === $score ? '—' : sprintf( '%d/100', $score ) )
-			);
+			// Not escaped again: score_pill() escapes everything it emits.
+			echo '<td>' . self::score_pill( $score ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			printf( '<td>%s</td>', esc_html( self::when( isset( $row['updated_at'] ) ? $row['updated_at'] : '' ) ) );
 
-			echo '<td>';
+			// A flex row rather than two siblings and a space. The discard
+			// control is a form, which is block-level, so the two buttons
+			// stacked one above the other in a narrow column.
+			echo '<td><div class="bc-library-actions">';
 			printf(
-				'<a class="button button-primary button-small" href="%1$s">%2$s</a> ',
+				'<a class="button button-primary button-small" href="%1$s">%2$s</a>',
 				esc_url(
 					add_query_arg(
 						array(
@@ -293,7 +294,7 @@ class Blogcraft_Library {
 				esc_html__( 'Read it', 'blogcraft' )
 			);
 			self::discard_button( (int) $row['id'] );
-			echo '</td></tr>';
+			echo '</div></td></tr>';
 		}
 
 		echo '</tbody></table></section>';
@@ -343,11 +344,11 @@ class Blogcraft_Library {
 			return;
 		}
 
-		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th>' . esc_html__( 'Post', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
+		echo '<table class="widefat striped blogcraft-table bc-library-table"><thead><tr>';
+		echo '<th scope="col">' . esc_html__( 'Post', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $posts as $post ) {
@@ -359,11 +360,14 @@ class Blogcraft_Library {
 				esc_url( (string) get_edit_post_link( $post->ID ) ),
 				esc_html( '' === $post->post_title ? __( 'Untitled', 'blogcraft' ) : $post->post_title )
 			);
-			printf( '<td>%s</td>', esc_html( self::status_label( $post->post_status ) ) );
 			printf(
-				'<td>%s</td>',
-				esc_html( '' === $score ? '—' : sprintf( '%d/100', (int) $score ) )
+				'<td><span class="blogcraft-badge is-%1$s">%2$s</span></td>',
+				esc_attr( $post->post_status ),
+				esc_html( self::status_label( $post->post_status ) )
 			);
+
+			// Not escaped again: score_pill() escapes everything it emits.
+			echo '<td>' . self::score_pill( '' === $score ? null : (int) $score ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			// post_date_gmt is only filled once a post is scheduled or
 			// published. Every draft this plugin writes has it empty, and
 			// the local date is the one that is always there.
@@ -397,6 +401,32 @@ class Blogcraft_Library {
 			default:
 				return __( 'Draft', 'blogcraft' );
 		}
+	}
+
+	/**
+	 * A score, coloured against the bar it was judged by.
+	 *
+	 * A bare "65/100" in a table column tells you a number and not whether
+	 * it is good. The threshold is the only thing that decides that, and
+	 * it is a setting, so the colour has to come from the same place the
+	 * review screen's dial comes from rather than a figure written in
+	 * here.
+	 *
+	 * @param int|null $score Score out of 100, or null when none was recorded.
+	 * @return string
+	 */
+	private static function score_pill( $score ) {
+		if ( null === $score ) {
+			return '<span class="bc-score-pill is-none">' . esc_html__( 'not scored', 'blogcraft' ) . '</span>';
+		}
+
+		$bar = (int) Blogcraft_Settings::get( 'quality_threshold' );
+
+		return sprintf(
+			'<span class="bc-score-pill %1$s">%2$d</span>',
+			esc_attr( (int) $score >= $bar ? 'is-ok' : 'is-under' ),
+			(int) $score
+		);
 	}
 
 	/**

@@ -446,6 +446,21 @@ class Blogcraft_Connection {
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft' ) . '</p>';
+
+		// Sent here mid-introduction. Without this the first step of the
+		// wizard is a one-way door: it asks somebody to set up a provider and
+		// then leaves them to find their own way back to a page they had been
+		// looking at for ten seconds.
+		$from = isset( $_GET['from'] ) ? sanitize_key( wp_unslash( $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( 'welcome' === $from ) {
+			printf(
+				'<p class="bc-back-to-setup"><a href="%1$s">%2$s</a></p>',
+				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Welcome::PAGE_SLUG ) ),
+				esc_html__( 'Back to setting up', 'blogcraft' )
+			);
+		}
+
 		echo '</div>';
 
 		self::render_status();

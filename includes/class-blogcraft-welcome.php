@@ -319,12 +319,24 @@ class Blogcraft_Welcome {
 				esc_html__( 'A provider is already set up. Nothing to do here.', 'blogcraft' )
 			);
 		} else {
+			// Marked so the settings screen can offer the way back. "Then
+			// come back here" asked somebody to remember a page they had
+			// been on for ten seconds and find it again in a sidebar of
+			// twenty items, on the one screen where giving up is likeliest.
 			printf(
 				'<p><a class="button button-primary" href="%1$s">%2$s</a></p>',
-				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-provider' ) ),
-				esc_html__( 'Open the provider settings', 'blogcraft' )
+				esc_url(
+					add_query_arg(
+						array(
+							'page' => 'blogcraft-settings',
+							'from' => 'welcome',
+						),
+						admin_url( 'admin.php' )
+					) . '#bc-card-provider'
+				),
+				esc_html__( 'Set up a provider', 'blogcraft' )
 			);
-			echo '<p class="description">' . esc_html__( 'Set it up in that tab, then come back here.', 'blogcraft' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'There is a link back to this page at the top of that screen.', 'blogcraft' ) . '</p>';
 		}
 
 		submit_button( __( 'Next', 'blogcraft' ), 'secondary', 'submit', false );

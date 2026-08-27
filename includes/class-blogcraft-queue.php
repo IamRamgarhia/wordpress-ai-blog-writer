@@ -265,6 +265,13 @@ class Blogcraft_Queue {
 				'status'     => 'complete',
 				'lock_token' => null,
 				'locked_at'  => null,
+				// A job that finished has no last problem. The column held
+				// whatever went wrong on an earlier attempt, so the Activity
+				// table showed a row marked Complete with a red error beside
+				// it — a post that worked, described as broken. The attempt
+				// count still says it took more than one go, and the event log
+				// still has the failure with its timestamp.
+				'last_error' => null,
 			)
 		);
 	}

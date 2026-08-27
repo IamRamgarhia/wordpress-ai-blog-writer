@@ -268,4 +268,31 @@ class Test_Blogcraft_Stuck extends WP_UnitTestCase {
 		$this->assertNotSame( '', $out['error'] );
 		$this->assertLessThanOrEqual( Blogcraft_Http::MAX_ATTEMPTS, $tries );
 	}
+
+	// ------------------------------------------- what the tables say.
+
+	public function test_a_job_that_finished_carries_no_last_problem() {
+		// The Activity table showed rows marked Complete with a red error
+		// beside them: a post that worked, described as broken, because the
+		// column still held whatever went wrong on an earlier attempt.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'publish', array() );
+
+		Blogcraft_Queue::fail( $job_id, 'Job reclaimed after an interrupted run.' );
+
+		$this->assertNotSame( '', (string) Blogcraft_Queue::find( $job_id )->last_error );
+
+		Blogcraft_Queue::complete( $job_id );
+
+		$this->assertSame( '', (string) Blogcraft_Queue::find( $job_id )->last_error );
+	}
+
+	public function test_how_many_tries_it_took_is_still_recorded() {
+		// Clearing the message must not erase the fact that it struggled.
+		$job_id = Blogcraft_Queue::enqueue( 'write_post', 'publish', array() );
+
+		Blogcraft_Queue::fail( $job_id, 'something went wrong' );
+		Blogcraft_Queue::complete( $job_id );
+
+		$this->assertGreaterThan( 0, (int) Blogcraft_Queue::find( $job_id )->attempts );
+	}
 }

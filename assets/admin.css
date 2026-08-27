@@ -1808,3 +1808,65 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: 13px;
 	line-height: 1.6;
 }
+
+/* ---------------------------------------------------------------------
+   Written by AI.
+   --------------------------------------------------------------------- */
+.bc-library-table td {
+	vertical-align: middle;
+}
+
+/* The discard control is a form, which is block-level, so the two
+   buttons stacked one above the other in a narrow column. */
+.bc-library-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s2);
+	align-items: center;
+}
+
+.bc-library-actions form {
+	margin: 0;
+}
+
+/* A bare "65/100" tells you a number and not whether it is good. The bar
+   it is judged against is a setting, so the colour comes from there. */
+.bc-score-pill {
+	display: inline-flex;
+	align-items: center;
+	min-width: 40px;
+	justify-content: center;
+	padding: 3px 10px;
+	border: 1px solid transparent;
+	border-radius: var(--bc-r-pill);
+	font-size: 12px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.bc-score-pill.is-ok {
+	border-color: rgba(0, 112, 23, 0.28);
+	background: rgba(0, 112, 23, 0.09);
+	color: var(--bc-ok);
+}
+
+.bc-score-pill.is-under {
+	border-color: rgba(138, 97, 22, 0.3);
+	background: var(--bc-warn-soft);
+	color: var(--bc-warn);
+}
+
+.bc-score-pill.is-none {
+	min-width: 0;
+	border-color: var(--bc-line);
+	background: var(--bc-canvas);
+	font-weight: 500;
+	color: var(--bc-muted);
+}
+
+/* The way back into the introduction, shown only when it sent you here. */
+.bc-back-to-setup {
+	margin: var(--bc-s3) 0 0;
+	font-size: 13px;
+	font-weight: 600;
+}
