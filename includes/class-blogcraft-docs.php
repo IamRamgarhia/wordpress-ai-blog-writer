@@ -33,6 +33,42 @@ class Blogcraft_Docs {
 	 */
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 24 );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
+	}
+
+	/**
+	 * Load the styling, and the script the contents rail wants.
+	 *
+	 * This screen used to load neither, which is why its table of contents
+	 * rendered as a stack of bare underlined links: the markup was there and
+	 * nothing had ever been written to style it.
+	 *
+	 * admin.js is a series of independent blocks, each returning early when
+	 * the elements it wants are absent, so the provider and model pieces do
+	 * nothing here. The one that is wanted marks the section being read.
+	 *
+	 * @param string $hook Current admin screen.
+	 * @return void
+	 */
+	public static function assets( $hook ) {
+		if ( false === strpos( (string) $hook, self::PAGE_SLUG ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.css',
+			array(),
+			BLOGCRAFT_VERSION
+		);
+
+		wp_enqueue_script(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.js',
+			array(),
+			BLOGCRAFT_VERSION,
+			true
+		);
 	}
 
 	/**
@@ -95,7 +131,9 @@ class Blogcraft_Docs {
 				'body'  => array(
 					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, with a key from your account, and every request is billed to you by them. Nothing passes through the plugin author.', 'blogcraft' ),
 					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked beside the field rather than copying an example — providers retire model names without notice, and a retired name fails with an error that does not say so.', 'blogcraft' ),
-					__( 'If you have no account anywhere, Groq and Google both have free tiers large enough to write with. Ollama and LM Studio run a model on your own machine for nothing at all, and need no key: pick one of those and leave the key blank.', 'blogcraft' ),
+					__( 'The provider list is grouped by what it costs, free first, because spending nothing is a supported way to use this plugin rather than a trial of it. Nothing is held back on a free provider — there is no paid tier here to unlock.', 'blogcraft' ),
+					__( 'The first group runs a model on this machine and contacts nobody: Ollama, LM Studio, Jan and llama.cpp. Install one, start it, pick it here and leave the key blank. The address is already filled in, and a model of around seven billion parameters is enough to write a readable post on an ordinary laptop.', 'blogcraft' ),
+					__( 'The second group wants a key but no card: Google, Groq, Mistral and Hugging Face each give away usage at no cost, and OpenRouter lists models that are free to call — on OpenRouter those are the ids ending in :free. Allowances move on the provider\'s schedule, so the link beside each choice goes to their own page rather than a figure written into a plugin.', 'blogcraft' ),
 					__( 'On WordPress 7.0 and later, if a provider plugin is installed, "WordPress AI Client" appears at the top of the list. Choosing it means no key here at all: WordPress holds the credentials and routes the request. It only appears when it can actually work.', 'blogcraft' ),
 					__( 'Leave the base URL blank unless you are pointing at a proxy or something of your own. The address shown in the empty field is what will be used.', 'blogcraft' ),
 				),
@@ -231,17 +269,12 @@ class Blogcraft_Docs {
 		);
 		echo '</div>';
 
-		echo '<nav class="bc-doc-toc" aria-label="' . esc_attr__( 'Sections', 'blogcraft' ) . '"><ul>';
-
-		foreach ( $sections as $anchor => $section ) {
-			printf(
-				'<li><a href="#%1$s">%2$s</a></li>',
-				esc_attr( $anchor ),
-				esc_html( $section['title'] )
-			);
-		}
-
-		echo '</ul></nav>';
+		// Two columns, the same component the settings screen uses. The
+		// contents were a stack of a dozen bare links sitting between the
+		// heading and the first section, pushing what somebody came to read
+		// below the fold and looking like markup nobody had got to yet.
+		echo '<div class="bc-settings-shell bc-doc-shell">';
+		echo '<div class="bc-settings-main">';
 
 		foreach ( $sections as $anchor => $section ) {
 			printf(
@@ -257,6 +290,44 @@ class Blogcraft_Docs {
 			echo '</section>';
 		}
 
+		echo '</div>';
+
+		self::render_rail( $sections );
+
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * The contents, beside the writing rather than on top of it.
+	 *
+	 * @param array $sections Anchor => section.
+	 * @return void
+	 */
+	private static function render_rail( $sections ) {
+		echo '<div class="bc-jump-col">';
+		printf(
+			'<nav class="bc-jump" aria-label="%s">',
+			esc_attr__( 'Sections on this page', 'blogcraft' )
+		);
+		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft' ) );
+
+		$number = 0;
+
+		foreach ( $sections as $anchor => $section ) {
+			++$number;
+
+			// data-target is what the scroll spy in admin.js watches for, so
+			// the rail answers "where am I" as well as "where can I go".
+			printf(
+				'<a class="bc-jump-item" href="#%1$s" data-target="%1$s"><span class="bc-jump-step">%2$02d</span><span class="bc-jump-text"><span class="bc-jump-label">%3$s</span></span></a>',
+				esc_attr( $anchor ),
+				(int) $number,
+				esc_html( $section['title'] )
+			);
+		}
+
+		echo '</nav>';
 		echo '</div>';
 	}
 }

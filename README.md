@@ -6,9 +6,9 @@
 
 [![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
-[![Version](https://img.shields.io/badge/Version-0.62.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
+[![Version](https://img.shields.io/badge/Version-0.63.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
-[![Tests](https://img.shields.io/badge/Tests-652%20passing-brightgreen.svg)](#-contributing)
+[![Tests](https://img.shields.io/badge/Tests-659%20passing-brightgreen.svg)](#-contributing)
 [![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
 [![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
 [![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/blogcraft/)
@@ -61,7 +61,16 @@ Three things decide whether the first post is any good. The plugin opens a setup
 
 **Settings → Connect a provider.** Choose who you have an account with, paste the key, save. The model list is then read from your own account, so you pick from what your key can actually use rather than typing an id from memory.
 
-No account anywhere? **Google** and **Groq** have free tiers large enough to write with. **Ollama** and **LM Studio** run a model on your own machine and need no key at all.
+The list is grouped by what it costs, free first, because spending nothing is a supported way to use this plugin rather than a trial of it.
+
+| Group | Who is in it | What you need |
+|---|---|---|
+| **Free — on your own machine** | Ollama · LM Studio · Jan · llama.cpp | Nothing. No account, no key, and nothing leaves the machine |
+| **Free tier — a key, no card** | Google Gemini · Groq · Mistral · Hugging Face · OpenRouter's `:free` models | An account and a key |
+| **Free credits, then paid** | Cerebras | An account |
+| **Paid** | OpenAI · Anthropic · xAI · DeepSeek · Moonshot · Together · Fireworks | An account with billing |
+
+Nothing is held back on a free provider. There is no paid tier here to unlock.
 
 ### 2. Say who you write for
 
@@ -83,7 +92,7 @@ Stuck? A button reads your topic and asks you four specific questions instead. I
 | **Who bills you** | Your AI provider, directly | The plugin vendor, with a markup |
 | **Where your content goes** | Your provider only | Through the vendor's servers |
 | **Locked features** | None. There is no pro tier | Usually |
-| **Runs on a local model** | Yes — Ollama, LM Studio, no key | Rarely |
+| **Runs on a local model** | Yes — Ollama, LM Studio, Jan, llama.cpp, no key | Rarely |
 | **Source** | All of it, public | Usually closed |
 | **Telemetry** | None | Varies |
 | **Scores what it wrote** | 25 checks, shown before publishing | Varies |
@@ -175,7 +184,7 @@ Failures come with an instruction the rewrite can act on. Where a failure is abo
 
 ## 🔌 Works with
 
-**Providers:** OpenAI · Anthropic · Google Gemini · xAI · Groq · DeepSeek · Moonshot · Mistral · OpenRouter · Together · Fireworks · Cerebras · Ollama · LM Studio · any OpenAI-compatible endpoint · the WordPress AI Client
+**Providers:** OpenAI · Anthropic · Google Gemini · xAI · Groq · DeepSeek · Moonshot · Mistral · OpenRouter · Together · Fireworks · Cerebras · Hugging Face · Ollama · LM Studio · Jan · llama.cpp · any OpenAI-compatible endpoint · the WordPress AI Client
 
 **SEO plugins:** Yoast SEO · Rank Math · SEOPress · All In One SEO — it fills their title and description fields automatically. With none installed it writes the description and sharing tags itself.
 
@@ -213,7 +222,13 @@ The plugin is, entirely, under GPLv2. There is no pro tier and nothing is locked
 <details>
 <summary><strong>Do I need a paid API key?</strong></summary>
 
-No. Google and Groq have free tiers. Ollama and LM Studio run a model on your own machine and need no key at all.
+No. The provider list is grouped by cost with the free routes at the top.
+
+**Nothing to pay, nothing to sign up for:** Ollama, LM Studio, Jan and llama.cpp each run a model on your own machine. Pick one, leave the key blank — the address is already filled in. A model of around seven billion parameters writes a readable post on an ordinary laptop.
+
+**A key but no card:** Google Gemini, Groq, Mistral and Hugging Face give away usage at no cost. OpenRouter lists models that are free to call — on OpenRouter those are the ids ending in `:free`.
+
+Every feature works the same on any of them. Allowances move on each provider's schedule, so the settings screen links to their own page for the current figure rather than repeating a number that would go stale.
 
 </details>
 

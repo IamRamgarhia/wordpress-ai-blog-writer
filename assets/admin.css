@@ -629,7 +629,7 @@ a.bc-nav-item:hover {
 	margin-right: 16px;
 }
 
-/* ------------------------------------------------- settings jump links. */
+/* --------------------------------------- settings and help jump links. */
 
 .bc-settings-shell {
 	display: grid;
@@ -768,6 +768,41 @@ a.bc-nav-item:hover {
 	.bc-jump-title {
 		width: 100%;
 		margin-bottom: 4px;
+	}
+}
+
+/* The help rail carries no save button and twelve entries rather than
+   six, so it gets a little more width and is allowed to scroll on its
+   own once it runs past the window. */
+.bc-doc-shell {
+	grid-template-columns: minmax(0, 1fr) 248px;
+}
+
+.bc-doc-shell .bc-jump {
+	max-height: calc(100vh - 96px);
+	overflow-y: auto;
+}
+
+.bc-doc-shell .bc-jump-item {
+	line-height: 1.35;
+}
+
+@media screen and (max-width: 1100px) {
+	.bc-doc-shell {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* Stacked, the rail is the second grid item and lands under every
+	   section it is meant to help you skip. On the settings screen that
+	   is survivable because the rail carries the save button; here it
+	   would be a table of contents printed after the book. */
+	.bc-doc-shell .bc-jump-col {
+		order: -1;
+	}
+
+	.bc-doc-shell .bc-jump {
+		max-height: none;
+		overflow-y: visible;
 	}
 }
 

@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.62.0
+Stable tag: 0.63.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,15 +81,15 @@ It contacts only the services you configure, and only when generating a post:
 
 **The WordPress AI Client** — on WordPress 7.0 and later, if a provider plugin is installed, Blogcraft can route everything through WordPress instead. No key here and no signup: the credentials live in WordPress and the request goes wherever your site already sends AI requests. It is offered in the provider list only when it is genuinely available.
 
-Blogcraft still talks to providers directly as well, and will keep doing so. It supports WordPress 6.0, where the AI Client does not exist; the AI Client needs a separate provider plugin, so a 7.0 site can have it and still have nothing behind it; and naming fourteen providers including models running on your own machine is the point of a bring-your-own-key tool.
+Blogcraft still talks to providers directly as well, and will keep doing so. It supports WordPress 6.0, where the AI Client does not exist; the AI Client needs a separate provider plugin, so a 7.0 site can have it and still have nothing behind it; and naming every provider individually, including models running on your own machine, is the point of a bring-your-own-key tool.
 
 **AI providers** — one of the following, whichever you set up. The topic, your style settings and any gathered research are sent so the post can be written.
 
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Anthropic — https://www.anthropic.com/legal/consumer-terms and https://www.anthropic.com/legal/privacy
 * Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
-* xAI (Grok), Moonshot (Kimi), DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks and Cerebras. Terms and privacy policy vary; see the one you choose.
-* Ollama or LM Studio running on your own machine, which sends nothing anywhere.
+* xAI (Grok), Moonshot (Kimi), DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks, Cerebras and Hugging Face. Terms and privacy policy vary; see the one you choose.
+* Ollama, LM Studio, Jan or llama.cpp running on your own machine, which sends nothing anywhere.
 * A custom endpoint you define yourself.
 
 **Research providers** — optional. The post topic is sent so relevant sources can be found.
@@ -131,9 +131,9 @@ Blogcraft may also fetch any URL you explicitly add to its research list, to rea
 Two places. The plugin ships its own under Blogcraft, Help, which is always accurate to the version you have installed. The longer guides and walkthroughs are at https://dicecodes.com/blogcraft/
 = Do I need to pay for anything? =
 
-The plugin is free and complete, and takes no cut of anything. You need an account with an AI provider, and every provider in the list is marked either free, "free tier", or paid, so you can see before you pick.
+The plugin is free and complete, and takes no cut of anything. The provider list is grouped by what it costs, free first, so the question is answered before you pick rather than after.
 
-Three routes cost nothing at all. Ollama and LM Studio run a model on your own computer, need no key, and send nothing anywhere. Google Gemini, Groq and Mistral each give away some usage at no cost, and OpenRouter lists a number of free models. The rest bill you directly at their own rates.
+The first group runs a model on your own computer: Ollama, LM Studio, Jan and llama.cpp. No account, no key, no bill, and nothing leaves the machine. The second needs a key but not a card: Google Gemini, Groq, Mistral and Hugging Face give away usage at no cost, and OpenRouter lists a number of models that are free to call. Everything Blogcraft does works the same on either — there is no paid tier here to unlock.
 
 Pictures work the same way: Pollinations needs no key, Pexels and Pixabay are free with a free key, and fal.ai, OpenAI, Gemini and Grok charge per image and are only ever used if you pick one of them.
 
@@ -155,13 +155,18 @@ WordPress only runs scheduled tasks when someone visits your site, so a quiet si
 
 = Can I use a local model? =
 
-Yes. Point the OpenAI-compatible provider at Ollama, LM Studio or vLLM and leave the API key blank.
+Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and llama.cpp each have an entry with the right address already filled in — pick one and leave the API key blank. Anything else that speaks the OpenAI protocol, vLLM included, works through the custom endpoint.
 
 = What happens to my API keys? =
 
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= 0.63.0 =
+* The provider list is grouped by what it costs, free routes first. Every label already said free or paid, but in a flat list of nineteen that only helped somebody who read all nineteen — and the two at the top of it both want a card before they will answer anything
+* Three more ways to spend nothing: Jan and llama.cpp join Ollama and LM Studio as models that run on your own machine with no key, and Hugging Face joins Google, Groq and Mistral as a hosted free tier. All three were reachable before through the custom endpoint, which is no use to anybody who does not already know their runtime speaks that protocol
+* The Help screen's contents moved to a rail beside the writing, and now marks the section you are reading. It was a stack of twelve bare links between the heading and the first section, because the screen loaded neither the stylesheet nor the script the rest of the plugin uses
 
 = 0.37.0 =
 * Translations are now loaded. Every string in the plugin was written to be translatable and the translation file is rebuilt on every release, but nothing ever loaded it, so all of it stayed in English no matter what language the site was in

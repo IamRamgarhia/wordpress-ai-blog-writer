@@ -496,19 +496,40 @@ class Blogcraft_Connection {
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft' ) . '</label></th><td>';
+		$groups = Blogcraft_Provider_Registry::groups();
+
 		echo '<select name="provider_type" id="blogcraft_provider_type">';
-		foreach ( Blogcraft_Provider_Registry::types() as $id => $label ) {
+
+		// Grouped, free first. The labels always said which were free; in
+		// a flat list of nineteen that only helped somebody who read all
+		// nineteen, and the two sitting at the top of it both want a card
+		// before they will answer anything.
+		foreach ( Blogcraft_Provider_Registry::grouped_types() as $class_name => $members ) {
 			printf(
-				'<option value="%s"%s>%s</option>',
-				esc_attr( $id ),
-				selected( $type, $id, false ),
-				esc_html( $label )
+				'<optgroup label="%s">',
+				esc_attr( isset( $groups[ $class_name ] ) ? $groups[ $class_name ] : $class_name )
 			);
+
+			foreach ( $members as $id => $label ) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr( $id ),
+					selected( $type, $id, false ),
+					esc_html( $label )
+				);
+			}
+
+			echo '</optgroup>';
 		}
+
 		echo '</select>';
 		printf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( '"Free tier" or "some free" means the provider itself gives away some usage at no cost, not that Blogcraft has changed anything. Limits move on their schedule, not this plugin\'s, so check the provider\'s own page below for the current number rather than trusting a figure written into a plugin.', 'blogcraft' )
+			esc_html__( 'Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock.', 'blogcraft' )
+		);
+		printf(
+			'<p class="bc-hint">%s</p>',
+			esc_html__( 'The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'blogcraft' )
 		);
 		echo '</td></tr>';
 

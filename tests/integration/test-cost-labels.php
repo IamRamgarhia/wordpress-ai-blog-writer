@@ -74,6 +74,103 @@ class Test_Blogcraft_Cost_Labels extends WP_UnitTestCase {
 		}
 	}
 
+	// -------------------------------------------------------- the grouping.
+
+	public function test_every_provider_lands_in_exactly_one_group() {
+		$grouped = Blogcraft_Provider_Registry::grouped_types();
+		$seen    = array();
+
+		foreach ( $grouped as $class_name => $members ) {
+			$this->assertArrayHasKey(
+				$class_name,
+				Blogcraft_Provider_Registry::groups(),
+				$class_name . ' is not a group the settings screen has a heading for'
+			);
+
+			foreach ( array_keys( $members ) as $id ) {
+				$this->assertNotContains( $id, $seen, $id . ' appears in two groups' );
+				$seen[] = $id;
+			}
+		}
+
+		// Nothing may be lost on the way into the groups: a provider that
+		// falls out of the grouped list is a provider that cannot be chosen,
+		// which is a worse bug than being in the wrong group.
+		$expected = array_keys( Blogcraft_Provider_Registry::types() );
+
+		sort( $expected );
+		sort( $seen );
+
+		$this->assertSame( $expected, $seen, 'the grouped list does not hold every provider' );
+	}
+
+	public function test_a_provider_with_no_cost_class_is_not_assumed_free() {
+		// Somebody else's plugin can add a provider through the filter, and
+		// it may say nothing about cost. The safe reading of silence is not
+		// "free" — that is the direction that costs the reader money.
+		$add = function ( $providers ) {
+			$providers['mystery'] = array(
+				'adapter'  => 'openai',
+				'base_url' => 'https://example.com/v1',
+				'help'     => 'Mystery',
+				'key_url'  => 'https://example.com/keys',
+				'docs_url' => 'https://example.com/models',
+			);
+
+			return $providers;
+		};
+
+		add_filter( 'blogcraft_providers', $add );
+		Blogcraft_Endpoints::reset();
+
+		$grouped = Blogcraft_Provider_Registry::grouped_types();
+		$free    = Blogcraft_Provider_Registry::is_free( 'mystery' );
+
+		remove_filter( 'blogcraft_providers', $add );
+		Blogcraft_Endpoints::reset();
+
+		$this->assertFalse( $free );
+		$this->assertArrayHasKey( 'varies', $grouped );
+		$this->assertArrayHasKey( 'mystery', $grouped['varies'] );
+	}
+
+	public function test_the_free_groups_come_before_the_paid_one() {
+		// The whole point. A reader who reads the first few entries and
+		// chooses should have seen the routes that cost nothing by then.
+		$order = array_keys( Blogcraft_Provider_Registry::groups() );
+
+		$this->assertLessThan( array_search( 'paid', $order, true ), array_search( 'local', $order, true ) );
+		$this->assertLessThan( array_search( 'paid', $order, true ), array_search( 'free_tier', $order, true ) );
+	}
+
+	public function test_the_free_routes_are_reported_free() {
+		// One assertion per promise this plugin makes in its own readme:
+		// a model on your own machine, and a hosted key with no card.
+		foreach ( array( 'ollama', 'lmstudio', 'jan', 'llamacpp', 'gemini', 'groq' ) as $id ) {
+			$this->assertTrue( Blogcraft_Provider_Registry::is_free( $id ), $id );
+		}
+
+		foreach ( array( 'openai', 'anthropic', 'custom' ) as $id ) {
+			$this->assertFalse( Blogcraft_Provider_Registry::is_free( $id ), $id );
+		}
+	}
+
+	public function test_every_local_runtime_needs_no_key() {
+		// "Free, no key" in a label has to be true of the wiring as well, or
+		// the settings screen holds the model fields back waiting for a key
+		// that is never coming.
+		foreach ( Blogcraft_Provider_Registry::catalogue() as $id => $spec ) {
+			if ( ! isset( $spec['cost'] ) || 'local' !== $spec['cost'] ) {
+				continue;
+			}
+
+			$help = Blogcraft_Provider_Registry::help( $id );
+
+			$this->assertSame( '', trim( (string) $help['key_url'] ), $id . ' asks for a key it says it does not need' );
+			$this->assertStringContainsString( 'localhost', Blogcraft_Provider_Registry::default_base_url( $id ), $id );
+		}
+	}
+
 	// ------------------------------------------------------------ pictures.
 
 	public function test_every_picture_service_says_whether_it_costs_money() {

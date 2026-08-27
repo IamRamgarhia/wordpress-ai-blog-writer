@@ -45,21 +45,24 @@ class Blogcraft_Provider_Registry {
 		// link next to each provider on the settings screen always has the
 		// current figure.
 		$labels = array(
-			'openai'     => __( 'OpenAI — GPT, paid', 'blogcraft' ),
-			'anthropic'  => __( 'Anthropic — Claude, paid', 'blogcraft' ),
-			'gemini'     => __( 'Google — Gemini, free tier', 'blogcraft' ),
-			'xai'        => __( 'xAI — Grok, paid', 'blogcraft' ),
-			'moonshot'   => __( 'Moonshot — Kimi, paid', 'blogcraft' ),
-			'deepseek'   => __( 'DeepSeek, paid', 'blogcraft' ),
-			'groq'       => __( 'Groq — fast, free tier', 'blogcraft' ),
-			'openrouter' => __( 'OpenRouter — many models, one key, some free', 'blogcraft' ),
-			'mistral'    => __( 'Mistral, free tier', 'blogcraft' ),
-			'together'   => __( 'Together AI, paid', 'blogcraft' ),
-			'fireworks'  => __( 'Fireworks AI, paid', 'blogcraft' ),
-			'cerebras'   => __( 'Cerebras, paid', 'blogcraft' ),
-			'ollama'     => __( 'Ollama — on this machine, free, no key', 'blogcraft' ),
-			'lmstudio'   => __( 'LM Studio — on this machine, free, no key', 'blogcraft' ),
-			'custom'     => __( 'Anything else — enter the address yourself', 'blogcraft' ),
+			'openai'      => __( 'OpenAI — GPT, paid', 'blogcraft' ),
+			'anthropic'   => __( 'Anthropic — Claude, paid', 'blogcraft' ),
+			'gemini'      => __( 'Google — Gemini, free tier', 'blogcraft' ),
+			'xai'         => __( 'xAI — Grok, paid', 'blogcraft' ),
+			'moonshot'    => __( 'Moonshot — Kimi, paid', 'blogcraft' ),
+			'deepseek'    => __( 'DeepSeek, paid', 'blogcraft' ),
+			'groq'        => __( 'Groq — fast, free tier', 'blogcraft' ),
+			'openrouter'  => __( 'OpenRouter — many models, one key, some of them free', 'blogcraft' ),
+			'mistral'     => __( 'Mistral, free tier', 'blogcraft' ),
+			'together'    => __( 'Together AI, paid', 'blogcraft' ),
+			'fireworks'   => __( 'Fireworks AI, paid', 'blogcraft' ),
+			'cerebras'    => __( 'Cerebras — free credits to start, then paid', 'blogcraft' ),
+			'huggingface' => __( 'Hugging Face — hundreds of open models, free tier', 'blogcraft' ),
+			'ollama'      => __( 'Ollama — on this machine, free, no key', 'blogcraft' ),
+			'lmstudio'    => __( 'LM Studio — on this machine, free, no key', 'blogcraft' ),
+			'jan'         => __( 'Jan — on this machine, free, no key', 'blogcraft' ),
+			'llamacpp'    => __( 'llama.cpp — on this machine, free, no key', 'blogcraft' ),
+			'custom'      => __( 'Anything else — enter the address yourself', 'blogcraft' ),
 		);
 
 		$out = array();
@@ -74,6 +77,7 @@ class Blogcraft_Provider_Registry {
 				// be pointed at a free local model or a paid account, and the
 				// plugin genuinely cannot tell which from here.
 				'label'    => __( 'WordPress AI Client — no key needed, free or paid depending on how WordPress is set up', 'blogcraft' ),
+				'cost'     => 'varies',
 				'adapter'  => 'wpai',
 				'base_url' => '',
 				'help'     => 'WordPress',
@@ -95,6 +99,10 @@ class Blogcraft_Provider_Registry {
 					'help'     => '',
 					'key_url'  => '',
 					'docs_url' => '',
+					// Anything added through the filter without one is grouped as
+					// "depends" rather than assumed free. Guessing wrong in that
+					// direction is the expensive way round.
+					'cost'     => 'varies',
 				),
 				$spec
 			);
@@ -116,6 +124,81 @@ class Blogcraft_Provider_Registry {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * The cost groups, in the order somebody spending nothing wants them.
+	 *
+	 * Every label already said free or paid, but in a flat list of nineteen
+	 * that only helps a reader who reads all nineteen. Most read the first
+	 * few and choose, which put OpenAI and Anthropic — both of which want a
+	 * card before they will answer anything — in front of every route that
+	 * costs nothing. Grouping changes none of what is offered. It changes
+	 * which options somebody has seen by the time they decide.
+	 *
+	 * The order is deliberate: no key at all, then a key but no card, then
+	 * credits that run out, then paid.
+	 *
+	 * @return array Cost class => translatable group heading.
+	 */
+	public static function groups() {
+		return array(
+			'local'     => __( 'Free — runs on your own machine, no key, no account', 'blogcraft' ),
+			'free_tier' => __( 'Free tier — a key, but no card', 'blogcraft' ),
+			'trial'     => __( 'Free credits to start, then paid', 'blogcraft' ),
+			'paid'      => __( 'Paid', 'blogcraft' ),
+			'varies'    => __( 'Depends on how you set it up', 'blogcraft' ),
+		);
+	}
+
+	/**
+	 * Every provider, arranged under those headings.
+	 *
+	 * A class this does not recognise goes under "depends" rather than
+	 * being dropped, so a provider added through the filter stays
+	 * selectable even when it says nothing about cost.
+	 *
+	 * @return array Cost class => array( provider id => label ).
+	 */
+	public static function grouped_types() {
+		$out = array();
+
+		foreach ( array_keys( self::groups() ) as $class_name ) {
+			$out[ $class_name ] = array();
+		}
+
+		foreach ( self::catalogue() as $id => $spec ) {
+			$cost = isset( $spec['cost'] ) ? (string) $spec['cost'] : 'varies';
+
+			if ( ! isset( $out[ $cost ] ) ) {
+				$cost = 'varies';
+			}
+
+			$out[ $cost ][ $id ] = $spec['label'];
+		}
+
+		return array_filter( $out );
+	}
+
+	/**
+	 * Whether a provider can be used without paying anybody anything.
+	 *
+	 * @param string $type Provider id.
+	 * @return bool
+	 */
+	public static function is_free( $type ) {
+		$catalogue = self::catalogue();
+		$type      = (string) $type;
+
+		if ( ! isset( $catalogue[ $type ]['cost'] ) ) {
+			return false;
+		}
+
+		return in_array(
+			(string) $catalogue[ $type ]['cost'],
+			array( 'local', 'free_tier' ),
+			true
+		);
 	}
 
 	/**

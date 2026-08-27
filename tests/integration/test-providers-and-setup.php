@@ -55,9 +55,14 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 
 	public function test_hosted_providers_say_where_to_get_a_key() {
 		foreach ( Blogcraft_Provider_Registry::catalogue() as $id => $spec ) {
-			// Local runtimes need no key, the custom endpoint is the user's
-			// own, and the AI Client holds credentials in WordPress itself.
-			if ( in_array( $id, array( 'custom', 'ollama', 'lmstudio', 'wpai' ), true ) ) {
+			// The custom endpoint is the reader's own and the AI Client holds
+			// its credentials in WordPress. Everything running on this machine
+			// needs no key either — read off the cost class rather than a list
+			// of names, so adding a local runtime does not mean editing a test
+			// that has nothing to do with it.
+			$cost = isset( $spec['cost'] ) ? (string) $spec['cost'] : '';
+
+			if ( 'local' === $cost || in_array( $id, array( 'custom', 'wpai' ), true ) ) {
 				continue;
 			}
 

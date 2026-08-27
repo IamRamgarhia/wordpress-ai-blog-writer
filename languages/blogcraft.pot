@@ -32,10 +32,6 @@ msgstr ""
 msgid "\"%s\" covers much the same ground. When two of your own pages answer one question, search engines usually pick one and it is not reliably the better one — and neither page gets the links or the attention that one page would."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:511
-msgid "\"Free tier\" or \"some free\" means the provider itself gives away some usage at no cost, not that Blogcraft has changed anything. Limits move on their schedule, not this plugin's, so check the provider's own page below for the current number rather than trusting a figure written into a plugin."
-msgstr ""
-
 #. translators: 1: outbound links. 2: figures stated. 3: images.
 #: includes/class-blogcraft-emulate.php:413
 msgid "%1$d links out, %2$d specific figures, %3$d images."
@@ -155,7 +151,7 @@ msgid "%s elapsed"
 msgstr ""
 
 #. translators: %s: the service name, such as Google AI Studio.
-#: includes/class-blogcraft-connection.php:1358
+#: includes/class-blogcraft-connection.php:1379
 msgid "%s image key"
 msgstr ""
 
@@ -187,7 +183,7 @@ msgstr ""
 msgid "3D render"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:144
+#: includes/class-blogcraft-docs.php:182
 msgid "A check that cannot be assessed is skipped rather than failed. The score is what was earned out of what was offered, so a question that could not be asked costs nothing."
 msgstr ""
 
@@ -199,7 +195,7 @@ msgstr ""
 msgid "A described voice and reader"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:186
+#: includes/class-blogcraft-docs.php:224
 msgid "A finished post is a normal WordPress post. It is written as real blocks, so every paragraph and heading is editable in the editor rather than arriving as one unopenable lump."
 msgstr ""
 
@@ -207,7 +203,7 @@ msgstr ""
 msgid "A line near the top saying who should read on, and who should not."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:773
+#: includes/class-blogcraft-connection.php:794
 msgid "A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule."
 msgstr ""
 
@@ -240,11 +236,11 @@ msgstr ""
 msgid "A provider is already set up. Nothing to do here."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:724
+#: includes/class-blogcraft-connection.php:745
 msgid "A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:126
+#: includes/class-blogcraft-docs.php:164
 msgid "A sentence works better than a keyword. \"How to choose a standing desk for a small home office\" produces a better post than \"standing desks\"."
 msgstr ""
 
@@ -272,15 +268,15 @@ msgstr ""
 msgid "A topic that says what to answer"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:521
+#: includes/class-blogcraft-connection.php:542
 msgid "API key"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1103
+#: includes/class-blogcraft-connection.php:1124
 msgid "API key missing"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:196
+#: includes/class-blogcraft-docs.php:234
 msgid "API keys are stored encrypted where the site provides a key to encrypt with, are never rendered back into the page, and are stripped from every log line and error message."
 msgstr ""
 
@@ -295,7 +291,7 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1638
+#: includes/class-blogcraft-connection.php:1659
 msgid "Add a model name before it can write anything."
 msgstr ""
 
@@ -376,7 +372,7 @@ msgstr ""
 msgid "Also put a picture under each section heading"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:687
+#: includes/class-blogcraft-connection.php:708
 msgid "Always read these URLs"
 msgstr ""
 
@@ -384,7 +380,7 @@ msgstr ""
 msgid "American"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:143
+#: includes/class-blogcraft-docs.php:181
 msgid "Among the checks: whether the opening answers the question in its first two sentences, whether every section that states a figure carries a link beside it, whether the draft says anything its sources do not already say, whether the subject appears in the title and in a heading, and whether the figures you supplied actually reached the page."
 msgstr ""
 
@@ -416,7 +412,7 @@ msgstr ""
 msgid "Angle for this post"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:753
+#: includes/class-blogcraft-connection.php:774
 msgid "Announcing a post sends its address to IndexNow, which is Microsoft's open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way."
 msgstr ""
 
@@ -461,19 +457,19 @@ msgstr ""
 msgid "Anything else"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:62
+#: includes/class-blogcraft-provider-registry.php:65
 msgid "Anything else — enter the address yourself"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:902
+#: includes/class-blogcraft-connection.php:923
 msgid "Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:146
+#: includes/class-blogcraft-docs.php:184
 msgid "Anything scoring below your threshold is held for review instead of published, whatever you chose."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:136
+#: includes/class-blogcraft-docs.php:174
 msgid "Anything shown in monospace is measured on the finished draft, not merely requested. The panel on the right shows the actual instructions the model receives."
 msgstr ""
 
@@ -497,7 +493,7 @@ msgstr ""
 msgid "Asking your provider..."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1290
+#: includes/class-blogcraft-connection.php:1311
 msgid "Asks your provider which models your key can use, and fills the box above. Nothing is bundled, so this list is never out of date."
 msgstr ""
 
@@ -517,15 +513,15 @@ msgstr ""
 msgid "Authoritative"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:925
+#: includes/class-blogcraft-connection.php:946
 msgid "Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:162
+#: includes/class-blogcraft-docs.php:200
 msgid "Automatic posts are saved as drafts unless you say otherwise. The daily cap and the monthly token cap are both there to make a mistake cheap."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:775
+#: includes/class-blogcraft-connection.php:796
 msgid "Automatic posts should be"
 msgstr ""
 
@@ -545,25 +541,25 @@ msgstr ""
 msgid "Automatic writing is on, but there are no topics queued for it."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1146
+#: includes/class-blogcraft-connection.php:1167
 msgid "Automatic writing is switched on, but no days are ticked, so nothing will ever be written. Choose at least one day."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1008
-#: includes/class-blogcraft-connection.php:737
-#: includes/class-blogcraft-docs.php:159
+#: includes/class-blogcraft-connection.php:1029
+#: includes/class-blogcraft-connection.php:758
+#: includes/class-blogcraft-docs.php:197
 msgid "Automation"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1067
+#: includes/class-blogcraft-connection.php:1088
 msgid "Automation has no days"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1068
+#: includes/class-blogcraft-connection.php:1089
 msgid "Automation off"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1065
+#: includes/class-blogcraft-connection.php:1086
 msgid "Automation on"
 msgstr ""
 
@@ -619,15 +615,15 @@ msgstr ""
 msgid "Blogcraft can read them and fill this in from how you actually write."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:194
+#: includes/class-blogcraft-docs.php:232
 msgid "Blogcraft contacts no servers of its own, collects no analytics, and sends nothing to the plugin author."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:883
+#: includes/class-blogcraft-connection.php:904
 msgid "Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:96
+#: includes/class-blogcraft-docs.php:132
 msgid "Blogcraft has no AI of its own. It talks to a provider you choose, with a key from your account, and every request is billed to you by them. Nothing passes through the plugin author."
 msgstr ""
 
@@ -676,7 +672,7 @@ msgstr ""
 msgid "British"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1345
+#: includes/class-blogcraft-connection.php:1366
 msgid "Browse text-to-image models"
 msgstr ""
 
@@ -694,7 +690,7 @@ msgstr ""
 msgid "Bulleted lists"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:187
+#: includes/class-blogcraft-docs.php:225
 msgid "By default it is saved as a draft, and you will find it under Posts. Anything that scored below your threshold is set to pending instead and listed under \"Needs review\", which only appears when something is actually waiting."
 msgstr ""
 
@@ -710,19 +706,19 @@ msgid "Category"
 msgstr ""
 
 #: includes/class-blogcraft-provider-registry.php:59
-msgid "Cerebras, paid"
+msgid "Cerebras — free credits to start, then paid"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:1379
 msgid "Change the service"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1265
+#: includes/class-blogcraft-connection.php:1286
 msgid "Cheaper model for the bulk"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1010
-#: includes/class-blogcraft-connection.php:815
+#: includes/class-blogcraft-connection.php:1031
+#: includes/class-blogcraft-connection.php:836
 msgid "Check it works"
 msgstr ""
 
@@ -730,7 +726,7 @@ msgstr ""
 msgid "Check that links resolve before publishing"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:176
+#: includes/class-blogcraft-docs.php:214
 msgid "Checking it works"
 msgstr ""
 
@@ -798,12 +794,12 @@ msgstr ""
 msgid "Concrete figures where they exist"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1005
-#: includes/class-blogcraft-connection.php:611
+#: includes/class-blogcraft-connection.php:1026
+#: includes/class-blogcraft-connection.php:632
 msgid "Connect a picture service"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1004
+#: includes/class-blogcraft-connection.php:1025
 #: includes/class-blogcraft-connection.php:495
 #: includes/class-blogcraft-overview.php:139
 #: includes/class-blogcraft-welcome.php:244
@@ -819,23 +815,23 @@ msgstr ""
 msgid "Connect a provider, and a picture service"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:94
+#: includes/class-blogcraft-docs.php:130
 msgid "Connecting a provider"
 msgstr ""
 
 #. translators: %s: error reported by the provider.
-#: includes/class-blogcraft-connection.php:1693
+#: includes/class-blogcraft-connection.php:1714
 msgid "Connection failed: %s"
 msgstr ""
 
 #. translators: %d: number of models the provider reported.
-#: includes/class-blogcraft-connection.php:1705
+#: includes/class-blogcraft-connection.php:1726
 msgid "Connection succeeded. %d model available."
 msgid_plural "Connection succeeded. %d models available."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-blogcraft-connection.php:770
+#: includes/class-blogcraft-connection.php:791
 msgid "Consider a post stale after"
 msgstr ""
 
@@ -859,7 +855,7 @@ msgstr ""
 msgid "Could not read a model list. Check the key is right, or type the model id yourself — the link beside this field goes to your provider's list."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1336
+#: includes/class-blogcraft-connection.php:1357
 msgid "Create a fal.ai key"
 msgstr ""
 
@@ -887,7 +883,7 @@ msgstr ""
 msgid "Custom endpoint request template is not valid JSON."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:602
+#: includes/class-blogcraft-connection.php:623
 msgid "Custom provider only. Use {{prompt}} and {{model}} as placeholders."
 msgstr ""
 
@@ -899,11 +895,11 @@ msgstr ""
 msgid "Days a week"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1127
+#: includes/class-blogcraft-connection.php:1148
 msgid "Days of the week to write on"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:771
+#: includes/class-blogcraft-connection.php:792
 msgid "Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned."
 msgstr ""
 
@@ -919,21 +915,25 @@ msgstr ""
 msgid "Definitive guide"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:806
+#: includes/class-blogcraft-connection.php:827
 msgid "Delete all of it instead, when the plugin is deleted"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:169
+#: includes/class-blogcraft-docs.php:207
 msgid "Deleting Blogcraft leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:802
+#: includes/class-blogcraft-connection.php:823
 msgid "Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:925
 #: includes/class-blogcraft-generate.php:1237
 msgid "Demand"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:150
+msgid "Depends on how you set it up"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:856
@@ -963,12 +963,12 @@ msgstr ""
 msgid "Describe them in words. Leave blank to let each picture suit its own subject."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1007
-#: includes/class-blogcraft-connection.php:694
+#: includes/class-blogcraft-connection.php:1028
+#: includes/class-blogcraft-connection.php:715
 msgid "Describe your voice"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:114
+#: includes/class-blogcraft-docs.php:152
 msgid "Describing your voice"
 msgstr ""
 
@@ -1016,7 +1016,7 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:788
+#: includes/class-blogcraft-connection.php:809
 msgid "Drafts are safer. Nothing goes live until you have read it."
 msgstr ""
 
@@ -1092,7 +1092,7 @@ msgstr ""
 msgid "Every 5 minutes (Blogcraft)"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:142
+#: includes/class-blogcraft-docs.php:180
 msgid "Every draft is measured before it becomes a post, and every failed check is written back into the rewrite as an instruction rather than a number. That loop is the thing this plugin does that the others do not."
 msgstr ""
 
@@ -1108,7 +1108,7 @@ msgstr ""
 msgid "Every section"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:901
+#: includes/class-blogcraft-connection.php:922
 msgid "Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one."
 msgstr ""
 
@@ -1124,7 +1124,7 @@ msgstr ""
 msgid "Everything generated so far cleared the quality bar."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:908
+#: includes/class-blogcraft-connection.php:929
 msgid "Everything here is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog."
 msgstr ""
 
@@ -1132,15 +1132,15 @@ msgstr ""
 msgid "Everything here is what the model is told before a word is written. It is the whole difference between a post that answers a question properly and one that reads like every other AI post — which is why it is worth thirty seconds rather than being buried in a settings tab."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:107
+#: includes/class-blogcraft-docs.php:145
 msgid "Everything here starts switched off, including the free sources. Blogcraft does not contact anybody you have not chosen: pasting a provider key is consent for that provider and for nothing else. Turning a source on is how you consent to it."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:116
+#: includes/class-blogcraft-docs.php:154
 msgid "Everything on this card is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:219
+#: includes/class-blogcraft-docs.php:257
 msgid "Everything the plugin does, and why it does it that way. Shipped with the plugin, so it is never out of date with the version you have installed."
 msgstr ""
 
@@ -1190,7 +1190,7 @@ msgstr ""
 msgid "Figures with a link beside them"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1676
+#: includes/class-blogcraft-connection.php:1697
 msgid "Fill in a model and an API key first, then save, then test."
 msgstr ""
 
@@ -1198,7 +1198,7 @@ msgstr ""
 msgid "Filled in on the other tabs. Nothing is saved until you press Save changes."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:699
+#: includes/class-blogcraft-connection.php:720
 msgid "Fills these in from what you have already published. Nothing is saved until you press save."
 msgstr ""
 
@@ -1267,6 +1267,18 @@ msgstr ""
 msgid "Four steps, once. After that it is a topic and a look at the draft."
 msgstr ""
 
+#: includes/class-blogcraft-provider-registry.php:148
+msgid "Free credits to start, then paid"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:147
+msgid "Free tier — a key, but no card"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:146
+msgid "Free — runs on your own machine, no key, no account"
+msgstr ""
+
 #: includes/class-blogcraft-blocks.php:89
 msgid "Frequently asked questions"
 msgstr ""
@@ -1333,11 +1345,11 @@ msgstr ""
 msgid "Guides and walkthroughs"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:228
+#: includes/class-blogcraft-docs.php:266
 msgid "Guides and walkthroughs at DiceCodes"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:977
+#: includes/class-blogcraft-connection.php:998
 msgid "Guides online"
 msgstr ""
 
@@ -1379,9 +1391,9 @@ msgstr ""
 msgid "Held for review"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:218
-#: includes/class-blogcraft-docs.php:78
-#: includes/class-blogcraft-docs.php:79
+#: includes/class-blogcraft-docs.php:114
+#: includes/class-blogcraft-docs.php:115
+#: includes/class-blogcraft-docs.php:256
 #: includes/class-blogcraft-nav.php:39
 msgid "Help"
 msgstr ""
@@ -1390,7 +1402,7 @@ msgstr ""
 msgid "High contrast"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:765
+#: includes/class-blogcraft-connection.php:786
 msgid "Hold posts scoring below"
 msgstr ""
 
@@ -1419,7 +1431,7 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:114
 #: includes/class-blogcraft-blueprint-screen.php:115
 #: includes/class-blogcraft-blueprint-screen.php:203
-#: includes/class-blogcraft-docs.php:132
+#: includes/class-blogcraft-docs.php:170
 #: includes/class-blogcraft-nav.php:33
 #: includes/class-blogcraft-overview.php:191
 #: includes/class-blogcraft-overview.php:434
@@ -1434,7 +1446,7 @@ msgstr ""
 msgid "How many takeaways"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:960
+#: includes/class-blogcraft-connection.php:981
 #: includes/class-blogcraft-overview.php:211
 msgid "How this works"
 msgstr ""
@@ -1443,7 +1455,11 @@ msgstr ""
 msgid "How to choose a standing desk for a small home office"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:180
+#: includes/class-blogcraft-provider-registry.php:60
+msgid "Hugging Face — hundreds of open models, free tier"
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:218
 msgid "If a post fails, Activity says why. Rate limits are waited out rather than counted as failures, so a quota that resets in an hour does not burn a job."
 msgstr ""
 
@@ -1451,29 +1467,25 @@ msgstr ""
 msgid "If nothing comes to mind, there is a button there that reads your topic and asks you four specific questions instead. It never answers them for you — invented facts are the one thing that would make every other check meaningless."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:117
+#: includes/class-blogcraft-docs.php:155
 msgid "If you already have posts published, press \"Learn from my posts\". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say \"I\" or \"you\" — and drafts the descriptions from your own titles. Nothing is saved until you press Save."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:909
+#: includes/class-blogcraft-connection.php:930
 msgid "If you already have posts published, use \"Learn from my posts\". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say \"I\" or \"you\" — and drafts the descriptions from your own titles. Nothing is saved until you press save."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1009
-#: includes/class-blogcraft-connection.php:798
-#: includes/class-blogcraft-docs.php:167
+#: includes/class-blogcraft-connection.php:1030
+#: includes/class-blogcraft-connection.php:819
+#: includes/class-blogcraft-docs.php:205
 msgid "If you delete this plugin"
-msgstr ""
-
-#: includes/class-blogcraft-docs.php:98
-msgid "If you have no account anywhere, Groq and Google both have free tiers large enough to write with. Ollama and LM Studio run a model on your own machine for nothing at all, and need no key: pick one of those and leave the key blank."
 msgstr ""
 
 #: includes/class-blogcraft-welcome.php:314
 msgid "If you have no account anywhere: Google and Groq both have free tiers big enough to write with, and Ollama runs a model on your own machine for nothing at all."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:154
+#: includes/class-blogcraft-docs.php:192
 msgid "If your writing provider is OpenAI and you also choose OpenAI for pictures, leave the image key blank and the same key does both. A key from any other company will not work, and the screen says which case you are in."
 msgstr ""
 
@@ -1485,7 +1497,7 @@ msgstr ""
 msgid "Image alt text"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1366
+#: includes/class-blogcraft-connection.php:1387
 msgid "Image model"
 msgstr ""
 
@@ -1497,7 +1509,7 @@ msgstr ""
 msgid "Image models render lettering as convincing gibberish, so text is excluded by default. Turn this on only with a model that handles typography."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:188
+#: includes/class-blogcraft-docs.php:226
 msgid "Images are downloaded into your Media library, not hotlinked. Alt text is set from the heading each one illustrates."
 msgstr ""
 
@@ -1505,7 +1517,7 @@ msgstr ""
 msgid "In words. Leave blank to let each picture suit its own subject."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1149
+#: includes/class-blogcraft-connection.php:1170
 msgid "In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog."
 msgstr ""
 
@@ -1538,7 +1550,7 @@ msgstr ""
 msgid "Isometric"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:195
+#: includes/class-blogcraft-docs.php:233
 msgid "It contacts only the services you configure, and only when generating a post. Your topic, your style settings and any gathered research are sent to the AI provider you chose so the post can be written. The full list of services, with their terms and privacy policies, is in the readme under External Services."
 msgstr ""
 
@@ -1552,6 +1564,10 @@ msgstr ""
 
 #: includes/class-blogcraft-progress.php:1274
 msgid "It stopped"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:63
+msgid "Jan — on this machine, free, no key"
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:152
@@ -1579,7 +1595,7 @@ msgstr ""
 msgid "Key takeaways"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1004
+#: includes/class-blogcraft-connection.php:1025
 msgid "Key, model, spending cap"
 msgstr ""
 
@@ -1587,7 +1603,7 @@ msgstr ""
 msgid "Keyword density"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:61
+#: includes/class-blogcraft-provider-registry.php:62
 msgid "LM Studio — on this machine, free, no key"
 msgstr ""
 
@@ -1600,7 +1616,7 @@ msgid "Last problem"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:194
-#: includes/class-blogcraft-connection.php:698
+#: includes/class-blogcraft-connection.php:719
 msgid "Learn from my posts"
 msgstr ""
 
@@ -1608,13 +1624,13 @@ msgstr ""
 msgid "Least often"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:748
+#: includes/class-blogcraft-connection.php:769
 msgid "Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1246
-#: includes/class-blogcraft-connection.php:541
-#: includes/class-blogcraft-connection.php:681
+#: includes/class-blogcraft-connection.php:1267
+#: includes/class-blogcraft-connection.php:562
+#: includes/class-blogcraft-connection.php:702
 msgid "Leave blank to keep the saved key."
 msgstr ""
 
@@ -1640,11 +1656,11 @@ msgstr ""
 msgid "Leave it for now"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:100
+#: includes/class-blogcraft-docs.php:138
 msgid "Leave the base URL blank unless you are pointing at a proxy or something of your own. The address shown in the empty field is what will be used."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:917
+#: includes/class-blogcraft-connection.php:938
 msgid "Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone."
 msgstr ""
 
@@ -1711,7 +1727,7 @@ msgstr ""
 msgid "Longest sentence"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:773
+#: includes/class-blogcraft-connection.php:794
 msgid "Maximum posts per day"
 msgstr ""
 
@@ -1784,16 +1800,16 @@ msgstr ""
 msgid "Model"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1099
+#: includes/class-blogcraft-connection.php:1120
 msgid "Model name missing"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:591
+#: includes/class-blogcraft-connection.php:612
 msgid "Monthly token cap"
 msgstr ""
 
 #. translators: %d: configured monthly token cap.
-#: includes/class-blogcraft-provider-registry.php:375
+#: includes/class-blogcraft-provider-registry.php:458
 msgid "Monthly token cap of %d tokens has been reached; no request was sent."
 msgstr ""
 
@@ -1818,7 +1834,7 @@ msgstr ""
 msgid "Most often"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:637
+#: includes/class-blogcraft-connection.php:658
 msgid "Most paid images per month"
 msgstr ""
 
@@ -1955,15 +1971,15 @@ msgstr ""
 msgid "No preference"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1683
+#: includes/class-blogcraft-connection.php:1704
 msgid "No provider is configured yet."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1106
+#: includes/class-blogcraft-connection.php:1127
 msgid "No provider yet"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:382
+#: includes/class-blogcraft-provider-registry.php:465
 msgid "No providers were configured."
 msgstr ""
 
@@ -1983,8 +1999,8 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:924
-#: includes/class-blogcraft-docs.php:161
+#: includes/class-blogcraft-connection.php:945
+#: includes/class-blogcraft-docs.php:199
 msgid "None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before."
 msgstr ""
 
@@ -2006,11 +2022,11 @@ msgstr ""
 msgid "Not allowed."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1245
+#: includes/class-blogcraft-connection.php:1266
 #: includes/class-blogcraft-connection.php:206
 #: includes/class-blogcraft-connection.php:208
-#: includes/class-blogcraft-connection.php:524
-#: includes/class-blogcraft-connection.php:679
+#: includes/class-blogcraft-connection.php:545
+#: includes/class-blogcraft-connection.php:700
 msgid "Not set"
 msgstr ""
 
@@ -2026,7 +2042,7 @@ msgstr ""
 msgid "Nothing has been saved. Correct anything that is wrong, then save."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:916
+#: includes/class-blogcraft-connection.php:937
 msgid "Nothing here changes how anything is written. It decides one thing: whether deleting the plugin also deletes what it has stored."
 msgstr ""
 
@@ -2070,11 +2086,11 @@ msgstr ""
 msgid "Numbered list, with a verdict"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:60
+#: includes/class-blogcraft-provider-registry.php:61
 msgid "Ollama — on this machine, free, no key"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:99
+#: includes/class-blogcraft-docs.php:137
 msgid "On WordPress 7.0 and later, if a provider plugin is installed, \"WordPress AI Client\" appears at the top of the list. Choosing it means no key here at all: WordPress holds the credentials and routes the request. It only appears when it can actually work."
 msgstr ""
 
@@ -2082,7 +2098,8 @@ msgstr ""
 msgid "On the Write screen there is a field asking what you know that nobody else does. It is the heaviest check on the finished post and the only part of a page a model genuinely cannot produce."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1015
+#: includes/class-blogcraft-connection.php:1036
+#: includes/class-blogcraft-docs.php:313
 msgid "On this page"
 msgstr ""
 
@@ -2153,7 +2170,7 @@ msgstr ""
 msgid "One per line. Product names, your brand, anything that gets mangled."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:688
+#: includes/class-blogcraft-connection.php:709
 msgid "One per line. Read for every post, whether or not a search provider is set."
 msgstr ""
 
@@ -2169,7 +2186,7 @@ msgstr ""
 msgid "One per line. Subjects to avoid even in passing. Sent to the model rather than measured, because a subject is not a single word."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1010
+#: includes/class-blogcraft-connection.php:1031
 msgid "One short live request"
 msgstr ""
 
@@ -2185,11 +2202,11 @@ msgstr ""
 msgid "One topic per line, or paste a CSV column"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:759
+#: includes/class-blogcraft-connection.php:780
 msgid "One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:638
+#: includes/class-blogcraft-connection.php:659
 msgid "Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping."
 msgstr ""
 
@@ -2217,15 +2234,15 @@ msgstr ""
 msgid "Open with a short anecdote"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1386
+#: includes/class-blogcraft-connection.php:1407
 msgid "OpenAI image guide"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1381
+#: includes/class-blogcraft-connection.php:1402
 msgid "OpenAI image key"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1382
+#: includes/class-blogcraft-connection.php:1403
 msgid "OpenAI image model"
 msgstr ""
 
@@ -2242,22 +2259,22 @@ msgid "OpenAI-compatible"
 msgstr ""
 
 #: includes/class-blogcraft-provider-registry.php:55
-msgid "OpenRouter — many models, one key, some free"
+msgid "OpenRouter — many models, one key, some of them free"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:859
+#: includes/class-blogcraft-connection.php:880
 msgid "Optional"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:652
+#: includes/class-blogcraft-connection.php:673
 msgid "Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1267
+#: includes/class-blogcraft-connection.php:1288
 msgid "Optional, and the same key and provider — only the model id differs. Most of a post's words are the section-by-section writing, which is carrying out a plan the outline already made. Naming a cheaper model here uses it for those sections, the questions and the extra blocks, while the outline, the opening, the critique and the rewrite stay on the model above, because those are the steps where judgement changes the result. Leave it blank to use one model for everything."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:737
+#: includes/class-blogcraft-connection.php:758
 msgid "Optional. Turn these on once the writing looks right to you."
 msgstr ""
 
@@ -2265,7 +2282,7 @@ msgstr ""
 msgid "Or match an article you like"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:135
+#: includes/class-blogcraft-docs.php:173
 msgid "Or paste the address of an article you admire. Blogcraft reads it and measures how it is built: length, sections, sentence and paragraph length, tables, lists, links out, how many figures it states, whether it says \"I\" or \"you\". Those measurements become your rules. Structure only — none of the wording is copied, kept, or shown to a model."
 msgstr ""
 
@@ -2273,12 +2290,16 @@ msgstr ""
 msgid "Order"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:766
+#: includes/class-blogcraft-connection.php:787
 msgid "Out of 100. Anything lower is held for review instead of published, whatever you chose above."
 msgstr ""
 
 #: includes/class-blogcraft-nav.php:30
 msgid "Overview"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:149
+msgid "Paid"
 msgstr ""
 
 #: includes/class-blogcraft-overview.php:408
@@ -2315,11 +2336,11 @@ msgstr ""
 msgid "Paste the address of an article first."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1346
+#: includes/class-blogcraft-connection.php:1367
 msgid "Paste the id exactly as the model page shows it, for example fal-ai/flux/schnell. Schnell is the cheapest and fastest. A pro FLUX model looks better and costs more. Ideogram is the one to pick if you need legible words in the picture."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:565
+#: includes/class-blogcraft-connection.php:586
 msgid "Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is."
 msgstr ""
 
@@ -2352,11 +2373,11 @@ msgstr ""
 msgid "Permission denied"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:643
+#: includes/class-blogcraft-connection.php:664
 msgid "Pexels API key"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:894
+#: includes/class-blogcraft-connection.php:915
 msgid "Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free."
 msgstr ""
 
@@ -2372,7 +2393,7 @@ msgstr ""
 msgid "Pick a model..."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1289
+#: includes/class-blogcraft-connection.php:1310
 msgid "Pick a model…"
 msgstr ""
 
@@ -2380,17 +2401,17 @@ msgstr ""
 msgid "Pick the closest, or describe your own."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:884
+#: includes/class-blogcraft-connection.php:905
 msgid "Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:137
-#: includes/class-blogcraft-docs.php:150
+#: includes/class-blogcraft-docs.php:188
 #: includes/class-blogcraft-generate.php:1000
 msgid "Pictures"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:926
+#: includes/class-blogcraft-connection.php:947
 msgid "Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback."
 msgstr ""
 
@@ -2398,11 +2419,11 @@ msgstr ""
 msgid "Pictures are switched off, so nothing here will run."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:612
+#: includes/class-blogcraft-connection.php:633
 msgid "Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:891
+#: includes/class-blogcraft-connection.php:912
 msgid "Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on."
 msgstr ""
 
@@ -2410,7 +2431,7 @@ msgstr ""
 msgid "Pictures in the body"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:644
+#: includes/class-blogcraft-connection.php:665
 msgid "Pixabay API key"
 msgstr ""
 
@@ -2455,7 +2476,7 @@ msgstr ""
 msgid "Post"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:118
+#: includes/class-blogcraft-docs.php:156
 msgid "Posts Blogcraft wrote are left out of that. Learning a voice from your own output is a loop that ends with every post sounding like the first one it generated."
 msgstr ""
 
@@ -2503,11 +2524,11 @@ msgstr ""
 msgid "Provider"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1054
+#: includes/class-blogcraft-connection.php:1075
 msgid "Provider connected"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:462
+#: includes/class-blogcraft-provider-registry.php:545
 msgid "Provider could not be reached."
 msgstr ""
 
@@ -2523,7 +2544,7 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:785
+#: includes/class-blogcraft-connection.php:806
 msgid "Published immediately"
 msgstr ""
 
@@ -2613,7 +2634,7 @@ msgstr ""
 msgid "Read that page."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:975
+#: includes/class-blogcraft-connection.php:996
 msgid "Read the full documentation"
 msgstr ""
 
@@ -2675,7 +2696,7 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1314
+#: includes/class-blogcraft-connection.php:1335
 msgid "Remove this key"
 msgstr ""
 
@@ -2683,7 +2704,7 @@ msgstr ""
 msgid "Removed."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:230
+#: includes/class-blogcraft-docs.php:268
 msgid "Report a problem"
 msgstr ""
 
@@ -2692,7 +2713,7 @@ msgstr ""
 msgid "Request failed with HTTP %d."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:597
+#: includes/class-blogcraft-connection.php:618
 msgid "Request template (JSON)"
 msgstr ""
 
@@ -2700,7 +2721,7 @@ msgstr ""
 msgid "Requests"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:859
+#: includes/class-blogcraft-connection.php:880
 msgid "Required"
 msgstr ""
 
@@ -2713,9 +2734,9 @@ msgstr ""
 msgid "Required terms"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1006
-#: includes/class-blogcraft-connection.php:651
-#: includes/class-blogcraft-docs.php:104
+#: includes/class-blogcraft-connection.php:1027
+#: includes/class-blogcraft-connection.php:672
+#: includes/class-blogcraft-docs.php:142
 msgid "Research"
 msgstr ""
 
@@ -2727,7 +2748,7 @@ msgstr ""
 msgid "Review them"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:722
+#: includes/class-blogcraft-connection.php:743
 msgid "Reviewed by"
 msgstr ""
 
@@ -2779,16 +2800,16 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1036
-#: includes/class-blogcraft-connection.php:793
+#: includes/class-blogcraft-connection.php:1057
+#: includes/class-blogcraft-connection.php:814
 msgid "Save settings"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:821
+#: includes/class-blogcraft-connection.php:842
 msgid "Save your settings first."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:780
+#: includes/class-blogcraft-connection.php:801
 msgid "Saved as drafts for review"
 msgstr ""
 
@@ -2796,11 +2817,11 @@ msgstr ""
 msgid "Saved. Every post from now on is written to this brief."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:179
+#: includes/class-blogcraft-docs.php:217
 msgid "Saving a key runs it automatically, so a mistake is caught when you make it rather than on a scheduled run nobody is watching."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:933
+#: includes/class-blogcraft-connection.php:954
 msgid "Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching."
 msgstr ""
 
@@ -2818,7 +2839,7 @@ msgstr ""
 msgid "Says something new"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1008
+#: includes/class-blogcraft-connection.php:1029
 msgid "Schedule, images, links, quality"
 msgstr ""
 
@@ -2841,7 +2862,7 @@ msgstr ""
 msgid "SearXNG (self-hosted)"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:673
+#: includes/class-blogcraft-connection.php:694
 msgid "SearXNG URL"
 msgstr ""
 
@@ -2850,7 +2871,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:675
+#: includes/class-blogcraft-connection.php:696
 msgid "Search API key"
 msgstr ""
 
@@ -2863,7 +2884,7 @@ msgstr ""
 msgid "Search is handled by %s, so each post fills in its title and description fields."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:657
+#: includes/class-blogcraft-connection.php:678
 msgid "Search provider"
 msgstr ""
 
@@ -2884,12 +2905,12 @@ msgstr ""
 msgid "Section briefs"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:234
 #: includes/class-blogcraft-scorecard.php:163
 msgid "Sections"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1014
+#: includes/class-blogcraft-connection.php:1035
+#: includes/class-blogcraft-docs.php:311
 msgid "Sections on this page"
 msgstr ""
 
@@ -2905,7 +2926,7 @@ msgstr ""
 msgid "See the full log"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1373
+#: includes/class-blogcraft-connection.php:1394
 msgid "See the image models"
 msgstr ""
 
@@ -2917,15 +2938,15 @@ msgstr ""
 msgid "See why"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:932
+#: includes/class-blogcraft-connection.php:953
 msgid "Sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:815
+#: includes/class-blogcraft-connection.php:836
 msgid "Sends one very short request and reports what the provider says back."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:694
+#: includes/class-blogcraft-connection.php:715
 msgid "Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing."
 msgstr ""
 
@@ -2972,7 +2993,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1626
+#: includes/class-blogcraft-connection.php:1647
 msgid "Settings saved."
 msgstr ""
 
@@ -2994,7 +3015,7 @@ msgstr ""
 msgid "Short paragraphs, two or three sentences each."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1288
+#: includes/class-blogcraft-connection.php:1309
 #: includes/class-blogcraft-connection.php:197
 msgid "Show the models on my account"
 msgstr ""
@@ -3079,6 +3100,10 @@ msgstr ""
 msgid "Spelling"
 msgstr ""
 
+#: includes/class-blogcraft-connection.php:528
+msgid "Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock."
+msgstr ""
+
 #: includes/class-blogcraft-art-direction.php:122
 msgid "Square"
 msgstr ""
@@ -3099,7 +3124,7 @@ msgstr ""
 msgid "Start from my own rules"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1163
+#: includes/class-blogcraft-connection.php:1184
 msgid "Starting at"
 msgstr ""
 
@@ -3150,7 +3175,7 @@ msgstr ""
 msgid "Stop job %d"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:591
+#: includes/class-blogcraft-connection.php:612
 msgid "Stops generation once this many tokens are used in a month. Zero means no limit."
 msgstr ""
 
@@ -3198,7 +3223,7 @@ msgstr ""
 msgid "Subject in the title"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1007
+#: includes/class-blogcraft-connection.php:1028
 msgid "Subject, reader, style"
 msgstr ""
 
@@ -3235,7 +3260,7 @@ msgstr ""
 msgid "Tavily"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:109
+#: includes/class-blogcraft-docs.php:147
 msgid "Tavily and SerpApi are paid and return more current results. A SearXNG instance is free if you host one. You can also list URLs to be read for every post."
 msgstr ""
 
@@ -3247,11 +3272,11 @@ msgstr ""
 msgid "Tell it how you write"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:820
+#: includes/class-blogcraft-connection.php:841
 msgid "Test connection"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:155
+#: includes/class-blogcraft-docs.php:193
 msgid "Text is kept out of generated images by default. Image models render lettering as convincing gibberish, and a thumbnail with misspelt words on it looks worse than one with none."
 msgstr ""
 
@@ -3268,7 +3293,7 @@ msgstr ""
 msgid "That form has expired. Reload the page."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:170
+#: includes/class-blogcraft-docs.php:208
 msgid "That is deliberate. WordPress asks whether you meant to delete the plugin; it has no way to ask whether you also meant to delete the rest, and dropping database tables cannot be undone. Deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean the work should be thrown away."
 msgstr ""
 
@@ -3326,11 +3351,11 @@ msgstr ""
 msgid "The angle every picture takes on its subject."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:892
+#: includes/class-blogcraft-connection.php:913
 msgid "The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under \"How it writes\" decide how it looks."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:152
+#: includes/class-blogcraft-docs.php:190
 msgid "The article decides what a picture shows; the Pictures controls decide how it looks. The model that wrote the piece describes the scene, which is the difference between a useful image and clip art of the headline."
 msgstr ""
 
@@ -3359,7 +3384,7 @@ msgstr ""
 msgid "The draft"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1180
+#: includes/class-blogcraft-connection.php:1201
 msgid "The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later."
 msgstr ""
 
@@ -3367,16 +3392,24 @@ msgstr ""
 msgid "The ending"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:910
+#: includes/class-blogcraft-connection.php:931
 msgid "The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:119
+#: includes/class-blogcraft-docs.php:157
 msgid "The experience field is the one worth spending time on. It is the only part of a post a model cannot produce."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:127
+#: includes/class-blogcraft-docs.php:165
 msgid "The field asking what you know that nobody else does is the most valuable one on the screen. Your own figures, results and prices are used as fact, never invented beyond, and the finished draft is checked to make sure they actually reached the page."
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:135
+msgid "The first group runs a model on this machine and contacts nobody: Ollama, LM Studio, Jan and llama.cpp. Install one, start it, pick it here and leave the key blank. The address is already filled in, and a model of around seven billion parameters is enough to write a readable post on an ordinary laptop."
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:532
+msgid "The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin's, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin."
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:410
@@ -3384,16 +3417,16 @@ msgid "The heaviest check on the finished post, and the one part a model cannot 
 msgstr ""
 
 #. translators: %s: reason the provider gave.
-#: includes/class-blogcraft-connection.php:1652
+#: includes/class-blogcraft-connection.php:1673
 msgid "The key did not work: %s"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1657
+#: includes/class-blogcraft-connection.php:1678
 msgid "The key works."
 msgstr ""
 
 #. translators: %s: the provider the saved key belongs to.
-#: includes/class-blogcraft-connection.php:535
+#: includes/class-blogcraft-connection.php:556
 msgid "The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place."
 msgstr ""
 
@@ -3430,11 +3463,15 @@ msgstr ""
 msgid "The picture service you chose is missing a key or a model name, so free images are being used instead."
 msgstr ""
 
+#: includes/class-blogcraft-docs.php:134
+msgid "The provider list is grouped by what it costs, free first, because spending nothing is a supported way to use this plugin rather than a trial of it. Nothing is held back on a free provider — there is no paid tier here to unlock."
+msgstr ""
+
 #: includes/class-blogcraft-blueprint-screen.php:1072
 msgid "The questions"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:717
+#: includes/class-blogcraft-connection.php:738
 msgid "The role or qualification of whoever posts are credited to, for example \"Head barista, twelve years\". Published as an expertise signal alongside the byline."
 msgstr ""
 
@@ -3444,6 +3481,10 @@ msgstr ""
 
 #: includes/class-blogcraft-calendar.php:128
 msgid "The schedule"
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:136
+msgid "The second group wants a key but no card: Google, Groq, Mistral and Hugging Face each give away usage at no cost, and OpenRouter lists models that are free to call — on OpenRouter those are the ids ending in :free. Allowances move on the provider's schedule, so the link beside each choice goes to their own page rather than a figure written into a plugin."
 msgstr ""
 
 #. translators: %d: the score, unchanged.
@@ -3464,7 +3505,7 @@ msgstr ""
 msgid "The sources it was written from"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:128
+#: includes/class-blogcraft-docs.php:166
 msgid "The tabs beneath change this post only. Pictures holds the art direction; Publishing decides the category, tags, author and when it goes live."
 msgstr ""
 
@@ -3472,7 +3513,7 @@ msgstr ""
 msgid "The takeaways and questions take up most of the word budget, leaving little for the article itself."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:178
+#: includes/class-blogcraft-docs.php:216
 msgid "The test on the settings screen sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down."
 msgstr ""
 
@@ -3488,7 +3529,7 @@ msgstr ""
 msgid "The topic could not be queued."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:125
+#: includes/class-blogcraft-docs.php:163
 msgid "The topic is the only field you have to fill in. Everything else already has an answer, taken from your standing rules under \"How it writes\"."
 msgstr ""
 
@@ -3508,7 +3549,7 @@ msgstr ""
 msgid "The written descriptions need a working AI provider, so only the measured style rules were filled in."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:731
+#: includes/class-blogcraft-connection.php:752
 msgid "Their role or qualification."
 msgstr ""
 
@@ -3520,7 +3561,7 @@ msgstr ""
 msgid "There are topics waiting, but no weekdays are selected, so none of them have a date. Choose at least one day under Settings."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:171
+#: includes/class-blogcraft-docs.php:209
 msgid "There is a box on the settings screen if you do want it all gone. Ticking it is the only confirmation there will be, so it says so plainly next to it."
 msgstr ""
 
@@ -3609,11 +3650,11 @@ msgstr ""
 msgid "This is the only thing you have to fill in. Everything below already has an answer, taken from your standing rules."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:106
+#: includes/class-blogcraft-docs.php:144
 msgid "This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off it writes from memory, which is exactly the kind of page search engines now discount."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:900
+#: includes/class-blogcraft-connection.php:921
 msgid "This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount."
 msgstr ""
 
@@ -3634,15 +3675,15 @@ msgstr ""
 msgid "This scored below your bar. Creating it anyway is fine — it lands as a draft you can edit."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:134
+#: includes/class-blogcraft-docs.php:172
 msgid "This screen is the brief every post is written to. Start from a shape — a definitive guide, a listicle, a tutorial and so on — and each one sets around twenty fields at once, all of which stay editable."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:97
+#: includes/class-blogcraft-docs.php:133
 msgid "Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked beside the field rather than copying an example — providers retire model names without notice, and a retired name fails with an error that does not say so."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:885
+#: includes/class-blogcraft-connection.php:906
 msgid "Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own."
 msgstr ""
 
@@ -3697,7 +3738,7 @@ msgstr ""
 msgid "Topic"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:758
+#: includes/class-blogcraft-connection.php:779
 msgid "Topic queue"
 msgstr ""
 
@@ -3735,7 +3776,7 @@ msgstr ""
 msgid "Turn them on"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:145
+#: includes/class-blogcraft-docs.php:183
 msgid "Two limits worth knowing. The figure check looks for a link in the same section as a number; it does not open that link and confirm the number is on the page at the other end, which is the shape most invented citations take. And the originality check compares the draft against the source excerpts it was given, so it can only see what it was shown — it is not a plagiarism service."
 msgstr ""
 
@@ -3817,11 +3858,11 @@ msgstr ""
 msgid "Voice"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1059
+#: includes/class-blogcraft-connection.php:1080
 msgid "Voice described"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1060
+#: includes/class-blogcraft-connection.php:1081
 msgid "Voice not described"
 msgstr ""
 
@@ -3862,7 +3903,7 @@ msgstr ""
 msgid "What happened"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:798
+#: includes/class-blogcraft-connection.php:819
 msgid "What happens to everything it has stored."
 msgstr ""
 
@@ -3870,11 +3911,11 @@ msgstr ""
 msgid "What happens to it"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1009
+#: includes/class-blogcraft-connection.php:1030
 msgid "What happens to your settings"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:140
+#: includes/class-blogcraft-docs.php:178
 msgid "What is checked, and why it matters"
 msgstr ""
 
@@ -3903,7 +3944,7 @@ msgstr ""
 msgid "What it shows"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:192
+#: includes/class-blogcraft-docs.php:230
 msgid "What leaves your site"
 msgstr ""
 
@@ -3920,7 +3961,7 @@ msgstr ""
 msgid "What shows under the title in search results."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:715
+#: includes/class-blogcraft-connection.php:736
 msgid "What the author does"
 msgstr ""
 
@@ -3932,7 +3973,7 @@ msgstr ""
 msgid "What the plugin has been doing, and why anything stopped."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:729
+#: includes/class-blogcraft-connection.php:750
 msgid "What the reviewer does"
 msgstr ""
 
@@ -3970,7 +4011,7 @@ msgstr ""
 msgid "What you will get"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:110
+#: includes/class-blogcraft-docs.php:148
 msgid "Whatever is found is also used to check the finished draft. If the article merely restates its sources, the score says so and the rewrite is told to fix it."
 msgstr ""
 
@@ -3990,7 +4031,7 @@ msgstr ""
 msgid "When you name no terms of your own, take them from the pages already covering the subject. Costs nothing extra: it reads the research this post already gathered."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1006
+#: includes/class-blogcraft-connection.php:1027
 msgid "Where facts come from"
 msgstr ""
 
@@ -3998,7 +4039,7 @@ msgstr ""
 msgid "Where it came from"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:184
+#: includes/class-blogcraft-docs.php:222
 msgid "Where posts go"
 msgstr ""
 
@@ -4006,29 +4047,29 @@ msgstr ""
 msgid "Where they genuinely help. Nothing here is forced into every section."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1334
+#: includes/class-blogcraft-connection.php:1355
 msgid "Where to get it"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1343
-#: includes/class-blogcraft-connection.php:1371
-#: includes/class-blogcraft-connection.php:1384
+#: includes/class-blogcraft-connection.php:1364
+#: includes/class-blogcraft-connection.php:1392
+#: includes/class-blogcraft-connection.php:1405
 msgid "Which model"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:153
+#: includes/class-blogcraft-docs.php:191
 msgid "Which service draws it is chosen under Settings. Pollinations needs no key. fal.ai and OpenAI charge per picture and are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:632
+#: includes/class-blogcraft-connection.php:653
 msgid "Whichever you pick, Blogcraft falls back through the others so a post is never left without an image."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:621
+#: includes/class-blogcraft-connection.php:642
 msgid "Who draws them"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1005
+#: includes/class-blogcraft-connection.php:1026
 msgid "Who draws them, and what it costs"
 msgstr ""
 
@@ -4078,7 +4119,7 @@ msgstr ""
 msgid "Wide, 16:9"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:108
+#: includes/class-blogcraft-docs.php:146
 msgid "Wikipedia and Hacker News need no key, so a tick is all they take. Each is a different kind of material, which is the point: a reference work gives dates and definitions, a forum gives what actually happened to people who tried the thing."
 msgstr ""
 
@@ -4098,7 +4139,7 @@ msgstr ""
 msgid "With research on, the model is handed current sources and writes from them. With everything off it writes from memory alone, which dates badly and cannot cite anything. Wikipedia and Hacker News need no key."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:811
+#: includes/class-blogcraft-connection.php:832
 msgid "With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay."
 msgstr ""
 
@@ -4118,15 +4159,15 @@ msgstr ""
 msgid "WordPress AI Client"
 msgstr ""
 
-#: includes/class-blogcraft-provider-registry.php:76
+#: includes/class-blogcraft-provider-registry.php:79
 msgid "WordPress AI Client — no key needed, free or paid depending on how WordPress is set up"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:163
+#: includes/class-blogcraft-docs.php:201
 msgid "WordPress only runs scheduled work when somebody visits the site, so a quiet morning can push a post later than the hour you chose. That is WordPress, not Blogcraft."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:746
+#: includes/class-blogcraft-connection.php:767
 msgid "Wording of that line"
 msgstr ""
 
@@ -4197,7 +4238,7 @@ msgstr ""
 msgid "Write my first post"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1123
+#: includes/class-blogcraft-connection.php:1144
 msgid "Write on"
 msgstr ""
 
@@ -4226,7 +4267,7 @@ msgstr ""
 msgid "Write, or already have, a few posts on neighbouring subjects — links between them are added automatically once they exist."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:123
+#: includes/class-blogcraft-docs.php:161
 #: includes/class-blogcraft-progress.php:482
 #: includes/class-blogcraft-progress.php:506
 #: includes/class-blogcraft-progress.php:98
@@ -4277,7 +4318,7 @@ msgstr ""
 msgid "You already have a post about this"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1375
+#: includes/class-blogcraft-connection.php:1396
 msgid "You are already writing with this provider, so leave the key blank and the same one draws the pictures. You still need to name an image model."
 msgstr ""
 
@@ -4285,7 +4326,7 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:149
 #: includes/class-blogcraft-calendar.php:91
 #: includes/class-blogcraft-connection.php:448
-#: includes/class-blogcraft-docs.php:209
+#: includes/class-blogcraft-docs.php:247
 #: includes/class-blogcraft-generate.php:212
 #: includes/class-blogcraft-overview.php:30
 #: includes/class-blogcraft-review.php:130
@@ -4305,7 +4346,7 @@ msgstr ""
 msgid "You are taken to a live progress screen while it writes, and shown the finished draft and its score before anything reaches your site."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1391
+#: includes/class-blogcraft-connection.php:1412
 msgid "You are writing with OpenAI, so leave the key above blank and the same key makes the pictures. One key, one bill. You still need to name an image model here."
 msgstr ""
 
@@ -4329,7 +4370,7 @@ msgstr ""
 msgid "Your key, your account, your bill. Nothing is sent to us."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1451
+#: includes/class-blogcraft-connection.php:1472
 msgid "Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP's sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected."
 msgstr ""
 
@@ -4341,8 +4382,8 @@ msgstr ""
 msgid "Your own numbers, results, prices, or what happened when you tried it. This is the only part of a post a model cannot produce, and it is what separates a page worth reading from a summary of pages that already exist. Everything here is used as fact and never invented beyond."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:918
-#: includes/class-blogcraft-docs.php:172
+#: includes/class-blogcraft-connection.php:939
+#: includes/class-blogcraft-docs.php:210
 msgid "Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin."
 msgstr ""
 
@@ -4363,11 +4404,11 @@ msgstr ""
 msgid "Your topic queue, against the schedule it will run on."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1376
+#: includes/class-blogcraft-connection.php:1397
 msgid "Your writing provider is a different company, so a key for this one is needed above."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1392
+#: includes/class-blogcraft-connection.php:1413
 msgid "Your writing provider is not OpenAI, so a separate OpenAI key is needed above. A key from one company will not work at another."
 msgstr ""
 
@@ -4396,11 +4437,11 @@ msgstr ""
 msgid "crowds, brand names, hands holding phones"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1332
+#: includes/class-blogcraft-connection.php:1353
 msgid "fal.ai API key"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1341
+#: includes/class-blogcraft-connection.php:1362
 msgid "fal.ai model"
 msgstr ""
 
@@ -4408,7 +4449,7 @@ msgstr ""
 msgid "fal.ai — hundreds of models, paid, per image"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:893
+#: includes/class-blogcraft-connection.php:914
 msgid "fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered."
 msgstr ""
 
@@ -4418,6 +4459,10 @@ msgstr ""
 
 #: includes/class-blogcraft-structure.php:199
 msgid "in order"
+msgstr ""
+
+#: includes/class-blogcraft-provider-registry.php:64
+msgid "llama.cpp — on this machine, free, no key"
 msgstr ""
 
 #: includes/class-blogcraft-preview.php:98
@@ -4496,7 +4541,7 @@ msgstr ""
 msgid "the introduction"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1730
+#: includes/class-blogcraft-connection.php:1751
 msgid "the provider gave no reason."
 msgstr ""
 

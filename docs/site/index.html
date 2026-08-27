@@ -190,7 +190,7 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
   "description": "A free AI blog writer for WordPress that runs on your own API key. It researches, drafts in a voice you describe, critiques its own work and scores every post before publishing.",
   "url": "https://dicecodes.com/blogcraft/",
   "downloadUrl": "https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest",
-  "softwareVersion": "0.62.0",
+  "softwareVersion": "0.63.0",
   "license": "https://www.gnu.org/licenses/gpl-2.0.html",
   "isAccessibleForFree": true,
   "author": {
@@ -263,7 +263,7 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       "name": "Do I need a paid API key?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. Google and Groq have free tiers. Ollama and LM Studio run a model on your own machine and need no key at all."
+        "text": "No. The provider list is grouped by cost with the free routes at the top. Ollama, LM Studio, Jan and llama.cpp each run a free AI model on your own machine and need no key or account at all. Google Gemini, Groq, Mistral and Hugging Face give away hosted usage for a key with no card attached, and OpenRouter lists models that are free to call. Every feature works the same on any of them."
       }
     },
     {
@@ -272,6 +272,22 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Nobody can promise that, and this plugin does not. Whether a page ranks depends on who else wants the query and what your site has earned, neither of which is visible from the words on the page. What Blogcraft does is measure the things that are checkable and tell you plainly what is working against a post."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which free AI model should I use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "If you want to spend nothing at all, run a local model: install Ollama or LM Studio, pull an instruction-tuned model of around seven or eight billion parameters, and leave the API key blank. If you would rather not run anything on your own machine, Google Gemini's free tier is the easiest hosted route and Groq's is the fastest. Blogcraft does not recommend a specific model, because the right one depends on your machine and on what the provider is offering this month — write one short post and read the scorecard, which tells you plainly whether the model can hold a structure. Swapping it is one field."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Blogcraft run entirely offline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Choose a local runtime as the provider, leave every research source switched off, and use no picture service or a local one. Nothing then leaves the machine at any point in the twelve steps — not the topic, not the draft, not your own figures."
       }
     },
     {
@@ -358,7 +374,7 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
 
 <header class="hero">
   <div class="hero-inner">
-    <span class="eyebrow"><span class="dot"></span> Documentation &middot; v0.62.0</span>
+    <span class="eyebrow"><span class="dot"></span> Documentation &middot; v0.63.0</span>
     <h1>Blogcraft: the free AI writer for WordPress</h1>
     <p class="lede">
       A free AI writer and SEO content generator for WordPress that runs on your
@@ -464,32 +480,103 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       first post.
     </p>
 
-    <h3>If you have no AI account at all</h3>
+    <h3>Free AI models: what to use if you have no AI account at all</h3>
+    <p>
+      The provider list is grouped by what it costs, free first, because
+      spending nothing is a supported way to use this plugin rather than a trial
+      of it. Nothing is held back on a free provider &mdash; there is no paid
+      tier here to unlock, and no feature that switches off.
+    </p>
+
+    <h4>Group one: free local AI models, no key, no account</h4>
+    <p>
+      These download a model once and run it on your own computer. Nothing
+      leaves the machine, there is no bill and there is no signup. Install one,
+      start it, choose it in Blogcraft and leave the API key blank &mdash; the
+      address is already filled in for you.
+    </p>
     <div class="grid">
       <div class="card">
-        <h4>Google Gemini <span class="pill pill-ok">free tier</span></h4>
-        <p>A free tier large enough to write with. Sign up, create a key, paste
-        it in.</p>
-      </div>
-      <div class="card">
-        <h4>Groq <span class="pill pill-ok">free tier</span></h4>
-        <p>Also free to start, and notably fast.</p>
-      </div>
-      <div class="card">
         <h4>Ollama <span class="pill pill-ok">no key</span></h4>
-        <p>Runs a model on your own machine. No account, no key, no bill at all.</p>
+        <p>The simplest one to start with. One command downloads a model and it
+        runs as a service in the background.</p>
       </div>
       <div class="card">
         <h4>LM Studio <span class="pill pill-ok">no key</span></h4>
-        <p>The same idea with a desktop app in front of it.</p>
+        <p>The same idea with a desktop app in front of it: browse models, click
+        to download, switch the local server on.</p>
+      </div>
+      <div class="card">
+        <h4>Jan <span class="pill pill-ok">no key</span></h4>
+        <p>Open source, offline by default, with a chat window of its own so you
+        can try a model before pointing a blog at it.</p>
+      </div>
+      <div class="card">
+        <h4>llama.cpp <span class="pill pill-ok">no key</span></h4>
+        <p>The engine underneath most of the others. Run
+        <code>llama-server</code> yourself when you want the control.</p>
       </div>
     </div>
+    <p class="note">
+      <strong>Which local model?</strong> Blogcraft does not bundle or recommend
+      one, because the answer depends on the machine. As a rule of thumb, an
+      instruction-tuned model of around seven or eight billion parameters writes
+      a readable post on an ordinary laptop; larger ones write better and need
+      more memory. Write one short post first and read the scorecard &mdash; it
+      will tell you plainly whether the model you picked can hold a structure,
+      and swapping it is one field.
+    </p>
+
+    <h4>Group two: free tiers &mdash; a key, but no card</h4>
+    <p>
+      These are hosted, so they are faster than a laptop and need no local
+      setup. Each gives away some usage at no cost. You create an account and a
+      key; none of them asks for a card to get started.
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h4>Google Gemini <span class="pill pill-ok">free tier</span></h4>
+        <p>A free tier large enough to write with, and the easiest hosted route
+        for a first post. Sign up, create a key, paste it in.</p>
+      </div>
+      <div class="card">
+        <h4>Groq <span class="pill pill-ok">free tier</span></h4>
+        <p>Also free to start, and notably fast &mdash; a twelve-step post
+        finishes in a fraction of the usual time.</p>
+      </div>
+      <div class="card">
+        <h4>Mistral <span class="pill pill-ok">free tier</span></h4>
+        <p>Open-weight models with a free tier, from the company that publishes
+        them.</p>
+      </div>
+      <div class="card">
+        <h4>Hugging Face <span class="pill pill-ok">free tier</span></h4>
+        <p>One token, hundreds of open models, and a free monthly allowance
+        across all of them.</p>
+      </div>
+      <div class="card">
+        <h4>OpenRouter <span class="pill pill-ok">free models</span></h4>
+        <p>One key for many providers, including a set of models that are free
+        to call &mdash; those are the ids ending in <code>:free</code>.</p>
+      </div>
+      <div class="card">
+        <h4>Cerebras <span class="pill pill-warn">free credits</span></h4>
+        <p>Free credits to start with rather than an ongoing allowance, then
+        paid.</p>
+      </div>
+    </div>
+    <p class="note">
+      Free allowances move on each provider's schedule, not this plugin's. The
+      settings screen links to every provider's own pricing page rather than
+      repeating a number here that would be wrong by the time you read it.
+    </p>
 
     <h3>Everything it works with</h3>
     <p>
       OpenAI, Anthropic, Google Gemini, xAI, Groq, DeepSeek, Moonshot, Mistral,
-      OpenRouter, Together, Fireworks, Cerebras, Ollama, LM Studio, any
-      OpenAI-compatible endpoint, and the WordPress AI Client.
+      OpenRouter, Together, Fireworks, Cerebras, Hugging Face, Ollama, LM Studio,
+      Jan, llama.cpp, any OpenAI-compatible endpoint, and the WordPress AI
+      Client.
     </p>
 
     <h3>A cheaper model for the bulk of the work</h3>
@@ -789,7 +876,7 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       <tr><td><strong>Price of a word</strong></td><td>The model's own rate</td><td>The model's rate plus a margin</td><td>Bundled, so unclear</td></tr>
       <tr><td><strong>Where your drafts go</strong></td><td>Your provider only</td><td>Through the vendor</td><td>Through the vendor</td></tr>
       <tr><td><strong>If you stop paying</strong></td><td>Nothing changes. There is nothing to stop paying</td><td>Writing stops</td><td>Writing stops</td></tr>
-      <tr><td><strong>Runs on a local model</strong></td><td>Yes &mdash; Ollama or LM Studio, no key</td><td>No</td><td>No</td></tr>
+      <tr><td><strong>Runs on a local model</strong></td><td>Yes &mdash; Ollama, LM Studio, Jan or llama.cpp, no key</td><td>No</td><td>No</td></tr>
       <tr><td><strong>Source you can read</strong></td><td>All of it</td><td>Usually not</td><td>Usually not</td></tr>
     </table>
     </div>
@@ -1086,8 +1173,12 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
 
     <details>
       <summary>Do I need a paid API key?</summary>
-      <p>No. Google and Groq have free tiers. Ollama and LM Studio run a model on
-      your own machine and need no key at all.</p>
+      <p>No. The provider list is grouped by cost with the free routes at the
+      top. Ollama, LM Studio, Jan and llama.cpp each run a free AI model on your
+      own machine and need no key or account at all. Google Gemini, Groq,
+      Mistral and Hugging Face give away hosted usage for a key with no card
+      attached, and OpenRouter lists models that are free to call. Every feature
+      works the same on any of them.</p>
     </details>
 
     <details>
@@ -1097,6 +1188,27 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       of which is visible from the words on the page. What Blogcraft does is
       measure the things that are checkable and tell you plainly what is working
       against a post.</p>
+    </details>
+
+    <details>
+      <summary>Which free AI model should I use?</summary>
+      <p>If you want to spend nothing at all, run a local model: install Ollama
+      or LM Studio, pull an instruction-tuned model of around seven or eight
+      billion parameters, and leave the API key blank. If you would rather not
+      run anything on your own machine, Google Gemini's free tier is the easiest
+      hosted route and Groq's is the fastest. Blogcraft does not recommend a
+      specific model, because the right one depends on your machine and on what
+      the provider is offering this month &mdash; write one short post and read
+      the scorecard, which tells you plainly whether the model can hold a
+      structure. Swapping it is one field.</p>
+    </details>
+
+    <details>
+      <summary>Can Blogcraft run entirely offline?</summary>
+      <p>Yes. Choose a local runtime as the provider, leave every research
+      source switched off, and use no picture service or a local one. Nothing
+      then leaves the machine at any point in the twelve steps &mdash; not the
+      topic, not the draft, not your own figures.</p>
     </details>
 
     <details>
