@@ -1881,3 +1881,23 @@ body[class*="page_blogcraft"] #wpcontent {
 	padding: 0;
 	font-size: 12.5px;
 }
+
+/* If you delete this plugin. Deliberately not styled as a warning until
+   the box is ticked: the default is the safe one, and colouring it red
+   would suggest something is wrong when nothing is. */
+.bc-removal-lead {
+	max-width: 68ch;
+	font-size: 13px;
+	line-height: 1.65;
+}
+
+.bc-removal-warn {
+	max-width: 68ch;
+	margin: var(--bc-s2) 0 0;
+	padding: var(--bc-s3);
+	border-left: 3px solid var(--bc-bad);
+	background: var(--bc-surface-soft);
+	font-size: 12.5px;
+	line-height: 1.65;
+	color: var(--bc-ink);
+}

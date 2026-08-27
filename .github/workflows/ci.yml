@@ -46,8 +46,22 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
       - run: composer install --prefer-dist --no-progress
-      - name: Lint for syntax errors
-        run: find . -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
+      # php -l exits 0 on a deprecation — it only fails on parse errors, so
+      # this matrix was proving the code parses on 8.4 and 8.5 and nothing
+      # more. Anything PHP has to say about a file is now a failure, which is
+      # what makes the two newest columns worth running.
+      - name: Lint for syntax errors and deprecations
+        run: |
+          set -eu
+          found=0
+          while IFS= read -r -d '' file; do
+            out=$(php -d error_reporting=E_ALL -d display_errors=1 -l "$file" 2>&1) || { echo "$out"; found=1; continue; }
+            if [ "$out" != "No syntax errors detected in $file" ]; then
+              echo "$out"
+              found=1
+            fi
+          done < <(find . -path ./vendor -prune -o -name '*.php' -print0)
+          exit "$found"
 
   # Actually runs the PHPUnit suite against a real WordPress install via
   # wp-env, on a single PHP configuration (matching .wp-env.json). Not run

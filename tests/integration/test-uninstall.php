@@ -77,4 +77,52 @@ class Test_Blogcraft_Uninstall extends WP_UnitTestCase {
 		$this->assertFalse( get_option( Blogcraft_Welcome::DONE_OPTION, false ) );
 		$this->assertFalse( get_option( Blogcraft_Welcome::PENDING_OPTION, false ) );
 	}
+
+	// ------------------------------------ whether any of that runs at all.
+
+	public function test_deleting_the_plugin_keeps_the_data_by_default() {
+		// Deleting a plugin to reinstall it, to move hosts, or to clear a
+		// half-finished upload is an ordinary thing to do, and none of those
+		// mean "throw away every setting and drop the tables". WordPress asks
+		// whether you meant to delete the plugin and has no way to ask about
+		// the rest, so the answer has to be given in advance — and the safe
+		// one has to be the default, because dropping tables has no undo.
+		Blogcraft_Activator::activate();
+
+		require_once dirname( dirname( __DIR__ ) ) . '/uninstall.php';
+
+		$this->assertFalse( blogcraft_should_purge() );
+	}
+
+	public function test_it_purges_only_when_that_was_asked_for() {
+		Blogcraft_Activator::activate();
+		Blogcraft_Settings::set( 'purge_on_delete', true );
+
+		require_once dirname( dirname( __DIR__ ) ) . '/uninstall.php';
+
+		$this->assertTrue( blogcraft_should_purge() );
+	}
+
+	public function test_unreadable_settings_mean_keep_rather_than_delete() {
+		// Absent, malformed or unreadable all have to mean keep. A settings
+		// row that failed to load must never be the reason somebody's work is
+		// erased.
+		require_once dirname( dirname( __DIR__ ) ) . '/uninstall.php';
+
+		delete_option( 'blogcraft_settings' );
+		$this->assertFalse( blogcraft_should_purge(), 'no settings at all was read as permission to delete' );
+
+		update_option( 'blogcraft_settings', 'not an array' );
+		$this->assertFalse( blogcraft_should_purge(), 'a malformed settings row was read as permission to delete' );
+
+		delete_option( 'blogcraft_settings' );
+	}
+
+	public function test_the_choice_has_a_control_on_the_settings_screen() {
+		// A setting that only exists in code is one nobody can answer, which
+		// would make the default permanent.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertStringContainsString( 'purge_on_delete', $source );
+	}
 }

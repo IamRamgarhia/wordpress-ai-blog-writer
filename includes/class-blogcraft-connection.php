@@ -403,6 +403,7 @@ class Blogcraft_Connection {
 			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
 			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'blogcraft' ),
+
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
 			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'blogcraft' ),
@@ -757,7 +758,24 @@ class Blogcraft_Connection {
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '06', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
+		self::open_card( '06', __( 'If you delete this plugin', 'blogcraft' ), __( 'What happens to everything it has stored.', 'blogcraft' ), 'removal' );
+
+		printf(
+			'<p class="bc-removal-lead">%s</p>',
+			esc_html__( 'Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away.', 'blogcraft' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+		self::checkbox_row( 'purge_on_delete', __( 'Delete all of it instead, when the plugin is deleted', 'blogcraft' ) );
+		echo '</tbody></table>';
+
+		printf(
+			'<p class="bc-removal-warn">%s</p>',
+			esc_html__( 'With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay.', 'blogcraft' )
+		);
+
+		self::close_card();
+		self::open_card( '07', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
@@ -855,6 +873,14 @@ class Blogcraft_Connection {
 					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.', 'blogcraft' ),
 				),
 			),
+			'removal'    => array(
+				'anchor' => 'removal',
+				'lines'  => array(
+					__( 'Nothing here changes how anything is written. It decides one thing: whether deleting the plugin also deletes what it has stored.', 'blogcraft' ),
+					__( 'Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.', 'blogcraft' ),
+					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'blogcraft' ),
+				),
+			),
 			'automation' => array(
 				'anchor' => 'automation',
 				'lines'  => array(
@@ -941,6 +967,7 @@ class Blogcraft_Connection {
 			'research'   => array( __( 'Research', 'blogcraft' ), __( 'Where facts come from', 'blogcraft' ) ),
 			'voice'      => array( __( 'Describe your voice', 'blogcraft' ), __( 'Subject, reader, style', 'blogcraft' ) ),
 			'automation' => array( __( 'Automation', 'blogcraft' ), __( 'Schedule, images, links, quality', 'blogcraft' ) ),
+			'removal'    => array( __( 'If you delete this plugin', 'blogcraft' ), __( 'What happens to your settings', 'blogcraft' ) ),
 			'test'       => array( __( 'Check it works', 'blogcraft' ), __( 'One short live request', 'blogcraft' ) ),
 		);
 

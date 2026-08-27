@@ -242,6 +242,18 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// Off, so that deleting the plugin keeps everything it wrote.
+			// WordPress asks whether you meant to delete the plugin; it has
+			// no way to ask whether you meant to delete years of settings,
+			// blueprints and job history along with it, and there is no undo
+			// once the tables are dropped. Somebody moving hosts, testing a
+			// reinstall, or clearing a failed upload gets their work back.
+			// Anybody who genuinely wants it all gone can say so here first.
+			'purge_on_delete'                 => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			// Off until asked for: switching it on is what tells Blogcraft it
 			// may announce your URLs to Microsoft's indexing service.
 			'indexnow_enabled'                => array(
