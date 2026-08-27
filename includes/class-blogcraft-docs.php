@@ -197,6 +197,18 @@ class Blogcraft_Docs {
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Help', 'blogcraft' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Everything the plugin does, and why it does it that way. Shipped with the plugin, so it is never out of date with the version you have installed.', 'blogcraft' ) . '</p>';
+
+		// Everything above this line ships with the plugin and is therefore
+		// always true of the version installed. These two are online, so they
+		// can carry the things a shipped page cannot: walkthroughs, and a
+		// place to say something is broken.
+		printf(
+			'<p class="bc-docs-links"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
+			esc_url( 'https://dicecodes.com/blogcraft/' ),
+			esc_html__( 'Guides and walkthroughs at DiceCodes', 'blogcraft' ),
+			esc_url( 'https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues' ),
+			esc_html__( 'Report a problem', 'blogcraft' )
+		);
 		echo '</div>';
 
 		echo '<nav class="bc-doc-toc" aria-label="' . esc_attr__( 'Sections', 'blogcraft' ) . '"><ul>';

@@ -604,8 +604,8 @@ msgstr ""
 msgid "Being written"
 msgstr ""
 
-#: includes/class-blogcraft-admin.php:65
-#: includes/class-blogcraft-admin.php:66
+#: includes/class-blogcraft-admin.php:73
+#: includes/class-blogcraft-admin.php:74
 #: includes/class-blogcraft-overview.php:38
 msgid "Blogcraft"
 msgstr ""
@@ -998,6 +998,10 @@ msgstr ""
 msgid "Dismiss this notice"
 msgstr ""
 
+#: includes/class-blogcraft-admin.php:59
+msgid "Docs"
+msgstr ""
+
 #: includes/class-blogcraft-overview.php:101
 msgid "Done"
 msgstr ""
@@ -1323,6 +1327,10 @@ msgstr ""
 
 #: includes/class-blogcraft-provider-registry.php:54
 msgid "Groq — fast, free tier"
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:208
+msgid "Guides and walkthroughs at DiceCodes"
 msgstr ""
 
 #. translators: 1: HTTP status code, 2: error message reported by the provider.
@@ -2663,6 +2671,10 @@ msgstr ""
 msgid "Removed."
 msgstr ""
 
+#: includes/class-blogcraft-docs.php:210
+msgid "Report a problem"
+msgstr ""
+
 #. translators: %d: HTTP status code.
 #: includes/class-blogcraft-http.php:155
 msgid "Request failed with HTTP %d."
@@ -2860,7 +2872,7 @@ msgstr ""
 msgid "Section briefs"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:202
+#: includes/class-blogcraft-docs.php:214
 #: includes/class-blogcraft-scorecard.php:163
 msgid "Sections"
 msgstr ""

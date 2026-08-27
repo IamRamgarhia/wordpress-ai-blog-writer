@@ -50,6 +50,14 @@ class Blogcraft_Admin {
 				esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
 				esc_html__( 'Settings', 'blogcraft' )
 			),
+			// Where the longer explanations live. The plugin's own Help screen
+			// covers using it; this is for the walkthroughs and the answers that
+			// are too long to sit in an admin panel.
+			sprintf(
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+				esc_url( 'https://dicecodes.com/blogcraft/' ),
+				esc_html__( 'Docs', 'blogcraft' )
+			),
 		);
 
 		return array_merge( $ours, (array) $links );

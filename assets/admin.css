@@ -1930,3 +1930,17 @@ body[class*="page_blogcraft"] #wpcontent {
 	line-height: 1.6;
 	color: var(--bc-ink);
 }
+
+/* The two links that cannot ship with the plugin: guides that get longer
+   over time, and somewhere to say something is broken. */
+.bc-docs-links {
+	margin: var(--bc-s3) 0 0;
+	font-size: var(--bc-t-md);
+	font-weight: 600;
+}
+
+.bc-docs-links span {
+	margin: 0 var(--bc-s1);
+	color: var(--bc-faint);
+	font-weight: 400;
+}

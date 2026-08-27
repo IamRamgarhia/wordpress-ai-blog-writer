@@ -1,129 +1,97 @@
 <div align="center">
 
-# Blogcraft — AI Writer & SEO Content Generator for WordPress
+# Blogcraft — Free AI Writer & SEO Content Generator for WordPress
 
-### Free, open source, and it runs on your own API key
+### Write blog posts inside WordPress with your own API key — no subscription, no credits, no middleman.
 
-[![CI](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/actions/workflows/ci.yml/badge.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/actions/workflows/ci.yml)
-[![Licence](https://img.shields.io/badge/licence-GPL--2.0--or--later-blue.svg)](LICENSE)
-[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)](https://wordpress.org/)
-[![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777bb4.svg)](https://www.php.net/)
-[![Tests](https://img.shields.io/badge/tests-652-brightgreen.svg)](#contributing)
+[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](LICENSE)
+[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
+[![Version](https://img.shields.io/badge/Version-0.60.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
+[![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
+[![Tests](https://img.shields.io/badge/Tests-652%20passing-brightgreen.svg)](#-contributing)
+[![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
+[![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
 
-**No subscription · No credits · No middleman · Nothing locked**
+**Research, draft, self-critique, rewrite and score — twelve steps inside your own WordPress, billed to your own AI account at your provider's own rates.**
+
+Blogcraft has no AI of its own and no server of its own. You paste a key from a provider you already use, and every request goes straight there. Nothing routes through anybody else, so there is no markup, no credit balance and no per-post fee.
+
+It reads current sources before writing, drafts in a voice you describe, reads its own work back, rewrites what it found wrong, and measures the finished draft against twenty-five checks — which you see, with the score, before anything becomes a post.
+
+**Looking for:** a free AI writing plugin with no monthly subscription · an AI content generator that uses your own OpenAI or Gemini key · a self-hosted alternative to credit-based AI writers · a way to run AI blogging on a local model with no key at all? That is what this is.
+
+[Download Now](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest) &nbsp;|&nbsp; [Documentation](https://dicecodes.com/blogcraft/) &nbsp;|&nbsp; [Quick Start](#-your-first-post-in-5-minutes) &nbsp;|&nbsp; [How It Works](#-how-it-writes) &nbsp;|&nbsp; [FAQ](#-frequently-asked-questions) &nbsp;|&nbsp; [Report Bug](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues) &nbsp;|&nbsp; [Request Feature](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues)
 
 </div>
 
 ---
 
-Blogcraft writes blog posts inside WordPress using an AI account you already
-own. There are no credits, no subscription, no per-post fee and nothing locked
-behind a paid tier. You paste your own provider key, and that provider bills
-you directly at their own rates.
-
-It researches before it writes, drafts in a voice you describe, reads its own
-work back, rewrites what it found wrong, and measures the result against
-twenty-odd checks before anything reaches your site.
-
-**Requires WordPress 6.0+ and PHP 7.4+. Tested to WordPress 7.1 and PHP 8.5.
-GPL-2.0-or-later.**
-
----
-
-## Why use this instead of a paid AI writing tool
-
-Every claim here is a fact about how the plugin works, not a promise about
-results. No plugin can promise you rankings, and this one does not try.
-
-- **You own the account.** Your key, your provider, your bill. Nothing routes
-  through a middleman, so there is no markup and no credit system.
-- **It runs on your server.** Your topics, drafts and settings stay in your
-  WordPress database. Nothing is sent anywhere except the AI provider you
-  chose, and the research sources you switched on.
-- **Nothing is locked.** There is no pro version. Every feature in the source
-  is the feature you get.
-- **The source is public.** All of it is here, readable, GPL.
-- **Free providers work.** Google and Groq have free tiers big enough to write
-  with. Ollama and LM Studio run a model on your own machine for nothing at
-  all, no key required.
-- **It disagrees with you when the evidence says so.** The scorecard reports
-  what it measured, not what you hoped. When a rewrite makes a post worse, it
-  says the score went down.
-
-### Free alternative to paid AI content plugins
-
-If you are looking for an AI writing plugin without a monthly subscription,
-without a credit balance, and without your content passing through somebody
-else's service, that is what this is. The trade is that you set up a provider
-account yourself, which takes about two minutes and is the same step that
-removes the middleman.
-
----
-
-## Install
+## 📦 Install
 
 ### From a release zip
 
-1. Download the latest `blogcraft-x.y.z.zip` from
-   [Releases](../../releases).
+1. Download the latest `blogcraft-x.y.z.zip` from [Releases](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest).
 2. In WordPress: **Plugins → Add Plugin → Upload Plugin**.
 3. Choose the zip, install, activate.
 
-Always install through **Upload Plugin** rather than extracting the zip by
-hand. WordPress reads the folder name from inside the archive, so uploading
-replaces the previous version cleanly. Extracting manually creates a second
-folder, and two copies of a plugin is a fatal error on activation.
+> **Install through Upload Plugin, not by extracting the zip by hand.** WordPress reads the folder name from inside the archive, so uploading replaces a previous version cleanly. Extracting manually creates a second folder, and two copies of the same plugin is a fatal error on activation.
 
 ### From source
 
 ```bash
 git clone https://github.com/IamRamgarhia/wordpress-ai-blog-writer.git
-cd blogcraft
+cd wordpress-ai-blog-writer
 composer install --no-dev
 ```
 
-Then move the folder into `wp-content/plugins/` and activate it.
+Move the folder into `wp-content/plugins/` and activate it.
+
+**Requires** WordPress 6.0+ and PHP 7.4+. Tested to WordPress 7.1 and PHP 8.5.
 
 ---
 
-## Getting started
+## ⚡ Your first post in 5 minutes
 
-On activation the plugin opens a short setup screen. Three things decide
-whether the first post is any good.
+Three things decide whether the first post is any good. The plugin opens a setup screen on activation and asks for them in order.
 
 ### 1. Connect a provider
 
-**Settings → Connect a provider.** Choose who you have an account with, paste
-the key, save. The model list is then read from your own account, so you pick
-from what your key can actually use rather than typing an id from memory.
+**Settings → Connect a provider.** Choose who you have an account with, paste the key, save. The model list is then read from your own account, so you pick from what your key can actually use rather than typing an id from memory.
 
-Supported: OpenAI, Anthropic, Google Gemini, xAI, Groq, DeepSeek, Moonshot,
-Mistral, OpenRouter, Together, Fireworks, Cerebras, Ollama, LM Studio, any
-OpenAI-compatible endpoint, and the WordPress AI Client.
+No account anywhere? **Google** and **Groq** have free tiers large enough to write with. **Ollama** and **LM Studio** run a model on your own machine and need no key at all.
 
 ### 2. Say who you write for
 
-**Settings → Describe your voice.** Two sentences on the subject and the
-reader. This is sent with every request and is the single biggest reason two
-blogs using the same model do not read the same. If you already have posts
-published, Blogcraft can read them and describe your voice for you.
+**Settings → Describe your voice.** Two sentences on the subject and the reader. This is sent with every request and is the single biggest reason two blogs using the same model do not read the same. Already have posts published? Blogcraft can read them and describe your voice for you.
 
 ### 3. Say what only you know
 
-On the Write screen there is a field asking what you know that nobody else
-does. A number you measured, a price you paid, what went wrong when you tried
-it. It is the heaviest check on the finished post and the only part of a page
-a model cannot produce. One or two sentences is enough.
+On the Write screen, one field asks what you know that nobody else does — a number you measured, a price you paid, what went wrong when you tried it. It is the heaviest check on the finished post and the only part of a page a model cannot produce.
 
-If nothing comes to mind, a button reads your topic and asks you four specific
-questions instead. It never answers them for you.
+Stuck? A button reads your topic and asks you four specific questions instead. It never answers them for you: invented facts are exactly what that field exists to avoid.
 
 ---
 
-## How it writes
+## 🎯 Why choose Blogcraft
 
-Twelve steps, one provider call each, driven from your browser so it works on
-hosts where WP-Cron is unreliable.
+| | Blogcraft | Typical paid AI plugin |
+|---|---|---|
+| **Cost of the plugin** | Free, GPLv2 | Subscription or credits |
+| **Who bills you** | Your AI provider, directly | The plugin vendor, with a markup |
+| **Where your content goes** | Your provider only | Through the vendor's servers |
+| **Locked features** | None. There is no pro tier | Usually |
+| **Runs on a local model** | Yes — Ollama, LM Studio, no key | Rarely |
+| **Source** | All of it, public | Usually closed |
+| **Telemetry** | None | Varies |
+| **Scores what it wrote** | 25 checks, shown before publishing | Varies |
+
+Every line there is a fact about how the plugin works. **No plugin can promise you rankings, and this one does not try.**
+
+---
+
+## ⚙️ How it writes
+
+Twelve steps, one provider call each, driven from your browser so it works on hosts where WP-Cron is unreliable.
 
 ```mermaid
 flowchart LR
@@ -156,68 +124,93 @@ flowchart LR
 | **Pictures** | One image per step, never all at once |
 | **Linking** | Points older posts at this one, tells the crawlers |
 
-You watch it happen, then read the finished draft and its score before
-anything becomes a post.
+You watch it happen, then read the finished draft and its score before anything becomes a post.
 
 ---
 
-## What it checks
+## ✅ What it checks
 
-Around twenty-five measurements on every finished draft, each one reporting
-what it found against what you asked for:
+Twenty-five measurements on every finished draft, each reporting what it found against what you asked for.
 
-- **Shape** — length, section count, heading order, paragraph and sentence
-  length, reading ease
-- **Search** — title length, subject in the title and early in it, subject in
-  the first hundred words, in the address, in the description, keyword
-  density, internal and external links
-- **Substance** — your own figures used, claims that have something to check
-  them against, whether it merely restates its sources
-- **Voice** — banned phrases, em dashes, passive voice, excluded terms
+<table>
+<tr><td valign="top" width="50%">
 
-Failures come with an instruction the rewrite can act on. Where a failure is
-about your site rather than the writing — too few internal links, for example
-— it says so instead of pretending a rewrite would fix it.
+**Shape**
+- Length against target
+- Section count
+- Heading order, no skipped levels
+- Paragraph and sentence length
+- Reading ease
 
----
+**Voice**
+- Banned phrases
+- Em dashes
+- Passive voice
+- Excluded terms
 
-## What it costs
+</td><td valign="top" width="50%">
 
-Nothing to the plugin. Your provider charges you at their rates, and the Write
-screen estimates the tokens before you spend them. A monthly token cap is
-available and stops generation once reached.
+**Search**
+- Title length and subject placement
+- Subject in the first 100 words
+- Subject in the address and description
+- Keyword density
+- Internal and external links
+- Image alt text
 
-Pictures are separate and optional. Pollinations needs no key. Pexels and
-Pixabay search real photographs and their keys are free. Paid image services
-are only ever used when you pick one, never as a fallback.
+**Substance**
+- Your own figures used
+- Claims with something to check them against
+- Whether it merely restates its sources
 
----
+</td></tr>
+</table>
 
-## Privacy
-
-- Your key is encrypted in the database and never written to logs, errors or
-  the screen.
-- Nothing is contacted until you switch it on. Research sources are all off by
-  default.
-- No telemetry, no phone-home, no analytics.
-- Deleting the plugin leaves your settings and posts alone unless you tick the
-  box asking for them to be removed.
+Failures come with an instruction the rewrite can act on. Where a failure is about your site rather than the writing — too few internal links, say — it says so instead of pretending a rewrite would fix it.
 
 ---
 
-## Frequently asked questions
+## 🔌 Works with
+
+**Providers:** OpenAI · Anthropic · Google Gemini · xAI · Groq · DeepSeek · Moonshot · Mistral · OpenRouter · Together · Fireworks · Cerebras · Ollama · LM Studio · any OpenAI-compatible endpoint · the WordPress AI Client
+
+**SEO plugins:** Yoast SEO · Rank Math · SEOPress · All In One SEO — it fills their title and description fields automatically. With none installed it writes the description and sharing tags itself.
+
+**Editors:** Real Gutenberg blocks, every paragraph and heading editable. On a Classic Editor site it writes plain HTML instead.
+
+**Pictures:** Pollinations (no key) · Pexels · Pixabay · fal.ai · OpenAI · Gemini · Grok. Paid services are only used when you pick one, never as a fallback.
+
+---
+
+## 💰 What it costs
+
+Nothing to the plugin. Your provider charges you at their rates, and the Write screen estimates the tokens before you spend them. A monthly token cap stops generation once reached.
+
+---
+
+## 🔒 Data privacy & security
+
+- Your key is **encrypted in the database** and never written to logs, error messages or the screen.
+- **Nothing is contacted until you switch it on.** Every research source is off by default.
+- **No telemetry, no phone-home, no analytics.** The plugin never contacts us, because there is no us to contact.
+- **Deleting the plugin leaves your settings and posts alone** unless you tick the box asking for them to be removed.
+- Posts are ordinary WordPress posts from the moment they are created, and stay whatever happens to this plugin.
+
+---
+
+## 🤔 Frequently asked questions
 
 <details>
 <summary><strong>Is it really free?</strong></summary>
 
-The plugin is. The AI is billed to you by whichever provider you choose, and several have free tiers large enough to write with.
+The plugin is, entirely, under GPLv2. There is no pro tier and nothing is locked. The AI is billed to you by whichever provider you choose, and several have free tiers large enough to write with.
 
 </details>
 
 <details>
 <summary><strong>Do I need a paid API key?</strong></summary>
 
-No. Google and Groq have free tiers. Ollama and LM Studio run locally and need no key at all.
+No. Google and Groq have free tiers. Ollama and LM Studio run a model on your own machine and need no key at all.
 
 </details>
 
@@ -245,19 +238,27 @@ Yes. It detects Yoast, Rank Math, SEOPress and All In One SEO and fills their ti
 <details>
 <summary><strong>Are the posts real Gutenberg blocks?</strong></summary>
 
-Yes. Every paragraph, heading, list and table is a proper block, editable normally. On a Classic Editor site it writes plain HTML instead.
+Yes. Every paragraph, heading, list and table is a proper block, editable normally rather than arriving as one unopenable lump. On a Classic Editor site it writes plain HTML instead.
 
 </details>
 
 <details>
 <summary><strong>Can it publish automatically?</strong></summary>
 
-It can, on a schedule you set, with a daily cap. It is off by default and posts are saved as drafts unless you say otherwise.
+It can, on a schedule you set, with a daily cap. It is off by default, and posts are saved as drafts unless you say otherwise.
+
+</details>
+
+<details>
+<summary><strong>What happens to my data if I delete the plugin?</strong></summary>
+
+Nothing, by default. Your settings, writing rules and posts stay exactly where they are — install it again and everything is as you left it. There is a box in Settings if you do want it all removed, and ticking it is the only confirmation there will be.
 
 </details>
 
 ---
-## Contributing
+
+## 🛠️ Contributing
 
 Issues and pull requests are welcome.
 
@@ -268,12 +269,19 @@ npx wp-env start
 npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit
 ```
 
-The test suite is the specification. Every fix in this repository ships with a
-test that fails without it, and the commit message says what went wrong and
-why the fix is shaped the way it is.
+The test suite is the specification. Every fix here ships with a test that fails without it, and the commit message says what went wrong and why the fix is shaped the way it is.
 
 ---
 
-## Licence
+## 💬 Support
 
-GPL-2.0-or-later. See [LICENSE](LICENSE).
+- **Found a bug?** [Open an issue](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues)
+- **Documentation:** [dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/)
+
+---
+
+<div align="center">
+
+**Built by [DiceCodes](https://dicecodes.com)** · GPL-2.0-or-later · [LICENSE](LICENSE)
+
+</div>
