@@ -77,6 +77,11 @@ class Blogcraft_Connection {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
 		}
 
+		// Every one of these asks the provider something. Without one the
+		// old answer was whatever the HTTP layer said, which is true and
+		// tells nobody what to do about it.
+		Blogcraft_Request::require_provider();
+
 		// Read from the form rather than from storage: the reader may be
 		// typing a key right now and have saved nothing yet, which is exactly
 		// the moment they want to see the list.
@@ -223,6 +228,10 @@ class Blogcraft_Connection {
 		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
 		}
+
+		// Reading your posts back needs the provider as much as writing one
+		// does, and this button sits on the same screen as the empty key field.
+		Blogcraft_Request::require_provider();
 
 		wp_send_json_success( Blogcraft_Learn::suggest() );
 	}

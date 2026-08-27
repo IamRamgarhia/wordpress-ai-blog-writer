@@ -849,6 +849,11 @@ class Blogcraft_Generate {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
 		}
 
+		// Every one of these asks the provider something. Without one the
+		// old answer was whatever the HTTP layer said, which is true and
+		// tells nobody what to do about it.
+		Blogcraft_Request::require_provider();
+
 		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' === trim( $topic ) ) {

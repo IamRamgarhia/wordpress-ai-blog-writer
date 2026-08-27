@@ -348,6 +348,11 @@ class Blogcraft_Blueprint_Screen {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
 		}
 
+		// Every one of these asks the provider something. Without one the
+		// old answer was whatever the HTTP layer said, which is true and
+		// tells nobody what to do about it.
+		Blogcraft_Request::require_provider();
+
 		$shape = isset( $_POST['shape'] ) ? sanitize_key( wp_unslash( $_POST['shape'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' !== $shape ) {

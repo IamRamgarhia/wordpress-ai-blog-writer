@@ -343,4 +343,51 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'bc-card-research', $html );
 		$this->assertStringContainsString( 'purge_on_delete', $html );
 	}
+
+	public function test_every_button_that_asks_the_provider_says_so_when_there_is_none() {
+		// Four buttons across three screens call a provider: list the models
+		// on this account, read my posts and describe my voice, read this
+		// article and match its shape, and ask what I should write about this
+		// topic. None of them checked first, so pressing one on a fresh
+		// install returned whatever the HTTP layer said — "Request failed with
+		// HTTP 401" — which is true, useless, and indistinguishable from the
+		// plugin being broken.
+		//
+		// Named rather than detected, because three of the four reach the
+		// provider through a helper and no honest static check can see that.
+		$guarded = array(
+			'class-blogcraft-connection.php'       => array( 'handle_list_models', 'handle_learn' ),
+			'class-blogcraft-blueprint-screen.php' => array( 'handle_shape' ),
+			'class-blogcraft-generate.php'         => array( 'handle_suggest' ),
+		);
+
+		foreach ( $guarded as $file => $handlers ) {
+			$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/' . $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( $handlers as $handler ) {
+				$at = strpos( $source, 'function ' . $handler . '(' );
+
+				$this->assertNotFalse( $at, $handler . ' has gone; this list is stale' );
+
+				$end  = strpos( $source, "
+	}", $at );
+				$body = substr( $source, $at, $end - $at );
+
+				$this->assertStringContainsString(
+					'Blogcraft_Request::require_provider()',
+					$body,
+					$handler . ' asks the provider without checking there is one'
+				);
+			}
+		}
+	}
+
+	public function test_the_refusal_names_what_to_do_rather_than_an_http_code() {
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-request.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$at   = strpos( $source, 'function require_provider(' );
+		$body = substr( $source, (int) $at );
+
+		$this->assertStringContainsString( 'Connect a provider', $body, 'the refusal does not say where to go' );
+	}
 }

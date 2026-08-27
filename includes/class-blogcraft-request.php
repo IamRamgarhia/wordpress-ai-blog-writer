@@ -49,6 +49,36 @@ class Blogcraft_Request {
 	}
 
 	/**
+	 * Stop a request that needs a provider when there is not one.
+	 *
+	 * Five buttons on four screens call a provider: list the models on
+	 * this account, read my posts and describe my voice, read this
+	 * article and match its shape, ask what I should write about this
+	 * topic, and preview a post. None of them checked first, so pressing
+	 * any of them on a fresh install produced whatever the HTTP layer
+	 * said — "Request failed with HTTP 401" — which is true, useless,
+	 * and indistinguishable from the plugin being broken.
+	 *
+	 * Checked at the handler rather than only hidden in the markup,
+	 * because a key can be cleared in another tab after the page that
+	 * drew the button was loaded.
+	 *
+	 * @return void Sends a JSON error and exits when nothing is set up.
+	 */
+	public static function require_provider() {
+		if ( Blogcraft_Provider_Registry::is_configured() ) {
+			return;
+		}
+
+		wp_send_json_error(
+			array(
+				'message' => __( 'No AI provider is set up yet, so there is nothing to ask. Settings, then Connect a provider.', 'blogcraft' ),
+			),
+			409
+		);
+	}
+
+	/**
 	 * Print a nonce field for a Blogcraft form.
 	 *
 	 * @param string $action Nonce action name.
