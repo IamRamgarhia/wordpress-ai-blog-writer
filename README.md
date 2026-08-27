@@ -1,4 +1,20 @@
-# Blogcraft — free AI blog writer for WordPress, with your own API key
+<div align="center">
+
+# Blogcraft
+
+### Free AI blog writer for WordPress — with your own API key
+
+[![CI](https://github.com/IamRamgarhia/blogcraft/actions/workflows/ci.yml/badge.svg)](https://github.com/IamRamgarhia/blogcraft/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/badge/licence-GPL--2.0--or--later-blue.svg)](LICENSE)
+[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)](https://wordpress.org/)
+[![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777bb4.svg)](https://www.php.net/)
+[![Tests](https://img.shields.io/badge/tests-652-brightgreen.svg)](#contributing)
+
+**No subscription · No credits · No middleman · Nothing locked**
+
+</div>
+
+---
 
 Blogcraft writes blog posts inside WordPress using an AI account you already
 own. There are no credits, no subscription, no per-post fee and nothing locked
@@ -109,20 +125,36 @@ questions instead. It never answers them for you.
 Twelve steps, one provider call each, driven from your browser so it works on
 hosts where WP-Cron is unreliable.
 
+```mermaid
+flowchart LR
+    A[Research] --> B[Outline]
+    B --> C[Draft]
+    C --> D[Sections]
+    D --> E[Questions]
+    E --> F[Extras]
+    F --> G[Critique]
+    G --> H[Revise]
+    H --> I[Verify]
+    I --> J{{You read it}}
+    J --> K[Publish]
+    K --> L[Pictures]
+    L --> M[Linking]
+```
+
 | Step | What happens |
 |------|--------------|
-| Research | Reads current sources, if you switched any on |
-| Outline | Plans the title, description, address and sections |
-| Draft | Writes the opening |
-| Section | Writes each section, one call per section |
-| Questions | Answers what readers actually ask |
-| Extras | Any optional blocks you asked for |
-| Critique | Reads its own draft back and measures it |
-| Revise | Fixes what the critique and the measurements found |
-| Verify | Checks every link resolves, scores the result |
-| Publish | Creates the post |
-| Pictures | One image per step, never all at once |
-| Finishing | Points older posts at this one, tells the crawlers |
+| **Research** | Reads current sources, if you switched any on |
+| **Outline** | Plans the title, description, address and sections |
+| **Draft** | Writes the opening |
+| **Sections** | Writes each section, one call per section |
+| **Questions** | Answers what readers actually ask |
+| **Extras** | Any optional blocks you asked for |
+| **Critique** | Reads its own draft back and measures it |
+| **Revise** | Fixes what the critique and the measurements found |
+| **Verify** | Checks every link resolves, scores the result |
+| **Publish** | Creates the post |
+| **Pictures** | One image per step, never all at once |
+| **Linking** | Points older posts at this one, tells the crawlers |
 
 You watch it happen, then read the finished draft and its score before
 anything becomes a post.
@@ -175,39 +207,56 @@ are only ever used when you pick one, never as a fallback.
 
 ## Frequently asked questions
 
-**Is it really free?**
-The plugin is. The AI is billed to you by whichever provider you choose, and
-several have free tiers large enough to write with.
+<details>
+<summary><strong>Is it really free?</strong></summary>
 
-**Do I need a paid API key?**
-No. Google and Groq have free tiers. Ollama and LM Studio run locally and need
-no key at all.
+The plugin is. The AI is billed to you by whichever provider you choose, and several have free tiers large enough to write with.
 
-**Will my posts rank on Google?**
-Nobody can promise that, and this plugin does not. What it does is measure the
-things that are checkable — structure, substance, internal links, whether the
-page says anything only you could have written — and tell you plainly what is
-working against a post.
+</details>
 
-**Does it disclose that AI was involved?**
-Yes, by default, in the byline. Google asks that automation be disclosed. You
-can change the wording or switch it off.
+<details>
+<summary><strong>Do I need a paid API key?</strong></summary>
 
-**Does it work with Yoast or Rank Math?**
-Yes. It detects Yoast, Rank Math, SEOPress and All In One SEO and fills their
-title and description fields. With none installed it writes the description
-and sharing tags itself.
+No. Google and Groq have free tiers. Ollama and LM Studio run locally and need no key at all.
 
-**Are the posts real Gutenberg blocks?**
-Yes. Every paragraph, heading, list and table is a proper block, editable
-normally. On a Classic Editor site it writes plain HTML instead.
+</details>
 
-**Can it publish automatically?**
-It can, on a schedule you set, with a daily cap. It is off by default and
-posts are saved as drafts unless you say otherwise.
+<details>
+<summary><strong>Will my posts rank on Google?</strong></summary>
+
+Nobody can promise that, and this plugin does not. What it does is measure the things that are checkable — structure, substance, internal links, whether the page says anything only you could have written — and tell you plainly what is working against a post.
+
+</details>
+
+<details>
+<summary><strong>Does it disclose that AI was involved?</strong></summary>
+
+Yes, by default, in the byline. Google asks that automation be disclosed. You can change the wording or switch it off.
+
+</details>
+
+<details>
+<summary><strong>Does it work with Yoast or Rank Math?</strong></summary>
+
+Yes. It detects Yoast, Rank Math, SEOPress and All In One SEO and fills their title and description fields. With none installed it writes the description and sharing tags itself.
+
+</details>
+
+<details>
+<summary><strong>Are the posts real Gutenberg blocks?</strong></summary>
+
+Yes. Every paragraph, heading, list and table is a proper block, editable normally. On a Classic Editor site it writes plain HTML instead.
+
+</details>
+
+<details>
+<summary><strong>Can it publish automatically?</strong></summary>
+
+It can, on a schedule you set, with a daily cap. It is off by default and posts are saved as drafts unless you say otherwise.
+
+</details>
 
 ---
-
 ## Contributing
 
 Issues and pull requests are welcome.
