@@ -1,10 +1,10 @@
 <div align="center">
 
-# Blogcraft
+# Blogcraft — AI Writer & SEO Content Generator for WordPress
 
-### Free AI blog writer for WordPress — with your own API key
+### Free, open source, and it runs on your own API key
 
-[![CI](https://github.com/IamRamgarhia/blogcraft/actions/workflows/ci.yml/badge.svg)](https://github.com/IamRamgarhia/blogcraft/actions/workflows/ci.yml)
+[![CI](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/actions/workflows/ci.yml/badge.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/actions/workflows/ci.yml)
 [![Licence](https://img.shields.io/badge/licence-GPL--2.0--or--later-blue.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777bb4.svg)](https://www.php.net/)
@@ -77,7 +77,7 @@ folder, and two copies of a plugin is a fatal error on activation.
 ### From source
 
 ```bash
-git clone https://github.com/IamRamgarhia/blogcraft.git
+git clone https://github.com/IamRamgarhia/wordpress-ai-blog-writer.git
 cd blogcraft
 composer install --no-dev
 ```

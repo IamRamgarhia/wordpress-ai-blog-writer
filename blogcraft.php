@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Blogcraft
+ * Plugin Name:       Blogcraft – AI Writer & SEO Content Generator
  * Plugin URI:        https://dicecodes.com/blogcraft
  * Description:       AI blog writer that researches first, writes in your voice, and checks its own work.
  * Version:           0.59.0

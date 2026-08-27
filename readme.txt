@@ -1,4 +1,4 @@
-=== Blogcraft ===
+=== Blogcraft – AI Writer & SEO Content Generator ===
 Contributors: dicecodes
 Tags: ai content generator, ai writer, autoblogging, seo content, blog automation
 Requires at least: 6.0
