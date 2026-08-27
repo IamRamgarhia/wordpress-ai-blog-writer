@@ -527,6 +527,18 @@
 	margin: 0 0 18px;
 }
 
+/* The sidebar column. The readiness panel and the outcome panel used to be
+   two separate children of this grid, so the second one wrapped to the
+   next row of the first column and rendered under the tab panels. */
+.bc-compose-side {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	position: sticky;
+	top: 60px;
+	min-width: 0;
+}
+
 .bc-compose-main {
 	display: flex;
 	flex-direction: column;
@@ -599,6 +611,16 @@
    typing a topic meant scrolling past every override to reach it. Pinned to
    the foot of the viewport it is always one click away, and it carries the
    sentence saying what pressing it actually does. */
+/* Room for the pinned bar. Without it the bar sat on top of the last few
+   lines of the form — on the tall Publishing tab, over a field. */
+.blogcraft-compose-page #blogcraft-compose {
+	padding-bottom: 8px;
+}
+
+.blogcraft-compose-page .bc-more {
+	margin-bottom: 90px;
+}
+
 .bc-commit {
 	position: sticky;
 	bottom: 0;
@@ -720,8 +742,7 @@
 /* ------------------------------------------------------------- outcome. */
 
 .bc-outcome {
-	position: sticky;
-	top: 60px;
+
 	border: 1px solid var(--bp-line);
 	border-radius: var(--bc-r-lg);
 	background: var(--bp-paper);
@@ -857,7 +878,7 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.bc-outcome {
+	.bc-compose-side {
 		position: static;
 	}
 }

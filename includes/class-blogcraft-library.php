@@ -364,7 +364,14 @@ class Blogcraft_Library {
 				'<td>%s</td>',
 				esc_html( '' === $score ? '—' : sprintf( '%d/100', (int) $score ) )
 			);
-			printf( '<td>%s</td>', esc_html( self::when( $post->post_date_gmt ) ) );
+			// post_date_gmt is only filled once a post is scheduled or
+			// published. Every draft this plugin writes has it empty, and
+			// the local date is the one that is always there.
+			$written = ( '' === $post->post_date_gmt || 0 === strpos( $post->post_date_gmt, '0000-00-00' ) )
+				? get_gmt_from_date( $post->post_date )
+				: $post->post_date_gmt;
+
+			printf( '<td>%s</td>', esc_html( self::when( $written ) ) );
 			echo '</tr>';
 		}
 
@@ -405,9 +412,17 @@ class Blogcraft_Library {
 			return '—';
 		}
 
+		// A draft that was never scheduled carries 0000-00-00 as its GMT
+		// date. strtotime reads that as the year zero, which is roughly
+		// sixty-four billion seconds ago — so every draft on this screen
+		// was labelled "2028 years ago".
+		if ( 0 === strpos( $gmt, '0000-00-00' ) ) {
+			return '—';
+		}
+
 		$stamp = strtotime( $gmt . ' UTC' );
 
-		if ( false === $stamp ) {
+		if ( false === $stamp || $stamp <= 0 ) {
 			return '—';
 		}
 

@@ -518,6 +518,11 @@ class Blogcraft_Progress {
 		$total = count( $steps );
 		$done  = $held ? $total : $current;
 
+		// Where "written but not yet a post" stops. Everything from here
+		// on is work that only happens once somebody says yes.
+		$after = array_search( 'publish', $order, true );
+		$after = ( false === $after ) ? $total : (int) $after;
+
 		echo '<section class="blogcraft-card" id="blogcraft-progress-card"><header>';
 		echo '<h2>' . esc_html__( 'What it is doing', 'blogcraft' ) . '</h2>';
 
@@ -584,8 +589,13 @@ class Blogcraft_Progress {
 				$state = 'is-now';
 			}
 
-			// Publish only counts as done once a post genuinely exists.
-			if ( 'publish' === $slug && $held ) {
+			// Publish and everything after it only count as done once a
+			// post genuinely exists. Naming publish alone was right when it
+			// was the last step; splitting the pictures and the linking out
+			// of it left those two showing as finished below a publish step
+			// that was not — a filled tick, a hollow one, then two more
+			// filled ticks, which reads as something having gone wrong.
+			if ( $held && $index >= $after ) {
 				$state = 'is-todo';
 			}
 
@@ -814,7 +824,7 @@ class Blogcraft_Progress {
 	private static function render_decision( $job, $score ) {
 		$threshold = (int) Blogcraft_Settings::get( 'quality_threshold' );
 
-		echo '<section class="blogcraft-card"><header>';
+		echo '<section class="blogcraft-card bc-decision-card"><header>';
 		echo '<h2>' . esc_html__( 'What happens to it', 'blogcraft' ) . '</h2>';
 		printf(
 			'<p>%s</p>',

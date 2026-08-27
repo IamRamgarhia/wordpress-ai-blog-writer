@@ -347,30 +347,13 @@ class Blogcraft_Overview {
 			);
 		}
 
-		// Which SEO plugin the crafted title and description are being handed
-		// to is invisible otherwise: it happens at publish, on another screen,
-		// into fields somebody has to go and look at.
-		$seo_plugin = Blogcraft_Seo::active_seo_plugin();
+		// Where the crafted title and description end up belongs on this
+		// screen, because it happens at publish, on another screen, into
+		// fields somebody has to go and look at. It does not belong in
+		// this list: a card headed "Needs you" is for things that need
+		// doing, and an amber bar beside a sentence saying everything is
+		// fine teaches people to stop reading the amber bars.
 
-		if ( '' === $seo_plugin ) {
-			$items[] = array(
-				'text' => __( 'No SEO plugin found, so Blogcraft writes the description and the sharing tags into the page itself.', 'blogcraft' ),
-				'url'  => '',
-				'link' => '',
-				'kind' => 'good',
-			);
-		} else {
-			$items[] = array(
-				'text' => sprintf(
-					/* translators: %s: name of the SEO plugin that is active. */
-					__( '%s is handling search, so each post\'s title and description are written into its fields instead.', 'blogcraft' ),
-					Blogcraft_Seo::seo_plugin_name( $seo_plugin )
-				),
-				'url'  => '',
-				'link' => '',
-				'kind' => 'good',
-			);
-		}
 		if ( empty( $items ) ) {
 			return;
 		}
@@ -431,6 +414,12 @@ class Blogcraft_Overview {
 			printf( '<p class="blogcraft-hint">%s</p>', esc_html( $next ) );
 		}
 
+		// Where the crafted title and description end up. It happens at
+		// publish, on another screen, into fields somebody has to go and look
+		// at — so without a line saying so, nothing on any screen tells you
+		// it happened at all.
+		printf( '<p class="blogcraft-hint">%s</p>', esc_html( self::search_line() ) );
+
 		echo '<div class="blogcraft-actions">';
 		printf(
 			'<a class="button button-primary" href="%1$s">%2$s</a>',
@@ -446,6 +435,24 @@ class Blogcraft_Overview {
 		echo '</section>';
 	}
 
+	/**
+	 * Which SEO plugin the title and description are handed to.
+	 *
+	 * @return string
+	 */
+	private static function search_line() {
+		$plugin = Blogcraft_Seo::active_seo_plugin();
+
+		if ( '' === $plugin ) {
+			return __( 'No SEO plugin found, so the description and the sharing tags are written into the page itself.', 'blogcraft' );
+		}
+
+		return sprintf(
+			/* translators: %s: name of the SEO plugin that is active. */
+			__( 'Search is handled by %s, so each post fills in its title and description fields.', 'blogcraft' ),
+			Blogcraft_Seo::seo_plugin_name( $plugin )
+		);
+	}
 	/**
 	 * When the next scheduled post is due, in plain words.
 	 *

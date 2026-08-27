@@ -1366,8 +1366,13 @@ body[class*="page_blogcraft"] #wpcontent {
  * line length nobody can read a paragraph in.
  */
 
+/* All three, so they line up. The decision card was left full width, so
+   the page ended with two cards at 900px and one that overhung both by a
+   hundred pixels — a ragged right edge on the screen where somebody is
+   deciding whether to publish. */
 .bc-score-card,
-.bc-draft-card {
+.bc-draft-card,
+.bc-decision-card {
 	max-width: 900px;
 }
 

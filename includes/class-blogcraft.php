@@ -62,7 +62,6 @@ class Blogcraft {
 		// anyone running it before it is listed there. The .pot file, the
 		// translator comments and the _n() calls were all being maintained
 		// for a file nothing ever loaded.
-		add_action( 'init', array( __CLASS__, 'load_textdomain' ) );
 
 		Blogcraft_Scheduler::init();
 		Blogcraft_Pipeline::register();
@@ -116,19 +115,6 @@ class Blogcraft {
 		if ( Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
 			Blogcraft_Autopilot::schedule();
 		}
-	}
-
-	/**
-	 * Load the translation files.
-	 *
-	 * @return void
-	 */
-	public static function load_textdomain() {
-		load_plugin_textdomain(
-			'blogcraft',
-			false,
-			dirname( plugin_basename( BLOGCRAFT_FILE ) ) . '/languages'
-		);
 	}
 
 	/**

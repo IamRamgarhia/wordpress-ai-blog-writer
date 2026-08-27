@@ -169,4 +169,31 @@ class Test_Blogcraft_Library extends WP_UnitTestCase {
 
 		return $job_id;
 	}
+
+	public function test_a_draft_with_no_gmt_date_is_not_dated_two_thousand_years_ago() {
+		// post_date_gmt is only filled once a post is scheduled or published,
+		// so every draft this plugin writes carries 0000-00-00. strtotime reads
+		// that as the year zero — about sixty-four billion seconds ago — and
+		// the library labelled every draft "2028 years ago".
+		Blogcraft_Capabilities::add();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$post_id = self::factory()->post->create(			array(
+				'post_status' => 'draft',
+				'post_title'  => 'A held draft',
+			)
+		);
+
+		update_post_meta( $post_id, '_blogcraft_generated', 1 );
+
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_date_gmt' => '0000-00-00 00:00:00' ), array( 'ID' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		clean_post_cache( $post_id );
+
+		ob_start();
+		Blogcraft_Library::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'years ago', $html );
+	}
 }

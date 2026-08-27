@@ -1193,6 +1193,12 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	private static function render_outcome( $blueprint ) {
+		// One column, not two children of the grid. These were siblings, so
+		// the readiness panel took the sidebar and the outcome dropped to the
+		// next row of the first column — landing underneath the tab panels, a
+		// screen away from the fields it claims to describe.
+		echo '<div class="bc-compose-side">';
+
 		self::render_readiness();
 
 		echo '<aside class="bc-outcome" aria-labelledby="bc-outcome-title">';
@@ -1207,6 +1213,7 @@ class Blogcraft_Generate {
 		);
 
 		echo '</aside>';
+		echo '</div>';
 	}
 
 	/**
