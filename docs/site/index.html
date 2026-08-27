@@ -3,12 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blogcraft documentation — free AI writer &amp; SEO content generator for WordPress</title>
-<meta name="description" content="How to install and use Blogcraft: connect an AI provider with your own key, describe your voice, write a post, read the score, and understand every check. Free, open source, no subscription.">
+<title>AI Writer for WordPress: Blogcraft Docs &amp; Setup Guide</title>
+<meta name="description" content="Set up the free AI writer for WordPress: connect your own API key, describe your voice, write a post and read the score. No subscription, no credits.">
 <link rel="canonical" href="https://dicecodes.com/blogcraft/">
 <meta property="og:title" content="Blogcraft documentation">
 <meta property="og:description" content="Everything the free AI blog writer for WordPress does, and how to use it.">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="DiceCodes">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Writer for WordPress: Blogcraft Docs">
+<meta name="twitter:description" content="Free AI blog writer that runs on your own API key. Setup guide, every check explained, and answers to the usual questions.">
 <meta property="og:url" content="https://dicecodes.com/blogcraft/">
 <style>
 /*
@@ -175,13 +180,186 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Blogcraft – AI Writer & SEO Content Generator",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "WordPress 6.0 or newer, PHP 7.4 or newer",
+  "description": "A free AI blog writer for WordPress that runs on your own API key. It researches, drafts in a voice you describe, critiques its own work and scores every post before publishing.",
+  "url": "https://dicecodes.com/blogcraft/",
+  "downloadUrl": "https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest",
+  "softwareVersion": "0.61.0",
+  "license": "https://www.gnu.org/licenses/gpl-2.0.html",
+  "isAccessibleForFree": true,
+  "author": {
+    "@type": "Organization",
+    "name": "DiceCodes",
+    "url": "https://dicecodes.com"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "The plugin will not activate",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Usually two copies installed. Blogcraft detects this and stands aside with a notice naming the folder to delete. Look in wp-content/plugins/ for a second folder — often named after a zip file — and delete it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "A post is stuck on one step",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each step is one request and each has a time budget. If a provider stops answering, the screen says so rather than spinning. Check Activity for the last error. A rate limit is waited out rather than counted as a failure, so a quota that resets in an hour does not burn the job."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "\"You exceeded your current quota\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Your provider's limit, not the plugin's. The job pauses and resumes on its own once the window passes. The progress screen shows when."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Every post scores badly on Internal links",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not a writing problem. It means the site has nothing else on the subject to point at. It improves as you publish more, and the plugin says so rather than pretending a rewrite would fix it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "The posts read like every other AI blog",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Almost always one of three things: nobody has described the voice, the writing rules are still the shipped defaults, or the evidence field is empty. The panel that opens before writing tells you which."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The plugin is, entirely, under GPLv2. There is no pro tier and nothing is locked. The AI is billed to you by whichever provider you choose, and several have free tiers large enough to write with."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a paid API key?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Google and Groq have free tiers. Ollama and LM Studio run a model on your own machine and need no key at all."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will my posts rank on Google?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nobody can promise that, and this plugin does not. Whether a page ranks depends on who else wants the query and what your site has earned, neither of which is visible from the words on the page. What Blogcraft does is measure the things that are checkable and tell you plainly what is working against a post."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does a post cost to write?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on your provider's rates and the length you asked for. The Write screen estimates the tokens before you spend them, and the estimates are deliberately generous. A monthly cap is available."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I edit a post before it is published?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Nothing becomes a post until you say so. The review screen shows the full draft in an editor, with the score and every check beside it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work with Yoast or Rank Math?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, and with SEOPress and All In One SEO. It fills their title and description fields automatically. With none installed it writes the description and sharing tags itself."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are the posts real Gutenberg blocks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Every paragraph, heading, list and table is a proper block. On a Classic Editor site it writes plain HTML instead."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can it write in languages other than English?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Write the topic and the voice description in the language you want, and set the spelling preference under the voice controls. The measurements count characters rather than bytes, so non-Latin scripts are handled properly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it publish without me looking?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Only if you switch automatic writing on. Posts written by hand always stop and wait for you, and automatic ones are saved as drafts unless you say otherwise."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I switch providers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The key fields clear, because a key saved for one service is not a key for another. Counting it would mean the setup says \"ready\" and the first post fails several steps in on authentication."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Blogcraft: the free AI writer for WordPress",
+  "description": "How to install and use Blogcraft, and what every check measures.",
+  "url": "https://dicecodes.com/blogcraft/",
+  "inLanguage": "en",
+  "author": {
+    "@type": "Organization",
+    "name": "DiceCodes",
+    "url": "https://dicecodes.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DiceCodes",
+    "url": "https://dicecodes.com"
+  }
+}
+</script>
 </head>
 <body>
 
 <header class="hero">
   <div class="hero-inner">
     <span class="eyebrow"><span class="dot"></span> Documentation &middot; v0.61.0</span>
-    <h1>Blogcraft</h1>
+    <h1>Blogcraft: the free AI writer for WordPress</h1>
     <p class="lede">
       A free AI writer and SEO content generator for WordPress that runs on your
       own API key. It researches before it writes, drafts in a voice you
@@ -214,6 +392,7 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       <li><a href="#how-it-writes">The writing rules</a></li>
       <li><a href="#research">Research</a></li>
       <li><a href="#pictures">Pictures</a></li>
+      <li><a href="#alternatives">Looking for an alternative?</a></li>
       <li><a href="#what-is-checked">Every check explained</a></li>
       <li><a href="#where-posts-go">Where posts go</a></li>
       <li><a href="#automation">Automation</a></li>
@@ -564,6 +743,72 @@ footer{border-top:1px solid var(--line);background:var(--surface)}
       Alt text describes the picture rather than repeating the heading above it,
       because a screen reader announcing the same sentence twice tells the
       listener nothing about the image.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="alternatives">
+    <h2>Looking for an alternative? <a class="anchor" href="#alternatives">#</a></h2>
+
+    <p>
+      Most AI writing plugins for WordPress work one of two ways. Either you buy
+      credits and the vendor calls the AI on your behalf, or you pay a monthly
+      subscription for the same thing with a different label. Both mean your
+      content passes through somebody else's service, and both mean the price you
+      pay is the model's price plus a margin.
+    </p>
+
+    <p>
+      Blogcraft is the third way: <strong>you bring your own API key</strong>.
+      The plugin is free and open source, the AI account is yours, and the bill
+      comes from the provider at their own rates with nothing added.
+    </p>
+
+    <h3>What people are usually searching for</h3>
+    <p>
+      If you arrived here after looking for <em>a free AI writer for
+      WordPress</em>, <em>an AI content generator with no monthly
+      subscription</em>, <em>a WordPress plugin that uses my own OpenAI or
+      Gemini API key</em>, <em>an open source alternative to credit-based AI
+      writing tools</em>, <em>an autoblogging plugin that is actually free</em>,
+      or <em>a way to run AI blog writing on a local model with no key at
+      all</em> &mdash; that is what this is.
+    </p>
+
+    <h3>How the models compare</h3>
+    <div class="scroller">
+    <table>
+      <tr>
+        <th>&nbsp;</th>
+        <th>Bring your own key <span class="pill pill-ok">Blogcraft</span></th>
+        <th>Credit packs</th>
+        <th>Monthly subscription</th>
+      </tr>
+      <tr><td><strong>Cost of the plugin</strong></td><td>Free, GPLv2</td><td>Usually free to install</td><td>Recurring</td></tr>
+      <tr><td><strong>Who bills you for the AI</strong></td><td>Your provider, directly</td><td>The vendor</td><td>The vendor</td></tr>
+      <tr><td><strong>Price of a word</strong></td><td>The model's own rate</td><td>The model's rate plus a margin</td><td>Bundled, so unclear</td></tr>
+      <tr><td><strong>Where your drafts go</strong></td><td>Your provider only</td><td>Through the vendor</td><td>Through the vendor</td></tr>
+      <tr><td><strong>If you stop paying</strong></td><td>Nothing changes. There is nothing to stop paying</td><td>Writing stops</td><td>Writing stops</td></tr>
+      <tr><td><strong>Runs on a local model</strong></td><td>Yes &mdash; Ollama or LM Studio, no key</td><td>No</td><td>No</td></tr>
+      <tr><td><strong>Source you can read</strong></td><td>All of it</td><td>Usually not</td><td>Usually not</td></tr>
+    </table>
+    </div>
+
+    <div class="note">
+      <p><strong>The honest trade.</strong> Bringing your own key means creating
+      an account at a provider and pasting a key in, which takes about two
+      minutes. That step is the whole reason there is no middleman &mdash; and it
+      is also the reason nobody can raise your price, change your plan, or switch
+      the model underneath you.</p>
+    </div>
+
+    <h3>When one of the others is the better answer</h3>
+    <p>
+      If you would rather never see an API key, never think about a provider, and
+      have somebody else absorb the billing entirely, a credit-based tool is
+      genuinely a better fit and it would be silly to pretend otherwise.
+      Blogcraft asks for two minutes of setup in exchange for owning the account.
+      That is the trade, stated plainly.
     </p>
   </section>
 
