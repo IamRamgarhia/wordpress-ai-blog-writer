@@ -6,11 +6,12 @@
 
 [![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
-[![Version](https://img.shields.io/badge/Version-0.61.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
+[![Version](https://img.shields.io/badge/Version-0.62.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
 [![Tests](https://img.shields.io/badge/Tests-652%20passing-brightgreen.svg)](#-contributing)
 [![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
 [![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
+[![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/blogcraft/)
 
 **Research, draft, self-critique, rewrite and score — twelve steps inside your own WordPress, billed to your own AI account at your provider's own rates.**
 
@@ -47,6 +48,8 @@ composer install --no-dev
 Move the folder into `wp-content/plugins/` and activate it.
 
 **Requires** WordPress 6.0+ and PHP 7.4+. Tested to WordPress 7.1 and PHP 8.5.
+
+> Full documentation, with a setup walkthrough and every check explained: **[dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/)**
 
 ---
 
@@ -268,6 +271,8 @@ composer lint          # PHPCS, WordPress Coding Standards
 npx wp-env start
 npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit
 ```
+
+Documentation for the plugin itself lives at [dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/).
 
 The test suite is the specification. Every fix here ships with a test that fails without it, and the commit message says what went wrong and why the fix is shaped the way it is.
 

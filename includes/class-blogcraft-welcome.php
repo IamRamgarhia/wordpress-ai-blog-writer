@@ -429,6 +429,13 @@ class Blogcraft_Welcome {
 		echo '<p>' . esc_html__( 'A number you measured. A price you paid. How long something actually took, or what went wrong when you tried it. One or two sentences is enough, and it is the difference between a page worth reading and a summary of pages that already exist.', 'blogcraft' ) . '</p>';
 		echo '<p>' . esc_html__( 'If nothing comes to mind, there is a button there that reads your topic and asks you four specific questions instead. It never answers them for you — invented facts are the one thing that would make every other check meaningless.', 'blogcraft' ) . '</p>';
 
+		printf(
+			'<p class="description">%1$s <a href="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a></p>',
+			esc_html__( 'Want the longer version first?', 'blogcraft' ),
+			esc_url( Blogcraft_Docs::site_url() ),
+			esc_html__( 'Read the guides', 'blogcraft' )
+		);
+
 		submit_button( __( 'Write my first post', 'blogcraft' ), 'primary', 'submit', false );
 		echo '</form>';
 	}

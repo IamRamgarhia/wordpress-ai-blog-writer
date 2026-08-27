@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.61.0
+Stable tag: 0.62.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,6 +15,8 @@ AI blog writer that researches first, writes in your voice, and checks its own w
 Blogcraft writes blog posts for your WordPress site using an AI provider you choose and connect with your own API key.
 
 Every feature is included. Nothing is locked, nothing expires, and there are no credits or quotas. Your only cost is whatever your chosen provider charges, and several offer free tiers.
+
+Full documentation, including a setup walkthrough and an explanation of every check it scores: https://dicecodes.com/blogcraft/
 
 **How a post is written**
 
@@ -124,6 +126,9 @@ Blogcraft may also fetch any URL you explicitly add to its research list, to rea
 
 == Frequently Asked Questions ==
 
+= Where is the documentation? =
+
+Two places. The plugin ships its own under Blogcraft, Help, which is always accurate to the version you have installed. The longer guides and walkthroughs are at https://dicecodes.com/blogcraft/
 = Do I need to pay for anything? =
 
 The plugin is free and complete, and takes no cut of anything. You need an account with an AI provider, and every provider in the list is marked either free, "free tier", or paid, so you can see before you pick.

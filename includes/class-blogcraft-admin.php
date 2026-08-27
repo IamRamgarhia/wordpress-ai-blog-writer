@@ -55,7 +55,7 @@ class Blogcraft_Admin {
 			// are too long to sit in an admin panel.
 			sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-				esc_url( 'https://dicecodes.com/blogcraft/' ),
+				esc_url( Blogcraft_Docs::site_url() ),
 				esc_html__( 'Docs', 'blogcraft' )
 			),
 		);

@@ -233,9 +233,11 @@ class Blogcraft_Overview {
 
 		echo '</ol>';
 		printf(
-			'<p class="blogcraft-hint"><a href="%1$s">%2$s</a></p>',
+			'<p class="blogcraft-hint"><a href="%1$s">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
 			esc_url( Blogcraft_Docs::url() ),
-			esc_html__( 'Everything else, in detail', 'blogcraft' )
+			esc_html__( 'Everything else, in detail', 'blogcraft' ),
+			esc_url( Blogcraft_Docs::site_url() ),
+			esc_html__( 'Guides and walkthroughs', 'blogcraft' )
 		);
 		echo '</section>';
 	}

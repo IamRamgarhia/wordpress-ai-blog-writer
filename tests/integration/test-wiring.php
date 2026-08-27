@@ -634,4 +634,51 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 
 		$this->assertSame( array(), $found, 'these queries make the database do the excluding' );
 	}
+
+	public function test_the_documentation_address_is_written_down_once() {
+		// Two links to the same page in two files is how they come to disagree,
+		// and a documentation link that quietly 404s is worse than none: the
+		// reader concludes the plugin is abandoned rather than that one string
+		// is stale.
+		//
+		// The plugin header is the one unavoidable exception. WordPress reads
+		// that as text before any code runs, so it cannot call anything.
+		$loose = array();
+
+		$files = array_merge(
+			(array) glob( BLOGCRAFT_PATH . 'includes/*.php' ),
+			array( BLOGCRAFT_PATH . 'blogcraft.php' )
+		);
+
+		foreach ( $files as $path ) {
+			$name = basename( $path );
+			$body = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( explode( "
+", $body ) as $number => $line ) {
+				if ( false === strpos( $line, 'dicecodes.com/blogcraft' ) ) {
+					continue;
+				}
+
+				// The helper itself, and the file header.
+				if ( 'class-blogcraft-docs.php' === $name || false !== strpos( $line, 'Plugin URI' ) ) {
+					continue;
+				}
+
+				$loose[] = $name . ':' . ( $number + 1 );
+			}
+		}
+
+		$this->assertSame( array(), $loose, 'these write the documentation address out again instead of asking for it' );
+	}
+
+	public function test_the_helper_and_the_plugin_header_agree() {
+		$headers = get_file_data( BLOGCRAFT_PATH . 'blogcraft.php', array( 'uri' => 'Plugin URI' ) );
+
+		$this->assertSame(
+			untrailingslashit( Blogcraft_Docs::site_url() ),
+			untrailingslashit( $headers['uri'] ),
+			'the header points somewhere other than the documentation the plugin links to'
+		);
+	}
 }
