@@ -970,9 +970,11 @@ class Blogcraft_Connection {
 		// a website that did not exist, so the one control offering to explain
 		// more returned a 404.
 		printf(
-			'<p class="bc-help-more"><a href="%1$s">%2$s</a></p>',
+			'<p class="bc-help-more"><a href="%1$s">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
 			esc_url( Blogcraft_Docs::url( $all[ $slug ]['anchor'] ) ),
-			esc_html__( 'Read the full documentation', 'blogcraft' )
+			esc_html__( 'Read the full documentation', 'blogcraft' ),
+			esc_url( Blogcraft_Docs::site_url( $all[ $slug ]['anchor'] ) ),
+			esc_html__( 'Guides online', 'blogcraft' )
 		);
 
 		echo '</div>';

@@ -36,6 +36,26 @@ class Blogcraft_Docs {
 	}
 
 	/**
+	 * Where the guides live online.
+	 *
+	 * The documentation that ships with the plugin is always true of the
+	 * version installed, which is why it is the first link offered anywhere.
+	 * This is the second one: the same sections, written at length, with the
+	 * walkthroughs and worked examples that would bloat an admin panel.
+	 *
+	 * The section names are deliberately identical at both ends, so a help
+	 * button already holding an anchor needs nothing added to deep-link.
+	 *
+	 * @param string $anchor Section anchor, or '' for the top.
+	 * @return string
+	 */
+	public static function site_url( $anchor = '' ) {
+		$base = 'https://dicecodes.com/blogcraft/';
+
+		return ( '' === $anchor ) ? $base : $base . '#' . sanitize_title( $anchor );
+	}
+
+	/**
 	 * The address of one section of this screen.
 	 *
 	 * @param string $anchor Section anchor, or '' for the top.
@@ -204,7 +224,7 @@ class Blogcraft_Docs {
 		// place to say something is broken.
 		printf(
 			'<p class="bc-docs-links"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
-			esc_url( 'https://dicecodes.com/blogcraft/' ),
+			esc_url( self::site_url() ),
 			esc_html__( 'Guides and walkthroughs at DiceCodes', 'blogcraft' ),
 			esc_url( 'https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues' ),
 			esc_html__( 'Report a problem', 'blogcraft' )

@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blogcraft documentation — free AI writer &amp; SEO content generator for WordPress</title>
+<meta name="description" content="How to install and use Blogcraft: connect an AI provider with your own key, describe your voice, write a post, read the score, and understand every check. Free, open source, no subscription.">
+<link rel="canonical" href="https://dicecodes.com/blogcraft/">
+<meta property="og:title" content="Blogcraft documentation">
+<meta property="og:description" content="Everything the free AI blog writer for WordPress does, and how to use it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dicecodes.com/blogcraft/">
+<style>
+/*
+ * The plugin's own tokens, so the documentation and the software people are
+ * reading it beside look like one product rather than two.
+ */
+:root{
+  --ink:#1d2327; --ink-soft:#3c434a; --muted:#646970; --faint:#8c8f94;
+  --surface:#fff; --surface-soft:#fbfbfc; --canvas:#f6f7f7;
+  --line:#dcdcde; --hair:#f0f0f1;
+  --accent:#3858e9; --accent-soft:#f0f2fd;
+  --ok:#007017; --warn:#8a6116; --warn-soft:#fdf6ec; --bad:#b32121;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --t-xs:12px; --t-sm:14px; --t-md:16px; --t-lg:18px; --t-xl:24px; --t-2xl:32px; --t-3xl:44px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --shell:1180px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e8eaed; --ink-soft:#c7cbd1; --muted:#9aa0a6; --faint:#75797e;
+    --surface:#1b1e22; --surface-soft:#212529; --canvas:#141619;
+    --line:#333941; --hair:#262b31;
+    --accent:#8ea1ff; --accent-soft:#1e2436;
+    --ok:#5dd47f; --warn:#e0b264; --warn-soft:#2a2418; --bad:#f08a8a;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:var(--s6)}
+body{
+  margin:0; background:var(--canvas); color:var(--ink);
+  font:var(--t-md)/1.7 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font:0.88em/1.5 var(--mono);background:var(--hair);padding:2px 6px;border-radius:var(--r-sm)}
+pre{
+  background:var(--surface-soft);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:var(--s4);overflow-x:auto;font:var(--t-sm)/1.6 var(--mono);
+}
+pre code{background:none;padding:0}
+
+/* ---------------------------------------------------------------- hero. */
+.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 120% at 12% -10%, var(--accent-soft) 0%, transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.hero-inner{max-width:var(--shell);margin:0 auto;padding:var(--s8) var(--s5) var(--s7)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:var(--s2);
+  padding:var(--s1) var(--s3);border:1px solid var(--line);border-radius:var(--r-pill);
+  background:var(--surface);font-size:var(--t-xs);font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+h1{
+  margin:var(--s4) 0 var(--s3);font-size:var(--t-3xl);line-height:1.15;
+  letter-spacing:-.02em;font-weight:700;max-width:19ch;
+}
+.lede{margin:0;max-width:62ch;font-size:var(--t-lg);line-height:1.6;color:var(--ink-soft)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s5)}
+.btn{
+  display:inline-flex;align-items:center;gap:var(--s2);
+  padding:var(--s3) var(--s5);border-radius:var(--r-md);
+  font-size:var(--t-sm);font-weight:600;border:1px solid transparent;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{text-decoration:none;filter:brightness(1.08)}
+.btn-ghost{border-color:var(--line);background:var(--surface);color:var(--ink)}
+.btn-ghost:hover{text-decoration:none;border-color:var(--accent);color:var(--accent)}
+.facts{display:flex;flex-wrap:wrap;gap:var(--s5);margin-top:var(--s6);padding-top:var(--s5);border-top:1px solid var(--line)}
+.fact strong{display:block;font-size:var(--t-xl);line-height:1.2;letter-spacing:-.01em}
+.fact span{font-size:var(--t-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+
+/* -------------------------------------------------------------- layout. */
+.shell{max-width:var(--shell);margin:0 auto;padding:var(--s7) var(--s5) var(--s8);
+  display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--s7)}
+.toc{position:sticky;top:var(--s5);align-self:start;max-height:calc(100vh - var(--s7));overflow-y:auto}
+.toc h2{font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:0 0 var(--s3)}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{margin:0}
+.toc a{
+  display:block;padding:var(--s2) var(--s3);border-left:2px solid var(--line);
+  font-size:var(--t-sm);color:var(--muted);
+}
+.toc a:hover{color:var(--ink);text-decoration:none;background:var(--surface-soft)}
+.toc a.on{border-left-color:var(--accent);color:var(--accent);font-weight:600;background:var(--accent-soft)}
+
+/* ------------------------------------------------------------ sections. */
+section{scroll-margin-top:var(--s5);margin-bottom:var(--s8)}
+section > h2{
+  margin:0 0 var(--s3);font-size:var(--t-2xl);line-height:1.2;
+  letter-spacing:-.02em;font-weight:700;
+}
+h3{margin:var(--s6) 0 var(--s2);font-size:var(--t-lg);line-height:1.35;font-weight:650}
+h4{margin:var(--s5) 0 var(--s2);font-size:var(--t-md);font-weight:650}
+p{margin:0 0 var(--s4);max-width:70ch}
+ul,ol{max-width:70ch;padding-left:var(--s5)}
+li{margin-bottom:var(--s2)}
+.anchor{opacity:0;margin-left:var(--s2);font-weight:400;color:var(--faint);text-decoration:none}
+h2:hover .anchor,h3:hover .anchor{opacity:1}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:var(--s5);margin:var(--s4) 0;
+}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:var(--s4) var(--s5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s4) 0}
+.warn{border-left:3px solid var(--warn);background:var(--warn-soft);
+  padding:var(--s4) var(--s5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s4) 0}
+.note p:last-child,.warn p:last-child,.card p:last-child{margin-bottom:0}
+
+table{width:100%;border-collapse:collapse;margin:var(--s4) 0;font-size:var(--t-sm)}
+th,td{text-align:left;padding:var(--s3);border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:650;color:var(--muted);font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.04em}
+.scroller{overflow-x:auto}
+
+.steps{counter-reset:step;list-style:none;padding:0;max-width:none}
+.steps > li{
+  counter-increment:step;position:relative;padding-left:var(--s7);margin-bottom:var(--s5);
+}
+.steps > li::before{
+  content:counter(step);position:absolute;left:0;top:0;
+  width:30px;height:30px;border-radius:50%;
+  background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-size:var(--t-sm);font-weight:700;
+}
+.steps h3{margin-top:0}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--s4);margin:var(--s4) 0}
+.grid .card{margin:0}
+.grid h4{margin-top:0}
+
+details{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);margin-bottom:var(--s3)}
+summary{padding:var(--s4) var(--s5);cursor:pointer;font-weight:650;font-size:var(--t-sm);list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";display:inline-block;width:1.2em;color:var(--accent);font-weight:700}
+details[open] summary::before{content:"\2212"}
+details > *:not(summary){padding:0 var(--s5) var(--s4);margin:0}
+details p{margin-bottom:var(--s3)}
+
+.pill{display:inline-block;padding:2px var(--s3);border-radius:var(--r-pill);
+  font-size:var(--t-xs);font-weight:650;border:1px solid}
+.pill-ok{color:var(--ok);border-color:var(--ok);background:transparent}
+.pill-warn{color:var(--warn);border-color:var(--warn);background:transparent}
+
+footer{border-top:1px solid var(--line);background:var(--surface)}
+.foot{max-width:var(--shell);margin:0 auto;padding:var(--s6) var(--s5);
+  display:flex;flex-wrap:wrap;gap:var(--s4);justify-content:space-between;
+  font-size:var(--t-sm);color:var(--muted)}
+.foot a{margin-right:var(--s4)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:var(--s5);padding-top:var(--s5)}
+  .toc{position:static;max-height:none;border:1px solid var(--line);
+    border-radius:var(--r-lg);background:var(--surface);padding:var(--s4)}
+  h1{font-size:var(--t-2xl)}
+  .hero-inner{padding:var(--s6) var(--s4)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="dot"></span> Documentation &middot; v0.61.0</span>
+    <h1>Blogcraft</h1>
+    <p class="lede">
+      A free AI writer and SEO content generator for WordPress that runs on your
+      own API key. It researches before it writes, drafts in a voice you
+      describe, reads its own work back, rewrites what it found wrong, and
+      shows you the score before anything becomes a post.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest">Download the latest release</a>
+      <a class="btn btn-ghost" href="#install">Install it</a>
+      <a class="btn btn-ghost" href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer">Source on GitHub</a>
+    </div>
+    <div class="facts">
+      <div class="fact"><strong>12</strong><span>Steps per post</span></div>
+      <div class="fact"><strong>25</strong><span>Checks scored</span></div>
+      <div class="fact"><strong>16</strong><span>AI providers</span></div>
+      <div class="fact"><strong>&pound;0</strong><span>Cost of the plugin</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <nav class="toc" aria-label="Contents">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#install">Installing</a></li>
+      <li><a href="#providers">Connecting a provider</a></li>
+      <li><a href="#voice">Describing your voice</a></li>
+      <li><a href="#writing-a-post">Writing a post</a></li>
+      <li><a href="#how-it-writes">The writing rules</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#pictures">Pictures</a></li>
+      <li><a href="#what-is-checked">Every check explained</a></li>
+      <li><a href="#where-posts-go">Where posts go</a></li>
+      <li><a href="#automation">Automation</a></li>
+      <li><a href="#checking-it-works">When something breaks</a></li>
+      <li><a href="#privacy">Privacy</a></li>
+      <li><a href="#removal">Deleting the plugin</a></li>
+      <li><a href="#faq">Questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="install">
+    <h2>Installing <a class="anchor" href="#install">#</a></h2>
+
+    <p>
+      Blogcraft needs <strong>WordPress 6.0 or newer</strong> and
+      <strong>PHP 7.4 or newer</strong>. It is tested against WordPress 7.1 and
+      every PHP version from 7.4 to 8.5.
+    </p>
+
+    <ol class="steps">
+      <li>
+        <h3>Download the zip</h3>
+        <p>Take the latest <code>blogcraft-x.y.z.zip</code> from the
+        <a href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest">releases page</a>.</p>
+      </li>
+      <li>
+        <h3>Upload it through WordPress</h3>
+        <p>Go to <strong>Plugins &rarr; Add Plugin &rarr; Upload Plugin</strong>,
+        choose the zip, install, activate.</p>
+      </li>
+      <li>
+        <h3>Finish the setup</h3>
+        <p>The plugin opens a short setup screen. Three questions, all skippable,
+        all changeable later.</p>
+      </li>
+    </ol>
+
+    <div class="warn">
+      <p><strong>Upload the zip rather than extracting it by hand.</strong>
+      WordPress reads the folder name from inside the archive, so uploading
+      replaces a previous version cleanly. Extracting with a file manager creates
+      a folder named after the zip with the real plugin inside it &mdash; and two
+      copies of the same plugin is a fatal error on activation. Blogcraft detects
+      this and stands aside with a notice naming the folder to delete, but it is
+      easier not to get there.</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="providers">
+    <h2>Connecting a provider <a class="anchor" href="#providers">#</a></h2>
+
+    <p>
+      Blogcraft has no AI of its own. It uses an account you own, with a key you
+      paste in, and every request is billed to you by that provider at their own
+      rates. Nothing passes through anybody else, which is why there is no
+      subscription and no credit balance.
+    </p>
+
+    <p>
+      Go to <strong>Blogcraft &rarr; Settings &rarr; Connect a provider</strong>.
+      Choose the provider, paste the key, press <em>Save settings</em>. The model
+      list is then read from your own account, so you pick from what your key can
+      actually use rather than typing a model id from memory &mdash; which is the
+      commonest way to end up with a setup that looks finished and fails on the
+      first post.
+    </p>
+
+    <h3>If you have no AI account at all</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>Google Gemini <span class="pill pill-ok">free tier</span></h4>
+        <p>A free tier large enough to write with. Sign up, create a key, paste
+        it in.</p>
+      </div>
+      <div class="card">
+        <h4>Groq <span class="pill pill-ok">free tier</span></h4>
+        <p>Also free to start, and notably fast.</p>
+      </div>
+      <div class="card">
+        <h4>Ollama <span class="pill pill-ok">no key</span></h4>
+        <p>Runs a model on your own machine. No account, no key, no bill at all.</p>
+      </div>
+      <div class="card">
+        <h4>LM Studio <span class="pill pill-ok">no key</span></h4>
+        <p>The same idea with a desktop app in front of it.</p>
+      </div>
+    </div>
+
+    <h3>Everything it works with</h3>
+    <p>
+      OpenAI, Anthropic, Google Gemini, xAI, Groq, DeepSeek, Moonshot, Mistral,
+      OpenRouter, Together, Fireworks, Cerebras, Ollama, LM Studio, any
+      OpenAI-compatible endpoint, and the WordPress AI Client.
+    </p>
+
+    <h3>A cheaper model for the bulk of the work</h3>
+    <p>
+      Most of a post's words &mdash; and so most of its cost &mdash; are written
+      in the section, questions and extras steps, which are carrying out a plan
+      the outline already made. There is a second model field for those. The
+      outline, the opening, the critique and the rewrite stay on your main model,
+      because those are the steps where a weaker one is paid for in every
+      paragraph afterwards.
+    </p>
+
+    <div class="note">
+      <p><strong>Your key never leaves your database in readable form.</strong>
+      It is encrypted at rest and never written to a log, an error message or the
+      screen. Switching provider does not carry the old key over: a key saved for
+      one service is not treated as a key for another.</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="voice">
+    <h2>Describing your voice <a class="anchor" href="#voice">#</a></h2>
+
+    <p>
+      This is the single biggest reason two blogs using the same model do not
+      read the same. It is sent with every request, and without it the model
+      writes for nobody in particular &mdash; which is what generic sounds like.
+    </p>
+
+    <p>Under <strong>Settings &rarr; Describe your voice</strong>:</p>
+
+    <table>
+      <tr><th>Field</th><th>What to put in it</th></tr>
+      <tr><td><strong>What this blog is about</strong></td>
+          <td>One or two sentences on the subject and the angle. Not a category
+          &mdash; a position. <em>"Home coffee equipment, tested properly rather
+          than unboxed."</em></td></tr>
+      <tr><td><strong>Who you write for</strong></td>
+          <td>Who is reading and what they already know. <em>"People buying their
+          first proper machine, who know what espresso is but not what a pressure
+          profile is."</em></td></tr>
+      <tr><td><strong>Style rules</strong></td>
+          <td>One per line. <em>No em dashes. Short paragraphs. Never open with a
+          question.</em></td></tr>
+      <tr><td><strong>Extra banned words</strong></td>
+          <td>One per line. A list of the usual AI tells is already blocked.</td></tr>
+      <tr><td><strong>Never write about</strong></td>
+          <td>Competitors, off-limits claims, anything legally sensitive.</td></tr>
+      <tr><td><strong>Your own experience</strong></td>
+          <td>Standing facts about you or the site that apply to every post.</td></tr>
+    </table>
+
+    <h3>Let it read your existing posts</h3>
+    <p>
+      If you already have posts published, there is a button that reads them and
+      fills these fields in from how you actually write. It is usually a better
+      starting point than describing yourself from scratch.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="writing-a-post">
+    <h2>Writing a post <a class="anchor" href="#writing-a-post">#</a></h2>
+
+    <p><strong>Blogcraft &rarr; Write a post.</strong> Only one field is required.</p>
+
+    <h3>Topic</h3>
+    <p>
+      A sentence works better than a keyword. <em>"How to choose a standing desk
+      for a small home office"</em> gives the model a question to answer;
+      <em>"standing desks"</em> gives it a category to fill.
+    </p>
+
+    <h3>Angle for this post</h3>
+    <p>
+      Anything true of this one post only. This is what stops every post reading
+      the same. <em>"Compare three price brackets and say which is worth it."</em>
+    </p>
+
+    <h3 id="evidence">What you know that nobody else does</h3>
+    <p>
+      The most important field on the screen, and the one most people skip.
+      Your own numbers, results, prices, or what happened when you tried it.
+    </p>
+    <div class="card">
+      <p><em>"We tested 9 desks over 4 months. The £220 bracket wobbled above
+      110cm; the £400 bracket did not. Our own returns rate on the cheapest was
+      3 in 9."</em></p>
+    </div>
+    <p>
+      It is the heaviest check on the finished post and the only part of a page a
+      model cannot produce. Everything here is used as fact and never invented
+      beyond &mdash; the model is explicitly told not to round these numbers,
+      extend them, or produce another figure of the same kind.
+    </p>
+    <p>
+      Stuck? The <strong>What should I write about this?</strong> button reads
+      your topic and asks you four specific questions instead. It never answers
+      them for you: invented facts are exactly what this field exists to avoid.
+    </p>
+
+    <h3>Before it writes</h3>
+    <p>
+      Pressing <strong>Write this post</strong> opens a panel listing what has
+      never been decided &mdash; whether anybody has described the voice, whether
+      the writing rules are still the shipped defaults, whether it has anything
+      to read but its own memory &mdash; and then the ten parts a post can be
+      built from, each switchable for this post alone.
+    </p>
+    <p>
+      Nothing blocks. <strong>Write it now</strong> sits underneath all of it,
+      and there is a <em>Stop asking me this</em> box if you would rather not see
+      it again.
+    </p>
+
+    <h3>Watching it work</h3>
+    <p>
+      You are taken to a live progress screen. The title and headings appear as
+      they are decided, a clock counts the real elapsed time, and each of the
+      twelve steps fills in as it completes. Leaving the page is safe: it picks
+      up where it stopped, and the navigation carries a <strong>Being
+      written</strong> tab while anything is in flight.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="how-it-writes">
+    <h2>The writing rules <a class="anchor" href="#how-it-writes">#</a></h2>
+
+    <p>
+      <strong>Blogcraft &rarr; How it writes</strong> is the brief every post is
+      written to. Anything shown in monospace on that screen is measured on the
+      finished draft, not merely requested.
+    </p>
+
+    <h3>Start from a shape</h3>
+    <p>
+      Eight shapes are offered &mdash; a definitive guide, a numbered list with a
+      verdict, step by step, this against that, a data study, an argued opinion,
+      a quick explainer, a hands-on review. Choosing one fills in every control
+      on the other tabs. A hands-on review and a definitive guide are not the
+      same shape, and the defaults are reasonable rather than right.
+    </p>
+
+    <h3>Or match an article you admire</h3>
+    <p>
+      Paste an address and Blogcraft reads that page, measures how it is built
+      &mdash; length, section count, sentence rhythm, how it opens and closes
+      &mdash; and sets your controls to match. It copies the shape, never the
+      words.
+    </p>
+
+    <h3>What you can set</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>Shape</h4>
+        <p>Length, fewest and most sections, how it opens, how it ends, and which
+        blocks to include.</p>
+      </div>
+      <div class="card">
+        <h4>Voice</h4>
+        <p>Tone, point of view, reading level, spelling, literary devices,
+        contractions, em dashes.</p>
+      </div>
+      <div class="card">
+        <h4>Search</h4>
+        <p>Primary keyword and density band, required terms, internal and
+        external link targets, title and description limits.</p>
+      </div>
+      <div class="card">
+        <h4>Sounding human</h4>
+        <p>Sentence variety, banned phrases, whether experience and statistics
+        are required, paragraph and sentence ceilings.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>The brief panel shows exactly what the model is told.</strong>
+      It updates as you change anything, so there is no gap between what you set
+      and what is sent.</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="research">
+    <h2>Research <a class="anchor" href="#research">#</a></h2>
+
+    <p>
+      With research on, the model is handed current sources and writes from them,
+      and the finished draft is checked against those same sources for whether it
+      says anything they do not. With everything off it writes from memory, which
+      dates badly and can cite nothing.
+    </p>
+
+    <div class="warn">
+      <p><strong>Nothing is contacted until you switch it on.</strong> Every
+      source is off by default. That is deliberate: a plugin that starts making
+      outbound requests the moment it is activated has decided something on your
+      behalf that was yours to decide.</p>
+    </div>
+
+    <table>
+      <tr><th>Source</th><th>Key needed</th><th>What it gives you</th></tr>
+      <tr><td><strong>Wikipedia</strong></td><td>None</td><td>Definitions, dates, background</td></tr>
+      <tr><td><strong>Hacker News</strong></td><td>None</td><td>What people who actually tried it say</td></tr>
+      <tr><td><strong>Tavily</strong></td><td>Paid</td><td>Current search results</td></tr>
+      <tr><td><strong>SerpApi</strong></td><td>Paid</td><td>Current search results</td></tr>
+      <tr><td><strong>SearXNG</strong></td><td>Self-hosted</td><td>Free if you run an instance</td></tr>
+    </table>
+
+    <p>
+      The two free ones are different <em>kinds</em> of material, which is the
+      point. A post built from a reference work and a forum thread says more than
+      one built from ten pages of the same search results.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="pictures">
+    <h2>Pictures <a class="anchor" href="#pictures">#</a></h2>
+
+    <p>
+      Optional, and off until you ask. The article decides what a picture should
+      show &mdash; the model that wrote the piece describes the scene &mdash; and
+      the Pictures controls decide how it looks. That is the difference between a
+      useful image and clip art of the headline.
+    </p>
+
+    <table>
+      <tr><th>Service</th><th>Cost</th><th>What it does</th></tr>
+      <tr><td><strong>Pollinations</strong></td><td>Free, no key</td><td>Generates images. The default.</td></tr>
+      <tr><td><strong>Pexels</strong></td><td>Free key</td><td>Searches real photographs</td></tr>
+      <tr><td><strong>Pixabay</strong></td><td>Free key</td><td>Searches real photographs</td></tr>
+      <tr><td><strong>fal.ai, OpenAI, Gemini, Grok</strong></td><td>Per picture</td><td>Generates images</td></tr>
+    </table>
+
+    <div class="note">
+      <p><strong>A paid service is only ever used when you pick it</strong>,
+      never as a fallback, so an image is never billed to you by accident. If you
+      already write with OpenAI, Google or xAI, choosing the same one here uses
+      the key you have already entered.</p>
+    </div>
+
+    <p>
+      Pictures are fetched one per step rather than all at once, so a slow image
+      service cannot hold up a post that is otherwise finished &mdash; and if one
+      fails, the post is published without it rather than failing.
+    </p>
+    <p>
+      Alt text describes the picture rather than repeating the heading above it,
+      because a screen reader announcing the same sentence twice tells the
+      listener nothing about the image.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="what-is-checked">
+    <h2>Every check explained <a class="anchor" href="#what-is-checked">#</a></h2>
+
+    <p>
+      Twenty-five measurements on every finished draft. Each reports what it
+      found against what you asked for, and each is worth a number of points; the
+      score is what was earned over what was offered, so a check that could not
+      be asked costs nothing rather than costing marks.
+    </p>
+
+    <div class="scroller">
+    <table>
+      <tr><th>Check</th><th>What it measures</th><th>Can a rewrite fix it?</th></tr>
+      <tr><td>Length</td><td>Word count against your target band</td><td>Yes</td></tr>
+      <tr><td>Sections</td><td>How many sections you wrote, not counting the blocks the plugin adds</td><td>Yes</td></tr>
+      <tr><td>Reading ease</td><td>Flesch score against your band</td><td>Yes</td></tr>
+      <tr><td>Sentence length</td><td>Sentences over your ceiling</td><td>Yes</td></tr>
+      <tr><td>Paragraph length</td><td>The longest paragraph</td><td>Yes</td></tr>
+      <tr><td>Heading order</td><td>No skipped levels, one H1</td><td>Yes</td></tr>
+      <tr><td>Banned phrases</td><td>The AI tells, plus your own list</td><td>Yes</td></tr>
+      <tr><td>Excluded terms</td><td>Anything on your never-write-about list</td><td>Yes</td></tr>
+      <tr><td>Em dashes</td><td>Counted when you have switched them off</td><td>Yes</td></tr>
+      <tr><td>Passive voice</td><td>Share of sentences</td><td>Yes</td></tr>
+      <tr><td>Title length</td><td>Characters, not bytes, so accents and non-Latin scripts are counted properly</td><td>Yes</td></tr>
+      <tr><td>Subject in the title</td><td>Whether the keyword appears at all</td><td>Yes</td></tr>
+      <tr><td>Subject early in the title</td><td>Whether it is in the half a reader scans</td><td>Yes</td></tr>
+      <tr><td>Subject in the first 100 words</td><td>Confirming the reader landed in the right place</td><td>Yes</td></tr>
+      <tr><td>Subject in the address</td><td>Whether the slug carries it</td><td class="pill-warn">No &mdash; the slug is set at the outline</td></tr>
+      <tr><td>Subject in the description</td><td>Search engines bold what was searched for</td><td>Yes</td></tr>
+      <tr><td>Subject in a heading</td><td>At least one</td><td>Yes</td></tr>
+      <tr><td>Keyword density</td><td>Against your band, so it is not stuffed either</td><td>Yes</td></tr>
+      <tr><td>Meta description</td><td>Present and within length</td><td>Yes</td></tr>
+      <tr><td>Answers first</td><td>Whether the opening answers or throat-clears</td><td>Yes</td></tr>
+      <tr><td>Internal links</td><td>Links to your own posts</td><td class="pill-warn">No &mdash; needs more posts</td></tr>
+      <tr><td>Sources cited</td><td>Real outbound links, from research rather than invented</td><td class="pill-warn">No &mdash; a settings choice</td></tr>
+      <tr><td>Figures with a link beside them</td><td>Numbers with nothing to check them against. Your own supplied figures are exempt</td><td>Yes</td></tr>
+      <tr><td>Your own material used</td><td>Whether the evidence you gave actually made it in</td><td>Yes</td></tr>
+      <tr><td>Says more than its sources</td><td>Whether it restates what it read</td><td>Yes</td></tr>
+      <tr><td>Image alt text</td><td>Every image described</td><td>Yes</td></tr>
+    </table>
+    </div>
+
+    <h3>Reading the score</h3>
+    <p>
+      Failures are shown first and expanded; passes are folded away. A flat list
+      of twenty-five rows buries the four that need a decision among the
+      twenty-one that do not.
+    </p>
+
+    <h3 id="improve">Having another go</h3>
+    <p>
+      The review screen offers one more writing pass aimed at the faults it just
+      listed. Worth knowing: the pipeline already runs critique and revise before
+      you see anything, so this is a second attempt rather than a fix nobody
+      tried. A rewrite is not deterministic and the measurements are, so a second
+      attempt at four numbered faults often lands.
+    </p>
+    <p>
+      Where nothing failing is something a rewrite owns, <strong>no request is
+      made and you are not charged for one</strong>. Where some are, the screen
+      names the ones rewriting will not touch instead of quietly skipping them.
+      The new score is shown against the old &mdash; including when it goes down,
+      which happens &mdash; and there is a button to put the earlier version
+      back, which costs nothing because it was kept.
+    </p>
+
+    <h3>What would hold this back</h3>
+    <p>
+      A separate panel lists the things working against the post being found:
+      whether it duplicates a post you already have, whether it says anything
+      that is only yours, whether anything on your site points at it, and whether
+      it is shorter than the question deserves.
+    </p>
+    <div class="warn">
+      <p><strong>None of this predicts a position.</strong> Whether a page ranks
+      depends on who else wants the same query and what your site has earned, and
+      no plugin can see either. Anything claiming otherwise is inventing a
+      number.</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="where-posts-go">
+    <h2>Where posts go <a class="anchor" href="#where-posts-go">#</a></h2>
+
+    <p>
+      A finished post is an ordinary WordPress post. It is written as real
+      Gutenberg blocks, so every paragraph and heading is editable normally
+      rather than arriving as one unopenable lump. On a site using the Classic
+      Editor it writes plain HTML instead &mdash; detected, not configured.
+    </p>
+
+    <p>
+      By default it is saved as a <strong>draft</strong> and appears under Posts.
+      Anything scoring below your threshold is set to pending instead and listed
+      under <em>Needs review</em>, which only appears when something is actually
+      waiting.
+    </p>
+
+    <h3>Your SEO plugin</h3>
+    <p>
+      Blogcraft detects <strong>Yoast SEO</strong>, <strong>Rank Math</strong>,
+      <strong>SEOPress</strong> and <strong>All In One SEO</strong> and fills
+      their title and description fields. With none installed it writes the
+      description and the sharing tags into the page itself.
+    </p>
+    <p>
+      It also writes BlogPosting and FAQPage structured data, and a breadcrumb
+      trail for search engines &mdash; unless an SEO plugin is already handling
+      that, in which case it stands back rather than producing two of everything.
+    </p>
+
+    <h3>Saying that AI was involved</h3>
+    <p>
+      Google asks that automation be disclosed: that it was used, how, and why
+      that helped the reader. Blogcraft writes a line into the byline saying so,
+      on by default, with wording you can replace or switch off entirely.
+    </p>
+
+    <h3>Written by AI</h3>
+    <p>
+      One screen lists everything the plugin has produced: what is being written
+      now, what is finished and waiting on you, and what is on your site with the
+      score each was judged by.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="automation">
+    <h2>Automation <a class="anchor" href="#automation">#</a></h2>
+
+    <p>
+      None of this is needed to write a post by hand. Turn it on once the writing
+      already looks right to you, not before.
+    </p>
+
+    <table>
+      <tr><th>Setting</th><th>What it does</th></tr>
+      <tr><td>Write posts automatically</td><td>On a schedule you choose, with a daily cap</td></tr>
+      <tr><td>Add links to your existing posts</td><td>Weaves internal links into new posts</td></tr>
+      <tr><td>Link older posts to each new one</td><td>Points existing content at the new page</td></tr>
+      <tr><td>Check that links resolve</td><td>Every link is fetched before publishing; dead ones are removed</td></tr>
+      <tr><td>Refuse near-duplicate topics</td><td>Before any tokens are spent</td></tr>
+      <tr><td>Rewrite older posts</td><td>Refreshing keeps the address and everything it has earned</td></tr>
+      <tr><td>Tell Bing and Yandex</td><td>IndexNow. Only the address is sent, never the post.</td></tr>
+      <tr><td>Monthly token cap</td><td>Stops generation once reached. Zero means no limit.</td></tr>
+    </table>
+
+    <div class="note">
+      <p>WordPress only runs scheduled work when somebody visits the site, so a
+      quiet morning can push a post later than the hour you chose. That is
+      WordPress rather than Blogcraft. Posts written by hand are driven from your
+      browser instead, which is why they work on hosts where scheduled tasks are
+      unreliable.</p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="checking-it-works">
+    <h2>When something breaks <a class="anchor" href="#checking-it-works">#</a></h2>
+
+    <h3>Test the connection first</h3>
+    <p>
+      <strong>Settings &rarr; Check it works</strong> sends one very short
+      request and reports exactly what came back. It costs a fraction of a penny
+      and is the fastest way to tell a wrong key from a wrong model id from a
+      provider that is simply down. Saving a key runs it automatically.
+    </p>
+
+    <h3>The Activity screen</h3>
+    <p>
+      Every job, every step, and why anything stopped. API keys are never
+      recorded there. A job still moving links to its own progress screen.
+    </p>
+
+    <details>
+      <summary>The plugin will not activate</summary>
+      <p>Usually two copies installed. Blogcraft detects this and stands aside
+      with a notice naming the folder to delete. Look in
+      <code>wp-content/plugins/</code> for a second folder &mdash; often named
+      after a zip file &mdash; and delete it.</p>
+    </details>
+
+    <details>
+      <summary>A post is stuck on one step</summary>
+      <p>Each step is one request and each has a time budget. If a provider stops
+      answering, the screen says so rather than spinning. Check Activity for the
+      last error. A rate limit is waited out rather than counted as a failure, so
+      a quota that resets in an hour does not burn the job.</p>
+    </details>
+
+    <details>
+      <summary>"You exceeded your current quota"</summary>
+      <p>Your provider's limit, not the plugin's. The job pauses and resumes on
+      its own once the window passes. The progress screen shows when.</p>
+    </details>
+
+    <details>
+      <summary>Every post scores badly on Internal links</summary>
+      <p>Not a writing problem. It means the site has nothing else on the subject
+      to point at. It improves as you publish more, and the plugin says so rather
+      than pretending a rewrite would fix it.</p>
+    </details>
+
+    <details>
+      <summary>The posts read like every other AI blog</summary>
+      <p>Almost always one of three things: nobody has described the voice, the
+      writing rules are still the shipped defaults, or the evidence field is
+      empty. The panel that opens before writing tells you which.</p>
+    </details>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="privacy">
+    <h2>Privacy <a class="anchor" href="#privacy">#</a></h2>
+
+    <ul>
+      <li><strong>Your key is encrypted</strong> in the database and never
+      written to a log, an error message or the screen.</li>
+      <li><strong>Nothing is contacted until you switch it on.</strong> Every
+      research source and every picture service is off by default.</li>
+      <li><strong>No telemetry, no phone-home, no analytics.</strong> The plugin
+      never contacts us, because there is nothing to contact.</li>
+      <li><strong>Your content goes to your provider and nowhere else.</strong>
+      Topics, drafts and settings stay in your WordPress database.</li>
+      <li><strong>IndexNow sends only the address</strong> of a published post,
+      and only if you switch it on.</li>
+    </ul>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="removal">
+    <h2>Deleting the plugin <a class="anchor" href="#removal">#</a></h2>
+
+    <p>
+      Deleting Blogcraft leaves your settings, your writing rules and its record
+      of every post it wrote exactly where they are. Install it again and
+      everything is as you left it.
+    </p>
+
+    <p>
+      That is deliberate. WordPress asks whether you meant to delete the plugin;
+      it has no way to ask whether you also meant to delete the rest, and
+      dropping database tables cannot be undone. Deleting a plugin to reinstall
+      it, to move hosts, or to clear a half-finished upload is an ordinary thing
+      to do, and none of those mean the work should be thrown away.
+    </p>
+
+    <div class="warn">
+      <p>There is a box in <strong>Settings &rarr; If you delete this
+      plugin</strong> if you do want it all gone. Ticking it is the only
+      confirmation there will be.</p>
+    </div>
+
+    <p>
+      <strong>Your posts are never affected either way.</strong> They are
+      ordinary WordPress posts from the moment they are created.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------- -->
+  <section id="faq">
+    <h2>Questions <a class="anchor" href="#faq">#</a></h2>
+
+    <details>
+      <summary>Is it really free?</summary>
+      <p>The plugin is, entirely, under GPLv2. There is no pro tier and nothing
+      is locked. The AI is billed to you by whichever provider you choose, and
+      several have free tiers large enough to write with.</p>
+    </details>
+
+    <details>
+      <summary>Do I need a paid API key?</summary>
+      <p>No. Google and Groq have free tiers. Ollama and LM Studio run a model on
+      your own machine and need no key at all.</p>
+    </details>
+
+    <details>
+      <summary>Will my posts rank on Google?</summary>
+      <p>Nobody can promise that, and this plugin does not. Whether a page ranks
+      depends on who else wants the query and what your site has earned, neither
+      of which is visible from the words on the page. What Blogcraft does is
+      measure the things that are checkable and tell you plainly what is working
+      against a post.</p>
+    </details>
+
+    <details>
+      <summary>How much does a post cost to write?</summary>
+      <p>It depends on your provider's rates and the length you asked for. The
+      Write screen estimates the tokens before you spend them, and the estimates
+      are deliberately generous. A monthly cap is available.</p>
+    </details>
+
+    <details>
+      <summary>Can I edit a post before it is published?</summary>
+      <p>Yes. Nothing becomes a post until you say so. The review screen shows
+      the full draft in an editor, with the score and every check beside it.</p>
+    </details>
+
+    <details>
+      <summary>Does it work with Yoast or Rank Math?</summary>
+      <p>Yes, and with SEOPress and All In One SEO. It fills their title and
+      description fields automatically. With none installed it writes the
+      description and sharing tags itself.</p>
+    </details>
+
+    <details>
+      <summary>Are the posts real Gutenberg blocks?</summary>
+      <p>Yes. Every paragraph, heading, list and table is a proper block. On a
+      Classic Editor site it writes plain HTML instead.</p>
+    </details>
+
+    <details>
+      <summary>Can it write in languages other than English?</summary>
+      <p>Yes. Write the topic and the voice description in the language you want,
+      and set the spelling preference under the voice controls. The measurements
+      count characters rather than bytes, so non-Latin scripts are handled
+      properly.</p>
+    </details>
+
+    <details>
+      <summary>Will it publish without me looking?</summary>
+      <p>Only if you switch automatic writing on. Posts written by hand always
+      stop and wait for you, and automatic ones are saved as drafts unless you
+      say otherwise.</p>
+    </details>
+
+    <details>
+      <summary>What happens if I switch providers?</summary>
+      <p>The key fields clear, because a key saved for one service is not a key
+      for another. Counting it would mean the setup says "ready" and the first
+      post fails several steps in on authentication.</p>
+    </details>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="foot">
+    <div>
+      <a href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer">GitHub</a>
+      <a href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest">Download</a>
+      <a href="https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues">Report a problem</a>
+      <a href="https://dicecodes.com">DiceCodes</a>
+    </div>
+    <div>Blogcraft &middot; GPL-2.0-or-later &middot; Built by DiceCodes</div>
+  </div>
+</footer>
+
+<script>
+/* Highlight the section being read. No dependencies, and the page is
+   perfectly usable if this never runs. */
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  var targets = [];
+
+  links.forEach(function (a) {
+    var el = document.getElementById(a.getAttribute('href').slice(1));
+    if (el) { map[el.id] = a; targets.push(el); }
+  });
+
+  if (!targets.length || !('IntersectionObserver' in window)) { return; }
+
+  var seen = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) { return; }
+      links.forEach(function (a) { a.classList.remove('on'); });
+      if (map[e.target.id]) { map[e.target.id].classList.add('on'); }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+
+  targets.forEach(function (t) { seen.observe(t); });
+}());
+</script>
+
+</body>
+</html>
