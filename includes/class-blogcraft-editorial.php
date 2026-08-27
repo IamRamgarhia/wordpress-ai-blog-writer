@@ -310,7 +310,7 @@ class Blogcraft_Editorial {
 			}
 
 			$heading = self::headings( $chunk );
-			$out[]   = empty( $heading ) ? __( 'the introduction', 'blogcraft' ) : $heading[0];
+			$out[]   = empty( $heading ) ? __( 'the introduction', 'blogcraft-ai-writer' ) : $heading[0];
 		}
 
 		return $out;
@@ -572,10 +572,10 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'answer_first',
-			__( 'Answer-first opening', 'blogcraft' ),
+			__( 'Answer-first opening', 'blogcraft-ai-writer' ),
 			$pass,
-			$stalls ? __( 'starts with a wind-up', 'blogcraft' ) : sprintf( '%d words', $words ),
-			__( '12–60 words, on subject', 'blogcraft' ),
+			$stalls ? __( 'starts with a wind-up', 'blogcraft-ai-writer' ) : sprintf( '%d words', $words ),
+			__( '12–60 words, on subject', 'blogcraft-ai-writer' ),
 			10,
 			$repair
 		);
@@ -622,7 +622,7 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'meta_title',
-			__( 'Title length', 'blogcraft' ),
+			__( 'Title length', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d characters', $length ),
 			sprintf( '20–%d', $max ),
@@ -656,9 +656,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_early_in_title',
-			__( 'Subject early in the title', 'blogcraft' ),
+			__( 'Subject early in the title', 'blogcraft-ai-writer' ),
 			$pass,
-			$at < 0 ? __( 'missing', 'blogcraft' ) : sprintf( 'character %d', (int) $at ),
+			$at < 0 ? __( 'missing', 'blogcraft-ai-writer' ) : sprintf( 'character %d', (int) $at ),
 			sprintf( '1–%d', $half ),
 			4,
 			$at < 0
@@ -688,9 +688,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_in_opening',
-			__( 'Subject in the first 100 words', 'blogcraft' ),
+			__( 'Subject in the first 100 words', 'blogcraft-ai-writer' ),
 			$pass,
-			$pass ? __( 'present', 'blogcraft' ) : __( 'missing', 'blogcraft' ),
+			$pass ? __( 'present', 'blogcraft-ai-writer' ) : __( 'missing', 'blogcraft-ai-writer' ),
 			$keyword,
 			5,
 			sprintf( 'The first hundred words never say "%s". Somebody who has just clicked a search result needs telling within a sentence or two that they are in the right place.', $keyword )
@@ -719,9 +719,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_in_slug',
-			__( 'Subject in the address', 'blogcraft' ),
+			__( 'Subject in the address', 'blogcraft-ai-writer' ),
 			$pass,
-			'' === $slug ? __( 'not set', 'blogcraft' ) : $slug,
+			'' === $slug ? __( 'not set', 'blogcraft-ai-writer' ) : $slug,
 			$want,
 			3,
 			''
@@ -744,9 +744,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_in_description',
-			__( 'Subject in the description', 'blogcraft' ),
+			__( 'Subject in the description', 'blogcraft-ai-writer' ),
 			$pass,
-			$pass ? __( 'present', 'blogcraft' ) : __( 'missing', 'blogcraft' ),
+			$pass ? __( 'present', 'blogcraft-ai-writer' ) : __( 'missing', 'blogcraft-ai-writer' ),
 			$keyword,
 			3,
 			sprintf( 'The meta description never says "%s". Search engines bold the words somebody searched for, so a description carrying the subject reads as an answer where the others do not.', $keyword )
@@ -778,9 +778,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_in_title',
-			__( 'Subject in the title', 'blogcraft' ),
+			__( 'Subject in the title', 'blogcraft-ai-writer' ),
 			$pass,
-			$pass ? __( 'present', 'blogcraft' ) : __( 'missing', 'blogcraft' ),
+			$pass ? __( 'present', 'blogcraft-ai-writer' ) : __( 'missing', 'blogcraft-ai-writer' ),
 			$keyword,
 			8,
 			sprintf( 'The title never says "%s". Rewrite it so the subject is unmistakable at a glance.', $keyword )
@@ -810,7 +810,7 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'meta_description',
-			__( 'Meta description', 'blogcraft' ),
+			__( 'Meta description', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d characters', $length ),
 			sprintf( '70–%d', $max ),
@@ -843,9 +843,9 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'keyword_in_heading',
-			__( 'Subject in a heading', 'blogcraft' ),
+			__( 'Subject in a heading', 'blogcraft-ai-writer' ),
 			$pass,
-			$pass ? __( 'present', 'blogcraft' ) : __( 'in no heading', 'blogcraft' ),
+			$pass ? __( 'present', 'blogcraft-ai-writer' ) : __( 'in no heading', 'blogcraft-ai-writer' ),
 			$keyword,
 			6,
 			sprintf( 'No section heading mentions "%s". Rewrite one so a reader skimming the headings can see the article is about it.', $keyword )
@@ -865,10 +865,10 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'data_points',
-			__( 'Concrete figures', 'blogcraft' ),
+			__( 'Concrete figures', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $count ),
-			__( '3 or more', 'blogcraft' ),
+			__( '3 or more', 'blogcraft-ai-writer' ),
 			8,
 			sprintf(
 				'The article carries only %d specific figure. Replace vague quantities — "many", "significantly", "a lot" — with the actual number, duration, price or measurement, and only where you can support it.',
@@ -950,10 +950,10 @@ class Blogcraft_Editorial {
 			// number is on the other end, and a check whose name implies
 			// verification it never performed is worse than no check, because
 			// the first person to notice stops believing the other twenty-four.
-			__( 'Figures with a link beside them', 'blogcraft' ),
+			__( 'Figures with a link beside them', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d with nothing to check', $count ),
-			__( 'none', 'blogcraft' ),
+			__( 'none', 'blogcraft-ai-writer' ),
 			8,
 			sprintf(
 				'These sections state a figure with nothing to check it against: %s. Link to where each number came from, or take the number out.',
@@ -974,10 +974,10 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'experience',
-			__( 'First-hand experience', 'blogcraft' ),
+			__( 'First-hand experience', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d passages', $count ),
-			__( '2 or more', 'blogcraft' ),
+			__( '2 or more', 'blogcraft-ai-writer' ),
 			6,
 			'Nothing here reads as written by someone who has done it. Add at least two passages describing what actually happened when you did — what you tried, what it cost, what went wrong — and keep them specific.'
 		);
@@ -997,10 +997,10 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'own_material',
-			__( 'Uses what you supplied', 'blogcraft' ),
+			__( 'Uses what you supplied', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d unused', $count ),
-			__( 'none unused', 'blogcraft' ),
+			__( 'none unused', 'blogcraft-ai-writer' ),
 			12,
 			sprintf(
 				'These figures were supplied by the author and do not appear in the article: %s. They are the only part of this post that is not available anywhere else, so state them, exactly as given, and say they are the site\'s own.',
@@ -1023,10 +1023,10 @@ class Blogcraft_Editorial {
 
 		return self::check(
 			'source_overlap',
-			__( 'Says something new', 'blogcraft' ),
+			__( 'Says something new', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d sentences', $count ),
-			__( '1 or fewer', 'blogcraft' ),
+			__( '1 or fewer', 'blogcraft-ai-writer' ),
 			10,
 			sprintf(
 				'%d sentences repeat the research sources almost word for word. A page that restates what is already published has nothing to offer over the pages it copied. Rewrite them, and add what those sources do not say.',

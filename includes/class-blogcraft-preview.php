@@ -56,7 +56,7 @@ class Blogcraft_Preview {
 		$out = array();
 
 		if ( (bool) $blueprint['toc'] ) {
-			$out[] = self::block( 'toc', __( 'Table of contents', 'blogcraft' ), 0, '' );
+			$out[] = self::block( 'toc', __( 'Table of contents', 'blogcraft-ai-writer' ), 0, '' );
 		}
 
 		$intros = Blogcraft_Blueprint::intro_styles();
@@ -64,7 +64,7 @@ class Blogcraft_Preview {
 
 		$out[] = self::block(
 			'intro',
-			__( 'Introduction', 'blogcraft' ),
+			__( 'Introduction', 'blogcraft-ai-writer' ),
 			$intro,
 			isset( $intros[ $style ] ) ? $intros[ $style ] : ''
 		);
@@ -72,18 +72,18 @@ class Blogcraft_Preview {
 		if ( (bool) $blueprint['takeaways'] ) {
 			$out[] = self::block(
 				'takeaways',
-				__( 'Key takeaways', 'blogcraft' ),
+				__( 'Key takeaways', 'blogcraft-ai-writer' ),
 				$takeaways,
 				sprintf(
 					/* translators: %d: number of takeaway points. */
-					_n( '%d point', '%d points', (int) $blueprint['takeaways_count'], 'blogcraft' ),
+					_n( '%d point', '%d points', (int) $blueprint['takeaways_count'], 'blogcraft-ai-writer' ),
 					(int) $blueprint['takeaways_count']
 				)
 			);
 		}
 
 		if ( (int) $blueprint['images_target'] > 0 ) {
-			$out[] = self::block( 'image', __( 'Featured image', 'blogcraft' ), 0, '' );
+			$out[] = self::block( 'image', __( 'Featured image', 'blogcraft-ai-writer' ), 0, '' );
 		}
 
 		for ( $i = 1; $i <= $sections; $i++ ) {
@@ -91,11 +91,11 @@ class Blogcraft_Preview {
 				'section',
 				sprintf(
 					/* translators: %d: section number. */
-					__( 'Section %d', 'blogcraft' ),
+					__( 'Section %d', 'blogcraft-ai-writer' ),
 					$i
 				),
 				$per_block,
-				( (bool) $blueprint['allow_h3'] && $per_block > 250 ) ? __( 'may use subheadings', 'blogcraft' ) : ''
+				( (bool) $blueprint['allow_h3'] && $per_block > 250 ) ? __( 'may use subheadings', 'blogcraft-ai-writer' ) : ''
 			);
 		}
 
@@ -105,7 +105,7 @@ class Blogcraft_Preview {
 
 			$out[] = self::block(
 				'ending',
-				__( 'Ending', 'blogcraft' ),
+				__( 'Ending', 'blogcraft-ai-writer' ),
 				$ending,
 				isset( $closes[ $close ] ) ? $closes[ $close ] : ''
 			);
@@ -114,18 +114,18 @@ class Blogcraft_Preview {
 		if ( (bool) $blueprint['faq'] ) {
 			$out[] = self::block(
 				'faq',
-				__( 'Questions and answers', 'blogcraft' ),
+				__( 'Questions and answers', 'blogcraft-ai-writer' ),
 				$faq,
 				sprintf(
 					/* translators: %d: number of questions. */
-					_n( '%d question', '%d questions', (int) $blueprint['faq_count'], 'blogcraft' ),
+					_n( '%d question', '%d questions', (int) $blueprint['faq_count'], 'blogcraft-ai-writer' ),
 					(int) $blueprint['faq_count']
 				)
 			);
 		}
 
 		if ( (int) $blueprint['internal_links_target'] > 0 && Blogcraft_Settings::get( 'internal_links_enabled' ) ) {
-			$out[] = self::block( 'related', __( 'Links to your other posts', 'blogcraft' ), 0, '' );
+			$out[] = self::block( 'related', __( 'Links to your other posts', 'blogcraft-ai-writer' ), 0, '' );
 		}
 
 		return $out;
@@ -172,13 +172,13 @@ class Blogcraft_Preview {
 		if ( ! empty( $sections ) && min( $sections ) < 90 ) {
 			$out[] = sprintf(
 				/* translators: %d: words available per section. */
-				__( 'That leaves about %d words a section, which is too thin to say anything. Raise the length or cut the number of sections.', 'blogcraft' ),
+				__( 'That leaves about %d words a section, which is too thin to say anything. Raise the length or cut the number of sections.', 'blogcraft-ai-writer' ),
 				min( $sections )
 			);
 		}
 
 		if ( ! empty( $sections ) && min( $sections ) > 600 ) {
-			$out[] = __( 'Sections this long tend to wander. More sections usually reads better than longer ones.', 'blogcraft' );
+			$out[] = __( 'Sections this long tend to wander. More sections usually reads better than longer ones.', 'blogcraft-ai-writer' );
 		}
 
 		$fixed = 0;
@@ -190,11 +190,11 @@ class Blogcraft_Preview {
 		}
 
 		if ( $fixed > (int) $blueprint['word_target'] * 0.4 ) {
-			$out[] = __( 'The takeaways and questions take up most of the word budget, leaving little for the article itself.', 'blogcraft' );
+			$out[] = __( 'The takeaways and questions take up most of the word budget, leaving little for the article itself.', 'blogcraft-ai-writer' );
 		}
 
 		if ( 'expert' === (string) $blueprint['reading_level'] && (int) $blueprint['sentence_max_words'] < 20 ) {
-			$out[] = __( 'An expert reading level with a short sentence limit pulls in opposite directions. One of the two checks will usually fail.', 'blogcraft' );
+			$out[] = __( 'An expert reading level with a short sentence limit pulls in opposite directions. One of the two checks will usually fail.', 'blogcraft-ai-writer' );
 		}
 
 		if ( '' !== trim( (string) $blueprint['primary_keyword'] ) ) {
@@ -203,7 +203,7 @@ class Blogcraft_Preview {
 			$needed = (int) ceil( ( $target * $least ) / 100 );
 
 			if ( $needed > 0 && $needed < 2 ) {
-				$out[] = __( 'At this length the target phrase only needs to appear once to pass. Consider raising the minimum.', 'blogcraft' );
+				$out[] = __( 'At this length the target phrase only needs to appear once to pass. Consider raising the minimum.', 'blogcraft-ai-writer' );
 			}
 		}
 

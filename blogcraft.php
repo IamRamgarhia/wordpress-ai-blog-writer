@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name:       Blogcraft – AI Writer & SEO Content Generator
+ * Plugin Name:       Blogcraft AI Writer
  * Plugin URI:        https://dicecodes.com/blogcraft/
  * Description:       AI blog writer that researches first, writes in your voice, and checks its own work.
- * Version:           0.64.0
+ * Version:           0.65.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Dicecodes
  * Author URI:        https://dicecodes.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       blogcraft
+ * Text Domain:       blogcraft-ai-writer
  * Domain Path:       /languages
  *
  * @package Blogcraft
@@ -50,7 +50,7 @@ if ( defined( 'BLOGCRAFT_VERSION' ) ) {
 				esc_html(
 					sprintf(
 						/* translators: 1: folder of the duplicate copy. 2: version already running. */
-						__( 'Blogcraft is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts.', 'blogcraft' ),
+						__( 'Blogcraft is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts.', 'blogcraft-ai-writer' ),
 						basename( __DIR__ ),
 						BLOGCRAFT_VERSION
 					)
@@ -62,7 +62,7 @@ if ( defined( 'BLOGCRAFT_VERSION' ) ) {
 	return;
 }
 
-define( 'BLOGCRAFT_VERSION', '0.64.0' );
+define( 'BLOGCRAFT_VERSION', '0.65.0' );
 define( 'BLOGCRAFT_DB_VERSION', '1' );
 define( 'BLOGCRAFT_FILE', __FILE__ );
 define( 'BLOGCRAFT_PATH', plugin_dir_path( __FILE__ ) );

@@ -53,8 +53,8 @@ class Blogcraft_Library {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Written by AI', 'blogcraft' ),
-			__( 'Written by AI', 'blogcraft' ),
+			__( 'Written by AI', 'blogcraft-ai-writer' ),
+			__( 'Written by AI', 'blogcraft-ai-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -123,8 +123,8 @@ class Blogcraft_Library {
 		echo '<div class="wrap blogcraft-wrap">';
 		Blogcraft_Nav::render();
 
-		echo '<h1>' . esc_html__( 'Written by AI', 'blogcraft' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Every post this plugin has written, and every draft still waiting on you.', 'blogcraft' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Written by AI', 'blogcraft-ai-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Every post this plugin has written, and every draft still waiting on you.', 'blogcraft-ai-writer' ) . '</p>';
 
 		self::render_in_progress();
 		self::render_waiting();
@@ -157,14 +157,14 @@ class Blogcraft_Library {
 		}
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'Being written', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Open one to watch it, or to see why it paused.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Being written', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Open one to watch it, or to see why it paused.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		echo '<table class="widefat striped"><thead><tr>';
-		echo '<th>' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'Step', 'blogcraft' ) . '</th>';
-		echo '<th>' . esc_html__( 'State', 'blogcraft' ) . '</th>';
+		echo '<th>' . esc_html__( 'Topic', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Step', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th>' . esc_html__( 'State', 'blogcraft-ai-writer' ) . '</th>';
 		echo '<th></th>';
 		echo '</tr></thead><tbody>';
 
@@ -179,11 +179,11 @@ class Blogcraft_Library {
 			$paused = self::pause_note( isset( $row['available_at'] ) ? (string) $row['available_at'] : '' );
 
 			echo '<tr>';
-			printf( '<td><strong>%s</strong></td>', esc_html( '' === $topic ? __( 'Untitled', 'blogcraft' ) : $topic ) );
+			printf( '<td><strong>%s</strong></td>', esc_html( '' === $topic ? __( 'Untitled', 'blogcraft-ai-writer' ) : $topic ) );
 			printf( '<td>%s</td>', esc_html( isset( $steps[ $stage ] ) ? $steps[ $stage ] : $stage ) );
 			printf(
 				'<td>%s</td>',
-				esc_html( '' === $paused ? __( 'Working', 'blogcraft' ) : $paused )
+				esc_html( '' === $paused ? __( 'Working', 'blogcraft-ai-writer' ) : $paused )
 			);
 			printf(
 				'<td><a class="button button-small" href="%1$s">%2$s</a></td>',
@@ -196,7 +196,7 @@ class Blogcraft_Library {
 						admin_url( 'admin.php' )
 					)
 				),
-				esc_html__( 'Open', 'blogcraft' )
+				esc_html__( 'Open', 'blogcraft-ai-writer' )
 			);
 			echo '</tr>';
 		}
@@ -225,7 +225,7 @@ class Blogcraft_Library {
 
 		return sprintf(
 			/* translators: %s: a clock time, such as "3:45 pm". */
-			__( 'Paused until %s', 'blogcraft' ),
+			__( 'Paused until %s', 'blogcraft-ai-writer' ),
 			wp_date( get_option( 'time_format' ), $at )
 		);
 	}
@@ -239,21 +239,21 @@ class Blogcraft_Library {
 		$held = Blogcraft_Queue::held_jobs();
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'Waiting for you', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Finished, paid for, and not on your site yet. These stay here until you do something with them.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Waiting for you', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Finished, paid for, and not on your site yet. These stay here until you do something with them.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( empty( $held ) ) {
-			echo '<p>' . esc_html__( 'Nothing waiting. Every draft has been dealt with.', 'blogcraft' ) . '</p></section>';
+			echo '<p>' . esc_html__( 'Nothing waiting. Every draft has been dealt with.', 'blogcraft-ai-writer' ) . '</p></section>';
 
 			return;
 		}
 
 		echo '<table class="widefat striped blogcraft-table bc-library-table"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'What now', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'What now', 'blogcraft-ai-writer' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $held as $row ) {
@@ -271,7 +271,7 @@ class Blogcraft_Library {
 			$score = isset( $payload['quality']['score'] ) ? (int) $payload['quality']['score'] : null;
 
 			echo '<tr>';
-			printf( '<td><strong>%s</strong></td>', esc_html( '' === $title ? __( 'Untitled', 'blogcraft' ) : $title ) );
+			printf( '<td><strong>%s</strong></td>', esc_html( '' === $title ? __( 'Untitled', 'blogcraft-ai-writer' ) : $title ) );
 			// Not escaped again: score_pill() escapes everything it emits.
 			echo '<td>' . self::score_pill( $score ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			printf( '<td>%s</td>', esc_html( self::when( isset( $row['updated_at'] ) ? $row['updated_at'] : '' ) ) );
@@ -291,7 +291,7 @@ class Blogcraft_Library {
 						admin_url( 'admin.php' )
 					)
 				),
-				esc_html__( 'Read it', 'blogcraft' )
+				esc_html__( 'Read it', 'blogcraft-ai-writer' )
 			);
 			self::discard_button( (int) $row['id'] );
 			echo '</div></td></tr>';
@@ -316,11 +316,11 @@ class Blogcraft_Library {
 			esc_attr(
 				sprintf(
 					/* translators: %d: job number. */
-					__( 'Discard draft %d', 'blogcraft' ),
+					__( 'Discard draft %d', 'blogcraft-ai-writer' ),
 					(int) $job_id
 				)
 			),
-			esc_html__( 'Discard', 'blogcraft' )
+			esc_html__( 'Discard', 'blogcraft-ai-writer' )
 		);
 		echo '</form>';
 	}
@@ -334,21 +334,21 @@ class Blogcraft_Library {
 		$posts = self::generated_posts();
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'On your site', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Posts this plugin wrote, with the score each one was judged by when it was written.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'On your site', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Posts this plugin wrote, with the score each one was judged by when it was written.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( empty( $posts ) ) {
-			echo '<p>' . esc_html__( 'Nothing yet. The first post you create will appear here.', 'blogcraft' ) . '</p></section>';
+			echo '<p>' . esc_html__( 'Nothing yet. The first post you create will appear here.', 'blogcraft-ai-writer' ) . '</p></section>';
 
 			return;
 		}
 
 		echo '<table class="widefat striped blogcraft-table bc-library-table"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Post', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Post', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Score', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Written', 'blogcraft-ai-writer' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $posts as $post ) {
@@ -358,7 +358,7 @@ class Blogcraft_Library {
 			printf(
 				'<td><a href="%1$s"><strong>%2$s</strong></a></td>',
 				esc_url( (string) get_edit_post_link( $post->ID ) ),
-				esc_html( '' === $post->post_title ? __( 'Untitled', 'blogcraft' ) : $post->post_title )
+				esc_html( '' === $post->post_title ? __( 'Untitled', 'blogcraft-ai-writer' ) : $post->post_title )
 			);
 			printf(
 				'<td><span class="blogcraft-badge is-%1$s">%2$s</span></td>',
@@ -391,15 +391,15 @@ class Blogcraft_Library {
 	private static function status_label( $status ) {
 		switch ( (string) $status ) {
 			case 'publish':
-				return __( 'Published', 'blogcraft' );
+				return __( 'Published', 'blogcraft-ai-writer' );
 			case 'future':
-				return __( 'Scheduled', 'blogcraft' );
+				return __( 'Scheduled', 'blogcraft-ai-writer' );
 			case 'pending':
-				return __( 'Held for review', 'blogcraft' );
+				return __( 'Held for review', 'blogcraft-ai-writer' );
 			case 'private':
-				return __( 'Private', 'blogcraft' );
+				return __( 'Private', 'blogcraft-ai-writer' );
 			default:
-				return __( 'Draft', 'blogcraft' );
+				return __( 'Draft', 'blogcraft-ai-writer' );
 		}
 	}
 
@@ -417,7 +417,7 @@ class Blogcraft_Library {
 	 */
 	private static function score_pill( $score ) {
 		if ( null === $score ) {
-			return '<span class="bc-score-pill is-none">' . esc_html__( 'not scored', 'blogcraft' ) . '</span>';
+			return '<span class="bc-score-pill is-none">' . esc_html__( 'not scored', 'blogcraft-ai-writer' ) . '</span>';
 		}
 
 		$bar = (int) Blogcraft_Settings::get( 'quality_threshold' );
@@ -458,7 +458,7 @@ class Blogcraft_Library {
 
 		return sprintf(
 			/* translators: %s: a length of time, such as "2 hours". */
-			__( '%s ago', 'blogcraft' ),
+			__( '%s ago', 'blogcraft-ai-writer' ),
 			human_time_diff( $stamp, time() )
 		);
 	}

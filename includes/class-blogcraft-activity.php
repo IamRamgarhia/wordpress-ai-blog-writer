@@ -64,8 +64,8 @@ class Blogcraft_Activity {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Activity', 'blogcraft' ),
-			__( 'Activity', 'blogcraft' ),
+			__( 'Activity', 'blogcraft-ai-writer' ),
+			__( 'Activity', 'blogcraft-ai-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -79,14 +79,14 @@ class Blogcraft_Activity {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
 		}
 
 		echo '<div class="wrap blogcraft-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Activity', 'blogcraft' ) . '</h1>';
-		echo '<p>' . esc_html__( 'What the plugin has been doing, and why anything stopped.', 'blogcraft' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Activity', 'blogcraft-ai-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'What the plugin has been doing, and why anything stopped.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</div>';
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
@@ -137,25 +137,25 @@ class Blogcraft_Activity {
 		$jobs = Blogcraft_Queue::recent_jobs( 25 );
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'Recent jobs', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Each post moves through the pipeline one step per run. A job that fails waits, then tries again.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Recent jobs', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Each post moves through the pipeline one step per run. A job that fails waits, then tries again.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( empty( $jobs ) ) {
-			echo '<p>' . esc_html__( 'Nothing has been queued yet.', 'blogcraft' ) . '</p>';
+			echo '<p>' . esc_html__( 'Nothing has been queued yet.', 'blogcraft-ai-writer' ) . '</p>';
 			echo '</section>';
 
 			return;
 		}
 
 		echo '<table class="widefat striped blogcraft-table"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Job', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Step', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Tries', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Updated', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Last problem', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Job', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Step', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Status', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Tries', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Updated', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Last problem', 'blogcraft-ai-writer' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $jobs as $job ) {
@@ -269,11 +269,11 @@ class Blogcraft_Activity {
 			esc_attr(
 				sprintf(
 					/* translators: %d: job number. */
-					__( 'Try job %d again', 'blogcraft' ),
+					__( 'Try job %d again', 'blogcraft-ai-writer' ),
 					(int) $job_id
 				)
 			),
-			esc_html__( 'Try again', 'blogcraft' )
+			esc_html__( 'Try again', 'blogcraft-ai-writer' )
 		);
 		echo '</form>';
 	}
@@ -294,11 +294,11 @@ class Blogcraft_Activity {
 			esc_attr(
 				sprintf(
 					/* translators: %d: job number. */
-					__( 'Stop job %d', 'blogcraft' ),
+					__( 'Stop job %d', 'blogcraft-ai-writer' ),
 					(int) $job_id
 				)
 			),
-			esc_html__( 'Stop', 'blogcraft' )
+			esc_html__( 'Stop', 'blogcraft-ai-writer' )
 		);
 		echo '</form>';
 	}
@@ -332,22 +332,22 @@ class Blogcraft_Activity {
 		$entries = Blogcraft_Logger::recent( 100 );
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'Event log', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'The newest hundred entries. Older ones are trimmed automatically. API keys are never recorded here.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Event log', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'The newest hundred entries. Older ones are trimmed automatically. API keys are never recorded here.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( empty( $entries ) ) {
-			echo '<p>' . esc_html__( 'Nothing logged yet.', 'blogcraft' ) . '</p>';
+			echo '<p>' . esc_html__( 'Nothing logged yet.', 'blogcraft-ai-writer' ) . '</p>';
 			echo '</section>';
 
 			return;
 		}
 
 		echo '<table class="widefat striped blogcraft-table"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'When', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Level', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Job', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'What happened', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'When', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Level', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Job', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'What happened', 'blogcraft-ai-writer' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $entries as $entry ) {
@@ -379,7 +379,7 @@ class Blogcraft_Activity {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_clear_log" />';
 		Blogcraft_Request::nonce_field( self::CLEAR_ACTION );
-		submit_button( __( 'Clear the log', 'blogcraft' ), 'secondary', 'submit', true );
+		submit_button( __( 'Clear the log', 'blogcraft-ai-writer' ), 'secondary', 'submit', true );
 		echo '</form>';
 
 		echo '</section>';
@@ -423,7 +423,7 @@ class Blogcraft_Activity {
 
 		Blogcraft_Logger::clear();
 
-		self::back( true, __( 'Log cleared.', 'blogcraft' ) );
+		self::back( true, __( 'Log cleared.', 'blogcraft-ai-writer' ) );
 	}
 
 	/**
@@ -439,10 +439,10 @@ class Blogcraft_Activity {
 		$job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( $job_id > 0 && Blogcraft_Queue::requeue( $job_id ) ) {
-			self::back( true, __( 'Queued again. It will run on the next step.', 'blogcraft' ) );
+			self::back( true, __( 'Queued again. It will run on the next step.', 'blogcraft-ai-writer' ) );
 		}
 
-		self::back( false, __( 'That job could not be queued again.', 'blogcraft' ) );
+		self::back( false, __( 'That job could not be queued again.', 'blogcraft-ai-writer' ) );
 	}
 
 	/**

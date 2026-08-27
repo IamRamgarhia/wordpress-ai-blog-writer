@@ -30,15 +30,15 @@ class Blogcraft_Art_Direction {
 	 */
 	public static function styles() {
 		return array(
-			'photo'        => __( 'Photograph', 'blogcraft' ),
-			'editorial'    => __( 'Editorial photograph, magazine-like', 'blogcraft' ),
-			'illustration' => __( 'Illustration', 'blogcraft' ),
-			'flat'         => __( 'Flat vector', 'blogcraft' ),
-			'isometric'    => __( 'Isometric', 'blogcraft' ),
-			'threed'       => __( '3D render', 'blogcraft' ),
-			'watercolour'  => __( 'Watercolour', 'blogcraft' ),
-			'line'         => __( 'Line drawing', 'blogcraft' ),
-			'minimal'      => __( 'Minimal, lots of space', 'blogcraft' ),
+			'photo'        => __( 'Photograph', 'blogcraft-ai-writer' ),
+			'editorial'    => __( 'Editorial photograph, magazine-like', 'blogcraft-ai-writer' ),
+			'illustration' => __( 'Illustration', 'blogcraft-ai-writer' ),
+			'flat'         => __( 'Flat vector', 'blogcraft-ai-writer' ),
+			'isometric'    => __( 'Isometric', 'blogcraft-ai-writer' ),
+			'threed'       => __( '3D render', 'blogcraft-ai-writer' ),
+			'watercolour'  => __( 'Watercolour', 'blogcraft-ai-writer' ),
+			'line'         => __( 'Line drawing', 'blogcraft-ai-writer' ),
+			'minimal'      => __( 'Minimal, lots of space', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -68,13 +68,13 @@ class Blogcraft_Art_Direction {
 	 */
 	public static function moods() {
 		return array(
-			''         => __( 'No preference', 'blogcraft' ),
-			'bright'   => __( 'Bright and open', 'blogcraft' ),
-			'warm'     => __( 'Warm', 'blogcraft' ),
-			'cool'     => __( 'Cool and calm', 'blogcraft' ),
-			'moody'    => __( 'Moody, low key', 'blogcraft' ),
-			'contrast' => __( 'High contrast', 'blogcraft' ),
-			'muted'    => __( 'Muted and understated', 'blogcraft' ),
+			''         => __( 'No preference', 'blogcraft-ai-writer' ),
+			'bright'   => __( 'Bright and open', 'blogcraft-ai-writer' ),
+			'warm'     => __( 'Warm', 'blogcraft-ai-writer' ),
+			'cool'     => __( 'Cool and calm', 'blogcraft-ai-writer' ),
+			'moody'    => __( 'Moody, low key', 'blogcraft-ai-writer' ),
+			'contrast' => __( 'High contrast', 'blogcraft-ai-writer' ),
+			'muted'    => __( 'Muted and understated', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -101,11 +101,11 @@ class Blogcraft_Art_Direction {
 	 */
 	public static function subjects() {
 		return array(
-			'object'   => __( 'The thing itself', 'blogcraft' ),
-			'inuse'    => __( 'Someone using it', 'blogcraft' ),
-			'scene'    => __( 'The setting it belongs in', 'blogcraft' ),
-			'abstract' => __( 'An abstract representation', 'blogcraft' ),
-			'detail'   => __( 'A close detail', 'blogcraft' ),
+			'object'   => __( 'The thing itself', 'blogcraft-ai-writer' ),
+			'inuse'    => __( 'Someone using it', 'blogcraft-ai-writer' ),
+			'scene'    => __( 'The setting it belongs in', 'blogcraft-ai-writer' ),
+			'abstract' => __( 'An abstract representation', 'blogcraft-ai-writer' ),
+			'detail'   => __( 'A close detail', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -116,10 +116,10 @@ class Blogcraft_Art_Direction {
 	 */
 	public static function shapes() {
 		return array(
-			'16:9' => __( 'Wide, 16:9', 'blogcraft' ),
-			'3:2'  => __( 'Classic, 3:2', 'blogcraft' ),
-			'4:3'  => __( 'Standard, 4:3', 'blogcraft' ),
-			'1:1'  => __( 'Square', 'blogcraft' ),
+			'16:9' => __( 'Wide, 16:9', 'blogcraft-ai-writer' ),
+			'3:2'  => __( 'Classic, 3:2', 'blogcraft-ai-writer' ),
+			'4:3'  => __( 'Standard, 4:3', 'blogcraft-ai-writer' ),
+			'1:1'  => __( 'Square', 'blogcraft-ai-writer' ),
 		);
 	}
 

@@ -146,9 +146,9 @@ class Blogcraft_Notices {
 
 		printf(
 			'<div class="notice notice-warning"><p>%1$s</p><p><a href="%2$s">%3$s</a></p></div>',
-			esc_html__( 'Blogcraft has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job.', 'blogcraft' ),
+			esc_html__( 'Blogcraft has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job.', 'blogcraft-ai-writer' ),
 			esc_url( self::dismiss_url( 'cron_health' ) ),
-			esc_html__( 'Dismiss this notice', 'blogcraft' )
+			esc_html__( 'Dismiss this notice', 'blogcraft-ai-writer' )
 		);
 	}
 }

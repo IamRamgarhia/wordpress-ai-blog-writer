@@ -27,16 +27,16 @@ class Blogcraft_Nav {
 	 */
 	public static function screens() {
 		$screens = array(
-			Blogcraft_Admin::MENU_SLUG    => __( 'Overview', 'blogcraft' ),
-			'blogcraft-write'             => __( 'Write a post', 'blogcraft' ),
-			Blogcraft_Progress::PAGE_SLUG => __( 'Being written', 'blogcraft' ),
-			'blogcraft-blueprint'         => __( 'How it writes', 'blogcraft' ),
-			'blogcraft-calendar'          => __( 'Calendar', 'blogcraft' ),
-			'blogcraft-library'           => __( 'Written by AI', 'blogcraft' ),
-			'blogcraft-review'            => __( 'Needs review', 'blogcraft' ),
-			'blogcraft-activity'          => __( 'Activity', 'blogcraft' ),
-			'blogcraft-settings'          => __( 'Settings', 'blogcraft' ),
-			'blogcraft-help'              => __( 'Help', 'blogcraft' ),
+			Blogcraft_Admin::MENU_SLUG    => __( 'Overview', 'blogcraft-ai-writer' ),
+			'blogcraft-write'             => __( 'Write a post', 'blogcraft-ai-writer' ),
+			Blogcraft_Progress::PAGE_SLUG => __( 'Being written', 'blogcraft-ai-writer' ),
+			'blogcraft-blueprint'         => __( 'How it writes', 'blogcraft-ai-writer' ),
+			'blogcraft-calendar'          => __( 'Calendar', 'blogcraft-ai-writer' ),
+			'blogcraft-library'           => __( 'Written by AI', 'blogcraft-ai-writer' ),
+			'blogcraft-review'            => __( 'Needs review', 'blogcraft-ai-writer' ),
+			'blogcraft-activity'          => __( 'Activity', 'blogcraft-ai-writer' ),
+			'blogcraft-settings'          => __( 'Settings', 'blogcraft-ai-writer' ),
+			'blogcraft-help'              => __( 'Help', 'blogcraft-ai-writer' ),
 		);
 
 		// A tab for an empty queue is a tab that is never worth clicking. It
@@ -79,7 +79,7 @@ class Blogcraft_Nav {
 		$current = self::current();
 		$waiting = count( Blogcraft_Review::pending_posts() );
 
-		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Blogcraft screens', 'blogcraft' ) . '">';
+		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Blogcraft screens', 'blogcraft-ai-writer' ) . '">';
 
 		foreach ( self::screens() as $slug => $label ) {
 			$bubble = '';

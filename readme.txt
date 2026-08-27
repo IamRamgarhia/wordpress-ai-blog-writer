@@ -1,10 +1,10 @@
-=== Blogcraft – AI Writer & SEO Content Generator ===
+=== Blogcraft AI Writer ===
 Contributors: dicecodes
 Tags: ai content generator, ai writer, autoblogging, seo content, blog automation
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.64.0
+Stable tag: 0.65.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -162,6 +162,16 @@ Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and 
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
 
 == Changelog ==
+
+= Changelog ==
+
+The complete history. The most recent releases are also in readme.txt;
+everything is here, oldest at the bottom.
+
+= 0.65.0 =
+* The plugin is now called Blogcraft AI Writer, and its text domain is blogcraft-ai-writer to match. wordpress.org generates the directory slug from the plugin name and will not change it afterwards, and the text domain has to equal that slug or the translations the directory builds never load — which is the same failure as shipping no translations at all
+* Nothing that identifies your data moved. The option names, the capability, the admin addresses and the class names are all unchanged, so an existing install keeps every setting, blueprint and record of what it has written
+
 = 0.64.0 =
 * No provider is chosen for you. The setting defaulted to OpenAI, so a plugin whose whole point is that you bring your own key opened with somebody else's company already selected — a paid, card-first one, sitting above every route that costs nothing. The list now starts on "Choose a provider" and waits
 * The Help screen is written to be scanned rather than read. It was twelve sections of four to seven full paragraphs, which is an essay about the plugin rather than instructions for using it. Each section now opens with one sentence and breaks into numbered steps or short lines, and a "Start here" section at the top gives the five steps in order
@@ -184,12 +194,5 @@ They are encrypted before being stored, shown only as a mask, and never written 
 = 0.60.0 =
 * The README and the branding inside WordPress brought into line with the house style used by Open WP Migration, so somebody arriving at either plugin recognises the second
 * The plugins row now offers Docs beside Set up and Settings, and the Help screen links out to the guides and to the issue tracker — kept clearly separate from the shipped documentation above them, which is always true of the version you have installed in a way an online page cannot be
-
-= 0.59.0 =
-* Two scoring bugs found by writing a real post end to end and reading the result. Neither was reachable from a unit test
-* The section count was counting the plugin's own headings. Key takeaways, the questions, the numbers, the mistakes and the sources are all h2, so a post asked for two sections and written to exactly two was marked down for having four — on the heaviest check in the scorecard, on every post with any block switched on
-* Figures you supplied yourself were counted as unsupported claims. The evidence field is the one the plugin weighs most heavily, and stating your own measurement cost eight points because there was no link beside it. There is nothing to link to; it is your number
-* A README, which the repository did not have. Two scraped research files that should never have been committed are gone with it
-* The display name is now "Blogcraft – AI Writer & SEO Content Generator". The slug, the folder name and the text domain are unchanged, so no existing install is affected
-
 Older releases are listed in changelog.txt, which ships with the plugin.
+

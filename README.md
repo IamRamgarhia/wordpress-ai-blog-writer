@@ -6,9 +6,9 @@
 
 [![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
-[![Version](https://img.shields.io/badge/Version-0.64.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
+[![Version](https://img.shields.io/badge/Version-0.65.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
-[![Tests](https://img.shields.io/badge/Tests-671%20passing-brightgreen.svg)](#-contributing)
+[![Tests](https://img.shields.io/badge/Tests-675%20passing-brightgreen.svg)](#-contributing)
 [![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
 [![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
 [![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/blogcraft/)
@@ -31,7 +31,7 @@ It reads current sources before writing, drafts in a voice you describe, reads i
 
 ### From a release zip
 
-1. Download the latest `blogcraft-x.y.z.zip` from [Releases](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest).
+1. Download the latest `blogcraft-ai-writer-x.y.z.zip` from [Releases](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest).
 2. In WordPress: **Plugins → Add Plugin → Upload Plugin**.
 3. Choose the zip, install, activate.
 

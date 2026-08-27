@@ -47,7 +47,7 @@ class Blogcraft_Emulate {
 		if ( '' === $url || ! wp_http_validate_url( $url ) ) {
 			return array(
 				'ok'    => false,
-				'error' => __( 'That does not look like a web address.', 'blogcraft' ),
+				'error' => __( 'That does not look like a web address.', 'blogcraft-ai-writer' ),
 				'title' => '',
 				'html'  => '',
 			);
@@ -64,7 +64,7 @@ class Blogcraft_Emulate {
 		if ( is_wp_error( $response ) ) {
 			return array(
 				'ok'    => false,
-				'error' => __( 'That page could not be read.', 'blogcraft' ),
+				'error' => __( 'That page could not be read.', 'blogcraft-ai-writer' ),
 				'title' => '',
 				'html'  => '',
 			);
@@ -73,7 +73,7 @@ class Blogcraft_Emulate {
 		if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
 			return array(
 				'ok'    => false,
-				'error' => __( 'That page did not answer with an article.', 'blogcraft' ),
+				'error' => __( 'That page did not answer with an article.', 'blogcraft-ai-writer' ),
 				'title' => '',
 				'html'  => '',
 			);
@@ -377,7 +377,7 @@ class Blogcraft_Emulate {
 		if ( $seen['words'] < 200 ) {
 			return array(
 				'ok'     => false,
-				'error'  => __( 'There was not enough writing on that page to measure. Link to the article itself rather than a category or a home page.', 'blogcraft' ),
+				'error'  => __( 'There was not enough writing on that page to measure. Link to the article itself rather than a category or a home page.', 'blogcraft-ai-writer' ),
 				'title'  => $page['title'],
 				'notes'  => array(),
 				'fields' => array(),
@@ -403,14 +403,14 @@ class Blogcraft_Emulate {
 		$notes = array(
 			sprintf(
 				/* translators: 1: word count. 2: number of sections. 3: average sentence length. */
-				__( '%1$s words across %2$d sections, averaging %3$d words a sentence.', 'blogcraft' ),
+				__( '%1$s words across %2$d sections, averaging %3$d words a sentence.', 'blogcraft-ai-writer' ),
 				number_format_i18n( (int) $seen['words'] ),
 				(int) $seen['sections'],
 				(int) $seen['sentence_words']
 			),
 			sprintf(
 				/* translators: 1: outbound links. 2: figures stated. 3: images. */
-				__( '%1$d links out, %2$d specific figures, %3$d images.', 'blogcraft' ),
+				__( '%1$d links out, %2$d specific figures, %3$d images.', 'blogcraft-ai-writer' ),
 				(int) $seen['external_links'],
 				(int) $seen['data_points'],
 				(int) $seen['images']
@@ -418,16 +418,16 @@ class Blogcraft_Emulate {
 		);
 
 		if ( 'first' === $seen['person'] ) {
-			$notes[] = __( 'Written in the first person.', 'blogcraft' );
+			$notes[] = __( 'Written in the first person.', 'blogcraft-ai-writer' );
 		} elseif ( 'second' === $seen['person'] ) {
-			$notes[] = __( 'Addresses the reader as "you".', 'blogcraft' );
+			$notes[] = __( 'Addresses the reader as "you".', 'blogcraft-ai-writer' );
 		}
 
 		if ( ! empty( $seen['faq'] ) ) {
-			$notes[] = __( 'Ends with a run of questions.', 'blogcraft' );
+			$notes[] = __( 'Ends with a run of questions.', 'blogcraft-ai-writer' );
 		}
 
-		$notes[] = __( 'Structure only. None of the wording was copied, kept, or shown to a model.', 'blogcraft' );
+		$notes[] = __( 'Structure only. None of the wording was copied, kept, or shown to a model.', 'blogcraft-ai-writer' );
 
 		return $notes;
 	}

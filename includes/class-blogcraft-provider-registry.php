@@ -45,24 +45,24 @@ class Blogcraft_Provider_Registry {
 		// link next to each provider on the settings screen always has the
 		// current figure.
 		$labels = array(
-			'openai'      => __( 'OpenAI — GPT, paid', 'blogcraft' ),
-			'anthropic'   => __( 'Anthropic — Claude, paid', 'blogcraft' ),
-			'gemini'      => __( 'Google — Gemini, free tier', 'blogcraft' ),
-			'xai'         => __( 'xAI — Grok, paid', 'blogcraft' ),
-			'moonshot'    => __( 'Moonshot — Kimi, paid', 'blogcraft' ),
-			'deepseek'    => __( 'DeepSeek, paid', 'blogcraft' ),
-			'groq'        => __( 'Groq — fast, free tier', 'blogcraft' ),
-			'openrouter'  => __( 'OpenRouter — many models, one key, some of them free', 'blogcraft' ),
-			'mistral'     => __( 'Mistral, free tier', 'blogcraft' ),
-			'together'    => __( 'Together AI, paid', 'blogcraft' ),
-			'fireworks'   => __( 'Fireworks AI, paid', 'blogcraft' ),
-			'cerebras'    => __( 'Cerebras — free credits to start, then paid', 'blogcraft' ),
-			'huggingface' => __( 'Hugging Face — hundreds of open models, free tier', 'blogcraft' ),
-			'ollama'      => __( 'Ollama — on this machine, free, no key', 'blogcraft' ),
-			'lmstudio'    => __( 'LM Studio — on this machine, free, no key', 'blogcraft' ),
-			'jan'         => __( 'Jan — on this machine, free, no key', 'blogcraft' ),
-			'llamacpp'    => __( 'llama.cpp — on this machine, free, no key', 'blogcraft' ),
-			'custom'      => __( 'Anything else — enter the address yourself', 'blogcraft' ),
+			'openai'      => __( 'OpenAI — GPT, paid', 'blogcraft-ai-writer' ),
+			'anthropic'   => __( 'Anthropic — Claude, paid', 'blogcraft-ai-writer' ),
+			'gemini'      => __( 'Google — Gemini, free tier', 'blogcraft-ai-writer' ),
+			'xai'         => __( 'xAI — Grok, paid', 'blogcraft-ai-writer' ),
+			'moonshot'    => __( 'Moonshot — Kimi, paid', 'blogcraft-ai-writer' ),
+			'deepseek'    => __( 'DeepSeek, paid', 'blogcraft-ai-writer' ),
+			'groq'        => __( 'Groq — fast, free tier', 'blogcraft-ai-writer' ),
+			'openrouter'  => __( 'OpenRouter — many models, one key, some of them free', 'blogcraft-ai-writer' ),
+			'mistral'     => __( 'Mistral, free tier', 'blogcraft-ai-writer' ),
+			'together'    => __( 'Together AI, paid', 'blogcraft-ai-writer' ),
+			'fireworks'   => __( 'Fireworks AI, paid', 'blogcraft-ai-writer' ),
+			'cerebras'    => __( 'Cerebras — free credits to start, then paid', 'blogcraft-ai-writer' ),
+			'huggingface' => __( 'Hugging Face — hundreds of open models, free tier', 'blogcraft-ai-writer' ),
+			'ollama'      => __( 'Ollama — on this machine, free, no key', 'blogcraft-ai-writer' ),
+			'lmstudio'    => __( 'LM Studio — on this machine, free, no key', 'blogcraft-ai-writer' ),
+			'jan'         => __( 'Jan — on this machine, free, no key', 'blogcraft-ai-writer' ),
+			'llamacpp'    => __( 'llama.cpp — on this machine, free, no key', 'blogcraft-ai-writer' ),
+			'custom'      => __( 'Anything else — enter the address yourself', 'blogcraft-ai-writer' ),
 		);
 
 		$out = array();
@@ -76,7 +76,7 @@ class Blogcraft_Provider_Registry {
 				// this route hands the request to WordPress itself, which may
 				// be pointed at a free local model or a paid account, and the
 				// plugin genuinely cannot tell which from here.
-				'label'    => __( 'WordPress AI Client — no key needed, free or paid depending on how WordPress is set up', 'blogcraft' ),
+				'label'    => __( 'WordPress AI Client — no key needed, free or paid depending on how WordPress is set up', 'blogcraft-ai-writer' ),
 				'cost'     => 'varies',
 				'adapter'  => 'wpai',
 				'base_url' => '',
@@ -143,11 +143,11 @@ class Blogcraft_Provider_Registry {
 	 */
 	public static function groups() {
 		return array(
-			'local'     => __( 'Free — runs on your own machine, no key, no account', 'blogcraft' ),
-			'free_tier' => __( 'Free tier — a key, but no card', 'blogcraft' ),
-			'trial'     => __( 'Free credits to start, then paid', 'blogcraft' ),
-			'paid'      => __( 'Paid', 'blogcraft' ),
-			'varies'    => __( 'Depends on how you set it up', 'blogcraft' ),
+			'local'     => __( 'Free — runs on your own machine, no key, no account', 'blogcraft-ai-writer' ),
+			'free_tier' => __( 'Free tier — a key, but no card', 'blogcraft-ai-writer' ),
+			'trial'     => __( 'Free credits to start, then paid', 'blogcraft-ai-writer' ),
+			'paid'      => __( 'Paid', 'blogcraft-ai-writer' ),
+			'varies'    => __( 'Depends on how you set it up', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -463,14 +463,14 @@ class Blogcraft_Provider_Registry {
 			$response        = new Blogcraft_Provider_Response();
 			$response->error = sprintf(
 				/* translators: %d: configured monthly token cap. */
-				__( 'Monthly token cap of %d tokens has been reached; no request was sent.', 'blogcraft' ),
+				__( 'Monthly token cap of %d tokens has been reached; no request was sent.', 'blogcraft-ai-writer' ),
 				(int) Blogcraft_Settings::get( 'monthly_token_cap' )
 			);
 			return $response;
 		}
 
 		$last        = new Blogcraft_Provider_Response();
-		$last->error = __( 'No providers were configured.', 'blogcraft' );
+		$last->error = __( 'No providers were configured.', 'blogcraft-ai-writer' );
 
 		foreach ( $providers as $provider ) {
 			if ( ! $provider instanceof Blogcraft_Provider ) {
@@ -550,7 +550,7 @@ class Blogcraft_Provider_Registry {
 
 		$result['error'] = ( $response instanceof Blogcraft_Provider_Response && '' !== $response->error )
 			? $response->error
-			: __( 'Provider could not be reached.', 'blogcraft' );
+			: __( 'Provider could not be reached.', 'blogcraft-ai-writer' );
 
 		return $result;
 	}

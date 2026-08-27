@@ -174,10 +174,10 @@ class Blogcraft_Structure {
 
 		$out[] = array(
 			'key'    => 'alt_text',
-			'label'  => __( 'Image alt text', 'blogcraft' ),
+			'label'  => __( 'Image alt text', 'blogcraft-ai-writer' ),
 			'pass'   => ( 0 === $missing ),
 			'actual' => sprintf( '%d missing', $missing ),
-			'target' => __( 'none missing', 'blogcraft' ),
+			'target' => __( 'none missing', 'blogcraft-ai-writer' ),
 			'weight' => 6,
 			// A failed check with nothing to do about it is a deduction, not a
 			// finding. Blogcraft writes alt text on the images it adds itself,
@@ -194,10 +194,10 @@ class Blogcraft_Structure {
 
 		$out[] = array(
 			'key'    => 'heading_order',
-			'label'  => __( 'Heading order', 'blogcraft' ),
+			'label'  => __( 'Heading order', 'blogcraft-ai-writer' ),
 			'pass'   => $ordered,
-			'actual' => $ordered ? __( 'in order', 'blogcraft' ) : __( 'a level is skipped', 'blogcraft' ),
-			'target' => __( 'no skipped levels', 'blogcraft' ),
+			'actual' => $ordered ? __( 'in order', 'blogcraft-ai-writer' ) : __( 'a level is skipped', 'blogcraft-ai-writer' ),
+			'target' => __( 'no skipped levels', 'blogcraft-ai-writer' ),
 			'weight' => 6,
 			'repair' => $ordered
 				? ''
@@ -215,7 +215,7 @@ class Blogcraft_Structure {
 
 		$out[] = array(
 			'key'    => 'thin_section',
-			'label'  => __( 'Thinnest section', 'blogcraft' ),
+			'label'  => __( 'Thinnest section', 'blogcraft-ai-writer' ),
 			'pass'   => $thin_ok,
 			'actual' => sprintf( '%d words', $thinnest ),
 			'target' => sprintf( '%d+', $floor ),

@@ -88,7 +88,7 @@ class Blogcraft_Backlinks {
 		}
 
 		return "\n\n" . self::START . "\n"
-			. Blogcraft_Blocks::heading( __( 'Related reading', 'blogcraft' ), 2 )
+			. Blogcraft_Blocks::heading( __( 'Related reading', 'blogcraft-ai-writer' ), 2 )
 			. "<!-- wp:list -->\n<ul class=\"wp-block-list\">\n" . $items . "</ul>\n<!-- /wp:list -->\n"
 			. self::END;
 	}

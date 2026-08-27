@@ -54,8 +54,8 @@ class Blogcraft_Calendar {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Calendar', 'blogcraft' ),
-			__( 'Calendar', 'blogcraft' ),
+			__( 'Calendar', 'blogcraft-ai-writer' ),
+			__( 'Calendar', 'blogcraft-ai-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -88,14 +88,14 @@ class Blogcraft_Calendar {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
 		}
 
 		echo '<div class="wrap blogcraft-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Calendar', 'blogcraft' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Your topic queue, against the schedule it will run on.', 'blogcraft' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Calendar', 'blogcraft-ai-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Your topic queue, against the schedule it will run on.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</div>';
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
@@ -125,12 +125,12 @@ class Blogcraft_Calendar {
 		$names = self::weekday_names();
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'The schedule', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Set under Settings, in your site timezone. Shown here so the dates below make sense.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'The schedule', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Set under Settings, in your site timezone. Shown here so the dates below make sense.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( ! Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
-			echo '<p class="blogcraft-callout">' . esc_html__( 'Automatic writing is off, so nothing below is scheduled yet. These are the dates it would use once you turn it on.', 'blogcraft' ) . '</p>';
+			echo '<p class="blogcraft-callout">' . esc_html__( 'Automatic writing is off, so nothing below is scheduled yet. These are the dates it would use once you turn it on.', 'blogcraft-ai-writer' ) . '</p>';
 		}
 
 		$chosen = array();
@@ -145,20 +145,20 @@ class Blogcraft_Calendar {
 
 		printf(
 			'<li><span class="blogcraft-stat-value">%1$s</span><span class="blogcraft-stat-label">%2$s</span></li>',
-			esc_html( empty( $chosen ) ? __( 'None', 'blogcraft' ) : (string) count( $chosen ) ),
-			esc_html__( 'Days a week', 'blogcraft' )
+			esc_html( empty( $chosen ) ? __( 'None', 'blogcraft-ai-writer' ) : (string) count( $chosen ) ),
+			esc_html__( 'Days a week', 'blogcraft-ai-writer' )
 		);
 
 		printf(
 			'<li><span class="blogcraft-stat-value">%1$s</span><span class="blogcraft-stat-label">%2$s</span></li>',
 			esc_html( wp_date( get_option( 'time_format', 'H:i' ), self::hour_stamp() ) ),
-			esc_html__( 'From', 'blogcraft' )
+			esc_html__( 'From', 'blogcraft-ai-writer' )
 		);
 
 		printf(
 			'<li><span class="blogcraft-stat-value">%1$d</span><span class="blogcraft-stat-label">%2$s</span></li>',
 			(int) Blogcraft_Settings::get( 'autopilot_per_day' ),
-			esc_html__( 'Posts a day', 'blogcraft' )
+			esc_html__( 'Posts a day', 'blogcraft-ai-writer' )
 		);
 
 		echo '</ul>';
@@ -198,19 +198,19 @@ class Blogcraft_Calendar {
 		$total = count( Blogcraft_Autopilot::topics() );
 
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'What is coming', 'blogcraft' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Each topic is used once, then removed from the list. Move one up to write it sooner.', 'blogcraft' ) . '</p>';
+		echo '<h2>' . esc_html__( 'What is coming', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Each topic is used once, then removed from the list. Move one up to write it sooner.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</header>';
 
 		if ( 0 === $total ) {
-			echo '<p>' . esc_html__( 'No topics queued. Add some under Settings, in the topic queue.', 'blogcraft' ) . '</p>';
+			echo '<p>' . esc_html__( 'No topics queued. Add some under Settings, in the topic queue.', 'blogcraft-ai-writer' ) . '</p>';
 			echo '</section>';
 
 			return;
 		}
 
 		if ( empty( $plan ) ) {
-			echo '<p>' . esc_html__( 'There are topics waiting, but no weekdays are selected, so none of them have a date. Choose at least one day under Settings.', 'blogcraft' ) . '</p>';
+			echo '<p>' . esc_html__( 'There are topics waiting, but no weekdays are selected, so none of them have a date. Choose at least one day under Settings.', 'blogcraft-ai-writer' ) . '</p>';
 			echo '</section>';
 
 			return;
@@ -219,9 +219,9 @@ class Blogcraft_Calendar {
 		$format = get_option( 'date_format', 'M j, Y' ) . ' ' . get_option( 'time_format', 'H:i' );
 
 		echo '<table class="widefat striped blogcraft-table"><thead><tr>';
-		echo '<th scope="col">' . esc_html__( 'Planned', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft' ) . '</th>';
-		echo '<th scope="col">' . esc_html__( 'Order', 'blogcraft' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Planned', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Topic', 'blogcraft-ai-writer' ) . '</th>';
+		echo '<th scope="col">' . esc_html__( 'Order', 'blogcraft-ai-writer' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $plan as $index => $entry ) {
@@ -235,14 +235,14 @@ class Blogcraft_Calendar {
 			$last  = count( $plan ) - 1;
 
 			if ( $index > 0 ) {
-				self::move_button( $index, 'up', __( 'Move up', 'blogcraft' ), $topic );
+				self::move_button( $index, 'up', __( 'Move up', 'blogcraft-ai-writer' ), $topic );
 			}
 
 			if ( $index < $last ) {
-				self::move_button( $index, 'down', __( 'Move down', 'blogcraft' ), $topic );
+				self::move_button( $index, 'down', __( 'Move down', 'blogcraft-ai-writer' ), $topic );
 			}
 
-			self::move_button( $index, 'remove', __( 'Remove', 'blogcraft' ), $topic );
+			self::move_button( $index, 'remove', __( 'Remove', 'blogcraft-ai-writer' ), $topic );
 
 			echo '</td>';
 			echo '</tr>';
@@ -260,7 +260,7 @@ class Blogcraft_Calendar {
 							'%d further topic is queued beyond the year shown here.',
 							'%d further topics are queued beyond the year shown here.',
 							$total - count( $plan ),
-							'blogcraft'
+							'blogcraft-ai-writer'
 						),
 						$total - count( $plan )
 					)
@@ -291,7 +291,7 @@ class Blogcraft_Calendar {
 			esc_attr(
 				sprintf(
 					/* translators: 1: button action such as Move up. 2: the topic it applies to. */
-					__( '%1$s: %2$s', 'blogcraft' ),
+					__( '%1$s: %2$s', 'blogcraft-ai-writer' ),
 					$label,
 					$topic
 				)
@@ -317,23 +317,23 @@ class Blogcraft_Calendar {
 		$topics = Blogcraft_Autopilot::topics();
 
 		if ( ! isset( $topics[ $index ] ) ) {
-			self::back( false, __( 'That topic is no longer in the queue.', 'blogcraft' ) );
+			self::back( false, __( 'That topic is no longer in the queue.', 'blogcraft-ai-writer' ) );
 		}
 
 		if ( 'remove' === $verb ) {
 			array_splice( $topics, $index, 1 );
 			self::store( $topics );
-			self::back( true, __( 'Removed.', 'blogcraft' ) );
+			self::back( true, __( 'Removed.', 'blogcraft-ai-writer' ) );
 		}
 
 		$target = ( 'up' === $verb ) ? $index - 1 : $index + 1;
 
 		if ( 'up' !== $verb && 'down' !== $verb ) {
-			self::back( false, __( 'Unknown action.', 'blogcraft' ) );
+			self::back( false, __( 'Unknown action.', 'blogcraft-ai-writer' ) );
 		}
 
 		if ( ! isset( $topics[ $target ] ) ) {
-			self::back( false, __( 'That topic is already at the end of the queue.', 'blogcraft' ) );
+			self::back( false, __( 'That topic is already at the end of the queue.', 'blogcraft-ai-writer' ) );
 		}
 
 		$swap              = $topics[ $target ];
@@ -341,7 +341,7 @@ class Blogcraft_Calendar {
 		$topics[ $index ]  = $swap;
 
 		self::store( $topics );
-		self::back( true, __( 'Moved.', 'blogcraft' ) );
+		self::back( true, __( 'Moved.', 'blogcraft-ai-writer' ) );
 	}
 
 	/**

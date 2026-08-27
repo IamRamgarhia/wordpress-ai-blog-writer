@@ -34,7 +34,7 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 	 * @return string
 	 */
 	public function label() {
-		return __( 'Custom endpoint', 'blogcraft' );
+		return __( 'Custom endpoint', 'blogcraft-ai-writer' );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 		// by construction, because Blogcraft_Http::post_json() re-encodes the
 		// resulting array correctly.
 		if ( ! is_array( $decoded ) ) {
-			$response->error = __( 'Custom endpoint request template is not valid JSON.', 'blogcraft' );
+			$response->error = __( 'Custom endpoint request template is not valid JSON.', 'blogcraft-ai-writer' );
 			return $response;
 		}
 
@@ -81,7 +81,7 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 		$text = self::dig( $result['body'], (string) $this->config( 'text_path', '' ) );
 
 		if ( ! is_string( $text ) || '' === $text ) {
-			$response->error = __( 'Unexpected response shape from provider.', 'blogcraft' );
+			$response->error = __( 'Unexpected response shape from provider.', 'blogcraft-ai-writer' );
 			return $response;
 		}
 
@@ -266,7 +266,7 @@ class Blogcraft_Provider_Custom extends Blogcraft_Provider {
 		if ( $code > 0 && ( $code < 200 || $code >= 300 ) ) {
 			return sprintf(
 				/* translators: 1: HTTP status code, 2: error message reported by the provider. */
-				__( 'HTTP %1$d: %2$s', 'blogcraft' ),
+				__( 'HTTP %1$d: %2$s', 'blogcraft-ai-writer' ),
 				$code,
 				$this->explain( $message )
 			);

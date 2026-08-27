@@ -49,7 +49,7 @@ class Blogcraft_Provider_Anthropic extends Blogcraft_Provider {
 	 * @return string
 	 */
 	public function label() {
-		return __( 'Anthropic', 'blogcraft' );
+		return __( 'Anthropic', 'blogcraft-ai-writer' );
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Blogcraft_Provider_Anthropic extends Blogcraft_Provider {
 			: null;
 
 		if ( ! is_string( $content ) ) {
-			$response->error = __( 'Unexpected response shape from provider.', 'blogcraft' );
+			$response->error = __( 'Unexpected response shape from provider.', 'blogcraft-ai-writer' );
 			return $response;
 		}
 
@@ -228,7 +228,7 @@ class Blogcraft_Provider_Anthropic extends Blogcraft_Provider {
 		if ( $code > 0 && ( $code < 200 || $code >= 300 ) ) {
 			return sprintf(
 				/* translators: 1: HTTP status code, 2: error message reported by the provider. */
-				__( 'HTTP %1$d: %2$s', 'blogcraft' ),
+				__( 'HTTP %1$d: %2$s', 'blogcraft-ai-writer' ),
 				$code,
 				$this->explain( $message )
 			);

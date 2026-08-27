@@ -317,7 +317,7 @@ class Test_Blogcraft_Robustness extends WP_UnitTestCase {
 
 			$domain = trim( $last[1], "'" . '"' );
 
-			if ( 'blogcraft' !== $domain ) {
+			if ( $this->declared_domain() !== $domain ) {
 				$out[] = $token[1] . '() on line ' . $token[2] . ' uses ' . $domain;
 			}
 		}
@@ -347,7 +347,12 @@ class Test_Blogcraft_Robustness extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( 'blogcraft', $headers['domain'] );
+		// The slug wordpress.org generates comes from Plugin Name, and the
+		// text domain has to equal that slug or the directory's language
+		// packs never load. Nothing here can see the slug, so what is held
+		// is the next best thing: the domain, the shipped .pot and the
+		// folder the build installs into all have to agree.
+		$this->assertNotSame( '', $headers['domain'] );
 		$this->assertSame( '/languages', $headers['path'] );
 
 		$bad = array();
@@ -375,8 +380,41 @@ class Test_Blogcraft_Robustness extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( 'load_plugin_textdomain', $source );
 	}
+	/**
+	 * The text domain as declared in the plugin header.
+	 *
+	 * @return string
+	 */
+	private function declared_domain() {
+		$header = (string) file_get_contents( BLOGCRAFT_PATH . 'blogcraft.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		preg_match( '/^\s*\*\s*Text Domain:\s*(\S+)/m', $header, $hit );
+
+		return isset( $hit[1] ) ? $hit[1] : '';
+	}
+
 	public function test_the_translations_are_looked_for_where_they_ship() {
+		$domain = $this->declared_domain();
+
+		$this->assertNotSame( '', $domain, 'the plugin header declares no text domain' );
 		$this->assertDirectoryExists( BLOGCRAFT_PATH . 'languages' );
-		$this->assertFileExists( BLOGCRAFT_PATH . 'languages/blogcraft.pot' );
+
+		// Named for the domain, because that is the name WordPress looks
+		// for. A .pot under any other name ships and does nothing.
+		$this->assertFileExists( BLOGCRAFT_PATH . 'languages/' . $domain . '.pot' );
+	}
+
+	public function test_the_build_installs_into_a_folder_named_for_the_domain() {
+		// wordpress.org derives the install folder and the text domain from
+		// the same slug, so a zip that unpacks to a different folder name
+		// installs a second copy beside the first — which this plugin now
+		// refuses to activate, correctly and confusingly.
+		$build = (string) file_get_contents( BLOGCRAFT_PATH . 'bin/build.py' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertStringContainsString(
+			"'" . $this->declared_domain() . "/'",
+			$build,
+			'the release zip does not unpack into a folder named for the text domain'
+		);
 	}
 }

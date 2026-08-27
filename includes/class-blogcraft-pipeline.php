@@ -1043,7 +1043,7 @@ class Blogcraft_Pipeline {
 			if ( empty( $check['pass'] ) ) {
 				$reasons[] = sprintf(
 					/* translators: 1: check name. 2: measured value. 3: the value asked for. */
-					__( '%1$s: %2$s, wanted %3$s', 'blogcraft' ),
+					__( '%1$s: %2$s, wanted %3$s', 'blogcraft-ai-writer' ),
 					$check['label'],
 					$check['actual'],
 					$check['target']
@@ -1131,7 +1131,7 @@ class Blogcraft_Pipeline {
 		}
 
 		if ( '' === $title ) {
-			$title = sanitize_text_field( isset( $payload['topic'] ) ? (string) $payload['topic'] : __( 'Untitled', 'blogcraft' ) );
+			$title = sanitize_text_field( isset( $payload['topic'] ) ? (string) $payload['topic'] : __( 'Untitled', 'blogcraft-ai-writer' ) );
 		}
 
 		// Built at verify and scored there; reused as-is so the post that gets

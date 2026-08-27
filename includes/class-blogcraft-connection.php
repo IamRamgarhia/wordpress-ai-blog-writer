@@ -68,13 +68,13 @@ class Blogcraft_Connection {
 	 */
 	public static function handle_list_models() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft-ai-writer' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
-			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft-ai-writer' ) ), 403 );
 		}
 
 		// Every one of these asks the provider something. Without one the
@@ -99,7 +99,7 @@ class Blogcraft_Connection {
 				$key = (string) Blogcraft_Settings::get( 'provider_api_key' );
 			} else {
 				wp_send_json_error(
-					array( 'message' => __( 'The saved key belongs to a different provider. Paste a key for this one, then try again.', 'blogcraft' ) ),
+					array( 'message' => __( 'The saved key belongs to a different provider. Paste a key for this one, then try again.', 'blogcraft-ai-writer' ) ),
 					200
 				);
 			}
@@ -124,7 +124,7 @@ class Blogcraft_Connection {
 		);
 
 		if ( null === $provider ) {
-			wp_send_json_error( array( 'message' => __( 'Choose a provider first.', 'blogcraft' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'Choose a provider first.', 'blogcraft-ai-writer' ) ), 400 );
 		}
 
 		$models = array();
@@ -138,7 +138,7 @@ class Blogcraft_Connection {
 		if ( empty( $models ) ) {
 			wp_send_json_error(
 				array(
-					'message' => __( 'Could not read a model list. Check the key is right, or type the model id yourself — the link beside this field goes to your provider\'s list.', 'blogcraft' ),
+					'message' => __( 'Could not read a model list. Check the key is right, or type the model id yourself — the link beside this field goes to your provider\'s list.', 'blogcraft-ai-writer' ),
 				),
 				200
 			);
@@ -183,29 +183,29 @@ class Blogcraft_Connection {
 				'help'      => Blogcraft_Provider_Registry::help_map(),
 				'bases'     => Blogcraft_Provider_Registry::base_url_map(),
 				/* translators: %s: default API address for the selected provider. */
-				'baseText'  => __( 'Leave blank to use %s.', 'blogcraft' ),
-				'baseNone'  => __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ),
-				'baseTail'  => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'blogcraft' ),
+				'baseText'  => __( 'Leave blank to use %s.', 'blogcraft-ai-writer' ),
+				'baseNone'  => __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft-ai-writer' ),
+				'baseTail'  => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'blogcraft-ai-writer' ),
 				/* translators: %s: provider name, such as OpenAI. */
-				'keyText'   => __( 'Get a key from %s', 'blogcraft' ),
+				'keyText'   => __( 'Get a key from %s', 'blogcraft-ai-writer' ),
 				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 				'nonce'     => wp_create_nonce( self::SAVE_ACTION ),
-				'learning'  => __( 'Reading your posts...', 'blogcraft' ),
-				'learned'   => __( 'Learn from my posts', 'blogcraft' ),
-				'failed'    => __( 'Your posts could not be read. Fill the fields in yourself.', 'blogcraft' ),
-				'asking'    => __( 'Asking your provider...', 'blogcraft' ),
-				'askModel'  => __( 'Show the models on my account', 'blogcraft' ),
+				'learning'  => __( 'Reading your posts...', 'blogcraft-ai-writer' ),
+				'learned'   => __( 'Learn from my posts', 'blogcraft-ai-writer' ),
+				'failed'    => __( 'Your posts could not be read. Fill the fields in yourself.', 'blogcraft-ai-writer' ),
+				'asking'    => __( 'Asking your provider...', 'blogcraft-ai-writer' ),
+				'askModel'  => __( 'Show the models on my account', 'blogcraft-ai-writer' ),
 				/* translators: %d: how many models the provider returned. */
-				'gotModels' => __( '%d models on your account. Pick one and it fills the box above.', 'blogcraft' ),
-				'pickModel' => __( 'Pick a model...', 'blogcraft' ),
+				'gotModels' => __( '%d models on your account. Pick one and it fills the box above.', 'blogcraft-ai-writer' ),
+				'pickModel' => __( 'Pick a model...', 'blogcraft-ai-writer' ),
 				// Which provider the saved key belongs to, so the field can
 				// stop claiming a key the moment the provider changes. The
 				// key itself is never sent to the browser.
 				'keyOwner'  => (string) Blogcraft_Settings::get( 'provider_key_owner' ),
 				'keyMask'   => '' === (string) Blogcraft_Settings::get( 'provider_api_key' )
-					? __( 'Not set', 'blogcraft' )
+					? __( 'Not set', 'blogcraft-ai-writer' )
 					: Blogcraft_Crypto::mask( (string) Blogcraft_Settings::get( 'provider_api_key' ) ),
-				'keyNone'   => __( 'Not set', 'blogcraft' ),
+				'keyNone'   => __( 'Not set', 'blogcraft-ai-writer' ),
 			)
 		);
 	}
@@ -220,13 +220,13 @@ class Blogcraft_Connection {
 	 */
 	public static function handle_learn() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft-ai-writer' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
-			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft-ai-writer' ) ), 403 );
 		}
 
 		// Reading your posts back needs the provider as much as writing one
@@ -244,8 +244,8 @@ class Blogcraft_Connection {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Blogcraft Settings', 'blogcraft' ),
-			__( 'Settings', 'blogcraft' ),
+			__( 'Blogcraft Settings', 'blogcraft-ai-writer' ),
+			__( 'Settings', 'blogcraft-ai-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -260,12 +260,12 @@ class Blogcraft_Connection {
 	private static function common_fields() {
 		return array(
 			'provider_base_url' => array(
-				__( 'Base URL', 'blogcraft' ),
+				__( 'Base URL', 'blogcraft-ai-writer' ),
 				self::base_url_hint(),
 			),
 			'provider_model'    => array(
-				__( 'Model', 'blogcraft' ),
-				__( 'The model id exactly as your provider writes it. Model names get retired regularly, so take the current one from the provider list linked below rather than copying an example. Nothing runs until this is filled in.', 'blogcraft' ),
+				__( 'Model', 'blogcraft-ai-writer' ),
+				__( 'The model id exactly as your provider writes it. Model names get retired regularly, so take the current one from the provider list linked below rather than copying an example. Nothing runs until this is filled in.', 'blogcraft-ai-writer' ),
 			),
 		);
 	}
@@ -298,7 +298,7 @@ class Blogcraft_Connection {
 			esc_html(
 				sprintf(
 					/* translators: %s: provider name, such as OpenAI. */
-					__( 'Get a key from %s', 'blogcraft' ),
+					__( 'Get a key from %s', 'blogcraft-ai-writer' ),
 					$help['label']
 				)
 			)
@@ -307,12 +307,12 @@ class Blogcraft_Connection {
 		printf(
 			' <a href="%1$s" target="_blank" rel="noopener noreferrer" data-role="docs">%2$s</a>',
 			esc_url( $help['docs_url'] ),
-			esc_html__( 'See their model names', 'blogcraft' )
+			esc_html__( 'See their model names', 'blogcraft-ai-writer' )
 		);
 
 		printf(
 			'<span class="screen-reader-text"> %s</span>',
-			esc_html__( '(opens in a new tab)', 'blogcraft' )
+			esc_html__( '(opens in a new tab)', 'blogcraft-ai-writer' )
 		);
 
 		echo '</p>';
@@ -331,15 +331,15 @@ class Blogcraft_Connection {
 			(string) Blogcraft_Settings::get( 'provider_type' )
 		);
 
-		$local = __( 'Point it at a proxy, a self-hosted model, or any compatible service — http://localhost:11434/v1 for Ollama, for example.', 'blogcraft' );
+		$local = __( 'Point it at a proxy, a self-hosted model, or any compatible service — http://localhost:11434/v1 for Ollama, for example.', 'blogcraft-ai-writer' );
 
 		if ( '' === $default ) {
-			return __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft' ) . ' ' . $local;
+			return __( 'Required for a custom endpoint. There is no default to fall back to.', 'blogcraft-ai-writer' ) . ' ' . $local;
 		}
 
 		return sprintf(
 			/* translators: %s: default API address for the selected provider. */
-			__( 'Leave blank to use %s.', 'blogcraft' ),
+			__( 'Leave blank to use %s.', 'blogcraft-ai-writer' ),
 			$default
 		) . ' ' . $local;
 	}
@@ -351,11 +351,11 @@ class Blogcraft_Connection {
 	 */
 	private static function custom_fields() {
 		return array(
-			'provider_auth_header'            => __( 'Auth header name', 'blogcraft' ),
-			'provider_auth_prefix'            => __( 'Auth value prefix', 'blogcraft' ),
-			'provider_text_path'              => __( 'Response text path', 'blogcraft' ),
-			'provider_prompt_tokens_path'     => __( 'Prompt tokens path', 'blogcraft' ),
-			'provider_completion_tokens_path' => __( 'Completion tokens path', 'blogcraft' ),
+			'provider_auth_header'            => __( 'Auth header name', 'blogcraft-ai-writer' ),
+			'provider_auth_prefix'            => __( 'Auth value prefix', 'blogcraft-ai-writer' ),
+			'provider_text_path'              => __( 'Response text path', 'blogcraft-ai-writer' ),
+			'provider_prompt_tokens_path'     => __( 'Prompt tokens path', 'blogcraft-ai-writer' ),
+			'provider_completion_tokens_path' => __( 'Completion tokens path', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -366,9 +366,9 @@ class Blogcraft_Connection {
 	 */
 	private static function voice_text_fields() {
 		return array(
-			'voice_tone'          => __( 'Tone', 'blogcraft' ),
-			'voice_point_of_view' => __( 'Point of view', 'blogcraft' ),
-			'voice_reading_level' => __( 'Reading level', 'blogcraft' ),
+			'voice_tone'          => __( 'Tone', 'blogcraft-ai-writer' ),
+			'voice_point_of_view' => __( 'Point of view', 'blogcraft-ai-writer' ),
+			'voice_reading_level' => __( 'Reading level', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -379,12 +379,12 @@ class Blogcraft_Connection {
 	 */
 	private static function voice_area_fields() {
 		return array(
-			'voice_niche'         => array( __( 'What this blog is about', 'blogcraft' ), __( 'One or two sentences on the subject and the angle.', 'blogcraft' ) ),
-			'voice_audience'      => array( __( 'Who you write for', 'blogcraft' ), __( 'Who is reading, and what they already know.', 'blogcraft' ) ),
-			'voice_style_rules'   => array( __( 'Style rules', 'blogcraft' ), __( 'One per line. For example: no em dashes. Short paragraphs. Never open with a question.', 'blogcraft' ) ),
-			'voice_banned_words'  => array( __( 'Extra banned words', 'blogcraft' ), __( 'One per line. A list of common AI tells is already blocked by default.', 'blogcraft' ) ),
-			'voice_banned_topics' => array( __( 'Never write about', 'blogcraft' ), __( 'One per line. Competitors, off-limits claims, anything legally sensitive.', 'blogcraft' ) ),
-			'voice_experience'    => array( __( 'Your own experience', 'blogcraft' ), __( 'Anecdotes, opinions or data only you have. This is what AI writing structurally lacks.', 'blogcraft' ) ),
+			'voice_niche'         => array( __( 'What this blog is about', 'blogcraft-ai-writer' ), __( 'One or two sentences on the subject and the angle.', 'blogcraft-ai-writer' ) ),
+			'voice_audience'      => array( __( 'Who you write for', 'blogcraft-ai-writer' ), __( 'Who is reading, and what they already know.', 'blogcraft-ai-writer' ) ),
+			'voice_style_rules'   => array( __( 'Style rules', 'blogcraft-ai-writer' ), __( 'One per line. For example: no em dashes. Short paragraphs. Never open with a question.', 'blogcraft-ai-writer' ) ),
+			'voice_banned_words'  => array( __( 'Extra banned words', 'blogcraft-ai-writer' ), __( 'One per line. A list of common AI tells is already blocked by default.', 'blogcraft-ai-writer' ) ),
+			'voice_banned_topics' => array( __( 'Never write about', 'blogcraft-ai-writer' ), __( 'One per line. Competitors, off-limits claims, anything legally sensitive.', 'blogcraft-ai-writer' ) ),
+			'voice_experience'    => array( __( 'Your own experience', 'blogcraft-ai-writer' ), __( 'Anecdotes, opinions or data only you have. This is what AI writing structurally lacks.', 'blogcraft-ai-writer' ) ),
 		);
 	}
 
@@ -395,8 +395,8 @@ class Blogcraft_Connection {
 	 */
 	private static function picture_toggles() {
 		return array(
-			'images_enabled'     => __( 'Give each post a featured image', 'blogcraft' ),
-			'images_per_section' => __( 'Also put a picture under each section heading', 'blogcraft' ),
+			'images_enabled'     => __( 'Give each post a featured image', 'blogcraft-ai-writer' ),
+			'images_per_section' => __( 'Also put a picture under each section heading', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -407,16 +407,16 @@ class Blogcraft_Connection {
 	 */
 	private static function toggle_fields() {
 		return array(
-			'internal_links_enabled'  => __( 'Add links to your existing posts', 'blogcraft' ),
-			'verify_links_enabled'    => __( 'Check that links resolve before publishing', 'blogcraft' ),
-			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft' ),
-			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft' ),
-			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'blogcraft' ),
-			'ai_disclosure'           => __( 'Say on each post that AI helped write it', 'blogcraft' ),
+			'internal_links_enabled'  => __( 'Add links to your existing posts', 'blogcraft-ai-writer' ),
+			'verify_links_enabled'    => __( 'Check that links resolve before publishing', 'blogcraft-ai-writer' ),
+			'backlinks_enabled'       => __( 'Link older posts to each new one', 'blogcraft-ai-writer' ),
+			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'blogcraft-ai-writer' ),
+			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'blogcraft-ai-writer' ),
+			'ai_disclosure'           => __( 'Say on each post that AI helped write it', 'blogcraft-ai-writer' ),
 
-			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft' ),
-			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft' ),
-			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'blogcraft' ),
+			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'blogcraft-ai-writer' ),
+			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'blogcraft-ai-writer' ),
+			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -445,7 +445,7 @@ class Blogcraft_Connection {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
 		}
 
 		$type   = (string) Blogcraft_Settings::get( 'provider_type' );
@@ -455,8 +455,8 @@ class Blogcraft_Connection {
 		echo '<div class="wrap blogcraft-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'blogcraft' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'blogcraft-ai-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'blogcraft-ai-writer' ) . '</p>';
 
 		// Sent here mid-introduction. Without this the first step of the
 		// wizard is a one-way door: it asks somebody to set up a provider and
@@ -468,7 +468,7 @@ class Blogcraft_Connection {
 			printf(
 				'<p class="bc-back-to-setup"><a href="%1$s">%2$s</a></p>',
 				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Welcome::PAGE_SLUG ) ),
-				esc_html__( 'Back to setting up', 'blogcraft' )
+				esc_html__( 'Back to setting up', 'blogcraft-ai-writer' )
 			);
 		}
 
@@ -492,10 +492,10 @@ class Blogcraft_Connection {
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
 
-		self::open_card( '01', __( 'Connect a provider', 'blogcraft' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'blogcraft' ), 'provider' );
+		self::open_card( '01', __( 'Connect a provider', 'blogcraft-ai-writer' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'blogcraft-ai-writer' ), 'provider' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		$groups = Blogcraft_Provider_Registry::groups();
 		$chosen = ( '' !== $type );
 
@@ -508,7 +508,7 @@ class Blogcraft_Connection {
 		printf(
 			'<option value=""%1$s>%2$s</option>',
 			selected( $chosen, false, false ),
-			esc_html__( 'Choose a provider…', 'blogcraft' )
+			esc_html__( 'Choose a provider…', 'blogcraft-ai-writer' )
 		);
 
 		// Grouped, free first. The labels always said which were free; in
@@ -536,11 +536,11 @@ class Blogcraft_Connection {
 		echo '</select>';
 		printf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( 'Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock.', 'blogcraft' )
+			esc_html__( 'Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock.', 'blogcraft-ai-writer' )
 		);
 		printf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( 'The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'blogcraft' )
+			esc_html__( 'The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'blogcraft-ai-writer' )
 		);
 		echo '</td></tr>';
 
@@ -550,10 +550,10 @@ class Blogcraft_Connection {
 		$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
 		$key_fits = ( '' !== $key ) && ( '' === $owner || $owner === $type );
 
-		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		printf(
 			'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
-			esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'blogcraft' ) )
+			esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'blogcraft-ai-writer' ) )
 		);
 
 		if ( '' !== $key && ! $key_fits ) {
@@ -564,13 +564,13 @@ class Blogcraft_Connection {
 				esc_html(
 					sprintf(
 						/* translators: %s: the provider the saved key belongs to. */
-						__( 'The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place.', 'blogcraft' ),
+						__( 'The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place.', 'blogcraft-ai-writer' ),
 						isset( $types[ $owner ] ) ? $types[ $owner ] : $owner
 					)
 				)
 			);
 		} else {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ) . '</p>';
 		}
 
 		echo self::clear_key_control( 'provider_api_key', $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -599,8 +599,8 @@ class Blogcraft_Connection {
 				'<tr><th scope="row"></th><td><p class="bc-await-key">%s</p></td></tr>',
 				esc_html(
 					$chosen
-						? __( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'blogcraft' )
-						: __( 'Choose a provider above and press Save settings. Which key to paste, which address to use and which models exist all follow from that one choice, so it is the only thing this screen asks for first.', 'blogcraft' )
+						? __( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'blogcraft-ai-writer' )
+						: __( 'Choose a provider above and press Save settings. Which key to paste, which address to use and which models exist all follow from that one choice, so it is the only thing this screen asks for first.', 'blogcraft-ai-writer' )
 				)
 			);
 		}
@@ -627,18 +627,18 @@ class Blogcraft_Connection {
 			}
 		}
 
-		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'blogcraft' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'blogcraft' ) );
+		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'blogcraft-ai-writer' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'blogcraft-ai-writer' ) );
 
 		foreach ( self::custom_fields() as $name => $label ) {
 			self::text_row( $name, $label, 'blogcraft-custom-only' );
 		}
 
-		echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		printf(
 			'<textarea name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
 			esc_textarea( (string) Blogcraft_Settings::get( 'provider_request_template' ) )
 		);
-		echo '<p class="description">' . esc_html__( 'Custom provider only. Use {{prompt}} and {{model}} as placeholders.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Custom provider only. Use {{prompt}} and {{model}} as placeholders.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
@@ -647,8 +647,8 @@ class Blogcraft_Connection {
 
 		self::open_card(
 			'02',
-			__( 'Connect a picture service', 'blogcraft' ),
-			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'blogcraft' ),
+			__( 'Connect a picture service', 'blogcraft-ai-writer' ),
+			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'blogcraft-ai-writer' ),
 			'pictures'
 		);
 		echo '<table class="form-table" role="presentation"><tbody>';
@@ -657,7 +657,7 @@ class Blogcraft_Connection {
 			self::checkbox_row( $name, $label );
 		}
 
-		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		echo '<select name="image_provider" id="blogcraft_image_provider">';
 		foreach ( Blogcraft_Images::providers() as $id => $label ) {
 			printf(
@@ -668,32 +668,32 @@ class Blogcraft_Connection {
 			);
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</td></tr>';
 
 		self::number_row(
 			'monthly_image_cap',
-			__( 'Most paid images per month', 'blogcraft' ),
-			__( 'Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'blogcraft' )
+			__( 'Most paid images per month', 'blogcraft-ai-writer' ),
+			__( 'Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'blogcraft-ai-writer' )
 		);
 
 		self::image_model_rows();
 
-		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft' ) );
-		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft' ) );
+		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'blogcraft-ai-writer' ) );
+		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'blogcraft-ai-writer' ) );
 
 		echo '</tbody></table>';
 		self::close_card();
 
 		self::open_card(
 			'03',
-			__( 'Research', 'blogcraft' ),
-			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft' ),
+			__( 'Research', 'blogcraft-ai-writer' ),
+			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'blogcraft-ai-writer' ),
 			'research'
 		);
 		echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		echo '<select name="research_provider" id="blogcraft_research_provider">';
 		foreach ( Blogcraft_Research::providers() as $id => $label ) {
 			printf(
@@ -709,33 +709,33 @@ class Blogcraft_Connection {
 			self::checkbox_row( $name, $label );
 		}
 
-		self::text_row( 'research_base_url', __( 'SearXNG URL', 'blogcraft' ) );
+		self::text_row( 'research_base_url', __( 'SearXNG URL', 'blogcraft-ai-writer' ) );
 
-		echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		$research_key = (string) Blogcraft_Settings::get( 'research_api_key' );
 		printf(
 			'<input type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
-			esc_attr( '' === $research_key ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $research_key ) )
+			esc_attr( '' === $research_key ? __( 'Not set', 'blogcraft-ai-writer' ) : Blogcraft_Crypto::mask( $research_key ) )
 		);
-		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ) . '</p>';
 		echo self::clear_key_control( 'research_api_key', $research_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '</td></tr>';
 
 		self::textarea_row(
 			'research_urls',
-			__( 'Always read these URLs', 'blogcraft' ),
-			__( 'One per line. Read for every post, whether or not a search provider is set.', 'blogcraft' )
+			__( 'Always read these URLs', 'blogcraft-ai-writer' ),
+			__( 'One per line. Read for every post, whether or not a search provider is set.', 'blogcraft-ai-writer' )
 		);
 
 		echo '</tbody></table>';
 		self::close_card();
 
-		self::open_card( '04', __( 'Describe your voice', 'blogcraft' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft' ), 'voice' );
+		self::open_card( '04', __( 'Describe your voice', 'blogcraft-ai-writer' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'blogcraft-ai-writer' ), 'voice' );
 		if ( Blogcraft_Learn::sample( 1 ) ) {
 			printf(
 				'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
-				esc_html__( 'Learn from my posts', 'blogcraft' ),
-				esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'blogcraft' )
+				esc_html__( 'Learn from my posts', 'blogcraft-ai-writer' ),
+				esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'blogcraft-ai-writer' )
 			);
 		}
 
@@ -751,29 +751,29 @@ class Blogcraft_Connection {
 
 		self::text_row(
 			'author_credentials',
-			__( 'What the author does', 'blogcraft' ),
+			__( 'What the author does', 'blogcraft-ai-writer' ),
 			'',
-			__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'blogcraft' )
+			__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'blogcraft-ai-writer' )
 		);
 
 		self::text_row(
 			'reviewer_name',
-			__( 'Reviewed by', 'blogcraft' ),
+			__( 'Reviewed by', 'blogcraft-ai-writer' ),
 			'',
-			__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'blogcraft' )
+			__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'blogcraft-ai-writer' )
 		);
 
 		self::text_row(
 			'reviewer_credentials',
-			__( 'What the reviewer does', 'blogcraft' ),
+			__( 'What the reviewer does', 'blogcraft-ai-writer' ),
 			'',
-			__( 'Their role or qualification.', 'blogcraft' )
+			__( 'Their role or qualification.', 'blogcraft-ai-writer' )
 		);
 
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '05', __( 'Automation', 'blogcraft' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft' ), 'automation' );
+		self::open_card( '05', __( 'Automation', 'blogcraft-ai-writer' ), __( 'Optional. Turn these on once the writing looks right to you.', 'blogcraft-ai-writer' ), 'automation' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -782,82 +782,82 @@ class Blogcraft_Connection {
 
 		self::text_row(
 			'ai_disclosure_text',
-			__( 'Wording of that line', 'blogcraft' ),
+			__( 'Wording of that line', 'blogcraft-ai-writer' ),
 			'',
-			__( 'Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it.', 'blogcraft' )
+			__( 'Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it.', 'blogcraft-ai-writer' )
 		);
 
 		printf(
 			'<tr><th scope="row"></th><td><p class="description">%s</p></td></tr>',
-			esc_html__( 'Announcing a post sends its address to IndexNow, which is Microsoft\'s open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way.', 'blogcraft' )
+			esc_html__( 'Announcing a post sends its address to IndexNow, which is Microsoft\'s open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way.', 'blogcraft-ai-writer' )
 		);
 
 		self::textarea_row(
 			'autopilot_topics',
-			__( 'Topic queue', 'blogcraft' ),
-			__( 'One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written.', 'blogcraft' )
+			__( 'Topic queue', 'blogcraft-ai-writer' ),
+			__( 'One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written.', 'blogcraft-ai-writer' )
 		);
 		self::weekday_row();
 		self::hour_row();
 		self::number_row(
 			'quality_threshold',
-			__( 'Hold posts scoring below', 'blogcraft' ),
-			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft' )
+			__( 'Hold posts scoring below', 'blogcraft-ai-writer' ),
+			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'blogcraft-ai-writer' )
 		);
 		self::number_row(
 			'refresh_after_days',
-			__( 'Consider a post stale after', 'blogcraft' ),
-			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'blogcraft' )
+			__( 'Consider a post stale after', 'blogcraft-ai-writer' ),
+			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'blogcraft-ai-writer' )
 		);
-		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'blogcraft' ) );
+		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'blogcraft-ai-writer' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'blogcraft-ai-writer' ) );
 
-		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
 		printf(
 			'<option value="draft"%s>%s</option>',
 			selected( 'publish' !== Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
-			esc_html__( 'Saved as drafts for review', 'blogcraft' )
+			esc_html__( 'Saved as drafts for review', 'blogcraft-ai-writer' )
 		);
 		printf(
 			'<option value="publish"%s>%s</option>',
 			selected( 'publish' === Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
-			esc_html__( 'Published immediately', 'blogcraft' )
+			esc_html__( 'Published immediately', 'blogcraft-ai-writer' )
 		);
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Drafts are safer. Nothing goes live until you have read it.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Drafts are safer. Nothing goes live until you have read it.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</td></tr>';
 
 		echo '</tbody></table>';
 		echo '<div class="blogcraft-actions">';
-		submit_button( __( 'Save settings', 'blogcraft' ), 'primary', 'submit', false );
+		submit_button( __( 'Save settings', 'blogcraft-ai-writer' ), 'primary', 'submit', false );
 		echo '</div>';
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '06', __( 'If you delete this plugin', 'blogcraft' ), __( 'What happens to everything it has stored.', 'blogcraft' ), 'removal' );
+		self::open_card( '06', __( 'If you delete this plugin', 'blogcraft-ai-writer' ), __( 'What happens to everything it has stored.', 'blogcraft-ai-writer' ), 'removal' );
 
 		printf(
 			'<p class="bc-removal-lead">%s</p>',
-			esc_html__( 'Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away.', 'blogcraft' )
+			esc_html__( 'Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away.', 'blogcraft-ai-writer' )
 		);
 
 		echo '<table class="form-table" role="presentation"><tbody>';
-		self::checkbox_row( 'purge_on_delete', __( 'Delete all of it instead, when the plugin is deleted', 'blogcraft' ) );
+		self::checkbox_row( 'purge_on_delete', __( 'Delete all of it instead, when the plugin is deleted', 'blogcraft-ai-writer' ) );
 		echo '</tbody></table>';
 
 		printf(
 			'<p class="bc-removal-warn">%s</p>',
-			esc_html__( 'With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay.', 'blogcraft' )
+			esc_html__( 'With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay.', 'blogcraft-ai-writer' )
 		);
 
 		self::close_card();
-		self::open_card( '07', __( 'Check it works', 'blogcraft' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft' ), 'test' );
+		self::open_card( '07', __( 'Check it works', 'blogcraft-ai-writer' ), __( 'Sends one very short request and reports what the provider says back.', 'blogcraft-ai-writer' ), 'test' );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
 		echo '<div class="blogcraft-actions">';
-		submit_button( __( 'Test connection', 'blogcraft' ), 'secondary', 'submit', false );
-		echo '<p class="blogcraft-hint">' . esc_html__( 'Save your settings first.', 'blogcraft' ) . '</p>';
+		submit_button( __( 'Test connection', 'blogcraft-ai-writer' ), 'secondary', 'submit', false );
+		echo '<p class="blogcraft-hint">' . esc_html__( 'Save your settings first.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</div>';
 		echo '</form>';
 		self::close_card();
@@ -895,7 +895,7 @@ class Blogcraft_Connection {
 			esc_html( $description ),
 			esc_attr( '' === $slug ? '' : 'bc-card-' . $slug ),
 			$needed ? ' is-needed' : '',
-			esc_html( $needed ? __( 'Required', 'blogcraft' ) : __( 'Optional', 'blogcraft' ) )
+			esc_html( $needed ? __( 'Required', 'blogcraft-ai-writer' ) : __( 'Optional', 'blogcraft-ai-writer' ) )
 		);
 
 		self::render_help( $slug );
@@ -919,57 +919,57 @@ class Blogcraft_Connection {
 			'provider'   => array(
 				'anchor' => 'providers',
 				'lines'  => array(
-					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'blogcraft' ),
-					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'blogcraft' ),
-					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'blogcraft' ),
+					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'blogcraft-ai-writer' ),
+					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'blogcraft-ai-writer' ),
+					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'pictures'   => array(
 				'anchor' => 'pictures',
 				'lines'  => array(
-					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'blogcraft' ),
-					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'blogcraft' ),
-					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'blogcraft' ),
-					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'blogcraft' ),
+					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'blogcraft-ai-writer' ),
+					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'blogcraft-ai-writer' ),
+					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'blogcraft-ai-writer' ),
+					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'research'   => array(
 				'anchor' => 'research',
 				'lines'  => array(
-					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft' ),
-					__( 'Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'blogcraft' ),
-					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft' ),
+					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount.', 'blogcraft-ai-writer' ),
+					__( 'Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'blogcraft-ai-writer' ),
+					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'voice'      => array(
 				'anchor' => 'voice',
 				'lines'  => array(
-					__( 'Everything here is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog.', 'blogcraft' ),
-					__( 'If you already have posts published, use "Learn from my posts". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say "I" or "you" — and drafts the descriptions from your own titles. Nothing is saved until you press save.', 'blogcraft' ),
-					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.', 'blogcraft' ),
+					__( 'Everything here is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog.', 'blogcraft-ai-writer' ),
+					__( 'If you already have posts published, use "Learn from my posts". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say "I" or "you" — and drafts the descriptions from your own titles. Nothing is saved until you press save.', 'blogcraft-ai-writer' ),
+					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'removal'    => array(
 				'anchor' => 'removal',
 				'lines'  => array(
-					__( 'Nothing here changes how anything is written. It decides one thing: whether deleting the plugin also deletes what it has stored.', 'blogcraft' ),
-					__( 'Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.', 'blogcraft' ),
-					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'blogcraft' ),
+					__( 'Nothing here changes how anything is written. It decides one thing: whether deleting the plugin also deletes what it has stored.', 'blogcraft-ai-writer' ),
+					__( 'Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.', 'blogcraft-ai-writer' ),
+					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'automation' => array(
 				'anchor' => 'automation',
 				'lines'  => array(
-					__( 'None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before.', 'blogcraft' ),
-					__( 'Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.', 'blogcraft' ),
-					__( 'Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback.', 'blogcraft' ),
+					__( 'None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before.', 'blogcraft-ai-writer' ),
+					__( 'Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.', 'blogcraft-ai-writer' ),
+					__( 'Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback.', 'blogcraft-ai-writer' ),
 				),
 			),
 			'test'       => array(
 				'anchor' => 'checking-it-works',
 				'lines'  => array(
-					__( 'Sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.', 'blogcraft' ),
-					__( 'Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching.', 'blogcraft' ),
+					__( 'Sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.', 'blogcraft-ai-writer' ),
+					__( 'Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching.', 'blogcraft-ai-writer' ),
 				),
 			),
 		);
@@ -996,7 +996,7 @@ class Blogcraft_Connection {
 		printf(
 			'<button type="button" class="bc-help-toggle" aria-expanded="false" aria-controls="%1$s"><span aria-hidden="true">?</span>%2$s</button>',
 			esc_attr( $id ),
-			esc_html__( 'How this works', 'blogcraft' )
+			esc_html__( 'How this works', 'blogcraft-ai-writer' )
 		);
 
 		printf( '<div class="bc-help" id="%s" hidden>', esc_attr( $id ) );
@@ -1011,9 +1011,9 @@ class Blogcraft_Connection {
 		printf(
 			'<p class="bc-help-more"><a href="%1$s">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
 			esc_url( Blogcraft_Docs::url( $all[ $slug ]['anchor'] ) ),
-			esc_html__( 'Read the full documentation', 'blogcraft' ),
+			esc_html__( 'Read the full documentation', 'blogcraft-ai-writer' ),
 			esc_url( Blogcraft_Docs::site_url( $all[ $slug ]['anchor'] ) ),
-			esc_html__( 'Guides online', 'blogcraft' )
+			esc_html__( 'Guides online', 'blogcraft-ai-writer' )
 		);
 
 		echo '</div>';
@@ -1040,18 +1040,18 @@ class Blogcraft_Connection {
 	 */
 	private static function render_jump() {
 		$sections = array(
-			'provider'   => array( __( 'Connect a provider', 'blogcraft' ), __( 'Key, model, spending cap', 'blogcraft' ) ),
-			'pictures'   => array( __( 'Connect a picture service', 'blogcraft' ), __( 'Who draws them, and what it costs', 'blogcraft' ) ),
-			'research'   => array( __( 'Research', 'blogcraft' ), __( 'Where facts come from', 'blogcraft' ) ),
-			'voice'      => array( __( 'Describe your voice', 'blogcraft' ), __( 'Subject, reader, style', 'blogcraft' ) ),
-			'automation' => array( __( 'Automation', 'blogcraft' ), __( 'Schedule, images, links, quality', 'blogcraft' ) ),
-			'removal'    => array( __( 'If you delete this plugin', 'blogcraft' ), __( 'What happens to your settings', 'blogcraft' ) ),
-			'test'       => array( __( 'Check it works', 'blogcraft' ), __( 'One short live request', 'blogcraft' ) ),
+			'provider'   => array( __( 'Connect a provider', 'blogcraft-ai-writer' ), __( 'Key, model, spending cap', 'blogcraft-ai-writer' ) ),
+			'pictures'   => array( __( 'Connect a picture service', 'blogcraft-ai-writer' ), __( 'Who draws them, and what it costs', 'blogcraft-ai-writer' ) ),
+			'research'   => array( __( 'Research', 'blogcraft-ai-writer' ), __( 'Where facts come from', 'blogcraft-ai-writer' ) ),
+			'voice'      => array( __( 'Describe your voice', 'blogcraft-ai-writer' ), __( 'Subject, reader, style', 'blogcraft-ai-writer' ) ),
+			'automation' => array( __( 'Automation', 'blogcraft-ai-writer' ), __( 'Schedule, images, links, quality', 'blogcraft-ai-writer' ) ),
+			'removal'    => array( __( 'If you delete this plugin', 'blogcraft-ai-writer' ), __( 'What happens to your settings', 'blogcraft-ai-writer' ) ),
+			'test'       => array( __( 'Check it works', 'blogcraft-ai-writer' ), __( 'One short live request', 'blogcraft-ai-writer' ) ),
 		);
 
 		echo '<div class="bc-jump-col">';
-		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'blogcraft' ) . '">';
-		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft' ) );
+		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'blogcraft-ai-writer' ) . '">';
+		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft-ai-writer' ) );
 
 		$step = 1;
 
@@ -1072,7 +1072,7 @@ class Blogcraft_Connection {
 		// scrolls, so the button names the form it belongs to.
 		printf(
 			'<button type="submit" form="blogcraft-settings-form" class="bc-jump-save">%s</button>',
-			esc_html__( 'Save settings', 'blogcraft' )
+			esc_html__( 'Save settings', 'blogcraft-ai-writer' )
 		);
 
 		echo '</div>';
@@ -1090,21 +1090,21 @@ class Blogcraft_Connection {
 		$states = array(
 			array(
 				'done' => Blogcraft_Provider_Registry::is_configured(),
-				'yes'  => __( 'Provider connected', 'blogcraft' ),
+				'yes'  => __( 'Provider connected', 'blogcraft-ai-writer' ),
 				'no'   => self::missing_label(),
 			),
 			array(
 				'done' => Blogcraft_Voice::is_configured(),
-				'yes'  => __( 'Voice described', 'blogcraft' ),
-				'no'   => __( 'Voice not described', 'blogcraft' ),
+				'yes'  => __( 'Voice described', 'blogcraft-ai-writer' ),
+				'no'   => __( 'Voice not described', 'blogcraft-ai-writer' ),
 			),
 			array(
 				'done' => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
 					&& array() !== Blogcraft_Autopilot::days(),
-				'yes'  => __( 'Automation on', 'blogcraft' ),
+				'yes'  => __( 'Automation on', 'blogcraft-ai-writer' ),
 				'no'   => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
-					? __( 'Automation has no days', 'blogcraft' )
-					: __( 'Automation off', 'blogcraft' ),
+					? __( 'Automation has no days', 'blogcraft-ai-writer' )
+					: __( 'Automation off', 'blogcraft-ai-writer' ),
 			),
 		);
 
@@ -1135,14 +1135,14 @@ class Blogcraft_Connection {
 		$has_model = '' !== trim( (string) Blogcraft_Settings::get( 'provider_model' ) );
 
 		if ( $has_key && ! $has_model ) {
-			return __( 'Model name missing', 'blogcraft' );
+			return __( 'Model name missing', 'blogcraft-ai-writer' );
 		}
 
 		if ( ! $has_key && $has_model ) {
-			return __( 'API key missing', 'blogcraft' );
+			return __( 'API key missing', 'blogcraft-ai-writer' );
 		}
 
-		return __( 'No provider yet', 'blogcraft' );
+		return __( 'No provider yet', 'blogcraft-ai-writer' );
 	}
 
 	/**
@@ -1159,11 +1159,11 @@ class Blogcraft_Connection {
 		$names  = Blogcraft_Calendar::weekday_names();
 		$start  = (int) get_option( 'start_of_week', 1 );
 
-		echo '<tr><th scope="row">' . esc_html__( 'Write on', 'blogcraft' ) . '</th><td>';
+		echo '<tr><th scope="row">' . esc_html__( 'Write on', 'blogcraft-ai-writer' ) . '</th><td>';
 		echo '<fieldset class="blogcraft-days">';
 		printf(
 			'<legend class="screen-reader-text">%s</legend>',
-			esc_html__( 'Days of the week to write on', 'blogcraft' )
+			esc_html__( 'Days of the week to write on', 'blogcraft-ai-writer' )
 		);
 
 		for ( $offset = 0; $offset <= 6; $offset++ ) {
@@ -1182,10 +1182,10 @@ class Blogcraft_Connection {
 		// Automation switched on with no days chosen looks configured and does
 		// nothing at all, which is the worst of both.
 		if ( empty( $chosen ) && Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
-			echo '<p class="blogcraft-callout">' . esc_html__( 'Automatic writing is switched on, but no days are ticked, so nothing will ever be written. Choose at least one day.', 'blogcraft' ) . '</p>';
+			echo '<p class="blogcraft-callout">' . esc_html__( 'Automatic writing is switched on, but no days are ticked, so nothing will ever be written. Choose at least one day.', 'blogcraft-ai-writer' ) . '</p>';
 		}
 
-		echo '<p class="description">' . esc_html__( 'In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -1199,7 +1199,7 @@ class Blogcraft_Connection {
 		$format = (string) get_option( 'time_format', 'H:i' );
 		$today  = strtotime( wp_date( 'Y-m-d' ) . ' 00:00:00 ' . wp_timezone_string() );
 
-		echo '<tr><th scope="row"><label for="blogcraft_autopilot_hour">' . esc_html__( 'Starting at', 'blogcraft' ) . '</label></th><td>';
+		echo '<tr><th scope="row"><label for="blogcraft_autopilot_hour">' . esc_html__( 'Starting at', 'blogcraft-ai-writer' ) . '</label></th><td>';
 		echo '<select name="autopilot_hour" id="blogcraft_autopilot_hour">';
 
 		for ( $hour = 0; $hour <= 23; $hour++ ) {
@@ -1216,7 +1216,7 @@ class Blogcraft_Connection {
 		}
 
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later.', 'blogcraft' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later.', 'blogcraft-ai-writer' ) . '</p>';
 		echo '</td></tr>';
 	}
 
@@ -1281,8 +1281,8 @@ class Blogcraft_Connection {
 			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p>%6$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
-			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft' ) : Blogcraft_Crypto::mask( $stored ) ),
-			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft' ),
+			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft-ai-writer' ) : Blogcraft_Crypto::mask( $stored ) ),
+			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ),
 			esc_attr( $row_class ),
 			self::clear_key_control( $name, $stored ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
@@ -1301,9 +1301,9 @@ class Blogcraft_Connection {
 	private static function render_draft_model_row() {
 		self::text_row(
 			'provider_draft_model',
-			__( 'Cheaper model for the bulk', 'blogcraft' ),
+			__( 'Cheaper model for the bulk', 'blogcraft-ai-writer' ),
 			'',
-			__( 'Optional, and the same key and provider — only the model id differs. Most of a post\'s words are the section-by-section writing, which is carrying out a plan the outline already made. Naming a cheaper model here uses it for those sections, the questions and the extra blocks, while the outline, the opening, the critique and the rewrite stay on the model above, because those are the steps where judgement changes the result. Leave it blank to use one model for everything.', 'blogcraft' )
+			__( 'Optional, and the same key and provider — only the model id differs. Most of a post\'s words are the section-by-section writing, which is carrying out a plan the outline already made. Naming a cheaper model here uses it for those sections, the questions and the extra blocks, while the outline, the opening, the critique and the rewrite stay on the model above, because those are the steps where judgement changes the result. Leave it blank to use one model for everything.', 'blogcraft-ai-writer' )
 		);
 	}
 
@@ -1324,9 +1324,9 @@ class Blogcraft_Connection {
 			. '<select id="blogcraft-model-choices" class="bc-model-choices" hidden><option value="">%2$s</option></select>'
 			. '<p class="description" id="blogcraft-model-status">%3$s</p>'
 			. '</td></tr>',
-			esc_html__( 'Show the models on my account', 'blogcraft' ),
-			esc_html__( 'Pick a model…', 'blogcraft' ),
-			esc_html__( 'Asks your provider which models your key can use, and fills the box above. Nothing is bundled, so this list is never out of date.', 'blogcraft' )
+			esc_html__( 'Show the models on my account', 'blogcraft-ai-writer' ),
+			esc_html__( 'Pick a model…', 'blogcraft-ai-writer' ),
+			esc_html__( 'Asks your provider which models your key can use, and fills the box above. Nothing is bundled, so this list is never out of date.', 'blogcraft-ai-writer' )
 		);
 	}
 
@@ -1350,7 +1350,7 @@ class Blogcraft_Connection {
 		return sprintf(
 			'<label class="blogcraft-clear-key"><input type="checkbox" name="clear_%1$s" value="1" /> %2$s</label>',
 			esc_attr( $name ),
-			esc_html__( 'Remove this key', 'blogcraft' )
+			esc_html__( 'Remove this key', 'blogcraft-ai-writer' )
 		);
 	}
 
@@ -1368,21 +1368,21 @@ class Blogcraft_Connection {
 		$fal    = Blogcraft_Image_Models::help( 'fal' );
 		$openai = Blogcraft_Image_Models::help( 'openai' );
 
-		self::secret_row( 'fal_api_key', __( 'fal.ai API key', 'blogcraft' ), 'blogcraft-image-fal' );
+		self::secret_row( 'fal_api_key', __( 'fal.ai API key', 'blogcraft-ai-writer' ), 'blogcraft-image-fal' );
 		self::provider_link_row(
-			__( 'Where to get it', 'blogcraft' ),
+			__( 'Where to get it', 'blogcraft-ai-writer' ),
 			$fal['key_url'],
-			__( 'Create a fal.ai key', 'blogcraft' ),
+			__( 'Create a fal.ai key', 'blogcraft-ai-writer' ),
 			'',
 			'blogcraft-image-fal'
 		);
 
-		self::text_row( 'fal_model', __( 'fal.ai model', 'blogcraft' ), 'blogcraft-image-fal' );
+		self::text_row( 'fal_model', __( 'fal.ai model', 'blogcraft-ai-writer' ), 'blogcraft-image-fal' );
 		self::provider_link_row(
-			__( 'Which model', 'blogcraft' ),
+			__( 'Which model', 'blogcraft-ai-writer' ),
 			$fal['models_url'],
-			__( 'Browse text-to-image models', 'blogcraft' ),
-			__( 'Paste the id exactly as the model page shows it, for example fal-ai/flux/schnell. Schnell is the cheapest and fastest. A pro FLUX model looks better and costs more. Ideogram is the one to pick if you need legible words in the picture.', 'blogcraft' ),
+			__( 'Browse text-to-image models', 'blogcraft-ai-writer' ),
+			__( 'Paste the id exactly as the model page shows it, for example fal-ai/flux/schnell. Schnell is the cheapest and fastest. A pro FLUX model looks better and costs more. Ideogram is the one to pick if you need legible words in the picture.', 'blogcraft-ai-writer' ),
 			'blogcraft-image-fal'
 		);
 
@@ -1394,7 +1394,7 @@ class Blogcraft_Connection {
 				'image_key_' . $service,
 				sprintf(
 					/* translators: %s: the service name, such as Google AI Studio. */
-					__( '%s image key', 'blogcraft' ),
+					__( '%s image key', 'blogcraft-ai-writer' ),
 					$spec['label']
 				),
 				$class
@@ -1402,33 +1402,33 @@ class Blogcraft_Connection {
 
 			self::text_row(
 				'image_model_' . $service,
-				__( 'Image model', 'blogcraft' ),
+				__( 'Image model', 'blogcraft-ai-writer' ),
 				$class
 			);
 
 			self::provider_link_row(
-				__( 'Which model', 'blogcraft' ),
+				__( 'Which model', 'blogcraft-ai-writer' ),
 				$spec['models_url'],
-				__( 'See the image models', 'blogcraft' ),
+				__( 'See the image models', 'blogcraft-ai-writer' ),
 				(string) Blogcraft_Settings::get( 'provider_type' ) === $service
-					? __( 'You are already writing with this provider, so leave the key blank and the same one draws the pictures. You still need to name an image model.', 'blogcraft' )
-					: __( 'Your writing provider is a different company, so a key for this one is needed above.', 'blogcraft' ),
+					? __( 'You are already writing with this provider, so leave the key blank and the same one draws the pictures. You still need to name an image model.', 'blogcraft-ai-writer' )
+					: __( 'Your writing provider is a different company, so a key for this one is needed above.', 'blogcraft-ai-writer' ),
 				$class
 			);
 		}
 
-		self::secret_row( 'openai_image_key', __( 'OpenAI image key', 'blogcraft' ), 'blogcraft-image-openai' );
-		self::text_row( 'openai_image_model', __( 'OpenAI image model', 'blogcraft' ), 'blogcraft-image-openai' );
+		self::secret_row( 'openai_image_key', __( 'OpenAI image key', 'blogcraft-ai-writer' ), 'blogcraft-image-openai' );
+		self::text_row( 'openai_image_model', __( 'OpenAI image model', 'blogcraft-ai-writer' ), 'blogcraft-image-openai' );
 		self::provider_link_row(
-			__( 'Which model', 'blogcraft' ),
+			__( 'Which model', 'blogcraft-ai-writer' ),
 			$openai['models_url'],
-			__( 'OpenAI image guide', 'blogcraft' ),
+			__( 'OpenAI image guide', 'blogcraft-ai-writer' ),
 			// Whether one key covers both depends entirely on who wrote the
 			// key, so say which case the reader is actually in rather than
 			// making them work it out.
 			'openai' === (string) Blogcraft_Settings::get( 'provider_type' )
-				? __( 'You are writing with OpenAI, so leave the key above blank and the same key makes the pictures. One key, one bill. You still need to name an image model here.', 'blogcraft' )
-				: __( 'Your writing provider is not OpenAI, so a separate OpenAI key is needed above. A key from one company will not work at another.', 'blogcraft' ),
+				? __( 'You are writing with OpenAI, so leave the key above blank and the same key makes the pictures. One key, one bill. You still need to name an image model here.', 'blogcraft-ai-writer' )
+				: __( 'Your writing provider is not OpenAI, so a separate OpenAI key is needed above. A key from one company will not work at another.', 'blogcraft-ai-writer' ),
 			'blogcraft-image-openai'
 		);
 	}
@@ -1487,7 +1487,7 @@ class Blogcraft_Connection {
 		if ( ! empty( $failed ) ) {
 			self::redirect_back(
 				false,
-				__( 'Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP\'s sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected.', 'blogcraft' )
+				__( 'Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP\'s sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected.', 'blogcraft-ai-writer' )
 			);
 		}
 
@@ -1662,7 +1662,7 @@ class Blogcraft_Connection {
 	 * @return string
 	 */
 	private static function save_message( $key_changed, $was_usable ) {
-		$saved = __( 'Settings saved.', 'blogcraft' );
+		$saved = __( 'Settings saved.', 'blogcraft-ai-writer' );
 
 		// Check on a new key, and on the save that first completes the setup.
 		// Someone who pastes a key one day and adds the model the next never
@@ -1674,7 +1674,7 @@ class Blogcraft_Connection {
 		}
 
 		if ( '' === trim( (string) Blogcraft_Settings::get( 'provider_model' ) ) ) {
-			return $saved . ' ' . __( 'Add a model name before it can write anything.', 'blogcraft' );
+			return $saved . ' ' . __( 'Add a model name before it can write anything.', 'blogcraft-ai-writer' );
 		}
 
 		$provider = Blogcraft_Provider_Registry::from_settings();
@@ -1688,12 +1688,12 @@ class Blogcraft_Connection {
 		if ( empty( $probe['reachable'] ) ) {
 			return $saved . ' ' . sprintf(
 				/* translators: %s: reason the provider gave. */
-				__( 'The key did not work: %s', 'blogcraft' ),
+				__( 'The key did not work: %s', 'blogcraft-ai-writer' ),
 				self::shorten( (string) $probe['error'] )
 			);
 		}
 
-		return $saved . ' ' . __( 'The key works.', 'blogcraft' );
+		return $saved . ' ' . __( 'The key works.', 'blogcraft-ai-writer' );
 	}
 
 	/**
@@ -1712,14 +1712,14 @@ class Blogcraft_Connection {
 		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
 			self::redirect_back(
 				false,
-				__( 'Fill in a model and an API key first, then save, then test.', 'blogcraft' )
+				__( 'Fill in a model and an API key first, then save, then test.', 'blogcraft-ai-writer' )
 			);
 		}
 
 		$provider = Blogcraft_Provider_Registry::from_settings();
 
 		if ( null === $provider ) {
-			self::redirect_back( false, __( 'No provider is configured yet.', 'blogcraft' ) );
+			self::redirect_back( false, __( 'No provider is configured yet.', 'blogcraft-ai-writer' ) );
 		}
 
 		$probe = Blogcraft_Provider_Registry::probe( $provider );
@@ -1729,7 +1729,7 @@ class Blogcraft_Connection {
 				false,
 				sprintf(
 					/* translators: %s: error reported by the provider. */
-					__( 'Connection failed: %s', 'blogcraft' ),
+					__( 'Connection failed: %s', 'blogcraft-ai-writer' ),
 					self::shorten( (string) $probe['error'] )
 				)
 			);
@@ -1745,7 +1745,7 @@ class Blogcraft_Connection {
 					'Connection succeeded. %d model available.',
 					'Connection succeeded. %d models available.',
 					count( $models ),
-					'blogcraft'
+					'blogcraft-ai-writer'
 				),
 				count( $models )
 			)
@@ -1766,7 +1766,7 @@ class Blogcraft_Connection {
 		$error = trim( preg_replace( '/\s+/', ' ', $error ) );
 
 		if ( '' === $error ) {
-			return __( 'the provider gave no reason.', 'blogcraft' );
+			return __( 'the provider gave no reason.', 'blogcraft-ai-writer' );
 		}
 
 		if ( preg_match( '/^(.{20,180}?[.!?])\s/u', $error, $matches ) ) {

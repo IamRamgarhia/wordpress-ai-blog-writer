@@ -29,10 +29,10 @@ class Blogcraft_Image_Models {
 	 */
 	public static function providers() {
 		return array(
-			'fal'    => __( 'fal.ai — hundreds of models, paid, per image', 'blogcraft' ),
-			'openai' => __( 'OpenAI — paid, per image; uses your OpenAI writing key if you have one', 'blogcraft' ),
-			'gemini' => __( 'Google Gemini — paid, per image; uses your Gemini writing key if you have one', 'blogcraft' ),
-			'xai'    => __( 'xAI Grok — paid, per image; uses your Grok writing key if you have one', 'blogcraft' ),
+			'fal'    => __( 'fal.ai — hundreds of models, paid, per image', 'blogcraft-ai-writer' ),
+			'openai' => __( 'OpenAI — paid, per image; uses your OpenAI writing key if you have one', 'blogcraft-ai-writer' ),
+			'gemini' => __( 'Google Gemini — paid, per image; uses your Gemini writing key if you have one', 'blogcraft-ai-writer' ),
+			'xai'    => __( 'xAI Grok — paid, per image; uses your Grok writing key if you have one', 'blogcraft-ai-writer' ),
 		);
 	}
 

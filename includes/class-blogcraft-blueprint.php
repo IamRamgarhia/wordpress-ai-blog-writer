@@ -43,17 +43,17 @@ class Blogcraft_Blueprint {
 	 */
 	public static function tones() {
 		return array(
-			'conversational' => __( 'Conversational', 'blogcraft' ),
-			'professional'   => __( 'Professional', 'blogcraft' ),
-			'friendly'       => __( 'Friendly', 'blogcraft' ),
-			'authoritative'  => __( 'Authoritative', 'blogcraft' ),
-			'plain'          => __( 'Plain and direct', 'blogcraft' ),
-			'witty'          => __( 'Witty', 'blogcraft' ),
-			'empathetic'     => __( 'Empathetic', 'blogcraft' ),
-			'journalistic'   => __( 'Journalistic', 'blogcraft' ),
-			'academic'       => __( 'Academic', 'blogcraft' ),
-			'enthusiastic'   => __( 'Enthusiastic', 'blogcraft' ),
-			'custom'         => __( 'Something else — I will describe it', 'blogcraft' ),
+			'conversational' => __( 'Conversational', 'blogcraft-ai-writer' ),
+			'professional'   => __( 'Professional', 'blogcraft-ai-writer' ),
+			'friendly'       => __( 'Friendly', 'blogcraft-ai-writer' ),
+			'authoritative'  => __( 'Authoritative', 'blogcraft-ai-writer' ),
+			'plain'          => __( 'Plain and direct', 'blogcraft-ai-writer' ),
+			'witty'          => __( 'Witty', 'blogcraft-ai-writer' ),
+			'empathetic'     => __( 'Empathetic', 'blogcraft-ai-writer' ),
+			'journalistic'   => __( 'Journalistic', 'blogcraft-ai-writer' ),
+			'academic'       => __( 'Academic', 'blogcraft-ai-writer' ),
+			'enthusiastic'   => __( 'Enthusiastic', 'blogcraft-ai-writer' ),
+			'custom'         => __( 'Something else — I will describe it', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -64,10 +64,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function points_of_view() {
 		return array(
-			'second'       => __( 'Second person — you', 'blogcraft' ),
-			'first_plural' => __( 'First person plural — we', 'blogcraft' ),
-			'first_person' => __( 'First person — I', 'blogcraft' ),
-			'third'        => __( 'Third person — they', 'blogcraft' ),
+			'second'       => __( 'Second person — you', 'blogcraft-ai-writer' ),
+			'first_plural' => __( 'First person plural — we', 'blogcraft-ai-writer' ),
+			'first_person' => __( 'First person — I', 'blogcraft-ai-writer' ),
+			'third'        => __( 'Third person — they', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -81,10 +81,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function reading_levels() {
 		return array(
-			'simple'   => array( __( 'Simple — anyone can follow it', 'blogcraft' ), 70, 100 ),
-			'general'  => array( __( 'General — a wide audience', 'blogcraft' ), 60, 80 ),
-			'informed' => array( __( 'Informed — familiar with the subject', 'blogcraft' ), 45, 65 ),
-			'expert'   => array( __( 'Expert — assumes the vocabulary', 'blogcraft' ), 25, 55 ),
+			'simple'   => array( __( 'Simple — anyone can follow it', 'blogcraft-ai-writer' ), 70, 100 ),
+			'general'  => array( __( 'General — a wide audience', 'blogcraft-ai-writer' ), 60, 80 ),
+			'informed' => array( __( 'Informed — familiar with the subject', 'blogcraft-ai-writer' ), 45, 65 ),
+			'expert'   => array( __( 'Expert — assumes the vocabulary', 'blogcraft-ai-writer' ), 25, 55 ),
 		);
 	}
 
@@ -95,11 +95,11 @@ class Blogcraft_Blueprint {
 	 */
 	public static function intro_styles() {
 		return array(
-			'direct'    => __( 'Answer the question immediately', 'blogcraft' ),
-			'hook'      => __( 'Open with a hook', 'blogcraft' ),
-			'problem'   => __( 'Name the problem the reader has', 'blogcraft' ),
-			'statistic' => __( 'Open with a figure', 'blogcraft' ),
-			'story'     => __( 'Open with a short anecdote', 'blogcraft' ),
+			'direct'    => __( 'Answer the question immediately', 'blogcraft-ai-writer' ),
+			'hook'      => __( 'Open with a hook', 'blogcraft-ai-writer' ),
+			'problem'   => __( 'Name the problem the reader has', 'blogcraft-ai-writer' ),
+			'statistic' => __( 'Open with a figure', 'blogcraft-ai-writer' ),
+			'story'     => __( 'Open with a short anecdote', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -110,10 +110,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function conclusion_styles() {
 		return array(
-			'summary'    => __( 'Summarise the main points', 'blogcraft' ),
-			'next_steps' => __( 'Give the reader next steps', 'blogcraft' ),
-			'action'     => __( 'End on a call to action', 'blogcraft' ),
-			'none'       => __( 'No conclusion section', 'blogcraft' ),
+			'summary'    => __( 'Summarise the main points', 'blogcraft-ai-writer' ),
+			'next_steps' => __( 'Give the reader next steps', 'blogcraft-ai-writer' ),
+			'action'     => __( 'End on a call to action', 'blogcraft-ai-writer' ),
+			'none'       => __( 'No conclusion section', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -124,12 +124,12 @@ class Blogcraft_Blueprint {
 	 */
 	public static function literary_devices() {
 		return array(
-			'analogy'  => __( 'Analogies', 'blogcraft' ),
-			'example'  => __( 'Concrete examples', 'blogcraft' ),
-			'anecdote' => __( 'Short anecdotes', 'blogcraft' ),
-			'question' => __( 'Rhetorical questions', 'blogcraft' ),
-			'contrast' => __( 'Before-and-after contrast', 'blogcraft' ),
-			'aside'    => __( 'Brief asides', 'blogcraft' ),
+			'analogy'  => __( 'Analogies', 'blogcraft-ai-writer' ),
+			'example'  => __( 'Concrete examples', 'blogcraft-ai-writer' ),
+			'anecdote' => __( 'Short anecdotes', 'blogcraft-ai-writer' ),
+			'question' => __( 'Rhetorical questions', 'blogcraft-ai-writer' ),
+			'contrast' => __( 'Before-and-after contrast', 'blogcraft-ai-writer' ),
+			'aside'    => __( 'Brief asides', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -140,15 +140,15 @@ class Blogcraft_Blueprint {
 	 */
 	public static function audiences() {
 		return array(
-			''              => __( 'Not specified', 'blogcraft' ),
-			'beginners'     => __( 'Beginners', 'blogcraft' ),
-			'enthusiasts'   => __( 'Enthusiasts', 'blogcraft' ),
-			'professionals' => __( 'Professionals in the field', 'blogcraft' ),
-			'buyers'        => __( 'People deciding what to buy', 'blogcraft' ),
-			'owners'        => __( 'Small business owners', 'blogcraft' ),
-			'developers'    => __( 'Developers', 'blogcraft' ),
-			'students'      => __( 'Students', 'blogcraft' ),
-			'custom'        => __( 'Someone else — I will describe them', 'blogcraft' ),
+			''              => __( 'Not specified', 'blogcraft-ai-writer' ),
+			'beginners'     => __( 'Beginners', 'blogcraft-ai-writer' ),
+			'enthusiasts'   => __( 'Enthusiasts', 'blogcraft-ai-writer' ),
+			'professionals' => __( 'Professionals in the field', 'blogcraft-ai-writer' ),
+			'buyers'        => __( 'People deciding what to buy', 'blogcraft-ai-writer' ),
+			'owners'        => __( 'Small business owners', 'blogcraft-ai-writer' ),
+			'developers'    => __( 'Developers', 'blogcraft-ai-writer' ),
+			'students'      => __( 'Students', 'blogcraft-ai-writer' ),
+			'custom'        => __( 'Someone else — I will describe them', 'blogcraft-ai-writer' ),
 		);
 	}
 
@@ -162,7 +162,7 @@ class Blogcraft_Blueprint {
 	public static function fields() {
 		return array(
 			// Voice.
-			'label'                 => array( 'string', __( 'Default', 'blogcraft' ) ),
+			'label'                 => array( 'string', __( 'Default', 'blogcraft-ai-writer' ) ),
 			'tone'                  => array( 'choice', 'conversational' ),
 			'tone_custom'           => array( 'text', '' ),
 			'point_of_view'         => array( 'choice', 'second' ),

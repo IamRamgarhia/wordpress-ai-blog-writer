@@ -43,7 +43,7 @@ def files():
     for entry in ROOTS:
         path = os.path.join(SRC, entry)
         if os.path.isfile(path):
-            yield path, 'blogcraft/' + entry
+            yield path, 'blogcraft-ai-writer/' + entry
             continue
         if not os.path.isdir(path):
             sys.exit('missing from the build: ' + entry)
@@ -51,11 +51,11 @@ def files():
             for name in sorted(names):
                 full = os.path.join(folder, name)
                 rel = os.path.relpath(full, SRC).replace(os.sep, '/')
-                yield full, 'blogcraft/' + rel
+                yield full, 'blogcraft-ai-writer/' + rel
 
 
 def main():
-    out = os.path.join(SRC, 'blogcraft-%s.zip' % version())
+    out = os.path.join(SRC, 'blogcraft-ai-writer-%s.zip' % version())
 
     if os.path.exists(out):
         os.remove(out)
@@ -71,7 +71,7 @@ def main():
         for name in names:
             if '\\' in name:
                 sys.exit('backslash in: ' + name)
-            if not name.startswith('blogcraft/'):
+            if not name.startswith('blogcraft-ai-writer/'):
                 sys.exit('outside the plugin folder: ' + name)
         bad = archive.testzip()
         if bad:

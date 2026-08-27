@@ -121,7 +121,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'words',
-			__( 'Length', 'blogcraft' ),
+			__( 'Length', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%1$d–%2$d', $low, $high ),
@@ -160,7 +160,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'sections',
-			__( 'Sections', 'blogcraft' ),
+			__( 'Sections', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%1$d–%2$d', $min, $max ),
@@ -192,7 +192,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'reading',
-			__( 'Reading ease', 'blogcraft' ),
+			__( 'Reading ease', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%.1f', $actual ),
 			sprintf( '%1$d–%2$d', $low, $high ),
@@ -226,7 +226,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'sentences',
-			__( 'Sentence length', 'blogcraft' ),
+			__( 'Sentence length', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d over', count( $long ) ),
 			sprintf( '%d max', $limit ),
@@ -257,7 +257,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'paragraphs',
-			__( 'Paragraph length', 'blogcraft' ),
+			__( 'Paragraph length', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d words', $actual ),
 			sprintf( '%d max', $limit ),
@@ -283,10 +283,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'banned',
-			__( 'Banned phrases', 'blogcraft' ),
+			__( 'Banned phrases', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d found', count( $hits ) ),
-			__( 'none', 'blogcraft' ),
+			__( 'none', 'blogcraft-ai-writer' ),
 			12,
 			$repair
 		);
@@ -313,10 +313,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'negative',
-			__( 'Excluded terms', 'blogcraft' ),
+			__( 'Excluded terms', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d found', count( $hits ) ),
-			__( 'none', 'blogcraft' ),
+			__( 'none', 'blogcraft-ai-writer' ),
 			18,
 			$repair
 		);
@@ -341,10 +341,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'em_dashes',
-			__( 'Em dashes', 'blogcraft' ),
+			__( 'Em dashes', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
-			$allowed ? __( 'allowed', 'blogcraft' ) : __( 'none', 'blogcraft' ),
+			$allowed ? __( 'allowed', 'blogcraft-ai-writer' ) : __( 'none', 'blogcraft-ai-writer' ),
 			5,
 			$repair
 		);
@@ -374,7 +374,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'keyword',
-			__( 'Keyword density', 'blogcraft' ),
+			__( 'Keyword density', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%.2f%%', $actual ),
 			sprintf( '%1$.1f–%2$.1f%%', $min, $max ),
@@ -402,7 +402,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'terms',
-			__( 'Required terms', 'blogcraft' ),
+			__( 'Required terms', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%1$d of %2$d', count( $covered ), $total ),
 			sprintf( '%d', $total ),
@@ -435,7 +435,7 @@ class Blogcraft_Scorecard {
 		// against the target already tells whoever reads the scorecard.
 		return self::check(
 			'external_links',
-			__( 'Sources cited', 'blogcraft' ),
+			__( 'Sources cited', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%d+', $target ),
@@ -460,7 +460,7 @@ class Blogcraft_Scorecard {
 		// person rather than asked of the model.
 		return self::check(
 			'internal_links',
-			__( 'Internal links', 'blogcraft' ),
+			__( 'Internal links', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%d+', $target ),
@@ -483,10 +483,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'passive',
-			__( 'Passive voice', 'blogcraft' ),
+			__( 'Passive voice', 'blogcraft-ai-writer' ),
 			$pass,
 			sprintf( '%.0f%%', $actual ),
-			__( 'under 20%', 'blogcraft' ),
+			__( 'under 20%', 'blogcraft-ai-writer' ),
 			2,
 			$repair
 		);

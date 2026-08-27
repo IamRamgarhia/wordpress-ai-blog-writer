@@ -58,22 +58,22 @@ class Blogcraft_Prospects {
 		if ( '' !== $rival ) {
 			$found[] = array(
 				'key'    => 'cannibal',
-				'title'  => __( 'You already have a post about this', 'blogcraft' ),
+				'title'  => __( 'You already have a post about this', 'blogcraft-ai-writer' ),
 				'detail' => sprintf(
 					/* translators: %s: the title of the existing post. */
-					__( '"%s" covers much the same ground. When two of your own pages answer one question, search engines usually pick one and it is not reliably the better one — and neither page gets the links or the attention that one page would.', 'blogcraft' ),
+					__( '"%s" covers much the same ground. When two of your own pages answer one question, search engines usually pick one and it is not reliably the better one — and neither page gets the links or the attention that one page would.', 'blogcraft-ai-writer' ),
 					$rival
 				),
-				'fix'    => __( 'Either give this one a clearly different angle, or fold what is new here into the post you already have.', 'blogcraft' ),
+				'fix'    => __( 'Either give this one a clearly different angle, or fold what is new here into the post you already have.', 'blogcraft-ai-writer' ),
 			);
 		}
 
 		if ( '' === trim( (string) self::evidence_of( $payload ) ) ) {
 			$found[] = array(
 				'key'    => 'nothing_new',
-				'title'  => __( 'There is nothing here that is only yours', 'blogcraft' ),
-				'detail' => __( 'Every fact in this post can be found on the pages it was written from. A page that restates what is already ranking has no argument for being ranked above it, and nothing in it another writer would cite.', 'blogcraft' ),
-				'fix'    => __( 'Add what you measured, paid, tried or got wrong. One paragraph of it is worth more than a thousand words that are not yours.', 'blogcraft' ),
+				'title'  => __( 'There is nothing here that is only yours', 'blogcraft-ai-writer' ),
+				'detail' => __( 'Every fact in this post can be found on the pages it was written from. A page that restates what is already ranking has no argument for being ranked above it, and nothing in it another writer would cite.', 'blogcraft-ai-writer' ),
+				'fix'    => __( 'Add what you measured, paid, tried or got wrong. One paragraph of it is worth more than a thousand words that are not yours.', 'blogcraft-ai-writer' ),
 			);
 		}
 
@@ -82,18 +82,18 @@ class Blogcraft_Prospects {
 		if ( $orphan > 0 ) {
 			$found[] = array(
 				'key'    => 'orphan',
-				'title'  => __( 'Almost nothing on your site points at it', 'blogcraft' ),
-				'detail' => __( 'A page nothing links to is one a crawler reaches last and a reader never reaches at all. This is not something rewriting the page can change.', 'blogcraft' ),
-				'fix'    => __( 'Write, or already have, a few posts on neighbouring subjects — links between them are added automatically once they exist.', 'blogcraft' ),
+				'title'  => __( 'Almost nothing on your site points at it', 'blogcraft-ai-writer' ),
+				'detail' => __( 'A page nothing links to is one a crawler reaches last and a reader never reaches at all. This is not something rewriting the page can change.', 'blogcraft-ai-writer' ),
+				'fix'    => __( 'Write, or already have, a few posts on neighbouring subjects — links between them are added automatically once they exist.', 'blogcraft-ai-writer' ),
 			);
 		}
 
 		if ( self::thin( $checks ) ) {
 			$found[] = array(
 				'key'    => 'thin',
-				'title'  => __( 'It is shorter than the question deserves', 'blogcraft' ),
-				'detail' => __( 'Length is not a ranking factor on its own, and padding does not help. But a page well under what it takes to answer the question tends to be the one that leaves the reader still looking.', 'blogcraft' ),
-				'fix'    => __( 'Either cover more of the question, or narrow the title to what this post actually answers.', 'blogcraft' ),
+				'title'  => __( 'It is shorter than the question deserves', 'blogcraft-ai-writer' ),
+				'detail' => __( 'Length is not a ranking factor on its own, and padding does not help. But a page well under what it takes to answer the question tends to be the one that leaves the reader still looking.', 'blogcraft-ai-writer' ),
+				'fix'    => __( 'Either cover more of the question, or narrow the title to what this post actually answers.', 'blogcraft-ai-writer' ),
 			);
 		}
 
@@ -110,7 +110,7 @@ class Blogcraft_Prospects {
 	 * @return string
 	 */
 	public static function caveat() {
-		return __( 'None of this predicts a position. Whether a page ranks depends on who else wants the same query and what your site has earned, and no plugin can see either. These are the things working against it that can actually be checked here.', 'blogcraft' );
+		return __( 'None of this predicts a position. Whether a page ranks depends on who else wants the same query and what your site has earned, and no plugin can see either. These are the things working against it that can actually be checked here.', 'blogcraft-ai-writer' );
 	}
 
 	/**

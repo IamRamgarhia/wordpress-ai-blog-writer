@@ -81,7 +81,7 @@ class Blogcraft_Provider_Wpai extends Blogcraft_Provider {
 	 * @return string
 	 */
 	public function label() {
-		return __( 'WordPress AI Client', 'blogcraft' );
+		return __( 'WordPress AI Client', 'blogcraft-ai-writer' );
 	}
 
 	/**
@@ -95,7 +95,7 @@ class Blogcraft_Provider_Wpai extends Blogcraft_Provider {
 		$response = new Blogcraft_Provider_Response();
 
 		if ( ! self::is_available() ) {
-			$response->error = __( 'This WordPress has no AI Client. Choose a provider and enter a key instead.', 'blogcraft' );
+			$response->error = __( 'This WordPress has no AI Client. Choose a provider and enter a key instead.', 'blogcraft-ai-writer' );
 
 			return $response;
 		}
@@ -142,7 +142,7 @@ class Blogcraft_Provider_Wpai extends Blogcraft_Provider {
 
 			$text = $builder->generate_text();
 		} catch ( Throwable $e ) {
-			$response->error = __( 'The WordPress AI Client could not answer.', 'blogcraft' );
+			$response->error = __( 'The WordPress AI Client could not answer.', 'blogcraft-ai-writer' );
 
 			return $response;
 		}
@@ -159,7 +159,7 @@ class Blogcraft_Provider_Wpai extends Blogcraft_Provider {
 		$response->model = ( '' === $model ) ? 'WordPress' : $model;
 
 		if ( '' === trim( $response->text ) ) {
-			$response->error = __( 'The WordPress AI Client returned nothing.', 'blogcraft' );
+			$response->error = __( 'The WordPress AI Client returned nothing.', 'blogcraft-ai-writer' );
 		}
 
 		// Token counts are the host's to know, not ours. Reporting a guess
