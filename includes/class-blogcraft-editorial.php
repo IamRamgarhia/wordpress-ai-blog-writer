@@ -262,10 +262,12 @@ class Blogcraft_Editorial {
 	 * not there — so this check narrows the problem rather than solving it. It
 	 * is named accordingly.
 	 *
-	 * @param string $content Rendered content.
+	 * @param string $content  Rendered content.
+	 * @param string $evidence What the writer supplied. Figures of their own are
+	 *                         theirs to state, so they are not counted here.
 	 * @return array Headings of the offending sections.
 	 */
-	public static function unsupported_sections( $content ) {
+	public static function unsupported_sections( $content, $evidence = '' ) {
 		$content = (string) $content;
 		$out     = array();
 		$offsets = array();
@@ -291,6 +293,13 @@ class Blogcraft_Editorial {
 			}
 
 			$figures = self::data_points( Blogcraft_Metrics::plain_text( $chunk ) );
+
+			// A figure the writer supplied is not an unsupported claim. It
+			// is theirs, there is nowhere to link it to, and it is the one
+			// thing the plugin says matters most — so docking eight points
+			// for including it punished exactly the behaviour every other
+			// part of the scorecard rewards.
+			$figures = self::not_the_writers_own( $figures, $evidence );
 
 			if ( empty( $figures ) ) {
 				continue;
@@ -449,7 +458,7 @@ class Blogcraft_Editorial {
 		}
 
 		if ( ! empty( $blueprint['require_citations'] ) ) {
-			$checks[] = self::support( $content );
+			$checks[] = self::support( $content, isset( $context['evidence'] ) ? (string) $context['evidence'] : '' );
 		}
 
 		if ( ! empty( $blueprint['require_experience'] ) ) {
@@ -874,8 +883,62 @@ class Blogcraft_Editorial {
 	 * @param string $content Rendered content.
 	 * @return array
 	 */
-	private static function support( $content ) {
-		$offenders = self::unsupported_sections( $content );
+	/**
+	 * Drop the figures the writer supplied themselves.
+	 *
+	 * Matched on the bare digits, so "9 of 12" in the evidence covers a
+	 * draft that writes "nine of the twelve batches" as 9 and 12. Loose
+	 * on purpose: a false negative here costs nothing, and a false
+	 * positive costs somebody eight points for doing the right thing.
+	 *
+	 * @param array  $figures  Figures found in a section.
+	 * @param string $evidence What the writer supplied.
+	 * @return array Whatever is left to answer for.
+	 */
+	private static function not_the_writers_own( $figures, $evidence ) {
+		$evidence = trim( (string) $evidence );
+
+		if ( '' === $evidence ) {
+			return $figures;
+		}
+
+		$theirs = array();
+
+		if ( preg_match_all( '/[0-9][0-9.,]*/', $evidence, $found ) ) {
+			foreach ( $found[0] as $number ) {
+				$theirs[] = rtrim( $number, '.,' );
+			}
+		}
+
+		if ( empty( $theirs ) ) {
+			return $figures;
+		}
+
+		$left = array();
+
+		foreach ( (array) $figures as $figure ) {
+			$digits = preg_replace( '/[^0-9.,]/', '', (string) $figure );
+			$digits = rtrim( (string) $digits, '.,' );
+
+			if ( '' !== $digits && in_array( $digits, $theirs, true ) ) {
+				continue;
+			}
+
+			$left[] = $figure;
+		}
+
+		return $left;
+	}
+
+	/**
+	 * Figures sitting in a section with nothing to check them against.
+	 *
+	 * @param string $content  Rendered article markup.
+	 * @param string $evidence What the writer supplied.
+	 * @return array
+	 */
+	private static function support( $content, $evidence = '' ) {
+		$offenders = self::unsupported_sections( $content, $evidence );
 		$count     = count( $offenders );
 		$pass      = ( 0 === $count );
 

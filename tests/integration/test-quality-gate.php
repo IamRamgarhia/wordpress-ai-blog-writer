@@ -423,4 +423,60 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 			'the panel script cannot see the form it is supposed to intercept'
 		);
 	}
+
+	// ------------------------------------ found by writing a real post.
+
+	public function test_the_section_count_ignores_the_blocks_the_plugin_appends() {
+		// A live run asked for exactly two sections, got exactly two, and was
+		// marked down for having four. Key takeaways, the questions, the
+		// numbers, the mistakes and the sources are all h2, so counting
+		// headings meant the heaviest check in the scorecard was measuring
+		// furniture the writer never asked for.
+		$blueprint                 = Blogcraft_Blueprint::defaults();
+		$blueprint['sections_min'] = 2;
+		$blueprint['sections_max'] = 2;
+
+		// Two real sections, then the two blocks the plugin adds afterwards.
+		$content = '<h2>One</h2><p>Words.</p><h2>Two</h2><p>Words.</p>'
+			. '<h2>Frequently asked questions</h2><p>Words.</p><h2>Sources</h2><p>Words.</p>';
+
+		$without = Blogcraft_Scorecard::evaluate( $content, $blueprint );
+		$with    = Blogcraft_Scorecard::evaluate( $content, $blueprint, array( 'sections' => 2 ) );
+
+		$before = wp_list_pluck( $without['checks'], 'actual', 'key' );
+		$after  = wp_list_pluck( $with['checks'], 'actual', 'key' );
+
+		$this->assertSame( '4', $before['sections'], 'the old count included the appended blocks' );
+		$this->assertSame( '2', $after['sections'], 'the writer wrote two sections and that is what should be counted' );
+
+		$passed = wp_list_pluck( $with['checks'], 'pass', 'key' );
+		$this->assertTrue( $passed['sections'] );
+	}
+
+	public function test_the_writers_own_figures_are_not_unsupported_claims() {
+		// The same live run lost eight points because the figures it was given
+		// had no link beside them. They are the author's own measurements:
+		// there is nothing to link to, and every other part of the scorecard
+		// rewards including them.
+		$content = '<h2>What we found</h2><p>We brewed 12 batches and 9 of 12 tasters preferred the 16 hour one.</p>';
+
+		$blind = Blogcraft_Editorial::unsupported_sections( $content );
+		$told  = Blogcraft_Editorial::unsupported_sections(
+			$content,
+			'We brewed 12 batches at 12, 16 and 20 hours. 9 of 12 tasters preferred the 16 hour batch.'
+		);
+
+		$this->assertNotEmpty( $blind, 'with no evidence supplied these figures do need a source' );
+		$this->assertSame( array(), $told, 'the writer supplied these figures, so they are not unsupported' );
+	}
+
+	public function test_a_figure_the_writer_did_not_supply_still_needs_a_source() {
+		// The exemption must not become a blanket amnesty: one number of your
+		// own cannot vouch for every other number in the post.
+		$content = '<h2>What we found</h2><p>We brewed 12 batches. Industry sales rose 47 percent last year.</p>';
+
+		$told = Blogcraft_Editorial::unsupported_sections( $content, 'We brewed 12 batches.' );
+
+		$this->assertNotEmpty( $told, 'the 47 percent came from nowhere and still needs checking' );
+	}
 }

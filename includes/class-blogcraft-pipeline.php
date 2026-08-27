@@ -228,6 +228,12 @@ class Blogcraft_Pipeline {
 			// before publishing rather than after somebody has linked to it.
 			'slug'             => isset( $outline['slug'] ) ? (string) $outline['slug'] : '',
 			'sources'          => isset( $job->payload['sources'] ) ? (array) $job->payload['sources'] : array(),
+			// The writer's own sections, so the section check does not count
+			// the takeaways, the questions and the sources block as three
+			// more of them.
+			'sections'         => isset( $job->payload['article']['sections'] )
+				? count( (array) $job->payload['article']['sections'] )
+				: null,
 			'evidence'         => self::evidence( $job ),
 		);
 	}

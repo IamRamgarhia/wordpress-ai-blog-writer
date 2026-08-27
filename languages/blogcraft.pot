@@ -67,7 +67,7 @@ msgid "%1$s: %2$s"
 msgstr ""
 
 #. translators: 1: check name. 2: measured value. 3: the value asked for.
-#: includes/class-blogcraft-pipeline.php:1040
+#: includes/class-blogcraft-pipeline.php:1046
 msgid "%1$s: %2$s, wanted %3$s"
 msgstr ""
 
@@ -167,19 +167,19 @@ msgstr ""
 msgid "1 is a message to a friend. 5 is a white paper."
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:966
+#: includes/class-blogcraft-editorial.php:1029
 msgid "1 or fewer"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:569
+#: includes/class-blogcraft-editorial.php:578
 msgid "12–60 words, on subject"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:917
+#: includes/class-blogcraft-editorial.php:980
 msgid "2 or more"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:862
+#: includes/class-blogcraft-editorial.php:871
 msgid "3 or more"
 msgstr ""
 
@@ -432,7 +432,7 @@ msgstr ""
 msgid "Answer the question immediately"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:566
+#: includes/class-blogcraft-editorial.php:575
 msgid "Answer-first opening"
 msgstr ""
 
@@ -575,7 +575,7 @@ msgstr ""
 msgid "Back to the brief"
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:279
+#: includes/class-blogcraft-scorecard.php:286
 msgid "Banned phrases"
 msgstr ""
 
@@ -789,7 +789,7 @@ msgstr ""
 msgid "Concrete examples"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:859
+#: includes/class-blogcraft-editorial.php:868
 #: includes/class-blogcraft-generate.php:1241
 msgid "Concrete figures"
 msgstr ""
@@ -1052,7 +1052,7 @@ msgstr ""
 msgid "Either give this one a clearly different angle, or fold what is new here into the post you already have."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:337
+#: includes/class-blogcraft-scorecard.php:344
 msgid "Em dashes"
 msgstr ""
 
@@ -1144,7 +1144,7 @@ msgstr ""
 msgid "Exactly what the model is told. Updates as you change anything above."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:309
+#: includes/class-blogcraft-scorecard.php:316
 msgid "Excluded terms"
 msgstr ""
 
@@ -1182,7 +1182,7 @@ msgstr ""
 msgid "Figure"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:890
+#: includes/class-blogcraft-editorial.php:953
 msgid "Figures with a link beside them"
 msgstr ""
 
@@ -1234,7 +1234,7 @@ msgstr ""
 msgid "First person — I"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:914
+#: includes/class-blogcraft-editorial.php:977
 msgid "First-hand experience"
 msgstr ""
 
@@ -1506,7 +1506,7 @@ msgstr ""
 msgid "Instructions for one part of the article only. These are appended to the rules the model already has, so use them for the things that keep coming out wrong."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:456
+#: includes/class-blogcraft-scorecard.php:463
 msgid "Internal links"
 msgstr ""
 
@@ -1567,7 +1567,7 @@ msgstr ""
 msgid "Key, model, spending cap"
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:370
+#: includes/class-blogcraft-scorecard.php:377
 msgid "Keyword density"
 msgstr ""
 
@@ -1746,7 +1746,7 @@ msgstr ""
 msgid "Measured. Outbound links to reputable sources."
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:804
+#: includes/class-blogcraft-editorial.php:813
 msgid "Meta description"
 msgstr ""
 
@@ -2273,7 +2273,7 @@ msgstr ""
 msgid "Paid search providers return more current results."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:253
+#: includes/class-blogcraft-scorecard.php:260
 msgid "Paragraph length"
 msgstr ""
 
@@ -2291,7 +2291,7 @@ msgstr ""
 msgid "Passed %1$d of %2$d checks, which is under your bar of %3$d. You can still create it — it lands as a draft."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:479
+#: includes/class-blogcraft-scorecard.php:486
 msgid "Passive voice"
 msgstr ""
 
@@ -2601,7 +2601,7 @@ msgstr ""
 msgid "Read the full documentation"
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:188
+#: includes/class-blogcraft-scorecard.php:195
 msgid "Reading ease"
 msgstr ""
 
@@ -2685,7 +2685,7 @@ msgstr ""
 msgid "Required for a custom endpoint. There is no default to fall back to."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:398
+#: includes/class-blogcraft-scorecard.php:405
 msgid "Required terms"
 msgstr ""
 
@@ -2790,7 +2790,7 @@ msgstr ""
 msgid "Say who you write for"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:963
+#: includes/class-blogcraft-editorial.php:1026
 msgid "Says something new"
 msgstr ""
 
@@ -2861,7 +2861,7 @@ msgid "Section briefs"
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:202
-#: includes/class-blogcraft-scorecard.php:156
+#: includes/class-blogcraft-scorecard.php:163
 msgid "Sections"
 msgstr ""
 
@@ -2905,7 +2905,7 @@ msgstr ""
 msgid "Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:222
+#: includes/class-blogcraft-scorecard.php:229
 msgid "Sentence length"
 msgstr ""
 
@@ -3034,7 +3034,7 @@ msgstr ""
 msgid "Sources"
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:431
+#: includes/class-blogcraft-scorecard.php:438
 msgid "Sources cited"
 msgstr ""
 
@@ -3150,27 +3150,27 @@ msgstr ""
 msgid "Sub-subheadings"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:650
+#: includes/class-blogcraft-editorial.php:659
 msgid "Subject early in the title"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:837
+#: includes/class-blogcraft-editorial.php:846
 msgid "Subject in a heading"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:713
+#: includes/class-blogcraft-editorial.php:722
 msgid "Subject in the address"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:738
+#: includes/class-blogcraft-editorial.php:747
 msgid "Subject in the description"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:682
+#: includes/class-blogcraft-editorial.php:691
 msgid "Subject in the first 100 words"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:772
+#: includes/class-blogcraft-editorial.php:781
 msgid "Subject in the title"
 msgstr ""
 
@@ -3631,7 +3631,7 @@ msgid "Title"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:881
-#: includes/class-blogcraft-editorial.php:616
+#: includes/class-blogcraft-editorial.php:625
 msgid "Title length"
 msgstr ""
 
@@ -3750,7 +3750,7 @@ msgstr ""
 #: includes/class-blogcraft-library.php:182
 #: includes/class-blogcraft-library.php:274
 #: includes/class-blogcraft-library.php:361
-#: includes/class-blogcraft-pipeline.php:1128
+#: includes/class-blogcraft-pipeline.php:1134
 msgid "Untitled"
 msgstr ""
 
@@ -3776,7 +3776,7 @@ msgstr ""
 msgid "Used where a list is genuinely a list, not as a way of avoiding paragraphs."
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:937
+#: includes/class-blogcraft-editorial.php:1000
 msgid "Uses what you supplied"
 msgstr ""
 
@@ -4355,7 +4355,7 @@ msgstr ""
 msgid "about %s left"
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:340
+#: includes/class-blogcraft-scorecard.php:347
 msgid "allowed"
 msgstr ""
 
@@ -4384,7 +4384,7 @@ msgstr ""
 msgid "fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered."
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:839
+#: includes/class-blogcraft-editorial.php:848
 msgid "in no heading"
 msgstr ""
 
@@ -4400,10 +4400,10 @@ msgstr ""
 msgid "medical advice"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:652
-#: includes/class-blogcraft-editorial.php:684
-#: includes/class-blogcraft-editorial.php:740
-#: includes/class-blogcraft-editorial.php:774
+#: includes/class-blogcraft-editorial.php:661
+#: includes/class-blogcraft-editorial.php:693
+#: includes/class-blogcraft-editorial.php:749
+#: includes/class-blogcraft-editorial.php:783
 msgid "missing"
 msgstr ""
 
@@ -4416,10 +4416,10 @@ msgstr ""
 msgid "no skipped levels"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:893
-#: includes/class-blogcraft-scorecard.php:282
-#: includes/class-blogcraft-scorecard.php:312
-#: includes/class-blogcraft-scorecard.php:340
+#: includes/class-blogcraft-editorial.php:956
+#: includes/class-blogcraft-scorecard.php:289
+#: includes/class-blogcraft-scorecard.php:319
+#: includes/class-blogcraft-scorecard.php:347
 msgid "none"
 msgstr ""
 
@@ -4427,7 +4427,7 @@ msgstr ""
 msgid "none missing"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:940
+#: includes/class-blogcraft-editorial.php:1003
 msgid "none unused"
 msgstr ""
 
@@ -4435,7 +4435,7 @@ msgstr ""
 msgid "not scored"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:715
+#: includes/class-blogcraft-editorial.php:724
 msgid "not set"
 msgstr ""
 
@@ -4443,10 +4443,10 @@ msgstr ""
 msgid "out of 100"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:684
-#: includes/class-blogcraft-editorial.php:740
-#: includes/class-blogcraft-editorial.php:774
-#: includes/class-blogcraft-editorial.php:839
+#: includes/class-blogcraft-editorial.php:693
+#: includes/class-blogcraft-editorial.php:749
+#: includes/class-blogcraft-editorial.php:783
+#: includes/class-blogcraft-editorial.php:848
 msgid "present"
 msgstr ""
 
@@ -4460,11 +4460,11 @@ msgstr ""
 msgid "standing desk"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:568
+#: includes/class-blogcraft-editorial.php:577
 msgid "starts with a wind-up"
 msgstr ""
 
-#: includes/class-blogcraft-editorial.php:304
+#: includes/class-blogcraft-editorial.php:313
 msgid "the introduction"
 msgstr ""
 
@@ -4472,7 +4472,7 @@ msgstr ""
 msgid "the provider gave no reason."
 msgstr ""
 
-#: includes/class-blogcraft-scorecard.php:482
+#: includes/class-blogcraft-scorecard.php:489
 msgid "under 20%"
 msgstr ""
 

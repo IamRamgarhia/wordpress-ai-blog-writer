@@ -138,9 +138,16 @@ class Blogcraft_Scorecard {
 	 * @return array
 	 */
 	private static function sections( $metrics, $blueprint ) {
-		$min    = (int) $blueprint['sections_min'];
-		$max    = (int) $blueprint['sections_max'];
-		$actual = (int) $metrics['h2'];
+		$min = (int) $blueprint['sections_min'];
+		$max = (int) $blueprint['sections_max'];
+
+		// The true count when the caller knows it. Falling back to the
+		// heading count keeps this working for anything measuring a page
+		// it did not write, such as the article somebody asks the
+		// blueprint screen to match.
+		$actual = isset( $metrics['sections'] )
+			? (int) $metrics['sections']
+			: (int) $metrics['h2'];
 		$pass   = ( $actual >= $min && $actual <= $max );
 
 		$repair = '';
@@ -495,7 +502,19 @@ class Blogcraft_Scorecard {
 	 */
 	public static function evaluate( $content, $blueprint, $context = array() ) {
 		$metrics = Blogcraft_Metrics::measure( $content, $blueprint );
-		$checks  = self::checks( $metrics, $blueprint );
+
+		// How many sections the writer actually wrote, which is not the
+		// same as how many <h2> the finished page carries. Key takeaways,
+		// the questions, the numbers, the mistakes and the sources are all
+		// h2 as well, so counting headings meant the heaviest check in the
+		// scorecard was measuring furniture: a post asked for four to seven
+		// sections, written to exactly that, and then marked down for the
+		// three blocks the plugin appended to it afterwards.
+		if ( isset( $context['sections'] ) ) {
+			$metrics['sections'] = (int) $context['sections'];
+		}
+
+		$checks = self::checks( $metrics, $blueprint );
 
 		// Structural checks read rendered markup rather than prose, so they
 		// build their own verdicts and are merged in whole.
