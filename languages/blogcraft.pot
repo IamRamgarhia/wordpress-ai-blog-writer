@@ -639,6 +639,11 @@ msgstr ""
 msgid "Blogcraft has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job."
 msgstr ""
 
+#. translators: 1: folder of the duplicate copy. 2: version already running.
+#: blogcraft.php:53
+msgid "Blogcraft is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts."
+msgstr ""
+
 #: includes/class-blogcraft-nav.php:82
 msgid "Blogcraft screens"
 msgstr ""
