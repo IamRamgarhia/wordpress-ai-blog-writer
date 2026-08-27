@@ -172,6 +172,134 @@ They are encrypted before being stored, shown only as a mask, and never written 
 * Three more ways to spend nothing: Jan and llama.cpp join Ollama and LM Studio as models that run on your own machine with no key, and Hugging Face joins Google, Groq and Mistral as a hosted free tier. All three were reachable before through the custom endpoint, which is no use to anybody who does not already know their runtime speaks that protocol
 * The Help screen's contents moved to a rail beside the writing, and now marks the section you are reading. It was a stack of twelve bare links between the heading and the first section, because the screen loaded neither the stylesheet nor the script the rest of the plugin uses
 
+= 0.62.0 =
+* The documentation link now appears on the overview, the last screen of the introduction, the wordpress.org listing and its FAQ, and three more places in the README
+* Every one of those addresses comes from one place now. The plugins row wrote it out itself, so there were two copies of one URL in two files — which is how a link comes to 404 while its twin still works
+* The plugin header pointed at the same page without a trailing slash, so the one address WordPress displays was a redirect rather than the address
+
+= 0.61.0 =
+* A documentation site at https://dicecodes.com/blogcraft/ — one self-contained HTML file with no CDN, no web fonts and no external request of any kind, built on the plugin's own palette and type scale
+* Its section anchors are the same slugs the plugin already uses, so every "How this works" panel offers the shipped documentation and the online guide side by side, each deep-linked to the matching section
+* That page was then audited against the same on-page rules the plugin applies to posts, and six of fourteen failed. The title was 82 characters and opened with the word "documentation"; the description never contained "AI writer" at all; and a page carrying fifteen questions had no structured data on it. It has three schema blocks now, with the FAQ generated from the visible answers rather than written a second time
+
+= 0.60.0 =
+* The README and the branding inside WordPress brought into line with the house style used by Open WP Migration, so somebody arriving at either plugin recognises the second
+* The plugins row now offers Docs beside Set up and Settings, and the Help screen links out to the guides and to the issue tracker — kept clearly separate from the shipped documentation above them, which is always true of the version you have installed in a way an online page cannot be
+
+= 0.59.0 =
+* Two scoring bugs found by writing a real post end to end and reading the result. Neither was reachable from a unit test
+* The section count was counting the plugin's own headings. Key takeaways, the questions, the numbers, the mistakes and the sources are all h2, so a post asked for two sections and written to exactly two was marked down for having four — on the heaviest check in the scorecard, on every post with any block switched on
+* Figures you supplied yourself were counted as unsupported claims. The evidence field is the one the plugin weighs most heavily, and stating your own measurement cost eight points because there was no link beside it. There is nothing to link to; it is your number
+* A README, which the repository did not have. Two scraped research files that should never have been committed are gone with it
+* The display name is now "Blogcraft – AI Writer & SEO Content Generator". The slug, the folder name and the text domain are unchanged, so no existing install is affected
+
+= 0.58.0 =
+* Stopped asking the database to exclude a post. "exclude" in get_posts() becomes a NOT IN, which stops MySQL using its index on a table that only ever grows — and the check using it was already looping over every row it got back, so the exclusion bought a worse query plan to save an if statement
+
+= 0.57.0 =
+* Five on-page rules that the current guides all state and this plugin did not measure. The subject has to arrive in the first hundred words, early in the title rather than merely somewhere in it, in the address, and in the search-result line
+* The address check carries no repair note, deliberately. The slug is decided at the outline and a rewrite cannot reach it
+* Google asks, in as many words, that automation be disclosed: that it was used, how, and why that helped the reader. There is now a line in the byline saying so, on by default, with wording you can change or switch off
+
+= 0.56.0 =
+* A type scale, and spacing that lands on a grid. The stylesheets held sixteen distinct font sizes, three of them half a pixel, and sixteen off-grid spacing values. Each is invisible on its own; together they are why nothing quite lined up with anything else
+* Seven sizes now, each with a job, and 172 spacing values snapped to a four-pixel grid. Three tests hold it: no hand-written font size, no spacing off the grid, and every step of the scale a multiple of four
+
+= 0.55.0 =
+* Four buttons asked a provider without checking there was one. On a fresh install, "Show the models on my account", "Learn from my posts", "Read this article" and "Suggest a topic" all returned whatever the HTTP layer said — "Request failed with HTTP 401", which is true, tells nobody what to do, and is indistinguishable from a broken plugin. One refusal now, in one place, naming the screen to go to
+
+= 0.54.0 =
+* Four prompts were handed your own material and dropped it. The pipeline sets the evidence before seven stages and four of those prompts never emitted it, which looks like working code at every call site because the call site is right
+* Worst of the four was the rewrite. A pass told to cut forty words could paraphrase "three of nine were returned" into "some were returned" and nothing noticed — the heaviest check on the finished post being quietly undone by the pass meant to improve it
+* The outline was among them, so the shape of the post was decided before your own material was in the room
+* The provider card asks for the key before the model. It asked for the model id above the field that makes a model list possible, so on a fresh install the only thing "Show the models on my account" could do was fail — which leaves typing an id from memory as the path of least resistance, and a retired id is a setup that looks finished and errors on the first post
+
+= 0.53.0 =
+* Deleting the plugin no longer deletes everything it stored. Your settings, your writing rules and the record of every post it wrote stay where they are. Install it again and it is as you left it
+* There is a box on the settings screen if you do want it all gone, and the warning that ticking it is the only confirmation there will be
+* Posts are never touched either way. They are ordinary WordPress posts from the moment they are created
+* The PHP matrix ran 7.4 through 8.5 and proved only that the code parses, because php -l exits 0 on a deprecation. Anything PHP has to say about a file now fails the build, which is what makes the 8.4 and 8.5 columns worth having
+
+= 0.52.0 =
+* Installing this plugin twice made it refuse to switch on. Two copies in wp-content/plugins is a fatal error, because PHP will not declare the same class twice, and WordPress rolls the activation back — which is correct and explains nothing. The second copy now stands aside and says which folder it is in, so there is something to delete
+
+= 0.51.0 =
+* The panel asking what a post will include shipped, rendered, and never opened. Its listener was appended to a file holding several immediately-invoked functions and landed in the last one, which owns a different control, so it threw before it could attach and pressing Write did what it always had
+* That panel now opens with what has never been decided: whether anybody has said who the blog is for, whether the writing rules are still the shipped defaults, whether there is anything to read but the model's own memory, and whether this post carries anything only its author knows. None of it blocks — "Write it now" sits under every one of them
+
+= 0.50.0 =
+* The undo the review screen promised now exists. It said a rewrite that made things worse could be undone because "the earlier wording is in the editor history" — but a held draft has no post, so it has no history, and the sentence was simply untrue on the one screen whose whole job is being honest about a draft's state. The article, its score and its checks are kept before a pass and put back on request, with no second provider call
+
+= 0.49.0 =
+* A finished job was described as broken. The Activity table kept whatever went wrong on an earlier attempt, so a post that worked and is on the site carried a red error beside "Complete"
+* Scores in the library are coloured against your threshold rather than left as bare numbers, and post status is a badge like every other table in the plugin
+* The first step of the introduction was a one-way door: it asked you to go and set up a provider, then left you to find your way back to a page you had been looking at for ten seconds. The trip is marked now, and settings shows a way back while it lasts
+
+= 0.48.0 =
+* Pressing Write opens a panel listing the ten parts a post can be built from, each with a sentence on what it is for and each switchable for this post alone. It appears every time until you tick "Stop asking me this"
+* Sources is the reason it exists. It was on every post because it defaults on and had no control anywhere on the write screen, so the first anybody learned of a Sources block was finding one at the bottom of a finished draft. Four other extras were in the same position
+* Turning Sources off no longer costs marks. It is the only place a real external link comes from, since every drafting prompt forbids the model from writing markup, so the citation check is skipped rather than failed
+
+= 0.47.0 =
+* The review screen offers one more writing pass aimed at the faults it has just listed, and shows the new score against the old one — including when it goes down, which happens
+* It will not charge for a pass that cannot change anything. "Internal links: 1, wanted 3" means the site has nothing else on the subject to point at, and no rewrite invents three related posts. Where nothing failing carries an instruction, no request is made and nobody is billed for one
+* A new panel answers the narrower question of what is working against a post that can actually be checked here: whether it duplicates something you already have, whether it says anything only yours, whether anything on the site points at it, and whether it is shorter than the question deserves. It does not predict a position, and a test asserts no line ever claims to
+
+= 0.46.0 =
+* Every draft on the library screen was labelled "2028 years ago". post_date_gmt is only filled once a post is scheduled or published, so every draft this plugin writes carries 0000-00-00, which reads as the year zero
+* The held-draft step list showed "Creating the post" not done with the two steps after it ticked. Naming publish alone was right only while publish was the last step
+* The Write screen's outcome and readiness panels were separate children of one grid, so the second wrapped underneath the tab panels — a screen away from the fields it describes
+* Removed load_plugin_textdomain(), which Plugin Check flags. It has been unnecessary for wordpress.org-hosted plugins since WordPress 4.6
+
+= 0.45.0 =
+* The job that stuck on "Creating the post". Publishing inserted the post and then, in the same request, downloaded four pictures, rewrote three older posts and told a crawler — against the one rule the pipeline is built on, that no stage may outlast PHP's execution limit on ordinary hosting. Pictures are their own stage now, one per run, and the linking is a stage after that. Neither may fail the job
+* The clock restarted on refresh. It counted from when the page loaded, so refreshing a post that had been writing for four minutes reported nine seconds. It is anchored to the job now
+* The progress screen had no menu entry and was reached by an id in the address, so refreshing or closing the tab left a post being written with nothing pointing back at it. The bare address finds whatever is in flight, and Activity links the jobs that have a screen to go to
+* A provider request had no timeout, so one that was never going to answer left a half-filled bar for ever
+* All In One SEO was detected, deferred to, and then never written to — it keeps its fields in its own table — so an AIOSEO site got neither its fields filled nor Blogcraft's own description printed
+* Two full palettes carrying different values for the same roles, sixteen corner radii between three and eighteen pixels, and the Write and Blueprint screens loading no admin.css at all, which is why the navigation on the two screens people use most had no background, no border and no current-tab highlight
+
+= 0.44.0 =
+* Three screens had no colours at all. Every colour resolves through custom properties declared on .blogcraft-page, and the progress screen, the library and the welcome screen use .blogcraft-wrap — so on those three every var() fell through to nothing
+* The progress screen, the one you sit and watch for several minutes, was capped at 820px, so on a normal monitor two thirds of the display was empty beside a column of ten one-line steps. The draft as it arrives takes the room now and the steps are a rail beside it
+* The write screen ended in a red button that trashes a day of posts, with four raw queue counters and a leftover "run the queue now" control beneath it. Those are folded into one section that says what is inside it, and the write button is pinned to the foot of the viewport rather than sitting six tab-panels down
+
+= 0.43.0 =
+* An introduction on install. The settings screen has six cards and about forty fields, which is the right shape for adjusting a working setup and the wrong shape for somebody who activated the plugin ninety seconds ago. The new screen asks for the three that decide whether the first post is any good, in order, and says what skipping each one costs
+* The outline is held to the number of sections asked for. A real run came back with ten against a ceiling of seven and the finished post was handed to its author with that check marked failed — and every section past the ceiling had also cost a provider call
+* In-body pictures were never inserted, and took the whole publish stage down with them. The image block's format string sat in a double-quoted PHP string with its dollars unescaped, so sprintf was handed an unknown specifier and threw, inside a step described as best-effort that was not actually wrapped
+* Alt text described the heading instead of the picture. A screen reader announced the heading, then announced the identical sentence again as the image, and came away knowing nothing about what the picture showed either time
+
+= 0.42.0 =
+* A key saved for one provider stayed sitting there when the provider was changed, and the field showed its mask — so it claimed a key was saved for a service it had never seen. Keys now record which provider they belong to
+* The same key also counted towards setup being complete, so the checklist said "ready", the first post started, and it failed several stages in with an authentication error nothing on any screen explained
+* Underneath that was a bigger one: every hosted provider counted as configured with no key at all. The address branch exists for the runtimes that genuinely need none, and every hosted provider has a default address too. What is asked now is whether the provider issues keys at all
+* A readiness check on the brief, and a button that turns a topic into four questions only you can answer. It returns questions, never answers — filling in the evidence field would be inventing the one thing the entire quality system leans on being true
+
+= 0.41.0 =
+* A paused post looked exactly like a broken one. Hitting a rate limit does the right thing underneath — the job goes back to pending, keeps everything already written, and resumes by itself — but the screens read only "Pending", so working and waiting were indistinguishable and waiting looked broken
+* A job whose next run is in the future is reported as waiting, the page stops polling, and it says what happened: the provider is rate limiting, nothing is lost, and roughly when it carries on
+* The library grew a "Being written" section listing anything in flight with its step and, if it is paused, until when
+* The Write screen says this before you start, since a post is eight to ten separate calls and beginning one into an exhausted quota does not fail at the door — it gets several stages in, spends what those cost, and then parks
+
+= 0.40.0 =
+* A "Written by AI" screen. A draft that finished and was never approved existed only as a job row: it had cost real money, it was complete, no post existed for it, and closing the tab made it unreachable
+* Discarding a draft cancels the job rather than deleting the row, because that row is the only record the topic was ever written
+* The progress screen shows what exists so far — the title as soon as the outline lands, then each planned heading filling in as its section is written. A bar that fills tells you the machine is alive; the headings tell you whether it is writing the post you asked for
+* The Discard button could not discard anything. cancel() listed the three job statuses that existed before drafts could be held, so a finished draft fell through the guard and the button silently did nothing
+
+= 0.39.0 =
+* The draft is editable before it lands, in the editor you already know, which brings its Add Media button and whatever a stock-photo plugin has put there
+* Edited HTML is re-wrapped into real blocks on the way back. The editor returns plain HTML, and saving that on a block-editor site produces one enormous Classic block with nothing individually editable inside it. Anything unrecognised becomes a paragraph rather than being dropped
+* The review screen was inheriting a full-bleed admin width, which put "Wanted" against the edge of a monitor and ran the draft at a line length nobody reads a paragraph in. Failed checks are listed first now and the passing ones fold away
+* Models emit **bold** despite every prompt forbidding markdown, and nothing converted it, so literal asterisks reached the page. They are converted rather than stripped — the model marked that phrase for a reason
+
+= 0.38.0 =
+* Writing a post lands on a screen that drives the pipeline from your browser, one stage per request, showing each step as it completes. Queueing used to answer with "the post will be written in the background", which is true only when WP-Cron fires — and on a staging site it frequently never does, leaving a job at Pending with an empty log, indistinguishable from broken
+* When the draft is finished it stops. The prose, the search description, the score against your threshold and every one of the checks are shown before anything touches the site. It becomes a post when you press the button, not before
+* Autopilot is unchanged. Unattended writing already has the quality gate and the review queue, so it still publishes on its own
+* The content now matches the editor the site actually uses. Block delimiters are HTML comments, so they render identically either way, but in the Classic editor they are visible clutter between every paragraph
+
 = 0.37.0 =
 * Translations are now loaded. Every string in the plugin was written to be translatable and the translation file is rebuilt on every release, but nothing ever loaded it, so all of it stayed in English no matter what language the site was in
 * A provider asking you to slow down is recognised by its status code rather than by reading its error message. The message is itself translated, so on a site in any other language a rate limit was mistaken for a failure and the post lost one of its three attempts to something that only needed a wait
