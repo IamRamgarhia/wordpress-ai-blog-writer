@@ -10,3 +10,7 @@ node_modules/
 
 # Editor/tool scratch, not part of the plugin.
 .zcode/
+
+# Scraping artefacts, never part of the plugin.
+rr.json
+sg.html
