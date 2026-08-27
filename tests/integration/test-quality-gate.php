@@ -141,8 +141,11 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 		$method->setAccessible( true );
 		$fields = $method->invoke( null );
 
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		// The capability goes on the role first. A WP_User caches its role's
+		// caps when it is instantiated, so granting after wp_set_current_user()
+		// leaves the current user without it.
 		Blogcraft_Capabilities::add();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		ob_start();
 		Blogcraft_Generate::render();
