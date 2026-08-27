@@ -8,7 +8,7 @@
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
 [![Version](https://img.shields.io/badge/Version-0.64.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
-[![Tests](https://img.shields.io/badge/Tests-666%20passing-brightgreen.svg)](#-contributing)
+[![Tests](https://img.shields.io/badge/Tests-671%20passing-brightgreen.svg)](#-contributing)
 [![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
 [![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
 [![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/blogcraft/)

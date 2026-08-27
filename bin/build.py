@@ -13,7 +13,22 @@ import sys
 import zipfile
 
 SRC = 'D:/calude/Wordpress plugin - blog writing'
-ROOTS = ['blogcraft.php', 'uninstall.php', 'readme.txt', 'includes', 'assets', 'languages', 'data']
+# LICENSE is not optional: GPLv2 requires the licence text travel with the
+# work, and shipping a plugin that declares GPLv2 without it is a licence
+# breach as well as a review finding. changelog.txt is referenced from
+# readme.txt, so leaving it out would point people at a file that is not
+# there.
+ROOTS = [
+    'blogcraft.php',
+    'uninstall.php',
+    'readme.txt',
+    'changelog.txt',
+    'LICENSE',
+    'includes',
+    'assets',
+    'languages',
+    'data',
+]
 
 
 def version():
@@ -31,7 +46,7 @@ def files():
             yield path, 'blogcraft/' + entry
             continue
         if not os.path.isdir(path):
-            continue
+            sys.exit('missing from the build: ' + entry)
         for folder, _, names in os.walk(path):
             for name in sorted(names):
                 full = os.path.join(folder, name)
