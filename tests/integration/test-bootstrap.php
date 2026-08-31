@@ -298,4 +298,115 @@ class Test_Blogcraft_Bootstrap extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	// ----------------------------------------------------------- the markup.
+
+	/**
+	 * Every shape of fragment this plugin builds and then prints.
+	 *
+	 * @return array Description => markup.
+	 */
+	private function assembled_fragments() {
+		return array(
+			'key control'  => '<label class="blogcraft-clear-key"><input type="checkbox" name="clear_provider_api_key" value="1" /> Remove this key</label>',
+			'score pill'   => '<span class="bc-score-pill is-ok">88</span>',
+			'unscored'     => '<span class="bc-score-pill is-none">not scored</span>',
+			'nav count'    => '<span class="bc-nav-count">3</span>',
+			'nav current'  => '<span class="bc-nav-item is-current" aria-current="page">Overview<span class="bc-nav-count">3</span></span>',
+			'nav link'     => '<a class="bc-nav-item" href="http://example.org/wp-admin/admin.php?page=blogcraft">Overview</a>',
+			'select'       => '<select name="a"><optgroup label="g"><option value="1">One</option></optgroup></select>',
+			'textarea'     => '<textarea name="t" rows="6" class="large-text code">hi</textarea>',
+			'number field' => '<input type="number" name="n" value="3" min="0" max="9" step="1" class="small-text" />',
+			'hint'         => '<p class="description">Something <strong>bold</strong> and <code>code</code>.</p>',
+		);
+	}
+
+	public function test_the_allowlist_does_not_eat_the_plugins_own_markup() {
+		// Nine places printed assembled HTML behind a phpcs:ignore asserting
+		// it was safe. They now run through wp_kses against a fixed list,
+		// which turns the assertion into a rule — but a list that is too
+		// narrow deletes markup silently, and a settings control that simply
+		// stops appearing is a worse bug than the one this replaced.
+		//
+		// So the list is asserted to be an identity on everything the plugin
+		// actually builds.
+		$allowed = Blogcraft_Markup::allowed();
+
+		foreach ( $this->assembled_fragments() as $name => $html ) {
+			$this->assertSame(
+				$html,
+				wp_kses( $html, $allowed ),
+				'the allowlist alters the ' . $name . ' fragment'
+			);
+		}
+	}
+
+	public function test_the_allowlist_still_removes_what_it_is_for() {
+		// The other half. An identity test alone passes just as well against
+		// a list that permits everything, which would make the whole change
+		// decorative.
+		$attacks = array(
+			'script tag'    => '<script>alert(1)</script>',
+			'iframe'        => '<iframe src="http://evil.example"></iframe>',
+			'inline handler' => '<span onclick="alert(1)">x</span>',
+			'style tag'     => '<style>body{display:none}</style>',
+			'object'        => '<object data="x"></object>',
+		);
+
+		$allowed = Blogcraft_Markup::allowed();
+
+		foreach ( $attacks as $name => $html ) {
+			$out = wp_kses( $html, $allowed );
+
+			$this->assertNotSame( $html, $out, 'the allowlist passes ' . $name . ' through unchanged' );
+			$this->assertStringNotContainsString( '<script', $out, $name );
+			$this->assertStringNotContainsString( '<iframe', $out, $name );
+			$this->assertStringNotContainsString( 'onclick', $out, $name );
+		}
+	}
+
+	public function test_no_output_is_printed_behind_a_suppression() {
+		// "echo $html; // safe" is the pattern review distrusts most, and
+		// rightly: the claim is only as good as the helper behind it, and
+		// nobody can tell a true one from a false one without reading that
+		// helper. There were nine. There should stay none.
+		$files = array_merge(
+			(array) glob( BLOGCRAFT_PATH . 'includes/*.php' ),
+			array( BLOGCRAFT_PATH . 'blogcraft.php', BLOGCRAFT_PATH . 'uninstall.php' )
+		);
+
+		$found = array();
+
+		foreach ( $files as $file ) {
+			$body = (string) file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( explode( "\n", $body ) as $number => $line ) {
+				if ( false !== strpos( $line, 'phpcs:ignore' ) && false !== strpos( $line, 'EscapeOutput' ) ) {
+					$found[] = basename( $file ) . ':' . ( $number + 1 );
+				}
+			}
+		}
+
+		$this->assertSame( array(), $found, 'output is being printed behind an escaping suppression' );
+	}
+
+	public function test_the_uninstall_guard_admits_only_a_real_uninstall() {
+		// ABSPATH used to be accepted as the second half of an or-chain, and
+		// ABSPATH is defined on every WordPress request — so the guard passed
+		// whenever the file was reached at all, not only when the plugin was
+		// being deleted.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'uninstall.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertStringContainsString(
+			"defined( 'WP_UNINSTALL_PLUGIN' ) || exit;",
+			$source,
+			'uninstall.php does not stop on anything but a real uninstall'
+		);
+
+		$this->assertStringNotContainsString(
+			"defined( 'ABSPATH' ) || exit",
+			$source,
+			'uninstall.php still accepts ABSPATH as proof it is being uninstalled'
+		);
+	}
 }

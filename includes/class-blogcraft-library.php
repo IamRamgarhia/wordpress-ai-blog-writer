@@ -273,7 +273,7 @@ class Blogcraft_Library {
 			echo '<tr>';
 			printf( '<td><strong>%s</strong></td>', esc_html( '' === $title ? __( 'Untitled', 'blogcraft-ai-writer' ) : $title ) );
 			// Not escaped again: score_pill() escapes everything it emits.
-			echo '<td>' . self::score_pill( $score ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td>' . wp_kses( self::score_pill( $score, Blogcraft_Markup::allowed() ) ) . '</td>';
 			printf( '<td>%s</td>', esc_html( self::when( isset( $row['updated_at'] ) ? $row['updated_at'] : '' ) ) );
 
 			// A flex row rather than two siblings and a space. The discard
@@ -367,7 +367,7 @@ class Blogcraft_Library {
 			);
 
 			// Not escaped again: score_pill() escapes everything it emits.
-			echo '<td>' . self::score_pill( '' === $score ? null : (int) $score ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<td>' . wp_kses( self::score_pill( '' === $score ? null : (int) $score, Blogcraft_Markup::allowed() ) ) . '</td>';
 			// post_date_gmt is only filled once a post is scheduled or
 			// published. Every draft this plugin writes has it empty, and
 			// the local date is the one that is always there.

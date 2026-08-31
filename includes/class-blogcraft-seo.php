@@ -566,7 +566,7 @@ class Blogcraft_Seo {
 		add_action( 'wp_head', array( __CLASS__, 'print_schema' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'print_head_meta' ), 5 );
 		add_filter( 'the_content', array( __CLASS__, 'append_author_box' ), 20 );
-		add_action( 'wp_head', array( __CLASS__, 'print_author_box_styles' ), 6 );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_author_box_styles' ) );
 
 		// All In One SEO keeps its fields in its own table rather than post
 		// meta, so there was nothing to write and nothing was written. It
@@ -638,14 +638,20 @@ class Blogcraft_Seo {
 	/**
 	 * The few rules the byline block needs to not look broken.
 	 *
-	 * Inline rather than a stylesheet, because a separate file would cost
+	 * Inline rather than a file, because a separate stylesheet would cost
 	 * every visitor a request for roughly a dozen declarations. Deliberately
 	 * minimal and colour-free: it inherits the theme's type and palette, so
 	 * it reads as part of the page rather than as something bolted on.
 	 *
+	 * Inline, but not printed. It used to echo a <style> block straight into
+	 * wp_head, which works and is invisible to every other plugin: nothing
+	 * can dequeue it, reorder it, or see that it is there. Registering a
+	 * handle with no file is the documented way to carry inline rules, and
+	 * it costs the same single request — which is to say, none.
+	 *
 	 * @return void
 	 */
-	public static function print_author_box_styles() {
+	public static function enqueue_author_box_styles() {
 		if ( ! is_singular( 'post' ) ) {
 			return;
 		}
@@ -660,14 +666,18 @@ class Blogcraft_Seo {
 			return;
 		}
 
-		echo '<style id="blogcraft-author-box">'
-			. '.blogcraft-author-box{margin:2.5em 0 0;padding:1.25em 0 0;border-top:1px solid currentColor;opacity:.85}'
+		$css = '.blogcraft-author-box{margin:2.5em 0 0;padding:1.25em 0 0;border-top:1px solid currentColor;opacity:.85}'
 			. '.blogcraft-author-box p{margin:0 0 .4em}'
 			. '.blogcraft-author-name{font-weight:600}'
 			. '.blogcraft-author-role{font-weight:400;opacity:.75}'
 			. '.blogcraft-author-bio,.blogcraft-author-reviewer,.blogcraft-author-links{font-size:.9em;opacity:.8}'
-			. '.blogcraft-author-links a{margin-right:.25em}'
-			. '</style>';
+			. '.blogcraft-author-links a{margin-right:.25em}';
+
+		// A handle with no source. wp_register_style() accepts false for
+		// exactly this: a stylesheet that exists only to carry inline rules.
+		wp_register_style( 'blogcraft-author-box', false, array(), BLOGCRAFT_VERSION );
+		wp_enqueue_style( 'blogcraft-author-box' );
+		wp_add_inline_style( 'blogcraft-author-box', $css );
 	}
 
 	/**
@@ -826,9 +836,21 @@ class Blogcraft_Seo {
 		}
 
 		foreach ( $graphs as $entry ) {
+			if ( ! is_array( $entry ) || array() === $entry ) {
+				continue;
+			}
+
+			// Two flags, one job. JSON_HEX_TAG puts < and > beyond reach, and
+			// dropping JSON_UNESCAPED_SLASHES means a literal </script> cannot
+			// survive into the page either — between them there is nothing left
+			// for a value to break out of the block with.
+			//
+			// It also means the phpcs:ignore that used to sit here can go. That
+			// comment was silencing a warning about the slashes flag, which is
+			// exactly the warning worth reading.
 			printf(
 				'<script type="application/ld+json">%s</script>',
-				wp_json_encode( $entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				wp_json_encode( $entry, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG )
 			);
 		}
 	}
@@ -1073,7 +1095,7 @@ class Blogcraft_Seo {
 					. '</a>';
 			}
 
-			$box .= '<p class="blogcraft-author-links">' . implode( ' · ', $rendered ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$box .= '<p class="blogcraft-author-links">' . implode( ' · ', $rendered ) . '</p>';
 		}
 
 		$box .= '</div>';

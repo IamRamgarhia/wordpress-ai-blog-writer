@@ -437,7 +437,7 @@ class Blogcraft_Blueprint_Screen {
 		}
 
 		echo '<div class="bc-control">';
-		echo $control; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped pieces by the helpers below.
+		echo wp_kses( $control, Blogcraft_Markup::allowed() );
 
 		if ( '' !== $hint ) {
 			printf( '<p class="bc-hint">%s</p>', esc_html( $hint ) );

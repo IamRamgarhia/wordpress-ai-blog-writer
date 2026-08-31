@@ -88,21 +88,30 @@ class Blogcraft_Nav {
 				$bubble = sprintf( '<span class="bc-nav-count">%d</span>', (int) $waiting );
 			}
 
+			// Built whole, then filtered once on the way out. Handing the
+			// filtered piece to printf as an argument is the same thing, but
+			// PHPCS cannot see through an argument list to know that — and a
+			// rule that has to be argued with at every call site is one that
+			// ends up suppressed instead.
 			if ( $slug === $current ) {
-				printf(
+				$item = sprintf(
 					'<span class="bc-nav-item is-current" aria-current="page">%1$s%2$s</span>',
 					esc_html( $label ),
-					$bubble // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from an integer above.
+					$bubble
 				);
+
+				echo wp_kses( $item, Blogcraft_Markup::allowed() );
 				continue;
 			}
 
-			printf(
+			$item = sprintf(
 				'<a class="bc-nav-item" href="%1$s">%2$s%3$s</a>',
 				esc_url( admin_url( 'admin.php?page=' . $slug ) ),
 				esc_html( $label ),
-				$bubble // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from an integer above.
+				$bubble
 			);
+
+			echo wp_kses( $item, Blogcraft_Markup::allowed() );
 		}
 
 		echo '</nav>';

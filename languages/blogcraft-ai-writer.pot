@@ -2870,12 +2870,12 @@ msgid "Reviewed by"
 msgstr ""
 
 #. translators: 1: reviewer name. 2: their role or credentials.
-#: includes/class-blogcraft-seo.php:1054
+#: includes/class-blogcraft-seo.php:1076
 msgid "Reviewed by %1$s, %2$s"
 msgstr ""
 
 #. translators: %s: reviewer name.
-#: includes/class-blogcraft-seo.php:1049
+#: includes/class-blogcraft-seo.php:1071
 msgid "Reviewed by %s"
 msgstr ""
 
@@ -4437,7 +4437,7 @@ msgid "Written as real blocks, so every paragraph and heading is editable in the
 msgstr ""
 
 #. translators: %s: author name.
-#: includes/class-blogcraft-seo.php:1028
+#: includes/class-blogcraft-seo.php:1050
 msgid "Written by %s"
 msgstr ""
 

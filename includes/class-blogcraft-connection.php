@@ -573,7 +573,7 @@ class Blogcraft_Connection {
 			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ) . '</p>';
 		}
 
-		echo self::clear_key_control( 'provider_api_key', $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( self::clear_key_control( 'provider_api_key', $key, Blogcraft_Markup::allowed() ) );
 		self::render_provider_help( $type );
 		echo '</td></tr>';
 
@@ -718,7 +718,7 @@ class Blogcraft_Connection {
 			esc_attr( '' === $research_key ? __( 'Not set', 'blogcraft-ai-writer' ) : Blogcraft_Crypto::mask( $research_key ) )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ) . '</p>';
-		echo self::clear_key_control( 'research_api_key', $research_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( self::clear_key_control( 'research_api_key', $research_key, Blogcraft_Markup::allowed() ) );
 		echo '</td></tr>';
 
 		self::textarea_row(
@@ -1284,7 +1284,7 @@ class Blogcraft_Connection {
 			esc_attr( '' === $stored ? __( 'Not set', 'blogcraft-ai-writer' ) : Blogcraft_Crypto::mask( $stored ) ),
 			esc_html__( 'Leave blank to keep the saved key.', 'blogcraft-ai-writer' ),
 			esc_attr( $row_class ),
-			self::clear_key_control( $name, $stored ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			wp_kses( self::clear_key_control( $name, $stored, Blogcraft_Markup::allowed() ) )
 		);
 	}
 

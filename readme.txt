@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.65.0
+Stable tag: 0.66.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,23 +94,23 @@ Blogcraft still talks to providers directly as well, and will keep doing so. It 
 
 **Research providers** — optional. The post topic is sent so relevant sources can be found.
 
-* Tavily — https://tavily.com/terms and https://tavily.com/privacy
-* SerpApi — https://serpapi.com/legal and https://serpapi.com/privacy-policy
+* Tavily (api.tavily.com) — https://tavily.com/terms and https://tavily.com/privacy
+* SerpApi (serpapi.com) — https://serpapi.com/legal#terms-of-service and https://serpapi.com/legal#privacy-policy
 * A SearXNG instance you host yourself.
-* Wikipedia — https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
-* Hacker News search, via Algolia — https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
+* Wikipedia (en.wikipedia.org) — the topic is sent to its public summary API to read the opening of a matching article. No account and no key. https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+* Hacker News search, via Algolia (hn.algolia.com) — the topic is sent as a search query. No account and no key. https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
 
 Every one of these starts switched off, including the two that need no key. Blogcraft contacts nothing until you turn a source on, and only the post topic is ever sent. Blogcraft, Settings, Research.
 
 **Image providers** — off until you switch pictures on, which is how you choose one. A short description of the wanted picture is then sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
 
-* Pollinations — https://pollinations.ai (this service publishes no terms or privacy page; it is offered because it needs no account, and it is off until you choose it)
+* Pollinations (image.pollinations.ai) — https://pollinations.ai (this service publishes no terms or privacy page; it is offered because it needs no account, and it is off until you choose it)
 * fal.ai — https://fal.ai/terms and https://fal.ai/privacy
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
 * xAI (Grok) — https://x.ai/legal/terms-of-service and https://x.ai/legal/privacy-policy
-* Pexels — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/
-* Pixabay — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/
+* Pexels (api.pexels.com) — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/
+* Pixabay (pixabay.com) — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/
 
 If you already write with OpenAI, Google or xAI, choosing the same one for pictures uses the key you have already entered — one key, one bill. A key from a different company will not work, and the settings screen says which case you are in.
 
@@ -118,7 +118,7 @@ fal.ai, OpenAI, Gemini and Grok charge for each image they generate. Blogcraft n
 
 **Search engine notification** — off unless you switch it on under Blogcraft, Settings, Automation.
 
-* IndexNow — https://www.bing.com/indexnow and https://www.microsoft.com/privacy/privacystatement
+* IndexNow (api.indexnow.org) — the address of the post, and nothing else, is sent once as it goes live. The endpoint is shared: Bing, Yandex, Seznam and Naver all read from it. https://www.bing.com/indexnow and https://www.microsoft.com/privacy/privacystatement
 
 When it is on, the address of each post is sent as it goes live, so Bing, Yandex, Seznam and Naver come and look rather than waiting to find it. Only the address is sent, never the post. Google has said it does not take part.
 
@@ -168,6 +168,14 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.66.0 =
+* uninstall.php could run outside an uninstall. Its guard accepted WP_UNINSTALL_PLUGIN or ABSPATH, and ABSPATH is defined on every WordPress request — so the second half was always true and the file would execute wherever it was reached. Only the constant that means "WordPress is deleting this plugin" is accepted now
+* The author box stylesheet is enqueued rather than printed. It echoed a <style> block into wp_head, which works but is invisible to everything else: no other plugin or theme could dequeue it, reorder it, or even see it was there. It is registered as a handle carrying inline rules, which costs the same number of requests, namely none
+* The structured-data block no longer passes JSON_UNESCAPED_SLASHES, which is what would have let a literal </script> reach the page, and adds JSON_HEX_TAG so angle brackets cannot either. The suppression comment that sat beside it was silencing a warning that had something to say
+* Nine places printed assembled markup behind a comment asserting it was already escaped. Every comment was accurate, and that is the problem: the safety held only while each helper stayed correct, and nobody could tell a true claim from a false one without reading the helper. They run through wp_kses against a fixed tag list now, so it is enforced rather than asserted
+* The SerpApi privacy link was a 404. Both of their documents live on one page under anchors, which is where it points now
+* Every external service in the readme names the host it actually contacts, so somebody reading a firewall log can match what they see against the list
+
 = 0.65.0 =
 * The plugin is now called Blogcraft AI Writer, and its text domain is blogcraft-ai-writer to match. wordpress.org generates the directory slug from the plugin name and will not change it afterwards, and the text domain has to equal that slug or the translations the directory builds never load — which is the same failure as shipping no translations at all
 * Nothing that identifies your data moved. The option names, the capability, the admin addresses and the class names are all unchanged, so an existing install keeps every setting, blueprint and record of what it has written
@@ -185,14 +193,5 @@ everything is here, oldest at the bottom.
 * The documentation link now appears on the overview, the last screen of the introduction, the wordpress.org listing and its FAQ, and three more places in the README
 * Every one of those addresses comes from one place now. The plugins row wrote it out itself, so there were two copies of one URL in two files — which is how a link comes to 404 while its twin still works
 * The plugin header pointed at the same page without a trailing slash, so the one address WordPress displays was a redirect rather than the address
-
-= 0.61.0 =
-* A documentation site at https://dicecodes.com/blogcraft/ — one self-contained HTML file with no CDN, no web fonts and no external request of any kind, built on the plugin's own palette and type scale
-* Its section anchors are the same slugs the plugin already uses, so every "How this works" panel offers the shipped documentation and the online guide side by side, each deep-linked to the matching section
-* That page was then audited against the same on-page rules the plugin applies to posts, and six of fourteen failed. The title was 82 characters and opened with the word "documentation"; the description never contained "AI writer" at all; and a page carrying fifteen questions had no structured data on it. It has three schema blocks now, with the FAQ generated from the visible answers rather than written a second time
-
-= 0.60.0 =
-* The README and the branding inside WordPress brought into line with the house style used by Open WP Migration, so somebody arriving at either plugin recognises the second
-* The plugins row now offers Docs beside Set up and Settings, and the Help screen links out to the guides and to the issue tracker — kept clearly separate from the shipped documentation above them, which is always true of the version you have installed in a way an online page cannot be
 Older releases are listed in changelog.txt, which ships with the plugin.
 

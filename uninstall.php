@@ -8,7 +8,12 @@
  * @package Blogcraft
  */
 
-defined( 'WP_UNINSTALL_PLUGIN' ) || defined( 'ABSPATH' ) || exit;
+// WP_UNINSTALL_PLUGIN is the only constant that means WordPress is
+// deleting this plugin right now. ABSPATH used to be accepted here too,
+// as the second half of an or-chain — and ABSPATH is defined on every
+// WordPress request, so the guard passed whenever this file was reached
+// by any route at all, not only a real uninstall.
+defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 if ( ! function_exists( 'blogcraft_should_purge' ) ) {
 
