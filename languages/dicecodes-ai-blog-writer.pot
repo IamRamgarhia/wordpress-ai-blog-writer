@@ -280,6 +280,10 @@ msgstr ""
 msgid "A topic that says what to answer"
 msgstr ""
 
+#: includes/class-blogcraft-admin.php:79
+msgid "AI Blog Writer"
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:553
 msgid "API key"
 msgstr ""
@@ -962,8 +966,7 @@ msgstr ""
 msgid "Devices to use"
 msgstr ""
 
-#: includes/class-blogcraft-admin.php:73
-#: includes/class-blogcraft-admin.php:74
+#: includes/class-blogcraft-admin.php:78
 #: includes/class-blogcraft-overview.php:38
 msgid "Dicecodes AI Blog Writer"
 msgstr ""

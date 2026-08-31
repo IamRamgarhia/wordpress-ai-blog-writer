@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.68.0
+Stable tag: 0.69.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,9 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.69.0 =
+* The admin menu says "AI Blog Writer" rather than the full plugin name. The sidebar column is about 160px wide, so the whole name wrapped onto two lines and knocked every item below it out of alignment. add_menu_page takes the browser title and the sidebar label separately, and only the readme heading and the Plugin Name header are required to agree
+
 = 0.68.0 =
 * The old name is out of the interface as well as the header. Renaming the plugin left the previous name on every screen, in the WP-CLI commands, and in the User-Agent sent to every research service — which is where somebody would actually have read it. Thirty-four strings, four commands and the request header now carry the real name
 * The documentation address no longer contains the old term either. The review named URLs specifically, and a link on the author's own domain still spells out a name that belongs to somebody else
@@ -191,9 +194,5 @@ everything is here, oldest at the bottom.
 = 0.65.0 =
 * The plugin is now called Blogcraft AI Writer, and its text domain is blogcraft-ai-writer to match. wordpress.org generates the directory slug from the plugin name and will not change it afterwards, and the text domain has to equal that slug or the translations the directory builds never load — which is the same failure as shipping no translations at all
 * Nothing that identifies your data moved. The option names, the capability, the admin addresses and the class names are all unchanged, so an existing install keeps every setting, blueprint and record of what it has written
-
-= 0.64.0 =
-* No provider is chosen for you. The setting defaulted to OpenAI, so a plugin whose whole point is that you bring your own key opened with somebody else's company already selected — a paid, card-first one, sitting above every route that costs nothing. The list now starts on "Choose a provider" and waits
-* The Help screen is written to be scanned rather than read. It was twelve sections of four to seven full paragraphs, which is an essay about the plugin rather than instructions for using it. Each section now opens with one sentence and breaks into numbered steps or short lines, and a "Start here" section at the top gives the five steps in order
 Older releases are listed in changelog.txt, which ships with the plugin.
 

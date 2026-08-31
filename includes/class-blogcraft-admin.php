@@ -69,9 +69,14 @@ class Blogcraft_Admin {
 	 * @return void
 	 */
 	public static function register_menu() {
+		// The first is the browser title, the second the sidebar label.
+		// They do not have to match, and should not here: the admin menu
+		// column is about 160px wide, so the full name wrapped onto two
+		// lines and pushed every item below it out of line. Only the
+		// readme heading and the Plugin Name header have to agree.
 		add_menu_page(
 			__( 'Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
-			__( 'Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
+			__( 'AI Blog Writer', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::MENU_SLUG,
 			array( __CLASS__, 'render_dashboard' ),
