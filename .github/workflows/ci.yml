@@ -97,5 +97,17 @@ jobs:
       - run: npm ci
       - run: composer install --prefer-dist --no-progress
       - run: npx wp-env start
+      # The exit code alone is not a gate. wp-env truncates the
+      # container stdout, so the summary never reaches this log, and a
+      # test that reaches an exit() ends PHP with status 0 — which is how
+      # this job reported success over five failing tests. The JUnit
+      # report exists only if the run got to the end, so that is what is
+      # checked.
       - name: Run PHPUnit inside wp-env
-        run: npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit
+        run: npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit --log-junit junit.xml
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check the run finished and everything passed
+        if: always()
+        run: python bin/check-tests.py junit.xml

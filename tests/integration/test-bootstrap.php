@@ -338,6 +338,16 @@ class Test_Blogcraft_Bootstrap extends WP_UnitTestCase {
 			'textarea'     => '<textarea name="t" rows="6" class="large-text code">hi</textarea>',
 			'number field' => '<input type="number" name="n" value="3" min="0" max="9" step="1" class="small-text" />',
 			'hint'         => '<p class="description">Something <strong>bold</strong> and <code>code</code>.</p>',
+			// Every accessibility and data attribute the filtered markup
+			// actually carries. aria-current was missing from the first
+			// version of the allowlist and was being deleted from the
+			// navigation on every screen, with nothing to show for it.
+			'aria region'  => '<div class="bc-control" role="group" aria-label="Length">x</div>',
+			'aria live'    => '<div class="bc-live" aria-live="polite" aria-hidden="false">x</div>',
+			'aria control' => '<button type="button" aria-expanded="false" aria-controls="p1">Open</button>',
+			'labelled by'  => '<div role="group" aria-labelledby="h1" aria-describedby="d1">x</div>',
+			'data attrs'   => '<a class="bc-jump-item" href="#a" data-target="a" data-role="jump">A</a>',
+			'pane'         => '<div class="bc-pane" data-pane="shape" data-shape="guide" data-unit="words">x</div>',
 		);
 	}
 

@@ -39,11 +39,26 @@ class Blogcraft_Markup {
 	 * @return array Tag => allowed attributes, for wp_kses().
 	 */
 	public static function allowed() {
+		// The accessibility attributes are not decoration. aria-current is
+		// how the navigation tells a screen reader which page you are on, and
+		// the first version of this list dropped it silently from every
+		// screen — which is the exact failure a too-narrow allowlist causes,
+		// and the reason the fixtures below are checked byte for byte.
 		$common = array(
-			'class' => true,
-			'id'    => true,
-			'style' => true,
-			'title' => true,
+			'class'            => true,
+			'id'               => true,
+			'style'            => true,
+			'title'            => true,
+			'role'             => true,
+			'aria-label'       => true,
+			'aria-labelledby'  => true,
+			'aria-describedby' => true,
+			'aria-current'     => true,
+			'aria-controls'    => true,
+			'aria-expanded'    => true,
+			'aria-hidden'      => true,
+			'aria-live'        => true,
+			'data-*'           => true,
 		);
 
 		return array(

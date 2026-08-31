@@ -5,6 +5,16 @@
  * @package Blogcraft
  */
 
+// WordPress defines this before it includes uninstall.php, and that file
+// now exits without it — correctly, since it drops tables and the old
+// guard also accepted ABSPATH, which is defined on every request.
+//
+// Defining it here is not a workaround for the guard. It is the test
+// finally doing what WordPress does, instead of relying on the hole.
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	define( 'WP_UNINSTALL_PLUGIN', 'blogcraft/blogcraft.php' );
+}
+
 class Test_Blogcraft_Uninstall extends WP_UnitTestCase {
 
 	public function tear_down() {
