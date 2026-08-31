@@ -298,6 +298,32 @@ class Test_Blogcraft_Bootstrap extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wp_verify_nonce', $body, 'verify() no longer checks a nonce' );
 	}
 
+	public function test_nothing_is_put_into_the_dashboard_notice_area() {
+		// Guideline 11. The cron warning was scoped to this plugin's own
+		// screens and dismissible, which the guideline allows — but the
+		// space belongs to the whole dashboard, and the surest way not to
+		// misuse it is not to occupy it. It renders as page content under
+		// our own navigation instead.
+		$files = array_merge(
+			(array) glob( BLOGCRAFT_PATH . 'includes/*.php' ),
+			array( BLOGCRAFT_PATH . 'blogcraft.php' )
+		);
+
+		$found = array();
+
+		foreach ( $files as $file ) {
+			$body = (string) file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+			foreach ( array( 'admin_notices', 'all_admin_notices', 'network_admin_notices' ) as $hook ) {
+				if ( false !== strpos( $body, "add_action( '" . $hook . "'" ) ) {
+					$found[] = basename( $file ) . ' hooks ' . $hook;
+				}
+			}
+		}
+
+		$this->assertSame( array(), $found, 'something is writing into the dashboard notice area' );
+	}
+
 	public function test_no_asset_is_loaded_from_somebody_elses_server() {
 		// Guideline 8. Every script and stylesheet has to come from inside the
 		// plugin — a CDN is a third party who can change what runs on the

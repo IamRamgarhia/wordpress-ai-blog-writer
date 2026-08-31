@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.69.0
+Stable tag: 0.70.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,10 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.70.0 =
+* The plugin puts nothing in the dashboard notice area at all. The one notice it had — a warning that the queue has stalled — was already capability-gated, shown only on this plugin's own screens, dismissible and switchable off, which guideline 11 permits. But that space belongs to the whole dashboard, and the surest way not to misuse it is not to occupy it. The warning is drawn as part of our own page instead, under the navigation
+* It also says how to fix the thing it is warning about, which the guideline asks for and a dismiss link on its own does not do: the first link now goes to the automation instructions, and dismissing is the second
+
 = 0.69.0 =
 * The admin menu says "AI Blog Writer" rather than the full plugin name. The sidebar column is about 160px wide, so the whole name wrapped onto two lines and knocked every item below it out of alignment. add_menu_page takes the browser title and the sidebar label separately, and only the readme heading and the Plugin Name header are required to agree
 
@@ -190,9 +194,5 @@ everything is here, oldest at the bottom.
 * Nine places printed assembled markup behind a comment asserting it was already escaped. Every comment was accurate, and that is the problem: the safety held only while each helper stayed correct, and nobody could tell a true claim from a false one without reading the helper. They run through wp_kses against a fixed tag list now, so it is enforced rather than asserted
 * The SerpApi privacy link was a 404. Both of their documents live on one page under anchors, which is where it points now
 * Every external service in the readme names the host it actually contacts, so somebody reading a firewall log can match what they see against the list
-
-= 0.65.0 =
-* The plugin is now called Blogcraft AI Writer, and its text domain is blogcraft-ai-writer to match. wordpress.org generates the directory slug from the plugin name and will not change it afterwards, and the text domain has to equal that slug or the translations the directory builds never load — which is the same failure as shipping no translations at all
-* Nothing that identifies your data moved. The option names, the capability, the admin addresses and the class names are all unchanged, so an existing install keeps every setting, blueprint and record of what it has written
 Older releases are listed in changelog.txt, which ships with the plugin.
 

@@ -115,5 +115,10 @@ class Blogcraft_Nav {
 		}
 
 		echo '</nav>';
+
+		// Page content on our own screen rather than a dashboard notice.
+		// It renders here because this is the one thing every Blogcraft
+		// screen already calls.
+		Blogcraft_Notices::render_cron_health_notice();
 	}
 }

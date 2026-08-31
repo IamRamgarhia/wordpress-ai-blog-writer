@@ -33,7 +33,13 @@ class Blogcraft_Notices {
 	 */
 	public static function init() {
 		add_action( 'admin_post_blogcraft_dismiss_notice', array( __CLASS__, 'handle_dismiss' ) );
-		add_action( 'admin_notices', array( __CLASS__, 'render_cron_health_notice' ) );
+
+		// Deliberately not hooked to admin_notices. It was scoped to this
+		// plugin's own screens and dismissible, which guideline 11 allows,
+		// but the guideline is about not putting things in a space that
+		// belongs to the whole dashboard — and the cheapest way to be sure
+		// of that is not to occupy the space at all. Blogcraft_Nav::render()
+		// draws it as part of our own page instead.
 	}
 
 	/**
@@ -144,11 +150,16 @@ class Blogcraft_Notices {
 			return;
 		}
 
+		// Guideline 11 asks that an alert say how to resolve the situation,
+		// not only that there is one. So the first link is the fix and the
+		// second is the dismissal, in that order.
 		printf(
-			'<div class="notice notice-warning"><p>%1$s</p><p><a href="%2$s">%3$s</a></p></div>',
-			esc_html__( 'Dicecodes AI Blog Writer has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job.', 'dicecodes-ai-blog-writer' ),
+			'<div class="notice notice-warning"><p>%1$s</p><p><a href="%2$s">%3$s</a> <span aria-hidden="true">&middot;</span> <a href="%4$s">%5$s</a></p></div>',
+			esc_html__( 'The queue has not been processed recently. WordPress only runs scheduled tasks when somebody visits your site, so a quiet site may need a real system cron job running wp dicecodes run.', 'dicecodes-ai-blog-writer' ),
+			esc_url( Blogcraft_Docs::url( 'automation' ) ),
+			esc_html__( 'How to fix this', 'dicecodes-ai-blog-writer' ),
 			esc_url( self::dismiss_url( 'cron_health' ) ),
-			esc_html__( 'Dismiss this notice', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Dismiss', 'dicecodes-ai-blog-writer' )
 		);
 	}
 }

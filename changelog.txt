@@ -3,6 +3,10 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.70.0 =
+* The plugin puts nothing in the dashboard notice area at all. The one notice it had — a warning that the queue has stalled — was already capability-gated, shown only on this plugin's own screens, dismissible and switchable off, which guideline 11 permits. But that space belongs to the whole dashboard, and the surest way not to misuse it is not to occupy it. The warning is drawn as part of our own page instead, under the navigation
+* It also says how to fix the thing it is warning about, which the guideline asks for and a dismiss link on its own does not do: the first link now goes to the automation instructions, and dismissing is the second
+
 = 0.69.0 =
 * The admin menu says "AI Blog Writer" rather than the full plugin name. The sidebar column is about 160px wide, so the whole name wrapped onto two lines and knocked every item below it out of alignment. add_menu_page takes the browser title and the sidebar label separately, and only the readme heading and the Plugin Name header are required to agree
 

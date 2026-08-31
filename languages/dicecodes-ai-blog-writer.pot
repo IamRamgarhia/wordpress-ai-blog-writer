@@ -991,10 +991,6 @@ msgstr ""
 msgid "Dicecodes AI Blog Writer has no AI of its own. It uses your account, and your provider bills you directly."
 msgstr ""
 
-#: includes/class-blogcraft-notices.php:149
-msgid "Dicecodes AI Blog Writer has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job."
-msgstr ""
-
 #. translators: 1: folder of the duplicate copy. 2: version already running.
 #: blogcraft.php:53
 msgid "Dicecodes AI Blog Writer is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts."
@@ -1022,8 +1018,8 @@ msgstr ""
 msgid "Discard draft %d"
 msgstr ""
 
-#: includes/class-blogcraft-notices.php:151
-msgid "Dismiss this notice"
+#: includes/class-blogcraft-notices.php:162
+msgid "Dismiss"
 msgstr ""
 
 #: includes/class-blogcraft-admin.php:59
@@ -1513,6 +1509,10 @@ msgstr ""
 
 #: includes/class-blogcraft-generate.php:922
 msgid "How to choose a standing desk for a small home office"
+msgstr ""
+
+#: includes/class-blogcraft-notices.php:160
+msgid "How to fix this"
 msgstr ""
 
 #: includes/class-blogcraft-provider-registry.php:60
@@ -3617,6 +3617,10 @@ msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:1072
 msgid "The questions"
+msgstr ""
+
+#: includes/class-blogcraft-notices.php:158
+msgid "The queue has not been processed recently. WordPress only runs scheduled tasks when somebody visits your site, so a quiet site may need a real system cron job running wp dicecodes run."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:756
