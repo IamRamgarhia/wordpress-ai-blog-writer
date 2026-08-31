@@ -453,7 +453,7 @@ msgid "Anthropic — Claude, paid"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:324
-msgid "Any published article, including one of your own. Blogcraft reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says \"I\" or \"you\". Structure only: none of the wording is copied, kept, or shown to a model."
+msgid "Any published article, including one of your own. Dicecodes AI Blog Writer reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says \"I\" or \"you\". Structure only: none of the wording is copied, kept, or shown to a model."
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:243
@@ -606,50 +606,6 @@ msgstr ""
 #: includes/class-blogcraft-library.php:160
 #: includes/class-blogcraft-nav.php:32
 msgid "Being written"
-msgstr ""
-
-#: includes/class-blogcraft-admin.php:73
-#: includes/class-blogcraft-admin.php:74
-#: includes/class-blogcraft-overview.php:38
-msgid "Blogcraft"
-msgstr ""
-
-#: includes/class-blogcraft-connection.php:247
-#: includes/class-blogcraft-connection.php:458
-msgid "Blogcraft Settings"
-msgstr ""
-
-#: includes/class-blogcraft-welcome.php:378
-msgid "Blogcraft can read them and fill this in from how you actually write."
-msgstr ""
-
-#: includes/class-blogcraft-docs.php:297
-msgid "Blogcraft contacts no servers of its own and sends nothing to the plugin author."
-msgstr ""
-
-#: includes/class-blogcraft-connection.php:922
-msgid "Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us."
-msgstr ""
-
-#: includes/class-blogcraft-welcome.php:313
-msgid "Blogcraft has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else."
-msgstr ""
-
-#: includes/class-blogcraft-docs.php:157
-msgid "Blogcraft has no AI of its own. It uses your account, and your provider bills you directly."
-msgstr ""
-
-#: includes/class-blogcraft-notices.php:149
-msgid "Blogcraft has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job."
-msgstr ""
-
-#. translators: 1: folder of the duplicate copy. 2: version already running.
-#: blogcraft.php:53
-msgid "Blogcraft is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts."
-msgstr ""
-
-#: includes/class-blogcraft-nav.php:82
-msgid "Blogcraft screens"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:219
@@ -936,7 +892,7 @@ msgid "Delete all of it instead, when the plugin is deleted"
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:267
-msgid "Deleting Blogcraft leaves your settings, your writing rules and your posts exactly where they are."
+msgid "Deleting Dicecodes AI Blog Writer leaves your settings, your writing rules and your posts exactly where they are."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:841
@@ -1004,6 +960,50 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:907
 #: includes/class-blogcraft-generate.php:1221
 msgid "Devices to use"
+msgstr ""
+
+#: includes/class-blogcraft-admin.php:73
+#: includes/class-blogcraft-admin.php:74
+#: includes/class-blogcraft-overview.php:38
+msgid "Dicecodes AI Blog Writer"
+msgstr ""
+
+#: includes/class-blogcraft-welcome.php:378
+msgid "Dicecodes AI Blog Writer can read them and fill this in from how you actually write."
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:297
+msgid "Dicecodes AI Blog Writer contacts no servers of its own and sends nothing to the plugin author."
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:922
+msgid "Dicecodes AI Blog Writer has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us."
+msgstr ""
+
+#: includes/class-blogcraft-welcome.php:313
+msgid "Dicecodes AI Blog Writer has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else."
+msgstr ""
+
+#: includes/class-blogcraft-docs.php:157
+msgid "Dicecodes AI Blog Writer has no AI of its own. It uses your account, and your provider bills you directly."
+msgstr ""
+
+#: includes/class-blogcraft-notices.php:149
+msgid "Dicecodes AI Blog Writer has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job."
+msgstr ""
+
+#. translators: 1: folder of the duplicate copy. 2: version already running.
+#: blogcraft.php:53
+msgid "Dicecodes AI Blog Writer is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts."
+msgstr ""
+
+#: includes/class-blogcraft-nav.php:82
+msgid "Dicecodes AI Blog Writer screens"
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:247
+#: includes/class-blogcraft-connection.php:458
+msgid "Dicecodes AI Blog Writer settings"
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:240
@@ -1126,7 +1126,7 @@ msgid "Event log"
 msgstr ""
 
 #: includes/class-blogcraft-scheduler.php:53
-msgid "Every 5 minutes (Blogcraft)"
+msgid "Every 5 minutes (Dicecodes AI Blog Writer)"
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:234
@@ -1993,7 +1993,7 @@ msgid "Next up: \"%1$s\", due %2$s."
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:236
-msgid "No AI provider is configured yet. Set one up under Blogcraft → Settings first."
+msgid "No AI provider is configured yet. Set one up under Dicecodes AI Blog Writer → Settings first."
 msgstr ""
 
 #: includes/class-blogcraft-request.php:75
@@ -2291,7 +2291,7 @@ msgid "One topic per line, or paste a CSV column"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:798
-msgid "One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written."
+msgid "One topic per line. Each is used once, then removed from this list. Dicecodes AI Blog Writer, Calendar shows when each one will be written."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:677
@@ -2520,11 +2520,11 @@ msgid "Pictures are switched off, so nothing here will run."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:651
-msgid "Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key."
+msgid "Pictures come from a different kind of service than the writing does, so switching them on is how you tell Dicecodes AI Blog Writer it may contact one. Nothing here runs until you do. The default service is free and needs no key."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:930
-msgid "Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on."
+msgid "Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Dicecodes AI Blog Writer it may contact a picture service. Pollinations needs no key and is the one it starts on."
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:215
@@ -2585,7 +2585,7 @@ msgid "Post"
 msgstr ""
 
 #: includes/class-blogcraft-docs.php:197
-msgid "Posts Blogcraft wrote are left out of that. Learning from its own output ends with every post sounding like the first."
+msgid "Posts Dicecodes AI Blog Writer wrote are left out of that. Learning from its own output ends with every post sounding like the first."
 msgstr ""
 
 #: includes/class-blogcraft-calendar.php:161
@@ -3187,7 +3187,7 @@ msgid "Something only you know"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:1694
-msgid "Something went wrong. Blogcraft → Activity has the reason."
+msgid "Something went wrong. Dicecodes AI Blog Writer → Activity has the reason."
 msgstr ""
 
 #: includes/class-blogcraft-progress.php:146
@@ -3550,7 +3550,7 @@ msgid "The full list of services, with their terms and privacy policies, is in t
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:543
-msgid "The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin's, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin."
+msgid "The groups describe what the provider charges, not what this plugin charges. Allowances move on their schedule, not this plugin's, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin."
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:410
@@ -3695,7 +3695,7 @@ msgid "Their role or qualification."
 msgstr ""
 
 #: includes/class-blogcraft-learn.php:295
-msgid "There are no posts here yet that Blogcraft did not write, so there is nothing to learn from."
+msgid "There are no posts here yet that Dicecodes AI Blog Writer did not write, so there is nothing to learn from."
 msgstr ""
 
 #: includes/class-blogcraft-calendar.php:213
@@ -3877,7 +3877,7 @@ msgid "Trash the last 24 hours"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:593
-msgid "Trashes posts Blogcraft created in the last 24 hours. Anything you wrote yourself is left alone."
+msgid "Trashes posts Dicecodes AI Blog Writer created in the last 24 hours. Anything you wrote yourself is left alone."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:977
@@ -4030,7 +4030,7 @@ msgstr ""
 
 #: includes/class-blogcraft-welcome.php:85
 #: includes/class-blogcraft-welcome.php:86
-msgid "Welcome to Blogcraft"
+msgid "Welcome to Dicecodes AI Blog Writer"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:78
@@ -4200,7 +4200,7 @@ msgid "Which model"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:671
-msgid "Whichever you pick, Blogcraft falls back through the others so a post is never left without an image."
+msgid "Whichever you pick, Dicecodes AI Blog Writer falls back through the others so a post is never left without an image."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:660
@@ -4522,7 +4522,7 @@ msgid "Your key, your account, your bill. Nothing is sent to us."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1490
-msgid "Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP's sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected."
+msgid "Your keys could not be stored. Dicecodes AI Blog Writer encrypts them before saving, and that needs PHP's sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:387

@@ -86,7 +86,7 @@ class Blogcraft_Docs {
 	 * @return string
 	 */
 	public static function site_url( $anchor = '' ) {
-		$base = 'https://dicecodes.com/blogcraft/';
+		$base = 'https://dicecodes.com/ai-blog-writer/';
 
 		return ( '' === $anchor ) ? $base : $base . '#' . sanitize_title( $anchor );
 	}
@@ -154,7 +154,7 @@ class Blogcraft_Docs {
 			),
 			'providers'         => array(
 				'title'  => __( 'Connecting a provider', 'dicecodes-ai-blog-writer' ),
-				'lead'   => __( 'Blogcraft has no AI of its own. It uses your account, and your provider bills you directly.', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Dicecodes AI Blog Writer has no AI of its own. It uses your account, and your provider bills you directly.', 'dicecodes-ai-blog-writer' ),
 				'steps'  => array(
 					array(
 						__( 'Provider', 'dicecodes-ai-blog-writer' ),
@@ -194,7 +194,7 @@ class Blogcraft_Docs {
 				'points' => array(
 					__( 'Two sentences on your subject and your reader is enough to start.', 'dicecodes-ai-blog-writer' ),
 					__( '"Learn from my posts" measures how you actually write and fills the fields in. Nothing saves until you press Save.', 'dicecodes-ai-blog-writer' ),
-					__( 'Posts Blogcraft wrote are left out of that. Learning from its own output ends with every post sounding like the first.', 'dicecodes-ai-blog-writer' ),
+					__( 'Posts Dicecodes AI Blog Writer wrote are left out of that. Learning from its own output ends with every post sounding like the first.', 'dicecodes-ai-blog-writer' ),
 					__( 'The experience field is the one worth time. It is the only part of a post a model cannot produce.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
@@ -264,7 +264,7 @@ class Blogcraft_Docs {
 			),
 			'removal'           => array(
 				'title'  => __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ),
-				'lead'   => __( 'Deleting Blogcraft leaves your settings, your writing rules and your posts exactly where they are.', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Deleting Dicecodes AI Blog Writer leaves your settings, your writing rules and your posts exactly where they are.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
 					__( 'Install it again and everything is as you left it.', 'dicecodes-ai-blog-writer' ),
 					__( 'Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.', 'dicecodes-ai-blog-writer' ),
@@ -294,7 +294,7 @@ class Blogcraft_Docs {
 			),
 			'privacy'           => array(
 				'title'  => __( 'What leaves your site', 'dicecodes-ai-blog-writer' ),
-				'lead'   => __( 'Blogcraft contacts no servers of its own and sends nothing to the plugin author.', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Dicecodes AI Blog Writer contacts no servers of its own and sends nothing to the plugin author.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
 					__( 'No analytics, no telemetry, nothing phoning home.', 'dicecodes-ai-blog-writer' ),
 					__( 'Only the services you configure, and only while a post is being written.', 'dicecodes-ai-blog-writer' ),

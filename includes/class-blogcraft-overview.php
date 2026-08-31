@@ -35,7 +35,7 @@ class Blogcraft_Overview {
 		Blogcraft_Nav::render();
 
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Blogcraft', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ) . '</h1>';
 		echo '<p>' . esc_html__( 'What is set up, what it has written, and what needs you.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 

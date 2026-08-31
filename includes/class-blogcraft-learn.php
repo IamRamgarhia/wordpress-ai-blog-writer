@@ -292,7 +292,7 @@ class Blogcraft_Learn {
 			return array(
 				'found'  => 0,
 				'fields' => array(),
-				'notes'  => array( __( 'There are no posts here yet that Blogcraft did not write, so there is nothing to learn from.', 'dicecodes-ai-blog-writer' ) ),
+				'notes'  => array( __( 'There are no posts here yet that Dicecodes AI Blog Writer did not write, so there is nothing to learn from.', 'dicecodes-ai-blog-writer' ) ),
 			);
 		}
 

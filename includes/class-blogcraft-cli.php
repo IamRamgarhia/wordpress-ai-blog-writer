@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Drives Blogcraft from the command line.
  *
- * Useful beyond convenience: a real system cron running `wp blogcraft run` is
+ * Useful beyond convenience: a real system cron running `wp dicecodes run` is
  * the reliable way to drive the queue, because WP-Cron only fires when someone
  * loads a page and a quiet site therefore never publishes.
  */
@@ -26,10 +26,10 @@ class Blogcraft_Cli {
 			return;
 		}
 
-		WP_CLI::add_command( 'blogcraft generate', array( __CLASS__, 'generate' ) );
-		WP_CLI::add_command( 'blogcraft run', array( __CLASS__, 'run' ) );
-		WP_CLI::add_command( 'blogcraft status', array( __CLASS__, 'status' ) );
-		WP_CLI::add_command( 'blogcraft refresh', array( __CLASS__, 'refresh' ) );
+		WP_CLI::add_command( 'dicecodes generate', array( __CLASS__, 'generate' ) );
+		WP_CLI::add_command( 'dicecodes run', array( __CLASS__, 'run' ) );
+		WP_CLI::add_command( 'dicecodes status', array( __CLASS__, 'status' ) );
+		WP_CLI::add_command( 'dicecodes refresh', array( __CLASS__, 'refresh' ) );
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Blogcraft_Cli {
 			WP_CLI::error( 'Not queued. It may be too similar to a post you already have.' );
 		}
 
-		WP_CLI::success( sprintf( 'Queued as job %d. Run `wp blogcraft run` to work through it.', $job_id ) );
+		WP_CLI::success( sprintf( 'Queued as job %d. Run `wp dicecodes run` to work through it.', $job_id ) );
 	}
 
 	/**

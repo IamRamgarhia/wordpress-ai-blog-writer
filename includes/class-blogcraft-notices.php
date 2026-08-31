@@ -146,7 +146,7 @@ class Blogcraft_Notices {
 
 		printf(
 			'<div class="notice notice-warning"><p>%1$s</p><p><a href="%2$s">%3$s</a></p></div>',
-			esc_html__( 'Blogcraft has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job.', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Dicecodes AI Blog Writer has not processed its queue recently. WordPress only runs scheduled tasks when someone visits your site, so low-traffic sites may need a real system cron job.', 'dicecodes-ai-blog-writer' ),
 			esc_url( self::dismiss_url( 'cron_health' ) ),
 			esc_html__( 'Dismiss this notice', 'dicecodes-ai-blog-writer' )
 		);

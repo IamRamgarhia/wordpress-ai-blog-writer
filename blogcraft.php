@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       Dicecodes AI Blog Writer
- * Plugin URI:        https://dicecodes.com/blogcraft/
+ * Plugin URI:        https://dicecodes.com/ai-blog-writer/
  * Description:       AI blog writer that researches first, writes in your voice, and checks its own work.
- * Version:           0.67.0
+ * Version:           0.68.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Dicecodes
@@ -50,7 +50,7 @@ if ( defined( 'BLOGCRAFT_VERSION' ) ) {
 				esc_html(
 					sprintf(
 						/* translators: 1: folder of the duplicate copy. 2: version already running. */
-						__( 'Blogcraft is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts.', 'dicecodes-ai-blog-writer' ),
+						__( 'Dicecodes AI Blog Writer is installed twice. The copy in %1$s did nothing, because version %2$s had already loaded. Delete the folder named above from your plugins directory — nothing is lost, the working copy owns the settings and the posts.', 'dicecodes-ai-blog-writer' ),
 						basename( __DIR__ ),
 						BLOGCRAFT_VERSION
 					)
@@ -62,7 +62,7 @@ if ( defined( 'BLOGCRAFT_VERSION' ) ) {
 	return;
 }
 
-define( 'BLOGCRAFT_VERSION', '0.67.0' );
+define( 'BLOGCRAFT_VERSION', '0.68.0' );
 define( 'BLOGCRAFT_DB_VERSION', '1' );
 define( 'BLOGCRAFT_FILE', __FILE__ );
 define( 'BLOGCRAFT_PATH', plugin_dir_path( __FILE__ ) );

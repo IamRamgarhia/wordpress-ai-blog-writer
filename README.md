@@ -6,12 +6,12 @@
 
 [![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg?logo=wordpress)](#-install)
-[![Version](https://img.shields.io/badge/Version-0.67.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
+[![Version](https://img.shields.io/badge/Version-0.68.0-orange.svg)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases)
 [![PHP](https://img.shields.io/badge/PHP-7.4%20to%208.5-777BB4.svg?logo=php)](#-install)
 [![Tests](https://img.shields.io/badge/Tests-676%20passing-brightgreen.svg)](#-contributing)
 [![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/wordpress-ai-blog-writer?style=social)](https://github.com/IamRamgarhia/wordpress-ai-blog-writer)
 [![Cost](https://img.shields.io/badge/Cost-100%25%20Free-brightgreen.svg)](#-why-choose-blogcraft)
-[![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/blogcraft/)
+[![Docs](https://img.shields.io/badge/Docs-dicecodes.com-3858e9.svg)](https://dicecodes.com/ai-blog-writer/)
 
 **Research, draft, self-critique, rewrite and score — twelve steps inside your own WordPress, billed to your own AI account at your provider's own rates.**
 
@@ -21,7 +21,7 @@ It reads current sources before writing, drafts in a voice you describe, reads i
 
 **Looking for:** a free AI writing plugin with no monthly subscription · an AI content generator that uses your own OpenAI or Gemini key · a self-hosted alternative to credit-based AI writers · a way to run AI blogging on a local model with no key at all? That is what this is.
 
-[Download Now](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest) &nbsp;|&nbsp; [Documentation](https://dicecodes.com/blogcraft/) &nbsp;|&nbsp; [Quick Start](#-your-first-post-in-5-minutes) &nbsp;|&nbsp; [How It Works](#-how-it-writes) &nbsp;|&nbsp; [FAQ](#-frequently-asked-questions) &nbsp;|&nbsp; [Report Bug](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues) &nbsp;|&nbsp; [Request Feature](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues)
+[Download Now](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/releases/latest) &nbsp;|&nbsp; [Documentation](https://dicecodes.com/ai-blog-writer/) &nbsp;|&nbsp; [Quick Start](#-your-first-post-in-5-minutes) &nbsp;|&nbsp; [How It Works](#-how-it-writes) &nbsp;|&nbsp; [FAQ](#-frequently-asked-questions) &nbsp;|&nbsp; [Report Bug](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues) &nbsp;|&nbsp; [Request Feature](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues)
 
 </div>
 
@@ -49,7 +49,7 @@ Move the folder into `wp-content/plugins/` and activate it.
 
 **Requires** WordPress 6.0+ and PHP 7.4+. Tested to WordPress 7.1 and PHP 8.5.
 
-> Full documentation, with a setup walkthrough and every check explained: **[dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/)**
+> Full documentation, with a setup walkthrough and every check explained: **[dicecodes.com/blogcraft](https://dicecodes.com/ai-blog-writer/)**
 
 ---
 
@@ -287,7 +287,7 @@ npx wp-env start
 npx wp-env run tests-cli --env-cwd=wp-content/plugins/blogcraft -- vendor/bin/phpunit
 ```
 
-Documentation for the plugin itself lives at [dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/).
+Documentation for the plugin itself lives at [dicecodes.com/blogcraft](https://dicecodes.com/ai-blog-writer/).
 
 The test suite is the specification. Every fix here ships with a test that fails without it, and the commit message says what went wrong and why the fix is shaped the way it is.
 
@@ -296,7 +296,7 @@ The test suite is the specification. Every fix here ships with a test that fails
 ## 💬 Support
 
 - **Found a bug?** [Open an issue](https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues)
-- **Documentation:** [dicecodes.com/blogcraft](https://dicecodes.com/blogcraft/)
+- **Documentation:** [dicecodes.com/blogcraft](https://dicecodes.com/ai-blog-writer/)
 
 ---
 

@@ -70,8 +70,8 @@ class Blogcraft_Admin {
 	 */
 	public static function register_menu() {
 		add_menu_page(
-			__( 'Blogcraft', 'dicecodes-ai-blog-writer' ),
-			__( 'Blogcraft', 'dicecodes-ai-blog-writer' ),
+			__( 'Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
+			__( 'Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::MENU_SLUG,
 			array( __CLASS__, 'render_dashboard' ),

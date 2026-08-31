@@ -244,7 +244,7 @@ class Blogcraft_Connection {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Blogcraft Settings', 'dicecodes-ai-blog-writer' ),
+			__( 'Dicecodes AI Blog Writer settings', 'dicecodes-ai-blog-writer' ),
 			__( 'Settings', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
@@ -455,7 +455,7 @@ class Blogcraft_Connection {
 		echo '<div class="wrap blogcraft-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Blogcraft Settings', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Dicecodes AI Blog Writer settings', 'dicecodes-ai-blog-writer' ) . '</h1>';
 		echo '<p>' . esc_html__( 'Set it up once. Everything here shapes every post it writes.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		// Sent here mid-introduction. Without this the first step of the
@@ -540,7 +540,7 @@ class Blogcraft_Connection {
 		);
 		printf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( 'The groups describe what the provider charges, not what Blogcraft charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'The groups describe what the provider charges, not what this plugin charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</td></tr>';
 
@@ -648,7 +648,7 @@ class Blogcraft_Connection {
 		self::open_card(
 			'02',
 			__( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
-			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Blogcraft it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
+			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Dicecodes AI Blog Writer it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
 			'pictures'
 		);
 		echo '<table class="form-table" role="presentation"><tbody>';
@@ -668,7 +668,7 @@ class Blogcraft_Connection {
 			);
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Whichever you pick, Blogcraft falls back through the others so a post is never left without an image.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Whichever you pick, Dicecodes AI Blog Writer falls back through the others so a post is never left without an image.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</td></tr>';
 
 		self::number_row(
@@ -795,7 +795,7 @@ class Blogcraft_Connection {
 		self::textarea_row(
 			'autopilot_topics',
 			__( 'Topic queue', 'dicecodes-ai-blog-writer' ),
-			__( 'One topic per line. Each is used once, then removed from this list. Blogcraft, Calendar shows when each one will be written.', 'dicecodes-ai-blog-writer' )
+			__( 'One topic per line. Each is used once, then removed from this list. Dicecodes AI Blog Writer, Calendar shows when each one will be written.', 'dicecodes-ai-blog-writer' )
 		);
 		self::weekday_row();
 		self::hour_row();
@@ -919,7 +919,7 @@ class Blogcraft_Connection {
 			'provider'   => array(
 				'anchor' => 'providers',
 				'lines'  => array(
-					__( 'Blogcraft has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'dicecodes-ai-blog-writer' ),
+					__( 'Dicecodes AI Blog Writer has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'dicecodes-ai-blog-writer' ),
 					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'dicecodes-ai-blog-writer' ),
 					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'dicecodes-ai-blog-writer' ),
 				),
@@ -927,7 +927,7 @@ class Blogcraft_Connection {
 			'pictures'   => array(
 				'anchor' => 'pictures',
 				'lines'  => array(
-					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Blogcraft it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'dicecodes-ai-blog-writer' ),
+					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Dicecodes AI Blog Writer it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'dicecodes-ai-blog-writer' ),
 					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'dicecodes-ai-blog-writer' ),
 					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'dicecodes-ai-blog-writer' ),
 					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'dicecodes-ai-blog-writer' ),
@@ -1487,7 +1487,7 @@ class Blogcraft_Connection {
 		if ( ! empty( $failed ) ) {
 			self::redirect_back(
 				false,
-				__( 'Your keys could not be stored. Blogcraft encrypts them before saving, and that needs PHP\'s sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected.', 'dicecodes-ai-blog-writer' )
+				__( 'Your keys could not be stored. Dicecodes AI Blog Writer encrypts them before saving, and that needs PHP\'s sodium extension, which this server does not have. Ask your host to enable it — nothing else on this screen is affected.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 

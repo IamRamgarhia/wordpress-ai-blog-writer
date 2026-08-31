@@ -290,7 +290,7 @@ class Blogcraft_Research {
 			$url,
 			array(
 				'timeout'    => 12,
-				'user-agent' => 'Blogcraft/' . BLOGCRAFT_VERSION . '; ' . home_url(),
+				'user-agent' => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
 			)
 		);
 
@@ -544,7 +544,7 @@ class Blogcraft_Research {
 				(string) $source['url'],
 				array(
 					'timeout'    => 8,
-					'user-agent' => 'Blogcraft/' . BLOGCRAFT_VERSION . '; ' . home_url(),
+					'user-agent' => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
 				)
 			);
 

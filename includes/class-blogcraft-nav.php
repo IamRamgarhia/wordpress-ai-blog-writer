@@ -79,7 +79,7 @@ class Blogcraft_Nav {
 		$current = self::current();
 		$waiting = count( Blogcraft_Review::pending_posts() );
 
-		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Blogcraft screens', 'dicecodes-ai-blog-writer' ) . '">';
+		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Dicecodes AI Blog Writer screens', 'dicecodes-ai-blog-writer' ) . '">';
 
 		foreach ( self::screens() as $slug => $label ) {
 			$bubble = '';

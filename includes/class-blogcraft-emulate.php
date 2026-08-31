@@ -57,7 +57,7 @@ class Blogcraft_Emulate {
 			$url,
 			array(
 				'timeout'    => 20,
-				'user-agent' => 'Mozilla/5.0 (compatible; Blogcraft/' . BLOGCRAFT_VERSION . '; +' . home_url( '/' ) . ')',
+				'user-agent' => 'Mozilla/5.0 (compatible; DicecodesAIBlogWriter/' . BLOGCRAFT_VERSION . '; +' . home_url( '/' ) . ')',
 			)
 		);
 

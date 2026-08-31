@@ -94,6 +94,26 @@ class Test_Blogcraft_Bootstrap extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_no_readme_section_exceeds_the_parser_ceiling() {
+		// The ceiling is per section, not per file, and it applies to all of
+		// them. Only the changelog was checked, so a rename that lengthened
+		// every sentence in External Services pushed that one to 5,116 with
+		// nothing failing — the same truncation, one section along.
+		$readme = (string) file_get_contents( BLOGCRAFT_PATH . 'readme.txt' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		preg_match_all( '/^== (.+?) ==$(.*?)(?=^== |\z)/ms', $readme, $hits, PREG_SET_ORDER );
+
+		$this->assertNotEmpty( $hits, 'readme.txt has no sections' );
+
+		foreach ( $hits as $hit ) {
+			$this->assertLessThan(
+				5000,
+				strlen( $hit[2] ),
+				'the "' . $hit[1] . '" section is ' . strlen( $hit[2] ) . ' characters and will be truncated at 5000'
+			);
+		}
+	}
+
 	public function test_the_readme_changelog_stays_under_the_parser_ceiling() {
 		// The readme parser truncates any section over 5000 characters and
 		// warns. Backfilling twenty-five releases put the changelog at 39,591,

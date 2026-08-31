@@ -82,8 +82,8 @@ class Blogcraft_Welcome {
 	public static function register_menu() {
 		add_submenu_page(
 			'',
-			__( 'Welcome to Blogcraft', 'dicecodes-ai-blog-writer' ),
-			__( 'Welcome to Blogcraft', 'dicecodes-ai-blog-writer' ),
+			__( 'Welcome to Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
+			__( 'Welcome to Dicecodes AI Blog Writer', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -310,7 +310,7 @@ class Blogcraft_Welcome {
 		self::open_form( 'provider', 'voice' );
 
 		echo '<h2>' . esc_html__( 'Connect a provider', 'dicecodes-ai-blog-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Blogcraft has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'Dicecodes AI Blog Writer has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '<p>' . esc_html__( 'If you have no account anywhere: Google and Groq both have free tiers big enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		if ( $ready ) {
@@ -375,7 +375,7 @@ class Blogcraft_Welcome {
 			'<p class="description">%1$s <a href="%2$s">%3$s</a></p>',
 			esc_html__( 'Already have posts published?', 'dicecodes-ai-blog-writer' ),
 			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-voice' ) ),
-			esc_html__( 'Blogcraft can read them and fill this in from how you actually write.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Dicecodes AI Blog Writer can read them and fill this in from how you actually write.', 'dicecodes-ai-blog-writer' )
 		);
 
 		submit_button( __( 'Save and continue', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );

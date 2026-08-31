@@ -244,7 +244,7 @@ class Test_Blogcraft_Reliability extends WP_UnitTestCase {
 
 	public function test_any_route_into_the_queue_records_a_heartbeat() {
 		// The plugin's own docs recommend driving the queue from a real system
-		// cron via `wp blogcraft run`, and on exactly that setup the heartbeat
+		// cron via `wp dicecodes run`, and on exactly that setup the heartbeat
 		// was never written — so the health check reported the queue had
 		// stopped, forever, while it was running on schedule.
 		delete_option( 'blogcraft_cron_heartbeat' );

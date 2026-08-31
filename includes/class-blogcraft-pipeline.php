@@ -289,7 +289,7 @@ class Blogcraft_Pipeline {
 		// from_settings() returns an object as soon as a type is chosen, and the
 		// type defaults to openai, so this alone never catches an empty setup.
 		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
-			throw new RuntimeException( 'No AI provider is set up yet. Add a model and an API key under Blogcraft, Settings.' );
+			throw new RuntimeException( 'No AI provider is set up yet. Add a model and an API key under Dicecodes AI Blog Writer, Settings.' );
 		}
 
 		$provider = Blogcraft_Provider_Registry::from_settings( isset( $options['model'] ) ? (string) $options['model'] : '' );

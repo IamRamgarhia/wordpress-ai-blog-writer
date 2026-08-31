@@ -233,7 +233,7 @@ class Blogcraft_Generate {
 		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
-				esc_html__( 'No AI provider is configured yet. Set one up under Blogcraft → Settings first.', 'dicecodes-ai-blog-writer' )
+				esc_html__( 'No AI provider is configured yet. Set one up under Dicecodes AI Blog Writer → Settings first.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -590,7 +590,7 @@ class Blogcraft_Generate {
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
 		Blogcraft_Request::nonce_field( self::ROLLBACK_ACTION );
 		printf( '<p><strong>%s</strong></p>', esc_html__( 'Undo a batch', 'dicecodes-ai-blog-writer' ) );
-		echo '<p class="description">' . esc_html__( 'Trashes posts Blogcraft created in the last 24 hours. Anything you wrote yourself is left alone.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Trashes posts Dicecodes AI Blog Writer created in the last 24 hours. Anything you wrote yourself is left alone.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		submit_button( __( 'Trash the last 24 hours', 'dicecodes-ai-blog-writer' ), 'delete', 'submit', false );
 		echo '</form>';
 
@@ -1691,7 +1691,7 @@ class Blogcraft_Generate {
 		if ( $after > $before ) {
 			self::back(
 				false,
-				$message . ' ' . __( 'Something went wrong. Blogcraft → Activity has the reason.', 'dicecodes-ai-blog-writer' )
+				$message . ' ' . __( 'Something went wrong. Dicecodes AI Blog Writer → Activity has the reason.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 

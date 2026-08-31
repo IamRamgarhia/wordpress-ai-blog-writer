@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.68.0 =
+* The old name is out of the interface as well as the header. Renaming the plugin left the previous name on every screen, in the WP-CLI commands, and in the User-Agent sent to every research service — which is where somebody would actually have read it. Thirty-four strings, four commands and the request header now carry the real name
+* The documentation address no longer contains the old term either. The review named URLs specifically, and a link on the author's own domain still spells out a name that belongs to somebody else
+* readme.txt names where development happens, which guideline 4 asks for: the source ships in full, but the build scripts do not, so the repository is linked
+* Trimmed two paragraphs of argument out of External Services. That section had crossed the 5,000-character ceiling and would have been truncated on the listing — the same fault as the changelog, one section along, and the test only covered the changelog. It covers every section now
+
 = 0.67.0 =
 * Renamed to Dicecodes AI Blog Writer, slug dicecodes-ai-blog-writer. The directory review flagged "Blogcraft" as a term belonging to somebody else in the same field, and a name that could be read as another company's is worth losing however good it sounded. The author's own brand goes at the front, which is the pattern the directory asks for
 * The text domain follows the slug, as it must. Nothing that identifies stored data moved: the option names, the capability, the admin addresses and the class names are unchanged, so an existing install keeps its settings and its record of every post written

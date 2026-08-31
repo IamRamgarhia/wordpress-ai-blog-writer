@@ -321,7 +321,7 @@ class Blogcraft_Blueprint_Screen {
 
 		self::row(
 			__( 'Address', 'dicecodes-ai-blog-writer' ),
-			__( 'Any published article, including one of your own. Blogcraft reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says "I" or "you". Structure only: none of the wording is copied, kept, or shown to a model.', 'dicecodes-ai-blog-writer' ),
+			__( 'Any published article, including one of your own. Dicecodes AI Blog Writer reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says "I" or "you". Structure only: none of the wording is copied, kept, or shown to a model.', 'dicecodes-ai-blog-writer' ),
 			'<input type="url" class="bc-text" id="bc-match-url" placeholder="https://example.com/their-best-post" autocomplete="off" />'
 			. '<button type="button" class="button bc-match" id="bc-match-go">' . esc_html__( 'Read it and match', 'dicecodes-ai-blog-writer' ) . '</button>',
 			'bc-match-url'
