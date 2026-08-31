@@ -25,8 +25,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Check languages/blogcraft.pot is current
+      - name: Check the translation template is current
         run: python bin/makepot.py --check
+      - name: Check readme.txt matches changelog.txt
+        run: python bin/changelog.py --check
+
+  # A broken autoloader kills the PHPUnit bootstrap before a single test
+  # runs, so the suite reports it as a stack trace rather than a failing
+  # assertion. This says which class stopped resolving, and needs no
+  # WordPress to do it.
+  autoload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - run: php bin/check-autoload.php .
 
   # Syntax-checks every PHP file across the full supported PHP range. This
   # catches parse errors per version but cannot catch runtime deprecation

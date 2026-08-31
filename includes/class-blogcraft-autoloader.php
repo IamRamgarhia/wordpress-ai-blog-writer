@@ -28,7 +28,7 @@ class Blogcraft_Autoloader {
 	 * @return void
 	 */
 	public static function autoload( $class_name ) {
-		if ( 'Dicecodes AI Blog Writer' !== $class_name && 0 !== strpos( $class_name, 'Blogcraft_' ) ) {
+		if ( 'Blogcraft' !== $class_name && 0 !== strpos( $class_name, 'Blogcraft_' ) ) {
 			return;
 		}
 

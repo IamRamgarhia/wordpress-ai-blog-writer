@@ -6,6 +6,9 @@
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 	<exclude-pattern>/tests/*</exclude-pattern>
+	<!-- Development tooling, not shipped: build.py, makepot.py and the
+	     autoload check are run by hand and by CI, never by WordPress. -->
+	<exclude-pattern>/bin/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg value="ps"/>
