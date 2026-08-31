@@ -31,8 +31,8 @@ class Blogcraft_Archetypes {
 	public static function all() {
 		return array(
 			'guide'      => array(
-				'label'  => __( 'Definitive guide', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'Long, thoroughly sectioned, with a contents list and the obvious questions answered at the end. The shape that ranks for a broad subject.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Definitive guide', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'Long, thoroughly sectioned, with a contents list and the obvious questions answered at the end. The shape that ranks for a broad subject.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 2200,
 					'sections_min'          => 6,
@@ -54,8 +54,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'listicle'   => array(
-				'label'  => __( 'Numbered list, with a verdict', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'One item per section, each covered the same way, and an actual recommendation rather than "it depends".', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Numbered list, with a verdict', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'One item per section, each covered the same way, and an actual recommendation rather than "it depends".', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 1800,
 					'sections_min'          => 5,
@@ -74,8 +74,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'tutorial'   => array(
-				'label'  => __( 'Step by step', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'One step per section, in order, with what to expect at each. Short sentences, no throat-clearing.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Step by step', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'One step per section, in order, with what to expect at each. Short sentences, no throat-clearing.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 1400,
 					'sections_min'          => 4,
@@ -97,8 +97,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'comparison' => array(
-				'label'  => __( 'This against that', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'Both sides covered on the same criteria, a table, and a straight answer about who each one suits.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'This against that', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'Both sides covered on the same criteria, a table, and a straight answer about who each one suits.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 1600,
 					'sections_min'          => 5,
@@ -118,8 +118,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'study'      => array(
-				'label'  => __( 'Data study', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'Built around figures, with the method stated and every number sourced. The shape most likely to be cited by other people.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Data study', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'Built around figures, with the method stated and every number sourced. The shape most likely to be cited by other people.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 2000,
 					'sections_min'          => 5,
@@ -140,8 +140,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'opinion'    => array(
-				'label'  => __( 'An argued opinion', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'A position held from the first line and defended. First person, longer sentences, no hedging.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'An argued opinion', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'A position held from the first line and defended. First person, longer sentences, no hedging.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 1200,
 					'sections_min'          => 3,
@@ -162,8 +162,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'explainer'  => array(
-				'label'  => __( 'Quick explainer', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'Answers in the first two sentences and stops when it is finished. For something people are searching for today.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Quick explainer', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'Answers in the first two sentences and stops when it is finished. For something people are searching for today.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 800,
 					'sections_min'          => 3,
@@ -186,8 +186,8 @@ class Blogcraft_Archetypes {
 				),
 			),
 			'review'     => array(
-				'label'  => __( 'Hands-on review', 'blogcraft-ai-writer' ),
-				'blurb'  => __( 'Written from having used the thing. Specific about what went wrong as well as what worked.', 'blogcraft-ai-writer' ),
+				'label'  => __( 'Hands-on review', 'dicecodes-ai-blog-writer' ),
+				'blurb'  => __( 'Written from having used the thing. Specific about what went wrong as well as what worked.', 'dicecodes-ai-blog-writer' ),
 				'fields' => array(
 					'word_target'           => 1700,
 					'sections_min'          => 5,
@@ -269,7 +269,7 @@ class Blogcraft_Archetypes {
 	 * @return array
 	 */
 	public static function choices() {
-		$out = array( '' => __( 'Start from my own rules', 'blogcraft-ai-writer' ) );
+		$out = array( '' => __( 'Start from my own rules', 'dicecodes-ai-blog-writer' ) );
 
 		foreach ( self::all() as $slug => $shape ) {
 			$out[ $slug ] = $shape['label'];

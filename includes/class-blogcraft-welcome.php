@@ -82,8 +82,8 @@ class Blogcraft_Welcome {
 	public static function register_menu() {
 		add_submenu_page(
 			'',
-			__( 'Welcome to Blogcraft', 'blogcraft-ai-writer' ),
-			__( 'Welcome to Blogcraft', 'blogcraft-ai-writer' ),
+			__( 'Welcome to Blogcraft', 'dicecodes-ai-blog-writer' ),
+			__( 'Welcome to Blogcraft', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -211,8 +211,8 @@ class Blogcraft_Welcome {
 		$step = isset( $_GET['step'] ) ? sanitize_key( wp_unslash( $_GET['step'] ) ) : 'provider'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		echo '<div class="wrap blogcraft-wrap bc-welcome">';
-		echo '<h1>' . esc_html__( 'Three things worth two minutes', 'blogcraft-ai-writer' ) . '</h1>';
-		echo '<p class="bc-welcome-lead">' . esc_html__( 'Almost everything that separates a post worth reading from filler is decided before any writing starts. These are the three that matter most. You can skip any of them and change all of them later.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Three things worth two minutes', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<p class="bc-welcome-lead">' . esc_html__( 'Almost everything that separates a post worth reading from filler is decided before any writing starts. These are the three that matter most. You can skip any of them and change all of them later.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		self::render_rail( $step );
 
@@ -241,10 +241,10 @@ class Blogcraft_Welcome {
 	 */
 	private static function render_rail( $current ) {
 		$steps = array(
-			'provider' => __( 'Connect a provider', 'blogcraft-ai-writer' ),
-			'voice'    => __( 'Say who you write for', 'blogcraft-ai-writer' ),
-			'research' => __( 'Choose what it may read', 'blogcraft-ai-writer' ),
-			'ready'    => __( 'Write something', 'blogcraft-ai-writer' ),
+			'provider' => __( 'Connect a provider', 'dicecodes-ai-blog-writer' ),
+			'voice'    => __( 'Say who you write for', 'dicecodes-ai-blog-writer' ),
+			'research' => __( 'Choose what it may read', 'dicecodes-ai-blog-writer' ),
+			'ready'    => __( 'Write something', 'dicecodes-ai-blog-writer' ),
 		);
 
 		$order = array_keys( $steps );
@@ -295,7 +295,7 @@ class Blogcraft_Welcome {
 		printf(
 			'<p class="bc-welcome-skip"><a href="%1$s">%2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
-			esc_html__( 'Skip this and go to the Write screen', 'blogcraft-ai-writer' )
+			esc_html__( 'Skip this and go to the Write screen', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -309,14 +309,14 @@ class Blogcraft_Welcome {
 
 		self::open_form( 'provider', 'voice' );
 
-		echo '<h2>' . esc_html__( 'Connect a provider', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Blogcraft has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else.', 'blogcraft-ai-writer' ) . '</p>';
-		echo '<p>' . esc_html__( 'If you have no account anywhere: Google and Groq both have free tiers big enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Connect a provider', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Blogcraft has no AI of its own. It uses an account you own, with a key you paste in, and every request is billed to you by that provider rather than passing through anybody else.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'If you have no account anywhere: Google and Groq both have free tiers big enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		if ( $ready ) {
 			printf(
 				'<p class="bc-welcome-ok">%s</p>',
-				esc_html__( 'A provider is already set up. Nothing to do here.', 'blogcraft-ai-writer' )
+				esc_html__( 'A provider is already set up. Nothing to do here.', 'dicecodes-ai-blog-writer' )
 			);
 		} else {
 			// Marked so the settings screen can offer the way back. "Then
@@ -334,12 +334,12 @@ class Blogcraft_Welcome {
 						admin_url( 'admin.php' )
 					) . '#bc-card-provider'
 				),
-				esc_html__( 'Set up a provider', 'blogcraft-ai-writer' )
+				esc_html__( 'Set up a provider', 'dicecodes-ai-blog-writer' )
 			);
-			echo '<p class="description">' . esc_html__( 'There is a link back to this page at the top of that screen.', 'blogcraft-ai-writer' ) . '</p>';
+			echo '<p class="description">' . esc_html__( 'There is a link back to this page at the top of that screen.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		}
 
-		submit_button( __( 'Next', 'blogcraft-ai-writer' ), 'secondary', 'submit', false );
+		submit_button( __( 'Next', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
 		self::skip_link();
 		echo '</form>';
 	}
@@ -352,33 +352,33 @@ class Blogcraft_Welcome {
 	private static function step_voice() {
 		self::open_form( 'voice', 'research' );
 
-		echo '<h2>' . esc_html__( 'Say who you write for', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'This is sent with every request afterwards, and it is the single biggest reason two blogs using the same model do not read the same. Two sentences is enough.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Say who you write for', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'This is sent with every request afterwards, and it is the single biggest reason two blogs using the same model do not read the same. Two sentences is enough.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		printf(
 			'<p class="bc-field"><label for="bc_welcome_niche"><strong>%1$s</strong></label>'
 			. '<textarea id="bc_welcome_niche" name="voice_niche" rows="2" class="large-text" placeholder="%2$s">%3$s</textarea></p>',
-			esc_html__( 'What this blog is about', 'blogcraft-ai-writer' ),
-			esc_attr__( 'Home coffee equipment, tested properly rather than unboxed.', 'blogcraft-ai-writer' ),
+			esc_html__( 'What this blog is about', 'dicecodes-ai-blog-writer' ),
+			esc_attr__( 'Home coffee equipment, tested properly rather than unboxed.', 'dicecodes-ai-blog-writer' ),
 			esc_textarea( (string) Blogcraft_Settings::get( 'voice_niche' ) )
 		);
 
 		printf(
 			'<p class="bc-field"><label for="bc_welcome_audience"><strong>%1$s</strong></label>'
 			. '<textarea id="bc_welcome_audience" name="voice_audience" rows="2" class="large-text" placeholder="%2$s">%3$s</textarea></p>',
-			esc_html__( 'Who is reading, and what they already know', 'blogcraft-ai-writer' ),
-			esc_attr__( 'People buying their first proper machine, who know what espresso is but not what a pressure profile is.', 'blogcraft-ai-writer' ),
+			esc_html__( 'Who is reading, and what they already know', 'dicecodes-ai-blog-writer' ),
+			esc_attr__( 'People buying their first proper machine, who know what espresso is but not what a pressure profile is.', 'dicecodes-ai-blog-writer' ),
 			esc_textarea( (string) Blogcraft_Settings::get( 'voice_audience' ) )
 		);
 
 		printf(
 			'<p class="description">%1$s <a href="%2$s">%3$s</a></p>',
-			esc_html__( 'Already have posts published?', 'blogcraft-ai-writer' ),
+			esc_html__( 'Already have posts published?', 'dicecodes-ai-blog-writer' ),
 			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-voice' ) ),
-			esc_html__( 'Blogcraft can read them and fill this in from how you actually write.', 'blogcraft-ai-writer' )
+			esc_html__( 'Blogcraft can read them and fill this in from how you actually write.', 'dicecodes-ai-blog-writer' )
 		);
 
-		submit_button( __( 'Save and continue', 'blogcraft-ai-writer' ), 'primary', 'submit', false );
+		submit_button( __( 'Save and continue', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
 		self::skip_link();
 		echo '</form>';
 	}
@@ -391,9 +391,9 @@ class Blogcraft_Welcome {
 	private static function step_research() {
 		self::open_form( 'research', 'ready' );
 
-		echo '<h2>' . esc_html__( 'Choose what it may read', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'With research on, the model is handed current sources and writes from them, and the finished draft is checked against those same sources for whether it says anything they do not. With everything off it writes from memory, which dates badly and can cite nothing.', 'blogcraft-ai-writer' ) . '</p>';
-		echo '<p>' . esc_html__( 'Nothing is contacted until you tick something here. Both of these are free and need no account.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Choose what it may read', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'With research on, the model is handed current sources and writes from them, and the finished draft is checked against those same sources for whether it says anything they do not. With everything off it writes from memory, which dates badly and can cite nothing.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'Nothing is contacted until you tick something here. Both of these are free and need no account.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		foreach ( Blogcraft_Research::free_sources() as $key => $label ) {
 			printf(
@@ -406,12 +406,12 @@ class Blogcraft_Welcome {
 
 		printf(
 			'<p class="description">%1$s <a href="%2$s">%3$s</a></p>',
-			esc_html__( 'Paid search providers return more current results.', 'blogcraft-ai-writer' ),
+			esc_html__( 'Paid search providers return more current results.', 'dicecodes-ai-blog-writer' ),
 			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ) ),
-			esc_html__( 'They are in Settings, and entirely optional.', 'blogcraft-ai-writer' )
+			esc_html__( 'They are in Settings, and entirely optional.', 'dicecodes-ai-blog-writer' )
 		);
 
-		submit_button( __( 'Save and continue', 'blogcraft-ai-writer' ), 'primary', 'submit', false );
+		submit_button( __( 'Save and continue', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
 		self::skip_link();
 		echo '</form>';
 	}
@@ -424,19 +424,19 @@ class Blogcraft_Welcome {
 	private static function step_ready() {
 		self::open_form( 'finish', '' );
 
-		echo '<h2>' . esc_html__( 'One thing before you write', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'On the Write screen there is a field asking what you know that nobody else does. It is the heaviest check on the finished post and the only part of a page a model genuinely cannot produce.', 'blogcraft-ai-writer' ) . '</p>';
-		echo '<p>' . esc_html__( 'A number you measured. A price you paid. How long something actually took, or what went wrong when you tried it. One or two sentences is enough, and it is the difference between a page worth reading and a summary of pages that already exist.', 'blogcraft-ai-writer' ) . '</p>';
-		echo '<p>' . esc_html__( 'If nothing comes to mind, there is a button there that reads your topic and asks you four specific questions instead. It never answers them for you — invented facts are the one thing that would make every other check meaningless.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'One thing before you write', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'On the Write screen there is a field asking what you know that nobody else does. It is the heaviest check on the finished post and the only part of a page a model genuinely cannot produce.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'A number you measured. A price you paid. How long something actually took, or what went wrong when you tried it. One or two sentences is enough, and it is the difference between a page worth reading and a summary of pages that already exist.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'If nothing comes to mind, there is a button there that reads your topic and asks you four specific questions instead. It never answers them for you — invented facts are the one thing that would make every other check meaningless.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		printf(
 			'<p class="description">%1$s <a href="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a></p>',
-			esc_html__( 'Want the longer version first?', 'blogcraft-ai-writer' ),
+			esc_html__( 'Want the longer version first?', 'dicecodes-ai-blog-writer' ),
 			esc_url( Blogcraft_Docs::site_url() ),
-			esc_html__( 'Read the guides', 'blogcraft-ai-writer' )
+			esc_html__( 'Read the guides', 'dicecodes-ai-blog-writer' )
 		);
 
-		submit_button( __( 'Write my first post', 'blogcraft-ai-writer' ), 'primary', 'submit', false );
+		submit_button( __( 'Write my first post', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
 		echo '</form>';
 	}
 }

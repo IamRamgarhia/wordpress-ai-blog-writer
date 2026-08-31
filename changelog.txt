@@ -3,6 +3,10 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.67.0 =
+* Renamed to Dicecodes AI Blog Writer, slug dicecodes-ai-blog-writer. The directory review flagged "Blogcraft" as a term belonging to somebody else in the same field, and a name that could be read as another company's is worth losing however good it sounded. The author's own brand goes at the front, which is the pattern the directory asks for
+* The text domain follows the slug, as it must. Nothing that identifies stored data moved: the option names, the capability, the admin addresses and the class names are unchanged, so an existing install keeps its settings and its record of every post written
+
 = 0.66.0 =
 * uninstall.php could run outside an uninstall. Its guard accepted WP_UNINSTALL_PLUGIN or ABSPATH, and ABSPATH is defined on every WordPress request — so the second half was always true and the file would execute wherever it was reached. Only the constant that means "WordPress is deleting this plugin" is accepted now
 * The author box stylesheet is enqueued rather than printed. It echoed a <style> block into wp_head, which works but is invisible to everything else: no other plugin or theme could dequeue it, reorder it, or even see it was there. It is registered as a handle carrying inline rules, which costs the same number of requests, namely none

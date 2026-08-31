@@ -41,8 +41,8 @@ class Blogcraft_Request {
 	public static function verify_or_die( $action, $nonce_value ) {
 		if ( ! self::verify( $action, $nonce_value ) ) {
 			wp_die(
-				esc_html__( 'You are not allowed to perform this action.', 'blogcraft-ai-writer' ),
-				esc_html__( 'Permission denied', 'blogcraft-ai-writer' ),
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
 				array( 'response' => 403 )
 			);
 		}
@@ -72,7 +72,7 @@ class Blogcraft_Request {
 
 		wp_send_json_error(
 			array(
-				'message' => __( 'No AI provider is set up yet, so there is nothing to ask. Settings, then Connect a provider.', 'blogcraft-ai-writer' ),
+				'message' => __( 'No AI provider is set up yet, so there is nothing to ask. Settings, then Connect a provider.', 'dicecodes-ai-blog-writer' ),
 			),
 			409
 		);

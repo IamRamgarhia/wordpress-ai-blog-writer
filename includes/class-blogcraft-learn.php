@@ -183,30 +183,30 @@ class Blogcraft_Learn {
 		}
 
 		if ( $seen['sentence_words'] > 0 && $seen['sentence_words'] <= 16 ) {
-			$rules[] = __( 'Keep sentences short. Most of ours run under sixteen words.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Keep sentences short. Most of ours run under sixteen words.', 'dicecodes-ai-blog-writer' );
 		} elseif ( $seen['sentence_words'] >= 24 ) {
-			$rules[] = __( 'Long sentences are fine here. Do not chop everything into fragments.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Long sentences are fine here. Do not chop everything into fragments.', 'dicecodes-ai-blog-writer' );
 		}
 
 		if ( $seen['para_sentences'] > 0 && $seen['para_sentences'] <= 3 ) {
-			$rules[] = __( 'Short paragraphs, two or three sentences each.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Short paragraphs, two or three sentences each.', 'dicecodes-ai-blog-writer' );
 		}
 
 		// Under one per post across the sample is a writer who avoids them.
 		if ( $seen['em_dash'] < $seen['posts'] ) {
-			$rules[] = __( 'No em dashes.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'No em dashes.', 'dicecodes-ai-blog-writer' );
 		}
 
 		if ( $seen['contractions'] >= ( $seen['posts'] * 5 ) ) {
-			$rules[] = __( 'Use contractions. Write the way people speak.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Use contractions. Write the way people speak.', 'dicecodes-ai-blog-writer' );
 		} elseif ( 0 === $seen['contractions'] ) {
-			$rules[] = __( 'No contractions.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'No contractions.', 'dicecodes-ai-blog-writer' );
 		}
 
 		if ( 'first' === $seen['person'] ) {
-			$rules[] = __( 'Write in the first person. Say what we did and what we found.', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Write in the first person. Say what we did and what we found.', 'dicecodes-ai-blog-writer' );
 		} elseif ( 'second' === $seen['person'] ) {
-			$rules[] = __( 'Address the reader directly as "you".', 'blogcraft-ai-writer' );
+			$rules[] = __( 'Address the reader directly as "you".', 'dicecodes-ai-blog-writer' );
 		}
 
 		return $rules;
@@ -292,7 +292,7 @@ class Blogcraft_Learn {
 			return array(
 				'found'  => 0,
 				'fields' => array(),
-				'notes'  => array( __( 'There are no posts here yet that Blogcraft did not write, so there is nothing to learn from.', 'blogcraft-ai-writer' ) ),
+				'notes'  => array( __( 'There are no posts here yet that Blogcraft did not write, so there is nothing to learn from.', 'dicecodes-ai-blog-writer' ) ),
 			);
 		}
 
@@ -314,25 +314,25 @@ class Blogcraft_Learn {
 		}
 
 		if ( 'first' === $seen['person'] ) {
-			$fields['voice_point_of_view'] = __( 'First person plural', 'blogcraft-ai-writer' );
+			$fields['voice_point_of_view'] = __( 'First person plural', 'dicecodes-ai-blog-writer' );
 		} elseif ( 'second' === $seen['person'] ) {
-			$fields['voice_point_of_view'] = __( 'Second person, addressing the reader', 'blogcraft-ai-writer' );
+			$fields['voice_point_of_view'] = __( 'Second person, addressing the reader', 'dicecodes-ai-blog-writer' );
 		}
 
 		$notes = array(
 			sprintf(
 				/* translators: 1: number of posts read. 2: average word count. */
-				__( 'Read %1$d of your posts. They average %2$d words.', 'blogcraft-ai-writer' ),
+				__( 'Read %1$d of your posts. They average %2$d words.', 'dicecodes-ai-blog-writer' ),
 				(int) $seen['posts'],
 				(int) $seen['words']
 			),
 		);
 
 		if ( '' === $written['niche'] ) {
-			$notes[] = __( 'The written descriptions need a working AI provider, so only the measured style rules were filled in.', 'blogcraft-ai-writer' );
+			$notes[] = __( 'The written descriptions need a working AI provider, so only the measured style rules were filled in.', 'dicecodes-ai-blog-writer' );
 		}
 
-		$notes[] = __( 'Nothing has been saved. Correct anything that is wrong, then save.', 'blogcraft-ai-writer' );
+		$notes[] = __( 'Nothing has been saved. Correct anything that is wrong, then save.', 'dicecodes-ai-blog-writer' );
 
 		return array(
 			'found'  => (int) $seen['posts'],

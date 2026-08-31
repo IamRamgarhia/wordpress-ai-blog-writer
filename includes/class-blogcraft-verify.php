@@ -182,24 +182,24 @@ class Blogcraft_Verify {
 
 		if ( empty( $article['intro'] ) ) {
 			$score    -= 15;
-			$reasons[] = __( 'No opening paragraph answering the title.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'No opening paragraph answering the title.', 'dicecodes-ai-blog-writer' );
 		}
 
 		$sections = ( ! empty( $article['sections'] ) && is_array( $article['sections'] ) ) ? $article['sections'] : array();
 
 		if ( count( $sections ) < 3 ) {
 			$score    -= 20;
-			$reasons[] = __( 'Fewer than three sections.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'Fewer than three sections.', 'dicecodes-ai-blog-writer' );
 		}
 
 		$words = self::word_count( $article );
 
 		if ( $words < 300 ) {
 			$score    -= 25;
-			$reasons[] = __( 'Under 300 words. Thin content is the most penalised kind.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'Under 300 words. Thin content is the most penalised kind.', 'dicecodes-ai-blog-writer' );
 		} elseif ( $words < 600 ) {
 			$score    -= 10;
-			$reasons[] = __( 'Under 600 words.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'Under 600 words.', 'dicecodes-ai-blog-writer' );
 		}
 
 		// Only counted against a post that was supposed to have them. The
@@ -212,12 +212,12 @@ class Blogcraft_Verify {
 
 		if ( ! empty( $blueprint['faq'] ) && empty( $article['faq'] ) ) {
 			$score    -= 5;
-			$reasons[] = __( 'No FAQ section.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'No FAQ section.', 'dicecodes-ai-blog-writer' );
 		}
 
 		if ( ! empty( $blueprint['takeaways'] ) && empty( $article['key_takeaways'] ) ) {
 			$score    -= 5;
-			$reasons[] = __( 'No key takeaways.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'No key takeaways.', 'dicecodes-ai-blog-writer' );
 		}
 
 		// A banned phrase surviving both the draft and the revise pass is a strong
@@ -234,7 +234,7 @@ class Blogcraft_Verify {
 			if ( Blogcraft_Metrics::phrase_count( $haystack, $banned ) > 0 ) {
 				$score -= 10;
 				/* translators: %s: the banned word or phrase found in the draft. */
-				$reasons[] = sprintf( __( 'Contains a banned phrase: "%s".', 'blogcraft-ai-writer' ), $banned );
+				$reasons[] = sprintf( __( 'Contains a banned phrase: "%s".', 'dicecodes-ai-blog-writer' ), $banned );
 				break;
 			}
 		}
@@ -249,7 +249,7 @@ class Blogcraft_Verify {
 
 		if ( count( $headings ) !== count( array_unique( $headings ) ) ) {
 			$score    -= 10;
-			$reasons[] = __( 'Two sections share a heading.', 'blogcraft-ai-writer' );
+			$reasons[] = __( 'Two sections share a heading.', 'dicecodes-ai-blog-writer' );
 		}
 
 		return array(

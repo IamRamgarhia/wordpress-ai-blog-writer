@@ -43,12 +43,12 @@ class Blogcraft_Admin {
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Welcome::PAGE_SLUG ) ),
-				esc_html__( 'Set up', 'blogcraft-ai-writer' )
+				esc_html__( 'Set up', 'dicecodes-ai-blog-writer' )
 			),
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
-				esc_html__( 'Settings', 'blogcraft-ai-writer' )
+				esc_html__( 'Settings', 'dicecodes-ai-blog-writer' )
 			),
 			// Where the longer explanations live. The plugin's own Help screen
 			// covers using it; this is for the walkthroughs and the answers that
@@ -56,7 +56,7 @@ class Blogcraft_Admin {
 			sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
 				esc_url( Blogcraft_Docs::site_url() ),
-				esc_html__( 'Docs', 'blogcraft-ai-writer' )
+				esc_html__( 'Docs', 'dicecodes-ai-blog-writer' )
 			),
 		);
 
@@ -70,8 +70,8 @@ class Blogcraft_Admin {
 	 */
 	public static function register_menu() {
 		add_menu_page(
-			__( 'Blogcraft', 'blogcraft-ai-writer' ),
-			__( 'Blogcraft', 'blogcraft-ai-writer' ),
+			__( 'Blogcraft', 'dicecodes-ai-blog-writer' ),
+			__( 'Blogcraft', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::MENU_SLUG,
 			array( __CLASS__, 'render_dashboard' ),

@@ -75,11 +75,11 @@ class Blogcraft_Images {
 		// The generators come from Blogcraft_Image_Models rather than being
 		// listed again here. Two lists meant adding a service in one place and
 		// having resolve() never route to it.
-		return array( 'pollinations' => __( 'Pollinations — free, generated, no key needed', 'blogcraft-ai-writer' ) )
+		return array( 'pollinations' => __( 'Pollinations — free, generated, no key needed', 'dicecodes-ai-blog-writer' ) )
 			+ Blogcraft_Image_Models::providers()
 			+ array(
-				'pexels'  => __( 'Pexels — free, real photos, free key', 'blogcraft-ai-writer' ),
-				'pixabay' => __( 'Pixabay — free, real photos, free key', 'blogcraft-ai-writer' ),
+				'pexels'  => __( 'Pexels — free, real photos, free key', 'dicecodes-ai-blog-writer' ),
+				'pixabay' => __( 'Pixabay — free, real photos, free key', 'dicecodes-ai-blog-writer' ),
 			);
 	}
 

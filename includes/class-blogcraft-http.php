@@ -139,7 +139,7 @@ class Blogcraft_Http {
 					return array(
 						'code'  => $code,
 						'body'  => array(),
-						'error' => __( 'Invalid JSON response.', 'blogcraft-ai-writer' ),
+						'error' => __( 'Invalid JSON response.', 'dicecodes-ai-blog-writer' ),
 					);
 				}
 
@@ -152,7 +152,7 @@ class Blogcraft_Http {
 
 			$error = sprintf(
 				/* translators: %d: HTTP status code. */
-				__( 'Request failed with HTTP %d.', 'blogcraft-ai-writer' ),
+				__( 'Request failed with HTTP %d.', 'dicecodes-ai-blog-writer' ),
 				$code
 			);
 

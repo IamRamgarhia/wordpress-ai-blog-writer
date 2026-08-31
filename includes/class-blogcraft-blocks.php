@@ -35,7 +35,7 @@ class Blogcraft_Blocks {
 		}
 
 		if ( ! empty( $article['key_takeaways'] ) && is_array( $article['key_takeaways'] ) ) {
-			$out .= self::heading( __( 'Key takeaways', 'blogcraft-ai-writer' ), 2 );
+			$out .= self::heading( __( 'Key takeaways', 'dicecodes-ai-blog-writer' ), 2 );
 			$out .= self::unordered_list( $article['key_takeaways'] );
 		}
 
@@ -45,8 +45,8 @@ class Blogcraft_Blocks {
 		$out .= self::two_lists(
 			isset( $article['for_whom'] ) ? $article['for_whom'] : array(),
 			isset( $article['not_for'] ) ? $article['not_for'] : array(),
-			__( 'Who this is for', 'blogcraft-ai-writer' ),
-			__( 'Who it is not for', 'blogcraft-ai-writer' )
+			__( 'Who this is for', 'dicecodes-ai-blog-writer' ),
+			__( 'Who it is not for', 'dicecodes-ai-blog-writer' )
 		);
 
 		if ( ! empty( $article['sections'] ) && is_array( $article['sections'] ) ) {
@@ -74,19 +74,19 @@ class Blogcraft_Blocks {
 		$out .= self::two_lists(
 			isset( $article['pros'] ) ? $article['pros'] : array(),
 			isset( $article['cons'] ) ? $article['cons'] : array(),
-			__( 'What works', 'blogcraft-ai-writer' ),
-			__( 'What does not', 'blogcraft-ai-writer' )
+			__( 'What works', 'dicecodes-ai-blog-writer' ),
+			__( 'What does not', 'dicecodes-ai-blog-writer' )
 		);
 
 		$out .= self::figures( isset( $article['figures'] ) ? $article['figures'] : array() );
 
 		if ( ! empty( $article['mistakes'] ) && is_array( $article['mistakes'] ) ) {
-			$out .= self::heading( __( 'Mistakes worth avoiding', 'blogcraft-ai-writer' ), 2 );
+			$out .= self::heading( __( 'Mistakes worth avoiding', 'dicecodes-ai-blog-writer' ), 2 );
 			$out .= self::unordered_list( $article['mistakes'] );
 		}
 
 		if ( ! empty( $article['faq'] ) && is_array( $article['faq'] ) ) {
-			$out .= self::heading( __( 'Frequently asked questions', 'blogcraft-ai-writer' ), 2 );
+			$out .= self::heading( __( 'Frequently asked questions', 'dicecodes-ai-blog-writer' ), 2 );
 
 			foreach ( $article['faq'] as $entry ) {
 				if ( ! is_array( $entry ) || empty( $entry['question'] ) ) {
@@ -167,14 +167,14 @@ class Blogcraft_Blocks {
 
 		$table = self::table(
 			array(
-				__( 'Figure', 'blogcraft-ai-writer' ),
-				__( 'What it means', 'blogcraft-ai-writer' ),
-				__( 'Where it came from', 'blogcraft-ai-writer' ),
+				__( 'Figure', 'dicecodes-ai-blog-writer' ),
+				__( 'What it means', 'dicecodes-ai-blog-writer' ),
+				__( 'Where it came from', 'dicecodes-ai-blog-writer' ),
 			),
 			$rows
 		);
 
-		return ( '' === $table ) ? '' : self::heading( __( 'The numbers', 'blogcraft-ai-writer' ), 2 ) . $table;
+		return ( '' === $table ) ? '' : self::heading( __( 'The numbers', 'dicecodes-ai-blog-writer' ), 2 ) . $table;
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Blogcraft_Blocks {
 			return '';
 		}
 
-		return self::heading( __( 'Sources', 'blogcraft-ai-writer' ), 2 ) . self::unordered_list( $items );
+		return self::heading( __( 'Sources', 'dicecodes-ai-blog-writer' ), 2 ) . self::unordered_list( $items );
 	}
 
 	/**

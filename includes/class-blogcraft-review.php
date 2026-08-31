@@ -57,7 +57,7 @@ class Blogcraft_Review {
 	 */
 	public static function register_menu() {
 		$waiting = count( self::pending_posts() );
-		$label   = __( 'Needs review', 'blogcraft-ai-writer' );
+		$label   = __( 'Needs review', 'dicecodes-ai-blog-writer' );
 
 		if ( $waiting > 0 ) {
 			$label .= sprintf( ' <span class="update-plugins count-%1$d"><span class="update-count">%1$d</span></span>', $waiting );
@@ -69,7 +69,7 @@ class Blogcraft_Review {
 			// listing it, so a link from Overview or a bookmark still works
 			// and the reader still gets a page that says the queue is clear.
 			$waiting > 0 ? Blogcraft_Admin::MENU_SLUG : null,
-			__( 'Needs review', 'blogcraft-ai-writer' ),
+			__( 'Needs review', 'dicecodes-ai-blog-writer' ),
 			$label,
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
@@ -127,7 +127,7 @@ class Blogcraft_Review {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
@@ -136,8 +136,8 @@ class Blogcraft_Review {
 		echo '<div class="wrap blogcraft-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Needs review', 'blogcraft-ai-writer' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Posts held back because they scored below your quality threshold.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Needs review', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Posts held back because they scored below your quality threshold.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		if ( is_array( $notice ) ) {
@@ -151,8 +151,8 @@ class Blogcraft_Review {
 
 		if ( empty( $posts ) ) {
 			echo '<section class="blogcraft-card"><header>';
-			echo '<h2>' . esc_html__( 'Nothing waiting', 'blogcraft-ai-writer' ) . '</h2>';
-			echo '<p>' . esc_html__( 'Everything generated so far cleared the quality bar.', 'blogcraft-ai-writer' ) . '</p>';
+			echo '<h2>' . esc_html__( 'Nothing waiting', 'dicecodes-ai-blog-writer' ) . '</h2>';
+			echo '<p>' . esc_html__( 'Everything generated so far cleared the quality bar.', 'dicecodes-ai-blog-writer' ) . '</p>';
 			echo '</header></section>';
 			echo '</div>';
 
@@ -183,7 +183,7 @@ class Blogcraft_Review {
 			esc_html(
 				sprintf(
 					/* translators: %d: quality score out of 100. */
-					__( 'Scored %d of 100', 'blogcraft-ai-writer' ),
+					__( 'Scored %d of 100', 'dicecodes-ai-blog-writer' ),
 					$score
 				)
 			)
@@ -211,11 +211,11 @@ class Blogcraft_Review {
 		printf(
 			'<a class="button" href="%s">%s</a>',
 			esc_url( (string) get_edit_post_link( $post->ID ) ),
-			esc_html__( 'Read it', 'blogcraft-ai-writer' )
+			esc_html__( 'Read it', 'dicecodes-ai-blog-writer' )
 		);
 
-		self::action_button( $post->ID, 'approve', __( 'Approve and publish', 'blogcraft-ai-writer' ), 'button-primary' );
-		self::action_button( $post->ID, 'reject', __( 'Move to trash', 'blogcraft-ai-writer' ), 'button-link-delete' );
+		self::action_button( $post->ID, 'approve', __( 'Approve and publish', 'dicecodes-ai-blog-writer' ), 'button-primary' );
+		self::action_button( $post->ID, 'reject', __( 'Move to trash', 'dicecodes-ai-blog-writer' ), 'button-link-delete' );
 
 		echo '</div>';
 		echo '</section>';
@@ -257,11 +257,11 @@ class Blogcraft_Review {
 				esc_html(
 					sprintf(
 						/* translators: %s: the value the blueprint asked for. */
-						__( 'wanted %s', 'blogcraft-ai-writer' ),
+						__( 'wanted %s', 'dicecodes-ai-blog-writer' ),
 						(string) $check['target']
 					)
 				),
-				esc_html( empty( $check['pass'] ) ? __( 'Failed', 'blogcraft-ai-writer' ) : __( 'Passed', 'blogcraft-ai-writer' ) )
+				esc_html( empty( $check['pass'] ) ? __( 'Failed', 'dicecodes-ai-blog-writer' ) : __( 'Passed', 'dicecodes-ai-blog-writer' ) )
 			);
 		}
 
@@ -270,7 +270,7 @@ class Blogcraft_Review {
 		if ( ! empty( $failed ) ) {
 			printf(
 				'<p class="blogcraft-hint">%s</p>',
-				esc_html__( 'These were measured on the finished draft. The model was told about each one and rewrote once before this.', 'blogcraft-ai-writer' )
+				esc_html__( 'These were measured on the finished draft. The model was told about each one and rewrote once before this.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 	}
@@ -314,7 +314,7 @@ class Blogcraft_Review {
 
 		// Only ever act on a post this plugin generated and is holding.
 		if ( ! $post || 'pending' !== $post->post_status || ! get_post_meta( $post_id, '_blogcraft_generated', true ) ) {
-			self::back( false, __( 'That post is no longer waiting for review.', 'blogcraft-ai-writer' ) );
+			self::back( false, __( 'That post is no longer waiting for review.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		if ( 'approve' === $verb ) {
@@ -325,16 +325,16 @@ class Blogcraft_Review {
 				)
 			);
 
-			self::back( true, __( 'Published.', 'blogcraft-ai-writer' ) );
+			self::back( true, __( 'Published.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		if ( 'reject' === $verb ) {
 			wp_trash_post( $post_id );
 
-			self::back( true, __( 'Moved to trash.', 'blogcraft-ai-writer' ) );
+			self::back( true, __( 'Moved to trash.', 'dicecodes-ai-blog-writer' ) );
 		}
 
-		self::back( false, __( 'Unknown action.', 'blogcraft-ai-writer' ) );
+		self::back( false, __( 'Unknown action.', 'dicecodes-ai-blog-writer' ) );
 	}
 
 	/**

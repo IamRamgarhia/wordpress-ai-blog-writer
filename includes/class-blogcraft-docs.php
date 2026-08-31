@@ -111,8 +111,8 @@ class Blogcraft_Docs {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Help', 'blogcraft-ai-writer' ),
-			__( 'Help', 'blogcraft-ai-writer' ),
+			__( 'Help', 'dicecodes-ai-blog-writer' ),
+			__( 'Help', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -127,180 +127,180 @@ class Blogcraft_Docs {
 	public static function sections() {
 		return array(
 			'quickstart'        => array(
-				'title' => __( 'Start here', 'blogcraft-ai-writer' ),
-				'lead'  => __( 'Five steps, about ten minutes. Nothing is contacted until you finish the first one.', 'blogcraft-ai-writer' ),
+				'title' => __( 'Start here', 'dicecodes-ai-blog-writer' ),
+				'lead'  => __( 'Five steps, about ten minutes. Nothing is contacted until you finish the first one.', 'dicecodes-ai-blog-writer' ),
 				'steps' => array(
 					array(
-						__( 'Choose a provider', 'blogcraft-ai-writer' ),
-						__( 'Settings, Connect a provider. The free ones are at the top. Nothing is chosen for you.', 'blogcraft-ai-writer' ),
+						__( 'Choose a provider', 'dicecodes-ai-blog-writer' ),
+						__( 'Settings, Connect a provider. The free ones are at the top. Nothing is chosen for you.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Paste the key', 'blogcraft-ai-writer' ),
-						__( 'The link beside the field goes to the right page. A model on your own machine needs no key. Save.', 'blogcraft-ai-writer' ),
+						__( 'Paste the key', 'dicecodes-ai-blog-writer' ),
+						__( 'The link beside the field goes to the right page. A model on your own machine needs no key. Save.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Pick a model', 'blogcraft-ai-writer' ),
-						__( 'Press "Show the models on my account". Never type an id from memory.', 'blogcraft-ai-writer' ),
+						__( 'Pick a model', 'dicecodes-ai-blog-writer' ),
+						__( 'Press "Show the models on my account". Never type an id from memory.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Describe your voice', 'blogcraft-ai-writer' ),
-						__( 'Two sentences on your subject and your reader. Or press "Learn from my posts".', 'blogcraft-ai-writer' ),
+						__( 'Describe your voice', 'dicecodes-ai-blog-writer' ),
+						__( 'Two sentences on your subject and your reader. Or press "Learn from my posts".', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Write one post', 'blogcraft-ai-writer' ),
-						__( 'Give it a topic and read the score before you publish anything.', 'blogcraft-ai-writer' ),
+						__( 'Write one post', 'dicecodes-ai-blog-writer' ),
+						__( 'Give it a topic and read the score before you publish anything.', 'dicecodes-ai-blog-writer' ),
 					),
 				),
 			),
 			'providers'         => array(
-				'title'  => __( 'Connecting a provider', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Blogcraft has no AI of its own. It uses your account, and your provider bills you directly.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Connecting a provider', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Blogcraft has no AI of its own. It uses your account, and your provider bills you directly.', 'dicecodes-ai-blog-writer' ),
 				'steps'  => array(
 					array(
-						__( 'Provider', 'blogcraft-ai-writer' ),
-						__( 'Grouped by what it costs, free first. Nothing is preselected.', 'blogcraft-ai-writer' ),
+						__( 'Provider', 'dicecodes-ai-blog-writer' ),
+						__( 'Grouped by what it costs, free first. Nothing is preselected.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Key', 'blogcraft-ai-writer' ),
-						__( 'Follow the link beside the field. A local model needs none.', 'blogcraft-ai-writer' ),
+						__( 'Key', 'dicecodes-ai-blog-writer' ),
+						__( 'Follow the link beside the field. A local model needs none.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Model id', 'blogcraft-ai-writer' ),
-						__( 'Take it from your own account, not from an example. Retired ids fail with an error that does not say so.', 'blogcraft-ai-writer' ),
+						__( 'Model id', 'dicecodes-ai-blog-writer' ),
+						__( 'Take it from your own account, not from an example. Retired ids fail with an error that does not say so.', 'dicecodes-ai-blog-writer' ),
 					),
 				),
 				'points' => array(
-					__( 'Free, no key, no account: Ollama, LM Studio, Jan, llama.cpp. They run on this machine and contact nobody.', 'blogcraft-ai-writer' ),
-					__( 'Free tier, a key but no card: Google, Groq, Mistral, Hugging Face. On OpenRouter the free ids end in :free.', 'blogcraft-ai-writer' ),
-					__( 'Nothing is held back on a free provider. There is no paid tier here to unlock.', 'blogcraft-ai-writer' ),
-					__( 'On WordPress 7.0 and later, "WordPress AI Client" appears when a provider plugin is installed. No key here at all.', 'blogcraft-ai-writer' ),
-					__( 'Leave the base URL blank unless you are pointing at a proxy of your own.', 'blogcraft-ai-writer' ),
+					__( 'Free, no key, no account: Ollama, LM Studio, Jan, llama.cpp. They run on this machine and contact nobody.', 'dicecodes-ai-blog-writer' ),
+					__( 'Free tier, a key but no card: Google, Groq, Mistral, Hugging Face. On OpenRouter the free ids end in :free.', 'dicecodes-ai-blog-writer' ),
+					__( 'Nothing is held back on a free provider. There is no paid tier here to unlock.', 'dicecodes-ai-blog-writer' ),
+					__( 'On WordPress 7.0 and later, "WordPress AI Client" appears when a provider plugin is installed. No key here at all.', 'dicecodes-ai-blog-writer' ),
+					__( 'Leave the base URL blank unless you are pointing at a proxy of your own.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'research'          => array(
-				'title'  => __( 'Research', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'The biggest single lever on whether a post is worth reading.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Research', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'The biggest single lever on whether a post is worth reading.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Off, the model writes from memory. On, it writes from current sources.', 'blogcraft-ai-writer' ),
-					__( 'Everything starts switched off. Turning a source on is how you consent to it.', 'blogcraft-ai-writer' ),
-					__( 'Wikipedia and Hacker News need no key. Tavily and SerpApi are paid and more current.', 'blogcraft-ai-writer' ),
-					__( 'A SearXNG instance you host is free. You can also list URLs to be read for every post.', 'blogcraft-ai-writer' ),
-					__( 'What is found also checks the draft: merely restating your sources costs points.', 'blogcraft-ai-writer' ),
+					__( 'Off, the model writes from memory. On, it writes from current sources.', 'dicecodes-ai-blog-writer' ),
+					__( 'Everything starts switched off. Turning a source on is how you consent to it.', 'dicecodes-ai-blog-writer' ),
+					__( 'Wikipedia and Hacker News need no key. Tavily and SerpApi are paid and more current.', 'dicecodes-ai-blog-writer' ),
+					__( 'A SearXNG instance you host is free. You can also list URLs to be read for every post.', 'dicecodes-ai-blog-writer' ),
+					__( 'What is found also checks the draft: merely restating your sources costs points.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'voice'             => array(
-				'title'  => __( 'Describing your voice', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Sent with every request. The reason two blogs on the same model do not read alike.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Describing your voice', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Sent with every request. The reason two blogs on the same model do not read alike.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Two sentences on your subject and your reader is enough to start.', 'blogcraft-ai-writer' ),
-					__( '"Learn from my posts" measures how you actually write and fills the fields in. Nothing saves until you press Save.', 'blogcraft-ai-writer' ),
-					__( 'Posts Blogcraft wrote are left out of that. Learning from its own output ends with every post sounding like the first.', 'blogcraft-ai-writer' ),
-					__( 'The experience field is the one worth time. It is the only part of a post a model cannot produce.', 'blogcraft-ai-writer' ),
+					__( 'Two sentences on your subject and your reader is enough to start.', 'dicecodes-ai-blog-writer' ),
+					__( '"Learn from my posts" measures how you actually write and fills the fields in. Nothing saves until you press Save.', 'dicecodes-ai-blog-writer' ),
+					__( 'Posts Blogcraft wrote are left out of that. Learning from its own output ends with every post sounding like the first.', 'dicecodes-ai-blog-writer' ),
+					__( 'The experience field is the one worth time. It is the only part of a post a model cannot produce.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'writing-a-post'    => array(
-				'title'  => __( 'Writing a post', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'One required field. Everything else already has an answer.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Writing a post', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'One required field. Everything else already has an answer.', 'dicecodes-ai-blog-writer' ),
 				'steps'  => array(
 					array(
-						__( 'Topic', 'blogcraft-ai-writer' ),
-						__( 'A sentence beats a keyword: "how to choose a standing desk for a small office".', 'blogcraft-ai-writer' ),
+						__( 'Topic', 'dicecodes-ai-blog-writer' ),
+						__( 'A sentence beats a keyword: "how to choose a standing desk for a small office".', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'What only you know', 'blogcraft-ai-writer' ),
-						__( 'Your figures, prices and results. Used as fact, and checked for on the finished draft.', 'blogcraft-ai-writer' ),
+						__( 'What only you know', 'dicecodes-ai-blog-writer' ),
+						__( 'Your figures, prices and results. Used as fact, and checked for on the finished draft.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'The tabs beneath', 'blogcraft-ai-writer' ),
-						__( 'Pictures holds the art direction. Publishing sets the category, tags, author and time.', 'blogcraft-ai-writer' ),
+						__( 'The tabs beneath', 'dicecodes-ai-blog-writer' ),
+						__( 'Pictures holds the art direction. Publishing sets the category, tags, author and time.', 'dicecodes-ai-blog-writer' ),
 					),
 				),
 				'points' => array(
-					__( 'Stuck on the second one? A button asks you four specific questions instead. It never answers them for you.', 'blogcraft-ai-writer' ),
+					__( 'Stuck on the second one? A button asks you four specific questions instead. It never answers them for you.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'how-it-writes'     => array(
-				'title'  => __( 'How it writes', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'The standing brief every post is written to.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'How it writes', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'The standing brief every post is written to.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Start from a shape — guide, listicle, tutorial — and about twenty fields are set at once. All stay editable.', 'blogcraft-ai-writer' ),
-					__( 'Or paste the address of an article you admire. Its structure is measured and becomes your rules.', 'blogcraft-ai-writer' ),
-					__( 'Structure only. No wording is copied, kept, or shown to a model.', 'blogcraft-ai-writer' ),
-					__( 'Anything shown in monospace is measured on the finished draft, not merely asked for.', 'blogcraft-ai-writer' ),
+					__( 'Start from a shape — guide, listicle, tutorial — and about twenty fields are set at once. All stay editable.', 'dicecodes-ai-blog-writer' ),
+					__( 'Or paste the address of an article you admire. Its structure is measured and becomes your rules.', 'dicecodes-ai-blog-writer' ),
+					__( 'Structure only. No wording is copied, kept, or shown to a model.', 'dicecodes-ai-blog-writer' ),
+					__( 'Anything shown in monospace is measured on the finished draft, not merely asked for.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'what-is-checked'   => array(
-				'title'  => __( 'What is checked', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Every draft is measured before it becomes a post, and each failure is written back into the rewrite as an instruction.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'What is checked', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Every draft is measured before it becomes a post, and each failure is written back into the rewrite as an instruction.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Does the opening answer the question in its first two sentences?', 'blogcraft-ai-writer' ),
-					__( 'Does every section stating a figure carry a link beside it?', 'blogcraft-ai-writer' ),
-					__( 'Does the draft say anything its sources do not already say?', 'blogcraft-ai-writer' ),
-					__( 'Is the subject in the title, a heading, the address and the first hundred words?', 'blogcraft-ai-writer' ),
-					__( 'Did the figures you supplied actually reach the page?', 'blogcraft-ai-writer' ),
-					__( 'A check that cannot be assessed is skipped, not failed. The score is what was earned out of what was offered.', 'blogcraft-ai-writer' ),
-					__( 'Two limits: the figure check does not open the link to confirm the number, and the originality check only sees the sources it was given. It is not a plagiarism service.', 'blogcraft-ai-writer' ),
-					__( 'Anything below your threshold is held for review instead of published.', 'blogcraft-ai-writer' ),
+					__( 'Does the opening answer the question in its first two sentences?', 'dicecodes-ai-blog-writer' ),
+					__( 'Does every section stating a figure carry a link beside it?', 'dicecodes-ai-blog-writer' ),
+					__( 'Does the draft say anything its sources do not already say?', 'dicecodes-ai-blog-writer' ),
+					__( 'Is the subject in the title, a heading, the address and the first hundred words?', 'dicecodes-ai-blog-writer' ),
+					__( 'Did the figures you supplied actually reach the page?', 'dicecodes-ai-blog-writer' ),
+					__( 'A check that cannot be assessed is skipped, not failed. The score is what was earned out of what was offered.', 'dicecodes-ai-blog-writer' ),
+					__( 'Two limits: the figure check does not open the link to confirm the number, and the originality check only sees the sources it was given. It is not a plagiarism service.', 'dicecodes-ai-blog-writer' ),
+					__( 'Anything below your threshold is held for review instead of published.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'pictures'          => array(
-				'title'  => __( 'Pictures', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'The article decides what a picture shows. These controls decide how it looks.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Pictures', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'The article decides what a picture shows. These controls decide how it looks.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'The model that wrote the piece describes the scene — the difference between a useful image and clip art of the headline.', 'blogcraft-ai-writer' ),
-					__( 'Pollinations needs no key. fal.ai, OpenAI, Gemini and Grok charge per picture and run only when you pick them.', 'blogcraft-ai-writer' ),
-					__( 'Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both.', 'blogcraft-ai-writer' ),
-					__( 'Text is kept out of generated images by default. Image models render lettering as convincing gibberish.', 'blogcraft-ai-writer' ),
+					__( 'The model that wrote the piece describes the scene — the difference between a useful image and clip art of the headline.', 'dicecodes-ai-blog-writer' ),
+					__( 'Pollinations needs no key. fal.ai, OpenAI, Gemini and Grok charge per picture and run only when you pick them.', 'dicecodes-ai-blog-writer' ),
+					__( 'Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both.', 'dicecodes-ai-blog-writer' ),
+					__( 'Text is kept out of generated images by default. Image models render lettering as convincing gibberish.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'automation'        => array(
-				'title'  => __( 'Automation', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Not needed to write a post by hand. Switch it on once the writing already looks right to you.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Automation', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Not needed to write a post by hand. Switch it on once the writing already looks right to you.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Automatic posts are saved as drafts unless you say otherwise.', 'blogcraft-ai-writer' ),
-					__( 'A daily cap and a monthly token cap are both there to make a mistake cheap.', 'blogcraft-ai-writer' ),
-					__( 'WordPress runs scheduled work only when somebody visits, so a quiet morning can push a post past the hour you chose.', 'blogcraft-ai-writer' ),
+					__( 'Automatic posts are saved as drafts unless you say otherwise.', 'dicecodes-ai-blog-writer' ),
+					__( 'A daily cap and a monthly token cap are both there to make a mistake cheap.', 'dicecodes-ai-blog-writer' ),
+					__( 'WordPress runs scheduled work only when somebody visits, so a quiet morning can push a post past the hour you chose.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'removal'           => array(
-				'title'  => __( 'If you delete this plugin', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Deleting Blogcraft leaves your settings, your writing rules and your posts exactly where they are.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Deleting Blogcraft leaves your settings, your writing rules and your posts exactly where they are.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Install it again and everything is as you left it.', 'blogcraft-ai-writer' ),
-					__( 'Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.', 'blogcraft-ai-writer' ),
-					__( 'There is a box in Settings if you do want it all gone. Ticking it is the only confirmation there will be.', 'blogcraft-ai-writer' ),
-					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created.', 'blogcraft-ai-writer' ),
+					__( 'Install it again and everything is as you left it.', 'dicecodes-ai-blog-writer' ),
+					__( 'Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.', 'dicecodes-ai-blog-writer' ),
+					__( 'There is a box in Settings if you do want it all gone. Ticking it is the only confirmation there will be.', 'dicecodes-ai-blog-writer' ),
+					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'checking-it-works' => array(
-				'title'  => __( 'Checking it works', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'The test on the settings screen sends one short request and reports exactly what came back.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Checking it works', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'The test on the settings screen sends one short request and reports exactly what came back.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'It costs a fraction of a penny, and it separates a wrong key from a wrong model id from a provider that is down.', 'blogcraft-ai-writer' ),
-					__( 'Saving a key runs it automatically, so a mistake is caught when you make it.', 'blogcraft-ai-writer' ),
-					__( 'If a post fails, Activity says why.', 'blogcraft-ai-writer' ),
-					__( 'Rate limits are waited out rather than counted as failures.', 'blogcraft-ai-writer' ),
+					__( 'It costs a fraction of a penny, and it separates a wrong key from a wrong model id from a provider that is down.', 'dicecodes-ai-blog-writer' ),
+					__( 'Saving a key runs it automatically, so a mistake is caught when you make it.', 'dicecodes-ai-blog-writer' ),
+					__( 'If a post fails, Activity says why.', 'dicecodes-ai-blog-writer' ),
+					__( 'Rate limits are waited out rather than counted as failures.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'where-posts-go'    => array(
-				'title'  => __( 'Where posts go', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'A finished post is a normal WordPress post.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'Where posts go', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'A finished post is a normal WordPress post.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'Written as real blocks, so every paragraph and heading is editable in the editor.', 'blogcraft-ai-writer' ),
-					__( 'Saved as a draft by default. You will find it under Posts.', 'blogcraft-ai-writer' ),
-					__( 'Anything below your threshold is set to pending and listed under "Needs review".', 'blogcraft-ai-writer' ),
-					__( 'Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates.', 'blogcraft-ai-writer' ),
+					__( 'Written as real blocks, so every paragraph and heading is editable in the editor.', 'dicecodes-ai-blog-writer' ),
+					__( 'Saved as a draft by default. You will find it under Posts.', 'dicecodes-ai-blog-writer' ),
+					__( 'Anything below your threshold is set to pending and listed under "Needs review".', 'dicecodes-ai-blog-writer' ),
+					__( 'Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'privacy'           => array(
-				'title'  => __( 'What leaves your site', 'blogcraft-ai-writer' ),
-				'lead'   => __( 'Blogcraft contacts no servers of its own and sends nothing to the plugin author.', 'blogcraft-ai-writer' ),
+				'title'  => __( 'What leaves your site', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Blogcraft contacts no servers of its own and sends nothing to the plugin author.', 'dicecodes-ai-blog-writer' ),
 				'points' => array(
-					__( 'No analytics, no telemetry, nothing phoning home.', 'blogcraft-ai-writer' ),
-					__( 'Only the services you configure, and only while a post is being written.', 'blogcraft-ai-writer' ),
-					__( 'Your topic, your style settings and any gathered research go to the provider you chose.', 'blogcraft-ai-writer' ),
-					__( 'Keys are stored encrypted, never rendered back into the page, and stripped from every log line.', 'blogcraft-ai-writer' ),
-					__( 'The full list of services, with their terms and privacy policies, is in the readme under External Services.', 'blogcraft-ai-writer' ),
+					__( 'No analytics, no telemetry, nothing phoning home.', 'dicecodes-ai-blog-writer' ),
+					__( 'Only the services you configure, and only while a post is being written.', 'dicecodes-ai-blog-writer' ),
+					__( 'Your topic, your style settings and any gathered research go to the provider you chose.', 'dicecodes-ai-blog-writer' ),
+					__( 'Keys are stored encrypted, never rendered back into the page, and stripped from every log line.', 'dicecodes-ai-blog-writer' ),
+					__( 'The full list of services, with their terms and privacy policies, is in the readme under External Services.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 		);
@@ -313,7 +313,7 @@ class Blogcraft_Docs {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		$sections = self::sections();
@@ -322,8 +322,8 @@ class Blogcraft_Docs {
 		Blogcraft_Nav::render();
 
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Help', 'blogcraft-ai-writer' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Everything the plugin does, and why it does it that way. Shipped with the plugin, so it is never out of date with the version you have installed.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Help', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Everything the plugin does, and why it does it that way. Shipped with the plugin, so it is never out of date with the version you have installed.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		// Everything above this line ships with the plugin and is therefore
 		// always true of the version installed. These two are online, so they
@@ -332,9 +332,9 @@ class Blogcraft_Docs {
 		printf(
 			'<p class="bc-docs-links"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
 			esc_url( self::site_url() ),
-			esc_html__( 'Guides and walkthroughs at DiceCodes', 'blogcraft-ai-writer' ),
+			esc_html__( 'Guides and walkthroughs at DiceCodes', 'dicecodes-ai-blog-writer' ),
 			esc_url( 'https://github.com/IamRamgarhia/wordpress-ai-blog-writer/issues' ),
-			esc_html__( 'Report a problem', 'blogcraft-ai-writer' )
+			esc_html__( 'Report a problem', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</div>';
 
@@ -417,9 +417,9 @@ class Blogcraft_Docs {
 		echo '<div class="bc-jump-col">';
 		printf(
 			'<nav class="bc-jump" aria-label="%s">',
-			esc_attr__( 'Sections on this page', 'blogcraft-ai-writer' )
+			esc_attr__( 'Sections on this page', 'dicecodes-ai-blog-writer' )
 		);
-		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'blogcraft-ai-writer' ) );
+		printf( '<h2 class="bc-jump-title">%s</h2>', esc_html__( 'On this page', 'dicecodes-ai-blog-writer' ) );
 
 		$number = 0;
 

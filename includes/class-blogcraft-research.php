@@ -67,10 +67,10 @@ class Blogcraft_Research {
 	 */
 	public static function providers() {
 		return array(
-			'none'    => __( 'None — use my own site and any URLs I supply', 'blogcraft-ai-writer' ),
-			'tavily'  => __( 'Tavily', 'blogcraft-ai-writer' ),
-			'serpapi' => __( 'SerpApi', 'blogcraft-ai-writer' ),
-			'searxng' => __( 'SearXNG (self-hosted)', 'blogcraft-ai-writer' ),
+			'none'    => __( 'None — use my own site and any URLs I supply', 'dicecodes-ai-blog-writer' ),
+			'tavily'  => __( 'Tavily', 'dicecodes-ai-blog-writer' ),
+			'serpapi' => __( 'SerpApi', 'dicecodes-ai-blog-writer' ),
+			'searxng' => __( 'SearXNG (self-hosted)', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -104,8 +104,8 @@ class Blogcraft_Research {
 	 */
 	public static function free_sources() {
 		return array(
-			'research_wikipedia' => __( 'Wikipedia — definitions, dates and background', 'blogcraft-ai-writer' ),
-			'research_community' => __( 'Hacker News — what people who tried it say', 'blogcraft-ai-writer' ),
+			'research_wikipedia' => __( 'Wikipedia — definitions, dates and background', 'dicecodes-ai-blog-writer' ),
+			'research_community' => __( 'Hacker News — what people who tried it say', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -210,7 +210,7 @@ class Blogcraft_Research {
 			$out[] = array(
 				'url'     => esc_url_raw( 'https://news.ycombinator.com/item?id=' . rawurlencode( (string) $hit['objectID'] ) ),
 				'title'   => wp_strip_all_tags(
-					isset( $hit['story_title'] ) ? (string) $hit['story_title'] : __( 'Hacker News discussion', 'blogcraft-ai-writer' )
+					isset( $hit['story_title'] ) ? (string) $hit['story_title'] : __( 'Hacker News discussion', 'dicecodes-ai-blog-writer' )
 				),
 				'excerpt' => self::sanitise_excerpt( $text ),
 			);

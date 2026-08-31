@@ -109,9 +109,9 @@ class Blogcraft_Generate {
 			array(
 				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::QUEUE_ACTION ),
-				'asking'   => __( 'Thinking about your topic...', 'blogcraft-ai-writer' ),
-				'askAgain' => __( 'What should I write about this?', 'blogcraft-ai-writer' ),
-				'noTopic'  => __( 'Write a topic first, then ask again.', 'blogcraft-ai-writer' ),
+				'asking'   => __( 'Thinking about your topic...', 'dicecodes-ai-blog-writer' ),
+				'askAgain' => __( 'What should I write about this?', 'dicecodes-ai-blog-writer' ),
+				'noTopic'  => __( 'Write a topic first, then ask again.', 'dicecodes-ai-blog-writer' ),
 			)
 		);
 	}
@@ -153,13 +153,13 @@ class Blogcraft_Generate {
 	 */
 	public static function handle_preview() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
-			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		$raw = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is sanitised by type in Blogcraft_Blueprint::normalise().
@@ -179,7 +179,7 @@ class Blogcraft_Generate {
 					? ''
 					: sprintf(
 						/* translators: %s: the clashing topic. */
-						__( 'This looks like a repeat of "%s". Queueing it anyway is allowed, but near-identical posts are what search engines penalise.', 'blogcraft-ai-writer' ),
+						__( 'This looks like a repeat of "%s". Queueing it anyway is allowed, but near-identical posts are what search engines penalise.', 'dicecodes-ai-blog-writer' ),
 						$clash
 					),
 			)
@@ -194,8 +194,8 @@ class Blogcraft_Generate {
 	public static function register_menu() {
 		add_submenu_page(
 			Blogcraft_Admin::MENU_SLUG,
-			__( 'Write a post', 'blogcraft-ai-writer' ),
-			__( 'Write a post', 'blogcraft-ai-writer' ),
+			__( 'Write a post', 'dicecodes-ai-blog-writer' ),
+			__( 'Write a post', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -209,7 +209,7 @@ class Blogcraft_Generate {
 	 */
 	public static function render() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to access this page.', 'blogcraft-ai-writer' ) );
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		$notice = get_transient( self::NOTICE_TRANSIENT . get_current_user_id() );
@@ -217,8 +217,8 @@ class Blogcraft_Generate {
 		echo '<div class="wrap blogcraft-page blogcraft-compose-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
-		echo '<h1>' . esc_html__( 'Write a post', 'blogcraft-ai-writer' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h1>' . esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		if ( is_array( $notice ) ) {
@@ -233,7 +233,7 @@ class Blogcraft_Generate {
 		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
-				esc_html__( 'No AI provider is configured yet. Set one up under Blogcraft → Settings first.', 'blogcraft-ai-writer' )
+				esc_html__( 'No AI provider is configured yet. Set one up under Blogcraft → Settings first.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -252,7 +252,7 @@ class Blogcraft_Generate {
 
 		printf(
 			'<p class="bc-commit-say">%s</p>',
-			esc_html__( 'You are taken to a live progress screen while it writes, and shown the finished draft and its score before anything reaches your site.', 'blogcraft-ai-writer' )
+			esc_html__( 'You are taken to a live progress screen while it writes, and shown the finished draft and its score before anything reaches your site.', 'dicecodes-ai-blog-writer' )
 		);
 
 		if ( Blogcraft_Provider_Registry::is_configured() ) {
@@ -261,14 +261,14 @@ class Blogcraft_Generate {
 				// "Queue" described the old behaviour, where the post was
 				// written by cron some minutes later and this screen could
 				// only promise it. Pressing this now starts the writing.
-				esc_html__( 'Write this post', 'blogcraft-ai-writer' )
+				esc_html__( 'Write this post', 'dicecodes-ai-blog-writer' )
 			);
 		} else {
 			printf(
 				'<a class="bc-compose-fix" href="%1$s">%2$s</a><button type="submit" class="bc-save" disabled>%3$s</button>',
 				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-provider' ) ),
-				esc_html__( 'Connect a provider first', 'blogcraft-ai-writer' ),
-				esc_html__( 'Write this post', 'blogcraft-ai-writer' )
+				esc_html__( 'Connect a provider first', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Write this post', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -295,44 +295,44 @@ class Blogcraft_Generate {
 	private static function parts() {
 		return array(
 			'takeaways'      => array(
-				__( 'Key takeaways', 'blogcraft-ai-writer' ),
-				__( 'A short list near the top. It is what gets quoted when a search engine answers the question without the click.', 'blogcraft-ai-writer' ),
+				__( 'Key takeaways', 'dicecodes-ai-blog-writer' ),
+				__( 'A short list near the top. It is what gets quoted when a search engine answers the question without the click.', 'dicecodes-ai-blog-writer' ),
 			),
 			'faq'            => array(
-				__( 'Questions and answers', 'blogcraft-ai-writer' ),
-				__( 'Built from what people actually ask about this subject, and marked up so it can appear as its own result.', 'blogcraft-ai-writer' ),
+				__( 'Questions and answers', 'dicecodes-ai-blog-writer' ),
+				__( 'Built from what people actually ask about this subject, and marked up so it can appear as its own result.', 'dicecodes-ai-blog-writer' ),
 			),
 			'toc'            => array(
-				__( 'Contents list', 'blogcraft-ai-writer' ),
-				__( 'Worth it on a long guide, clutter on a short answer.', 'blogcraft-ai-writer' ),
+				__( 'Contents list', 'dicecodes-ai-blog-writer' ),
+				__( 'Worth it on a long guide, clutter on a short answer.', 'dicecodes-ai-blog-writer' ),
 			),
 			'tables'         => array(
-				__( 'Tables', 'blogcraft-ai-writer' ),
-				__( 'For anything with figures to compare. Prose that lists numbers is harder to read and harder to cite.', 'blogcraft-ai-writer' ),
+				__( 'Tables', 'dicecodes-ai-blog-writer' ),
+				__( 'For anything with figures to compare. Prose that lists numbers is harder to read and harder to cite.', 'dicecodes-ai-blog-writer' ),
 			),
 			'lists'          => array(
-				__( 'Bulleted lists', 'blogcraft-ai-writer' ),
-				__( 'Used where a list is genuinely a list, not as a way of avoiding paragraphs.', 'blogcraft-ai-writer' ),
+				__( 'Bulleted lists', 'dicecodes-ai-blog-writer' ),
+				__( 'Used where a list is genuinely a list, not as a way of avoiding paragraphs.', 'dicecodes-ai-blog-writer' ),
 			),
 			'block_sources'  => array(
-				__( 'The sources it was written from', 'blogcraft-ai-writer' ),
-				__( 'The only real outbound links a post gets — they are the addresses research actually fetched, never ones the model wrote. Off means no citations, and the citation check is skipped rather than failed.', 'blogcraft-ai-writer' ),
+				__( 'The sources it was written from', 'dicecodes-ai-blog-writer' ),
+				__( 'The only real outbound links a post gets — they are the addresses research actually fetched, never ones the model wrote. Off means no citations, and the citation check is skipped rather than failed.', 'dicecodes-ai-blog-writer' ),
 			),
 			'block_audience' => array(
-				__( 'Who it is for', 'blogcraft-ai-writer' ),
-				__( 'A line near the top saying who should read on, and who should not.', 'blogcraft-ai-writer' ),
+				__( 'Who it is for', 'dicecodes-ai-blog-writer' ),
+				__( 'A line near the top saying who should read on, and who should not.', 'dicecodes-ai-blog-writer' ),
 			),
 			'block_proscons' => array(
-				__( 'What works and what does not', 'blogcraft-ai-writer' ),
-				__( 'For reviews and comparisons. A page with no criticism in it reads as an advert.', 'blogcraft-ai-writer' ),
+				__( 'What works and what does not', 'dicecodes-ai-blog-writer' ),
+				__( 'For reviews and comparisons. A page with no criticism in it reads as an advert.', 'dicecodes-ai-blog-writer' ),
 			),
 			'block_figures'  => array(
-				__( 'The numbers', 'blogcraft-ai-writer' ),
-				__( 'A table of the figures the post rests on, so they can be checked rather than taken.', 'blogcraft-ai-writer' ),
+				__( 'The numbers', 'dicecodes-ai-blog-writer' ),
+				__( 'A table of the figures the post rests on, so they can be checked rather than taken.', 'dicecodes-ai-blog-writer' ),
 			),
 			'block_mistakes' => array(
-				__( 'Mistakes worth avoiding', 'blogcraft-ai-writer' ),
-				__( 'The part a writer who has actually done the thing can write and a summary of other pages cannot.', 'blogcraft-ai-writer' ),
+				__( 'Mistakes worth avoiding', 'dicecodes-ai-blog-writer' ),
+				__( 'The part a writer who has actually done the thing can write and a summary of other pages cannot.', 'dicecodes-ai-blog-writer' ),
 			),
 		);
 	}
@@ -361,10 +361,10 @@ class Blogcraft_Generate {
 
 		if ( '' === $niche || '' === $audience ) {
 			$gaps[] = array(
-				'title' => __( 'Nobody has said who this blog is for', 'blogcraft-ai-writer' ),
-				'why'   => __( 'This is sent with every request and it is the single biggest reason two blogs using the same model do not read the same. Without it the model writes for nobody in particular, which is what generic sounds like.', 'blogcraft-ai-writer' ),
+				'title' => __( 'Nobody has said who this blog is for', 'dicecodes-ai-blog-writer' ),
+				'why'   => __( 'This is sent with every request and it is the single biggest reason two blogs using the same model do not read the same. Without it the model writes for nobody in particular, which is what generic sounds like.', 'dicecodes-ai-blog-writer' ),
 				'url'   => admin_url( 'admin.php?page=blogcraft-settings#bc-card-voice' ),
-				'link'  => __( 'Describe it', 'blogcraft-ai-writer' ),
+				'link'  => __( 'Describe it', 'dicecodes-ai-blog-writer' ),
 			);
 		}
 
@@ -373,10 +373,10 @@ class Blogcraft_Generate {
 		// this says "never adjusted", not "broken".
 		if ( ! Blogcraft_Blueprint::was_edited() ) {
 			$gaps[] = array(
-				'title' => __( 'The writing rules have never been adjusted', 'blogcraft-ai-writer' ),
-				'why'   => __( 'Shape, length, tone, reading level and what counts as a finished post are all set on one screen, and it still holds the defaults. They are reasonable defaults, not right ones: a hands-on review and a definitive guide are not the same shape.', 'blogcraft-ai-writer' ),
+				'title' => __( 'The writing rules have never been adjusted', 'dicecodes-ai-blog-writer' ),
+				'why'   => __( 'Shape, length, tone, reading level and what counts as a finished post are all set on one screen, and it still holds the defaults. They are reasonable defaults, not right ones: a hands-on review and a definitive guide are not the same shape.', 'dicecodes-ai-blog-writer' ),
 				'url'   => admin_url( 'admin.php?page=blogcraft-blueprint' ),
-				'link'  => __( 'Choose a shape', 'blogcraft-ai-writer' ),
+				'link'  => __( 'Choose a shape', 'dicecodes-ai-blog-writer' ),
 			);
 		}
 
@@ -392,10 +392,10 @@ class Blogcraft_Generate {
 
 		if ( ! $researching && ! Blogcraft_Research::has_search_provider() ) {
 			$gaps[] = array(
-				'title' => __( 'It has nothing to read but its own memory', 'blogcraft-ai-writer' ),
-				'why'   => __( 'With research on, the model is handed current sources and the finished draft is checked against them. With everything off it writes from training data, which dates badly and can cite nothing. The two free sources need no account.', 'blogcraft-ai-writer' ),
+				'title' => __( 'It has nothing to read but its own memory', 'dicecodes-ai-blog-writer' ),
+				'why'   => __( 'With research on, the model is handed current sources and the finished draft is checked against them. With everything off it writes from training data, which dates badly and can cite nothing. The two free sources need no account.', 'dicecodes-ai-blog-writer' ),
 				'url'   => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
-				'link'  => __( 'Switch one on', 'blogcraft-ai-writer' ),
+				'link'  => __( 'Switch one on', 'dicecodes-ai-blog-writer' ),
 			);
 		}
 
@@ -406,9 +406,9 @@ class Blogcraft_Generate {
 			. '<strong>%1$s</strong><span>%2$s</span>'
 			. '<button type="button" class="button-link" id="bc-gap-evidence-go">%3$s</button>'
 			. '</div>',
-			esc_html__( 'You have not said anything only you know', 'blogcraft-ai-writer' ),
-			esc_html__( 'The heaviest check on the finished post, and the one part a model cannot produce. Your own numbers, prices, results, or what went wrong when you tried it. One or two sentences is enough.', 'blogcraft-ai-writer' ),
-			esc_html__( 'Go and add it', 'blogcraft-ai-writer' )
+			esc_html__( 'You have not said anything only you know', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'The heaviest check on the finished post, and the one part a model cannot produce. Your own numbers, prices, results, or what went wrong when you tried it. One or two sentences is enough.', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Go and add it', 'dicecodes-ai-blog-writer' )
 		);
 
 		if ( empty( $gaps ) ) {
@@ -417,7 +417,7 @@ class Blogcraft_Generate {
 
 		printf(
 			'<h3 class="bc-confirm-section">%s</h3>',
-			esc_html__( 'Worth setting first', 'blogcraft-ai-writer' )
+			esc_html__( 'Worth setting first', 'dicecodes-ai-blog-writer' )
 		);
 
 		foreach ( $gaps as $gap ) {
@@ -458,8 +458,8 @@ class Blogcraft_Generate {
 		echo '<div class="bc-confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="bc-confirm-title">';
 
 		echo '<div class="bc-confirm-head">';
-		echo '<h2 id="bc-confirm-title">' . esc_html__( 'Before it writes', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Everything here is what the model is told before a word is written. It is the whole difference between a post that answers a question properly and one that reads like every other AI post — which is why it is worth thirty seconds rather than being buried in a settings tab.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2 id="bc-confirm-title">' . esc_html__( 'Before it writes', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Everything here is what the model is told before a word is written. It is the whole difference between a post that answers a question properly and one that reads like every other AI post — which is why it is worth thirty seconds rather than being buried in a settings tab.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="bc-confirm-body">';
@@ -468,11 +468,11 @@ class Blogcraft_Generate {
 
 		printf(
 			'<h3 class="bc-confirm-section">%s</h3>',
-			esc_html__( 'What this post will include', 'blogcraft-ai-writer' )
+			esc_html__( 'What this post will include', 'dicecodes-ai-blog-writer' )
 		);
 		printf(
 			'<p class="bc-confirm-note">%s</p>',
-			esc_html__( 'These change this post only. Your standing answers are already ticked.', 'blogcraft-ai-writer' )
+			esc_html__( 'These change this post only. Your standing answers are already ticked.', 'dicecodes-ai-blog-writer' )
 		);
 
 		// Five of these already have a switch on the Shape tab. Emitting a
@@ -509,17 +509,17 @@ class Blogcraft_Generate {
 
 		printf(
 			'<label class="bc-confirm-quiet"><input type="checkbox" name="stop_asking" value="1" /> %s</label>',
-			esc_html__( 'Stop asking me this', 'blogcraft-ai-writer' )
+			esc_html__( 'Stop asking me this', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<div class="bc-confirm-buttons">';
 		printf(
 			'<button type="button" class="button" id="bc-confirm-back">%s</button>',
-			esc_html__( 'Back to the brief', 'blogcraft-ai-writer' )
+			esc_html__( 'Back to the brief', 'dicecodes-ai-blog-writer' )
 		);
 		printf(
 			'<button type="submit" class="bc-save">%s</button>',
-			esc_html__( 'Write it now', 'blogcraft-ai-writer' )
+			esc_html__( 'Write it now', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</div>';
 
@@ -547,8 +547,8 @@ class Blogcraft_Generate {
 		echo '<details class="bc-more">';
 		printf(
 			'<summary><span>%1$s</span><span class="bc-more-hint">%2$s</span></summary>',
-			esc_html__( 'More than one at a time', 'blogcraft-ai-writer' ),
-			esc_html__( 'Queue a list, run a stuck job, undo a batch', 'blogcraft-ai-writer' )
+			esc_html__( 'More than one at a time', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Queue a list, run a stuck job, undo a batch', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<div class="bc-more-body">';
@@ -558,12 +558,12 @@ class Blogcraft_Generate {
 			esc_html(
 				sprintf(
 					/* translators: %d: how many posts are queued or being written. */
-					_n( '%d post is queued or being written.', '%d posts are queued or being written.', $waiting, 'blogcraft-ai-writer' ),
+					_n( '%d post is queued or being written.', '%d posts are queued or being written.', $waiting, 'dicecodes-ai-blog-writer' ),
 					$waiting
 				)
 			),
 			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
-			esc_html__( 'See everything written by AI', 'blogcraft-ai-writer' )
+			esc_html__( 'See everything written by AI', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
@@ -571,27 +571,27 @@ class Blogcraft_Generate {
 		Blogcraft_Request::nonce_field( self::BULK_ACTION );
 		printf(
 			'<label for="blogcraft_topics"><strong>%1$s</strong></label>',
-			esc_html__( 'Queue a list of topics', 'blogcraft-ai-writer' )
+			esc_html__( 'Queue a list of topics', 'dicecodes-ai-blog-writer' )
 		);
-		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="5" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'blogcraft-ai-writer' ) . '"></textarea>';
-		echo '<p class="description">' . esc_html__( 'These use your standing rules, not the brief above, and are written unattended. Repeats are skipped, whether the post already exists or is only queued.', 'blogcraft-ai-writer' ) . '</p>';
-		submit_button( __( 'Queue all of these', 'blogcraft-ai-writer' ), 'secondary', 'submit', false );
+		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="5" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'dicecodes-ai-blog-writer' ) . '"></textarea>';
+		echo '<p class="description">' . esc_html__( 'These use your standing rules, not the brief above, and are written unattended. Repeats are skipped, whether the post already exists or is only queued.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		submit_button( __( 'Queue all of these', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
 		echo '</form>';
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
 		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
 		Blogcraft_Request::nonce_field( self::RUN_ACTION );
-		printf( '<p><strong>%s</strong></p>', esc_html__( 'Push the queue along', 'blogcraft-ai-writer' ) );
-		echo '<p class="description">' . esc_html__( 'Posts written here run in your browser and need none of this. It is for a queued job that has stopped moving on a site where scheduled tasks do not fire.', 'blogcraft-ai-writer' ) . '</p>';
-		submit_button( __( 'Run the queue now', 'blogcraft-ai-writer' ), 'secondary', 'submit', false );
+		printf( '<p><strong>%s</strong></p>', esc_html__( 'Push the queue along', 'dicecodes-ai-blog-writer' ) );
+		echo '<p class="description">' . esc_html__( 'Posts written here run in your browser and need none of this. It is for a queued job that has stopped moving on a site where scheduled tasks do not fire.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		submit_button( __( 'Run the queue now', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
 		echo '</form>';
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block is-danger" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'blogcraft-ai-writer' ) ) . "'" ) . ');">';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block is-danger" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'dicecodes-ai-blog-writer' ) ) . "'" ) . ');">';
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
 		Blogcraft_Request::nonce_field( self::ROLLBACK_ACTION );
-		printf( '<p><strong>%s</strong></p>', esc_html__( 'Undo a batch', 'blogcraft-ai-writer' ) );
-		echo '<p class="description">' . esc_html__( 'Trashes posts Blogcraft created in the last 24 hours. Anything you wrote yourself is left alone.', 'blogcraft-ai-writer' ) . '</p>';
-		submit_button( __( 'Trash the last 24 hours', 'blogcraft-ai-writer' ), 'delete', 'submit', false );
+		printf( '<p><strong>%s</strong></p>', esc_html__( 'Undo a batch', 'dicecodes-ai-blog-writer' ) );
+		echo '<p class="description">' . esc_html__( 'Trashes posts Blogcraft created in the last 24 hours. Anything you wrote yourself is left alone.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		submit_button( __( 'Trash the last 24 hours', 'dicecodes-ai-blog-writer' ), 'delete', 'submit', false );
 		echo '</form>';
 
 		echo '</div>';
@@ -812,8 +812,8 @@ class Blogcraft_Generate {
 		}
 
 		echo '<aside class="bc-readiness">';
-		echo '<h2>' . esc_html__( 'Before you write', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'These are set once and used by every post afterwards. Skipping them is the difference between a post that sounds like your blog and one that sounds like every other AI blog.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Before you write', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'These are set once and used by every post afterwards. Skipping them is the difference between a post that sounds like your blog and one that sounds like every other AI blog.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '<ul>';
 
 		foreach ( $missing as $item ) {
@@ -828,7 +828,7 @@ class Blogcraft_Generate {
 		printf(
 			'<p><a class="button button-small" href="%1$s">%2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
-			esc_html__( 'Set them up', 'blogcraft-ai-writer' )
+			esc_html__( 'Set them up', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</aside>';
 	}
@@ -840,13 +840,13 @@ class Blogcraft_Generate {
 	 */
 	public static function handle_suggest() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
-			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		// Every one of these asks the provider something. Without one the
@@ -857,7 +857,7 @@ class Blogcraft_Generate {
 		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' === trim( $topic ) ) {
-			wp_send_json_error( array( 'message' => __( 'Write a topic first.', 'blogcraft-ai-writer' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'Write a topic first.', 'dicecodes-ai-blog-writer' ) ), 400 );
 		}
 
 		try {
@@ -892,11 +892,11 @@ class Blogcraft_Generate {
 
 		printf(
 			'<div class="notice notice-warning bc-quota-notice"><p><strong>%1$s</strong> %2$s</p>%3$s</div>',
-			esc_html__( 'Your provider is rate limiting.', 'blogcraft-ai-writer' ),
+			esc_html__( 'Your provider is rate limiting.', 'dicecodes-ai-blog-writer' ),
 			esc_html(
 				sprintf(
 					/* translators: %s: a clock time, such as "3:45 pm". */
-					__( 'A post already being written resumes at about %s. Starting another now will most likely stop part-way too, and the stages it runs first still cost you.', 'blogcraft-ai-writer' ),
+					__( 'A post already being written resumes at about %s. Starting another now will most likely stop part-way too, and the stages it runs first still cost you.', 'dicecodes-ai-blog-writer' ),
 					wp_date( get_option( 'time_format' ), (int) $limit['resumes'] )
 				)
 			),
@@ -917,26 +917,26 @@ class Blogcraft_Generate {
 		echo '<section class="bc-pane bc-pane-topic">';
 
 		echo Blogcraft_Controls::row(
-			__( 'Topic', 'blogcraft-ai-writer' ),
-			__( 'A sentence works better than a keyword. Say what the post should actually answer.', 'blogcraft-ai-writer' ),
-			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'blogcraft-ai-writer' ) . '" /><p class="bc-only-this">' . esc_html__( 'This is the only thing you have to fill in. Everything below already has an answer, taken from your standing rules.', 'blogcraft-ai-writer' ) . '</p><p class="bc-clash" id="bc-clash" hidden></p>',
+			__( 'Topic', 'dicecodes-ai-blog-writer' ),
+			__( 'A sentence works better than a keyword. Say what the post should actually answer.', 'dicecodes-ai-blog-writer' ),
+			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'dicecodes-ai-blog-writer' ) . '" /><p class="bc-only-this">' . esc_html__( 'This is the only thing you have to fill in. Everything below already has an answer, taken from your standing rules.', 'dicecodes-ai-blog-writer' ) . '</p><p class="bc-clash" id="bc-clash" hidden></p>',
 			'bc_topic'
 		);
 
 		echo Blogcraft_Controls::row(
-			__( 'Angle for this post', 'blogcraft-ai-writer' ),
-			__( 'Anything true of this one post only. This is what stops every post reading the same.', 'blogcraft-ai-writer' ),
-			Blogcraft_Controls::area( 'instructions', '', __( 'Compare three price brackets and say which is worth it.', 'blogcraft-ai-writer' ), 2 ),
+			__( 'Angle for this post', 'dicecodes-ai-blog-writer' ),
+			__( 'Anything true of this one post only. This is what stops every post reading the same.', 'dicecodes-ai-blog-writer' ),
+			Blogcraft_Controls::area( 'instructions', '', __( 'Compare three price brackets and say which is worth it.', 'dicecodes-ai-blog-writer' ), 2 ),
 			'bc_instructions'
 		);
 
 		echo Blogcraft_Controls::row(
-			__( 'What you know that nobody else does', 'blogcraft-ai-writer' ),
-			__( 'Your own numbers, results, prices, or what happened when you tried it. This is the only part of a post a model cannot produce, and it is what separates a page worth reading from a summary of pages that already exist. Everything here is used as fact and never invented beyond.', 'blogcraft-ai-writer' ),
+			__( 'What you know that nobody else does', 'dicecodes-ai-blog-writer' ),
+			__( 'Your own numbers, results, prices, or what happened when you tried it. This is the only part of a post a model cannot produce, and it is what separates a page worth reading from a summary of pages that already exist. Everything here is used as fact and never invented beyond.', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Controls::area(
 				'evidence',
 				'',
-				__( 'We tested 9 desks over 4 months. The £220 bracket wobbled above 110cm; the £400 bracket did not. Our own returns rate on the cheapest was 3 in 9.', 'blogcraft-ai-writer' ),
+				__( 'We tested 9 desks over 4 months. The £220 bracket wobbled above 110cm; the £400 bracket did not. Our own returns rate on the cheapest was 3 in 9.', 'dicecodes-ai-blog-writer' ),
 				4
 			),
 			'bc_evidence'
@@ -953,19 +953,19 @@ class Blogcraft_Generate {
 			. '<div class="bc-suggest-out" id="blogcraft-suggest-out" hidden>'
 			. '<p class="bc-suggest-lead">%3$s</p><ul id="blogcraft-suggest-list"></ul></div>'
 			. '</div>',
-			esc_html__( 'What should I write about this?', 'blogcraft-ai-writer' ),
-			esc_html__( 'Reads your topic and asks four questions only you can answer. It never answers them for you — invented facts are exactly what this field exists to avoid.', 'blogcraft-ai-writer' ),
-			esc_html__( 'Answer any of these in the box above, in your own words:', 'blogcraft-ai-writer' )
+			esc_html__( 'What should I write about this?', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Reads your topic and asks four questions only you can answer. It never answers them for you — invented facts are exactly what this field exists to avoid.', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Answer any of these in the box above, in your own words:', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo Blogcraft_Controls::row(
-			__( 'When it is finished', 'blogcraft-ai-writer' ),
+			__( 'When it is finished', 'dicecodes-ai-blog-writer' ),
 			'',
 			Blogcraft_Controls::segmented(
 				'status',
 				array(
-					'draft'   => __( 'Save as a draft', 'blogcraft-ai-writer' ),
-					'publish' => __( 'Publish it', 'blogcraft-ai-writer' ),
+					'draft'   => __( 'Save as a draft', 'dicecodes-ai-blog-writer' ),
+					'publish' => __( 'Publish it', 'dicecodes-ai-blog-writer' ),
 				),
 				'draft'
 			)
@@ -986,19 +986,19 @@ class Blogcraft_Generate {
 	 */
 	private static function render_brief_tabs( $bp ) {
 		echo '<div class="bc-tabs-head">';
-		echo '<h2>' . esc_html__( 'Everything else about this post', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'These start from your standing rules and change this post only. Pictures and Publishing are here too.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Everything else about this post', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'These start from your standing rules and change this post only. Pictures and Publishing are here too.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="bc-tabs" role="tablist">';
 
 		$tabs = array(
-			'shape'    => __( 'Shape', 'blogcraft-ai-writer' ),
-			'voice'    => __( 'Voice', 'blogcraft-ai-writer' ),
-			'seo'      => __( 'Search', 'blogcraft-ai-writer' ),
-			'human'    => __( 'Sounding human', 'blogcraft-ai-writer' ),
-			'pictures' => __( 'Pictures', 'blogcraft-ai-writer' ),
-			'publish'  => __( 'Publishing', 'blogcraft-ai-writer' ),
+			'shape'    => __( 'Shape', 'dicecodes-ai-blog-writer' ),
+			'voice'    => __( 'Voice', 'dicecodes-ai-blog-writer' ),
+			'seo'      => __( 'Search', 'dicecodes-ai-blog-writer' ),
+			'human'    => __( 'Sounding human', 'dicecodes-ai-blog-writer' ),
+			'pictures' => __( 'Pictures', 'dicecodes-ai-blog-writer' ),
+			'publish'  => __( 'Publishing', 'dicecodes-ai-blog-writer' ),
 		);
 
 		$first = true;
@@ -1051,43 +1051,43 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Length', 'blogcraft-ai-writer' ),
-				__( 'Measured on the finished draft.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::slider( 'o_word_target', 300, 4000, 50, $bp['word_target'], __( ' words', 'blogcraft-ai-writer' ) ),
+				__( 'Length', 'dicecodes-ai-blog-writer' ),
+				__( 'Measured on the finished draft.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::slider( 'o_word_target', 300, 4000, 50, $bp['word_target'], __( ' words', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_word_target'
 			),
 			Blogcraft_Controls::row(
-				__( 'Fewest sections', 'blogcraft-ai-writer' ),
+				__( 'Fewest sections', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::slider( 'o_sections_min', 1, 12, 1, $bp['sections_min'] ),
 				'bc_o_sections_min'
 			),
 			Blogcraft_Controls::row(
-				__( 'Most sections', 'blogcraft-ai-writer' ),
+				__( 'Most sections', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::slider( 'o_sections_max', 1, 15, 1, $bp['sections_max'] ),
 				'bc_o_sections_max'
 			),
 			Blogcraft_Controls::row(
-				__( 'How it opens', 'blogcraft-ai-writer' ),
+				__( 'How it opens', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_intro_style', Blogcraft_Blueprint::intro_styles(), $bp['intro_style'] ),
 				'bc_o_intro_style'
 			),
 			Blogcraft_Controls::row(
-				__( 'How it ends', 'blogcraft-ai-writer' ),
+				__( 'How it ends', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_conclusion_style', Blogcraft_Blueprint::conclusion_styles(), $bp['conclusion_style'] ),
 				'bc_o_conclusion_style'
 			),
 			Blogcraft_Controls::row(
-				__( 'Include', 'blogcraft-ai-writer' ),
+				__( 'Include', 'dicecodes-ai-blog-writer' ),
 				'',
-				Blogcraft_Controls::toggle( 'o_takeaways', $bp['takeaways'], __( 'Key takeaways', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_faq', $bp['faq'], __( 'Questions and answers', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_toc', $bp['toc'], __( 'Table of contents', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_tables', $bp['tables'], __( 'Tables', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_lists', $bp['lists'], __( 'Bulleted lists', 'blogcraft-ai-writer' ) )
+				Blogcraft_Controls::toggle( 'o_takeaways', $bp['takeaways'], __( 'Key takeaways', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_faq', $bp['faq'], __( 'Questions and answers', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_toc', $bp['toc'], __( 'Table of contents', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_tables', $bp['tables'], __( 'Tables', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_lists', $bp['lists'], __( 'Bulleted lists', 'dicecodes-ai-blog-writer' ) )
 			),
 		);
 
@@ -1106,44 +1106,44 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Tone', 'blogcraft-ai-writer' ),
+				__( 'Tone', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_tone', Blogcraft_Blueprint::tones(), $bp['tone'] ),
 				'bc_o_tone'
 			),
 			Blogcraft_Controls::row(
-				__( 'Describe the tone', 'blogcraft-ai-writer' ),
-				__( 'Used only when the tone above is set to something else.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::text( 'o_tone_custom', $bp['tone_custom'], __( 'Dry, a little sceptical', 'blogcraft-ai-writer' ) ),
+				__( 'Describe the tone', 'dicecodes-ai-blog-writer' ),
+				__( 'Used only when the tone above is set to something else.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::text( 'o_tone_custom', $bp['tone_custom'], __( 'Dry, a little sceptical', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_tone_custom'
 			),
 			Blogcraft_Controls::row(
-				__( 'Who is speaking', 'blogcraft-ai-writer' ),
+				__( 'Who is speaking', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::segmented( 'o_point_of_view', Blogcraft_Blueprint::points_of_view(), $bp['point_of_view'] )
 			),
 			Blogcraft_Controls::row(
-				__( 'Who is reading', 'blogcraft-ai-writer' ),
+				__( 'Who is reading', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_audience', Blogcraft_Blueprint::audiences(), $bp['audience'] ),
 				'bc_o_audience'
 			),
 			Blogcraft_Controls::row(
-				__( 'Describe the reader', 'blogcraft-ai-writer' ),
+				__( 'Describe the reader', 'dicecodes-ai-blog-writer' ),
 				'',
-				Blogcraft_Controls::text( 'o_audience_custom', $bp['audience_custom'], __( 'People setting up a first home office', 'blogcraft-ai-writer' ) ),
+				Blogcraft_Controls::text( 'o_audience_custom', $bp['audience_custom'], __( 'People setting up a first home office', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_audience_custom'
 			),
 			Blogcraft_Controls::row(
-				__( 'Reading level', 'blogcraft-ai-writer' ),
-				__( 'Measured as a Flesch Reading Ease band.', 'blogcraft-ai-writer' ),
+				__( 'Reading level', 'dicecodes-ai-blog-writer' ),
+				__( 'Measured as a Flesch Reading Ease band.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::select( 'o_reading_level', self::reading_labels(), $bp['reading_level'] ),
 				'bc_o_reading_level'
 			),
 			Blogcraft_Controls::row(
-				__( 'Longest sentence', 'blogcraft-ai-writer' ),
-				__( 'Measured.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::slider( 'o_sentence_max_words', 12, 50, 1, $bp['sentence_max_words'], __( ' words', 'blogcraft-ai-writer' ) ),
+				__( 'Longest sentence', 'dicecodes-ai-blog-writer' ),
+				__( 'Measured.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::slider( 'o_sentence_max_words', 12, 50, 1, $bp['sentence_max_words'], __( ' words', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_sentence_max_words'
 			),
 		);
@@ -1178,26 +1178,26 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Target phrase', 'blogcraft-ai-writer' ),
-				__( 'Measured. Leave blank to let the topic speak for itself.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::text( 'o_primary_keyword', $bp['primary_keyword'], __( 'standing desk', 'blogcraft-ai-writer' ) ),
+				__( 'Target phrase', 'dicecodes-ai-blog-writer' ),
+				__( 'Measured. Leave blank to let the topic speak for itself.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::text( 'o_primary_keyword', $bp['primary_keyword'], __( 'standing desk', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_primary_keyword'
 			),
 			Blogcraft_Controls::row(
-				__( 'Also cover', 'blogcraft-ai-writer' ),
-				__( 'One per line.', 'blogcraft-ai-writer' ),
+				__( 'Also cover', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::area( 'o_secondary_keywords', $bp['secondary_keywords'], "adjustable desk\nsit stand desk" ),
 				'bc_o_secondary_keywords'
 			),
 			Blogcraft_Controls::row(
-				__( 'Must appear', 'blogcraft-ai-writer' ),
-				__( 'One per line. Measured — a missing term is reported back and rewritten.', 'blogcraft-ai-writer' ),
+				__( 'Must appear', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line. Measured — a missing term is reported back and rewritten.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::area( 'o_required_terms', $bp['required_terms'], "ergonomics\nanti-fatigue mat" ),
 				'bc_o_required_terms'
 			),
 			Blogcraft_Controls::row(
-				__( 'Sources to cite', 'blogcraft-ai-writer' ),
-				__( 'Measured.', 'blogcraft-ai-writer' ),
+				__( 'Sources to cite', 'dicecodes-ai-blog-writer' ),
+				__( 'Measured.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::slider( 'o_external_links_target', 0, 10, 1, $bp['external_links_target'] ),
 				'bc_o_external_links_target'
 			),
@@ -1218,7 +1218,7 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Devices to use', 'blogcraft-ai-writer' ),
+				__( 'Devices to use', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::chips(
 					'o_literary_devices',
@@ -1227,35 +1227,35 @@ class Blogcraft_Generate {
 				)
 			),
 			Blogcraft_Controls::row(
-				__( 'Habits', 'blogcraft-ai-writer' ),
+				__( 'Habits', 'dicecodes-ai-blog-writer' ),
 				'',
-				Blogcraft_Controls::toggle( 'o_sentence_variety', $bp['sentence_variety'], __( 'Vary sentence length', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_allow_contractions', $bp['allow_contractions'], __( 'Allow contractions', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_allow_em_dash', $bp['allow_em_dash'], __( 'Allow em dashes', 'blogcraft-ai-writer' ) )
+				Blogcraft_Controls::toggle( 'o_sentence_variety', $bp['sentence_variety'], __( 'Vary sentence length', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_allow_contractions', $bp['allow_contractions'], __( 'Allow contractions', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_allow_em_dash', $bp['allow_em_dash'], __( 'Allow em dashes', 'dicecodes-ai-blog-writer' ) )
 			),
 			Blogcraft_Controls::row(
-				__( 'Demand', 'blogcraft-ai-writer' ),
+				__( 'Demand', 'dicecodes-ai-blog-writer' ),
 				'',
-				Blogcraft_Controls::toggle( 'o_require_experience', $bp['require_experience'], __( 'First-hand, specific detail', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_require_citations', $bp['require_citations'], __( 'A named source for claims', 'blogcraft-ai-writer' ) )
-				. Blogcraft_Controls::toggle( 'o_require_statistics', $bp['require_statistics'], __( 'Concrete figures', 'blogcraft-ai-writer' ) )
+				Blogcraft_Controls::toggle( 'o_require_experience', $bp['require_experience'], __( 'First-hand, specific detail', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_require_citations', $bp['require_citations'], __( 'A named source for claims', 'dicecodes-ai-blog-writer' ) )
+				. Blogcraft_Controls::toggle( 'o_require_statistics', $bp['require_statistics'], __( 'Concrete figures', 'dicecodes-ai-blog-writer' ) )
 			),
 			Blogcraft_Controls::row(
-				__( 'Never write', 'blogcraft-ai-writer' ),
-				__( 'One per line. Measured.', 'blogcraft-ai-writer' ),
+				__( 'Never write', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line. Measured.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::area( 'o_banned_phrases', $bp['banned_phrases'], "delve into\nin today's fast-paced world", 3 ),
 				'bc_o_banned_phrases'
 			),
 			Blogcraft_Controls::row(
-				__( 'Never mention', 'blogcraft-ai-writer' ),
-				__( 'One per line. Competitors, brands, claims that must not appear at all. Measured, weighted heavily.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::area( 'o_negative_keywords', $bp['negative_keywords'], __( "a competitor's name", 'blogcraft-ai-writer' ), 3 ),
+				__( 'Never mention', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line. Competitors, brands, claims that must not appear at all. Measured, weighted heavily.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::area( 'o_negative_keywords', $bp['negative_keywords'], __( "a competitor's name", 'dicecodes-ai-blog-writer' ), 3 ),
 				'bc_o_negative_keywords'
 			),
 			Blogcraft_Controls::row(
-				__( 'Steer clear of', 'blogcraft-ai-writer' ),
-				__( 'One per line. Subjects to avoid even in passing.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::area( 'o_avoid_subjects', $bp['avoid_subjects'], __( 'medical advice', 'blogcraft-ai-writer' ), 3 ),
+				__( 'Steer clear of', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line. Subjects to avoid even in passing.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::area( 'o_avoid_subjects', $bp['avoid_subjects'], __( 'medical advice', 'dicecodes-ai-blog-writer' ), 3 ),
 				'bc_o_avoid_subjects'
 			),
 		);
@@ -1279,61 +1279,61 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Featured image', 'blogcraft-ai-writer' ),
+				__( 'Featured image', 'dicecodes-ai-blog-writer' ),
 				'',
-				Blogcraft_Controls::toggle( 'o_image_describe', $bp['image_describe'], __( 'Let the model describe the picture for this post', 'blogcraft-ai-writer' ) )
+				Blogcraft_Controls::toggle( 'o_image_describe', $bp['image_describe'], __( 'Let the model describe the picture for this post', 'dicecodes-ai-blog-writer' ) )
 				. self::pictures_note()
 			),
 			Blogcraft_Controls::row(
-				__( 'Pictures in the body', 'blogcraft-ai-writer' ),
-				__( 'One beneath each section heading, up to this many.', 'blogcraft-ai-writer' ),
+				__( 'Pictures in the body', 'dicecodes-ai-blog-writer' ),
+				__( 'One beneath each section heading, up to this many.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::slider( 'o_images_target', 0, 6, 1, $bp['images_target'] )
 			),
 			Blogcraft_Controls::row(
-				__( 'Treatment', 'blogcraft-ai-writer' ),
+				__( 'Treatment', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_image_style', Blogcraft_Art_Direction::styles(), $bp['image_style'] ),
 				'bc_o_image_style'
 			),
 			Blogcraft_Controls::row(
-				__( 'Mood', 'blogcraft-ai-writer' ),
+				__( 'Mood', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::select( 'o_image_mood', Blogcraft_Art_Direction::moods(), $bp['image_mood'] ),
 				'bc_o_image_mood'
 			),
 			Blogcraft_Controls::row(
-				__( 'What it shows', 'blogcraft-ai-writer' ),
-				__( 'The angle every picture takes on its subject.', 'blogcraft-ai-writer' ),
+				__( 'What it shows', 'dicecodes-ai-blog-writer' ),
+				__( 'The angle every picture takes on its subject.', 'dicecodes-ai-blog-writer' ),
 				Blogcraft_Controls::select( 'o_image_subject', Blogcraft_Art_Direction::subjects(), $bp['image_subject'] ),
 				'bc_o_image_subject'
 			),
 			Blogcraft_Controls::row(
-				__( 'Shape', 'blogcraft-ai-writer' ),
+				__( 'Shape', 'dicecodes-ai-blog-writer' ),
 				'',
 				Blogcraft_Controls::segmented( 'o_image_shape', Blogcraft_Art_Direction::shapes(), $bp['image_shape'] )
 			),
 			Blogcraft_Controls::row(
-				__( 'Colours', 'blogcraft-ai-writer' ),
-				__( 'In words. Leave blank to let each picture suit its own subject.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::text( 'o_image_palette', $bp['image_palette'], __( 'muted greens, warm oak, off-white', 'blogcraft-ai-writer' ) ),
+				__( 'Colours', 'dicecodes-ai-blog-writer' ),
+				__( 'In words. Leave blank to let each picture suit its own subject.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::text( 'o_image_palette', $bp['image_palette'], __( 'muted greens, warm oak, off-white', 'dicecodes-ai-blog-writer' ) ),
 				'bc_o_image_palette'
 			),
 			Blogcraft_Controls::row(
-				__( 'Anything else', 'blogcraft-ai-writer' ),
-				__( 'Added to every image prompt as written.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::area( 'o_image_extra', $bp['image_extra'], __( 'shot from slightly above, shallow depth of field', 'blogcraft-ai-writer' ), 2 ),
+				__( 'Anything else', 'dicecodes-ai-blog-writer' ),
+				__( 'Added to every image prompt as written.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::area( 'o_image_extra', $bp['image_extra'], __( 'shot from slightly above, shallow depth of field', 'dicecodes-ai-blog-writer' ), 2 ),
 				'bc_o_image_extra'
 			),
 			Blogcraft_Controls::row(
-				__( 'Never show', 'blogcraft-ai-writer' ),
-				__( 'Things that keep appearing and should not.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::area( 'o_image_avoid', $bp['image_avoid'], __( 'crowds, brand names, hands holding phones', 'blogcraft-ai-writer' ), 2 ),
+				__( 'Never show', 'dicecodes-ai-blog-writer' ),
+				__( 'Things that keep appearing and should not.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::area( 'o_image_avoid', $bp['image_avoid'], __( 'crowds, brand names, hands holding phones', 'dicecodes-ai-blog-writer' ), 2 ),
 				'bc_o_image_avoid'
 			),
 			Blogcraft_Controls::row(
-				__( 'Words in the picture', 'blogcraft-ai-writer' ),
-				__( 'Image models render lettering as convincing gibberish, so text is excluded by default.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::toggle( 'o_image_allow_text', $bp['image_allow_text'], __( 'Allow text in generated images', 'blogcraft-ai-writer' ) )
+				__( 'Words in the picture', 'dicecodes-ai-blog-writer' ),
+				__( 'Image models render lettering as convincing gibberish, so text is excluded by default.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::toggle( 'o_image_allow_text', $bp['image_allow_text'], __( 'Allow text in generated images', 'dicecodes-ai-blog-writer' ) )
 			),
 		);
 
@@ -1356,9 +1356,9 @@ class Blogcraft_Generate {
 		if ( ! Blogcraft_Settings::get( 'images_enabled' ) ) {
 			return sprintf(
 				'<p class="bc-hint">%1$s <a href="%2$s">%3$s</a></p>',
-				esc_html__( 'Pictures are switched off, so nothing here will run.', 'blogcraft-ai-writer' ),
+				esc_html__( 'Pictures are switched off, so nothing here will run.', 'dicecodes-ai-blog-writer' ),
 				esc_url( $link ),
-				esc_html__( 'Turn them on', 'blogcraft-ai-writer' )
+				esc_html__( 'Turn them on', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -1371,12 +1371,12 @@ class Blogcraft_Generate {
 			esc_html(
 				sprintf(
 					/* translators: %s: the picture service currently chosen. */
-					__( 'The article decides what the picture shows; these decide how it looks. Drawn right now by: %s.', 'blogcraft-ai-writer' ),
+					__( 'The article decides what the picture shows; these decide how it looks. Drawn right now by: %s.', 'dicecodes-ai-blog-writer' ),
 					$name
 				)
 			),
 			esc_url( $link ),
-			esc_html__( 'Change the service', 'blogcraft-ai-writer' )
+			esc_html__( 'Change the service', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -1396,7 +1396,7 @@ class Blogcraft_Generate {
 				'name'              => 'post_category',
 				'id'                => 'bc_post_category',
 				'class'             => 'bc-select',
-				'show_option_none'  => __( 'Whatever the site default is', 'blogcraft-ai-writer' ),
+				'show_option_none'  => __( 'Whatever the site default is', 'dicecodes-ai-blog-writer' ),
 				'option_none_value' => 0,
 				'hide_empty'        => false,
 				'echo'              => false,
@@ -1409,7 +1409,7 @@ class Blogcraft_Generate {
 				'name'              => 'post_author',
 				'id'                => 'bc_post_author',
 				'class'             => 'bc-select',
-				'show_option_none'  => __( 'Me', 'blogcraft-ai-writer' ),
+				'show_option_none'  => __( 'Me', 'dicecodes-ai-blog-writer' ),
 				'option_none_value' => 0,
 				'echo'              => false,
 				'capability'        => array( 'edit_posts' ),
@@ -1418,26 +1418,26 @@ class Blogcraft_Generate {
 
 		$rows = array(
 			Blogcraft_Controls::row(
-				__( 'Category', 'blogcraft-ai-writer' ),
+				__( 'Category', 'dicecodes-ai-blog-writer' ),
 				'',
 				(string) $categories,
 				'bc_post_category'
 			),
 			Blogcraft_Controls::row(
-				__( 'Tags', 'blogcraft-ai-writer' ),
-				__( 'Comma separated. Left blank, no tags are added.', 'blogcraft-ai-writer' ),
-				Blogcraft_Controls::text( 'post_tags', '', __( 'cold brew, coffee gear', 'blogcraft-ai-writer' ) ),
+				__( 'Tags', 'dicecodes-ai-blog-writer' ),
+				__( 'Comma separated. Left blank, no tags are added.', 'dicecodes-ai-blog-writer' ),
+				Blogcraft_Controls::text( 'post_tags', '', __( 'cold brew, coffee gear', 'dicecodes-ai-blog-writer' ) ),
 				'bc_post_tags'
 			),
 			Blogcraft_Controls::row(
-				__( 'Credited to', 'blogcraft-ai-writer' ),
-				__( 'Whose byline appears on the post. A named author with stated credentials is a real trust signal, and it is published as structured data.', 'blogcraft-ai-writer' ),
+				__( 'Credited to', 'dicecodes-ai-blog-writer' ),
+				__( 'Whose byline appears on the post. A named author with stated credentials is a real trust signal, and it is published as structured data.', 'dicecodes-ai-blog-writer' ),
 				(string) $authors,
 				'bc_post_author'
 			),
 			Blogcraft_Controls::row(
-				__( 'Publish at', 'blogcraft-ai-writer' ),
-				__( 'Leave blank to publish as soon as it is written. Only applies if you chose to publish rather than save a draft.', 'blogcraft-ai-writer' ),
+				__( 'Publish at', 'dicecodes-ai-blog-writer' ),
+				__( 'Leave blank to publish as soon as it is written. Only applies if you chose to publish rather than save a draft.', 'dicecodes-ai-blog-writer' ),
 				'<input type="datetime-local" class="bc-text" name="publish_at" id="bc_publish_at" value="" />',
 				'bc_publish_at'
 			),
@@ -1464,8 +1464,8 @@ class Blogcraft_Generate {
 
 		echo '<aside class="bc-outcome" aria-labelledby="bc-outcome-title">';
 		echo '<div class="bc-outcome-head">';
-		echo '<h2 id="bc-outcome-title">' . esc_html__( 'What you will get', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'The shape of the post, not its words. Updates as you change anything.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2 id="bc-outcome-title">' . esc_html__( 'What you will get', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'The shape of the post, not its words. Updates as you change anything.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		printf(
@@ -1497,7 +1497,7 @@ class Blogcraft_Generate {
 					esc_html(
 						sprintf(
 							/* translators: %d: approximate word count. */
-							__( '~%d words', 'blogcraft-ai-writer' ),
+							__( '~%d words', 'dicecodes-ai-blog-writer' ),
 							(int) $block['words']
 						)
 					)
@@ -1523,18 +1523,18 @@ class Blogcraft_Generate {
 		$out .= sprintf(
 			'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
 			esc_html( number_format_i18n( (int) $blueprint['word_target'] ) ),
-			esc_html__( 'Words', 'blogcraft-ai-writer' )
+			esc_html__( 'Words', 'dicecodes-ai-blog-writer' )
 		);
 		$out .= sprintf(
 			'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
 			esc_html( self::compact( $tokens['total'] ) ),
-			esc_html__( 'Tokens, roughly', 'blogcraft-ai-writer' )
+			esc_html__( 'Tokens, roughly', 'dicecodes-ai-blog-writer' )
 		);
 		$out .= '</div>';
 
 		$out .= sprintf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( 'Token estimates are deliberately generous. Your provider bills you, not us.', 'blogcraft-ai-writer' )
+			esc_html__( 'Token estimates are deliberately generous. Your provider bills you, not us.', 'dicecodes-ai-blog-writer' )
 		);
 
 		foreach ( $warnings as $warning ) {
@@ -1609,7 +1609,7 @@ class Blogcraft_Generate {
 		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : 'draft'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' === $topic ) {
-			self::back( false, __( 'Please enter a topic.', 'blogcraft-ai-writer' ) );
+			self::back( false, __( 'Please enter a topic.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		// Ticked inside the panel that asks what a post will include, so this
@@ -1638,13 +1638,13 @@ class Blogcraft_Generate {
 					false,
 					sprintf(
 						/* translators: %s: the existing topic this one duplicates. */
-						__( 'Skipped: too similar to a post you already have about "%s".', 'blogcraft-ai-writer' ),
+						__( 'Skipped: too similar to a post you already have about "%s".', 'dicecodes-ai-blog-writer' ),
 						$clash
 					)
 				);
 			}
 
-			self::back( false, __( 'The topic could not be queued.', 'blogcraft-ai-writer' ) );
+			self::back( false, __( 'The topic could not be queued.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		// Straight to the screen that writes it, rather than a notice saying
@@ -1682,7 +1682,7 @@ class Blogcraft_Generate {
 
 		$message = sprintf(
 			/* translators: %d: number of pipeline steps that ran. */
-			_n( '%d step ran.', '%d steps ran.', $executed, 'blogcraft-ai-writer' ),
+			_n( '%d step ran.', '%d steps ran.', $executed, 'dicecodes-ai-blog-writer' ),
 			$executed
 		);
 
@@ -1691,7 +1691,7 @@ class Blogcraft_Generate {
 		if ( $after > $before ) {
 			self::back(
 				false,
-				$message . ' ' . __( 'Something went wrong. Blogcraft → Activity has the reason.', 'blogcraft-ai-writer' )
+				$message . ' ' . __( 'Something went wrong. Blogcraft → Activity has the reason.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -1734,7 +1734,7 @@ class Blogcraft_Generate {
 			true,
 			sprintf(
 				/* translators: 1: number queued, 2: number skipped as duplicates. */
-				__( '%1$d queued, %2$d skipped as too similar to a post you have or one already waiting.', 'blogcraft-ai-writer' ),
+				__( '%1$d queued, %2$d skipped as too similar to a post you have or one already waiting.', 'dicecodes-ai-blog-writer' ),
 				$queued,
 				$skipped
 			)
@@ -1777,7 +1777,7 @@ class Blogcraft_Generate {
 			true,
 			sprintf(
 				/* translators: %d: number of posts moved to the trash. */
-				_n( '%d post moved to the trash.', '%d posts moved to the trash.', $trashed, 'blogcraft-ai-writer' ),
+				_n( '%d post moved to the trash.', '%d posts moved to the trash.', $trashed, 'dicecodes-ai-blog-writer' ),
 				$trashed
 			)
 		);

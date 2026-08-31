@@ -1,10 +1,10 @@
-=== Blogcraft AI Writer ===
+=== Dicecodes AI Blog Writer ===
 Contributors: dicecodes
 Tags: ai content generator, ai writer, autoblogging, seo content, blog automation
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.66.0
+Stable tag: 0.67.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,10 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.67.0 =
+* Renamed to Dicecodes AI Blog Writer, slug dicecodes-ai-blog-writer. The directory review flagged "Blogcraft" as a term belonging to somebody else in the same field, and a name that could be read as another company's is worth losing however good it sounded. The author's own brand goes at the front, which is the pattern the directory asks for
+* The text domain follows the slug, as it must. Nothing that identifies stored data moved: the option names, the capability, the admin addresses and the class names are unchanged, so an existing install keeps its settings and its record of every post written
+
 = 0.66.0 =
 * uninstall.php could run outside an uninstall. Its guard accepted WP_UNINSTALL_PLUGIN or ABSPATH, and ABSPATH is defined on every WordPress request — so the second half was always true and the file would execute wherever it was reached. Only the constant that means "WordPress is deleting this plugin" is accepted now
 * The author box stylesheet is enqueued rather than printed. It echoed a <style> block into wp_head, which works but is invisible to everything else: no other plugin or theme could dequeue it, reorder it, or even see it was there. It is registered as a handle carrying inline rules, which costs the same number of requests, namely none
@@ -188,10 +192,5 @@ everything is here, oldest at the bottom.
 * The provider list is grouped by what it costs, free routes first. Every label already said free or paid, but in a flat list of nineteen that only helped somebody who read all nineteen — and the two at the top of it both want a card before they will answer anything
 * Three more ways to spend nothing: Jan and llama.cpp join Ollama and LM Studio as models that run on your own machine with no key, and Hugging Face joins Google, Groq and Mistral as a hosted free tier. All three were reachable before through the custom endpoint, which is no use to anybody who does not already know their runtime speaks that protocol
 * The Help screen's contents moved to a rail beside the writing, and now marks the section you are reading. It was a stack of twelve bare links between the heading and the first section, because the screen loaded neither the stylesheet nor the script the rest of the plugin uses
-
-= 0.62.0 =
-* The documentation link now appears on the overview, the last screen of the introduction, the wordpress.org listing and its FAQ, and three more places in the README
-* Every one of those addresses comes from one place now. The plugins row wrote it out itself, so there were two copies of one URL in two files — which is how a link comes to 404 while its twin still works
-* The plugin header pointed at the same page without a trailing slash, so the one address WordPress displays was a redirect rather than the address
 Older releases are listed in changelog.txt, which ships with the plugin.
 

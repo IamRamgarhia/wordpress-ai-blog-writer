@@ -167,8 +167,8 @@ class Blogcraft_Readiness {
 			'topic',
 			$words >= 4,
 			2,
-			__( 'A topic that says what to answer', 'blogcraft-ai-writer' ),
-			__( 'Two or three words is a category, not a question. A sentence gives the outline something to aim at, and outlines built from a bare keyword drift into whatever the model already knows about the subject.', 'blogcraft-ai-writer' )
+			__( 'A topic that says what to answer', 'dicecodes-ai-blog-writer' ),
+			__( 'Two or three words is a category, not a question. A sentence gives the outline something to aim at, and outlines built from a bare keyword drift into whatever the model already knows about the subject.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -185,8 +185,8 @@ class Blogcraft_Readiness {
 			'evidence',
 			$words >= 12,
 			5,
-			__( 'Something only you know', 'blogcraft-ai-writer' ),
-			__( 'This is the heaviest check on the finished post, and the only part of a page a model genuinely cannot produce. A number you measured, a price you paid, what went wrong when you tried it. Without it the post can only restate what is already published, which is exactly the kind of page search engines discount.', 'blogcraft-ai-writer' )
+			__( 'Something only you know', 'dicecodes-ai-blog-writer' ),
+			__( 'This is the heaviest check on the finished post, and the only part of a page a model genuinely cannot produce. A number you measured, a price you paid, what went wrong when you tried it. Without it the post can only restate what is already published, which is exactly the kind of page search engines discount.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -201,8 +201,8 @@ class Blogcraft_Readiness {
 			'angle',
 			'' !== trim( (string) $angle ),
 			2,
-			__( 'An angle for this one post', 'blogcraft-ai-writer' ),
-			__( 'Without it every post on a subject arrives at the same shape, because the same rules produced it. An angle is what makes this one yours rather than the default treatment.', 'blogcraft-ai-writer' )
+			__( 'An angle for this one post', 'dicecodes-ai-blog-writer' ),
+			__( 'Without it every post on a subject arrives at the same shape, because the same rules produced it. An angle is what makes this one yours rather than the default treatment.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -219,8 +219,8 @@ class Blogcraft_Readiness {
 			'voice',
 			'' !== $niche && '' !== $audience,
 			3,
-			__( 'A described voice and reader', 'blogcraft-ai-writer' ),
-			__( 'Set once, in Settings, and sent with every request afterwards. It is the difference between posts that sound like your blog and posts that sound like every other AI blog. There is a button there that reads your existing posts and fills it in for you.', 'blogcraft-ai-writer' )
+			__( 'A described voice and reader', 'dicecodes-ai-blog-writer' ),
+			__( 'Set once, in Settings, and sent with every request afterwards. It is the difference between posts that sound like your blog and posts that sound like every other AI blog. There is a button there that reads your existing posts and fills it in for you.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 
@@ -247,8 +247,8 @@ class Blogcraft_Readiness {
 			'research',
 			$on,
 			3,
-			__( 'Somewhere to research from', 'blogcraft-ai-writer' ),
-			__( 'With research on, the model is handed current sources and writes from them. With everything off it writes from memory alone, which dates badly and cannot cite anything. Wikipedia and Hacker News need no key.', 'blogcraft-ai-writer' )
+			__( 'Somewhere to research from', 'dicecodes-ai-blog-writer' ),
+			__( 'With research on, the model is handed current sources and writes from them. With everything off it writes from memory alone, which dates badly and cannot cite anything. Wikipedia and Hacker News need no key.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 }

@@ -50,7 +50,7 @@ class Blogcraft_Scheduler {
 	public static function register_recurrence( $schedules ) {
 		$schedules[ self::RECURRENCE ] = array(
 			'interval' => self::RECURRENCE_SECONDS,
-			'display'  => esc_html__( 'Every 5 minutes (Blogcraft)', 'blogcraft-ai-writer' ),
+			'display'  => esc_html__( 'Every 5 minutes (Blogcraft)', 'dicecodes-ai-blog-writer' ),
 		);
 
 		return $schedules;

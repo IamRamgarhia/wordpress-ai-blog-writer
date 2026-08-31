@@ -451,7 +451,7 @@ class Blogcraft_Queue {
 			return 0;
 		}
 
-		$message = __( 'Job reclaimed after an interrupted run.', 'blogcraft-ai-writer' );
+		$message = __( 'Job reclaimed after an interrupted run.', 'dicecodes-ai-blog-writer' );
 
 		foreach ( $rows as $row ) {
 			$job_id       = (int) $row['id'];

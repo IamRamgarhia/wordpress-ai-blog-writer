@@ -121,7 +121,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'words',
-			__( 'Length', 'blogcraft-ai-writer' ),
+			__( 'Length', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%1$d–%2$d', $low, $high ),
@@ -160,7 +160,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'sections',
-			__( 'Sections', 'blogcraft-ai-writer' ),
+			__( 'Sections', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%1$d–%2$d', $min, $max ),
@@ -192,7 +192,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'reading',
-			__( 'Reading ease', 'blogcraft-ai-writer' ),
+			__( 'Reading ease', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%.1f', $actual ),
 			sprintf( '%1$d–%2$d', $low, $high ),
@@ -226,7 +226,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'sentences',
-			__( 'Sentence length', 'blogcraft-ai-writer' ),
+			__( 'Sentence length', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d over', count( $long ) ),
 			sprintf( '%d max', $limit ),
@@ -257,7 +257,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'paragraphs',
-			__( 'Paragraph length', 'blogcraft-ai-writer' ),
+			__( 'Paragraph length', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d words', $actual ),
 			sprintf( '%d max', $limit ),
@@ -283,10 +283,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'banned',
-			__( 'Banned phrases', 'blogcraft-ai-writer' ),
+			__( 'Banned phrases', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d found', count( $hits ) ),
-			__( 'none', 'blogcraft-ai-writer' ),
+			__( 'none', 'dicecodes-ai-blog-writer' ),
 			12,
 			$repair
 		);
@@ -313,10 +313,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'negative',
-			__( 'Excluded terms', 'blogcraft-ai-writer' ),
+			__( 'Excluded terms', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d found', count( $hits ) ),
-			__( 'none', 'blogcraft-ai-writer' ),
+			__( 'none', 'dicecodes-ai-blog-writer' ),
 			18,
 			$repair
 		);
@@ -341,10 +341,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'em_dashes',
-			__( 'Em dashes', 'blogcraft-ai-writer' ),
+			__( 'Em dashes', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
-			$allowed ? __( 'allowed', 'blogcraft-ai-writer' ) : __( 'none', 'blogcraft-ai-writer' ),
+			$allowed ? __( 'allowed', 'dicecodes-ai-blog-writer' ) : __( 'none', 'dicecodes-ai-blog-writer' ),
 			5,
 			$repair
 		);
@@ -374,7 +374,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'keyword',
-			__( 'Keyword density', 'blogcraft-ai-writer' ),
+			__( 'Keyword density', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%.2f%%', $actual ),
 			sprintf( '%1$.1f–%2$.1f%%', $min, $max ),
@@ -402,7 +402,7 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'terms',
-			__( 'Required terms', 'blogcraft-ai-writer' ),
+			__( 'Required terms', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%1$d of %2$d', count( $covered ), $total ),
 			sprintf( '%d', $total ),
@@ -435,7 +435,7 @@ class Blogcraft_Scorecard {
 		// against the target already tells whoever reads the scorecard.
 		return self::check(
 			'external_links',
-			__( 'Sources cited', 'blogcraft-ai-writer' ),
+			__( 'Sources cited', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%d+', $target ),
@@ -460,7 +460,7 @@ class Blogcraft_Scorecard {
 		// person rather than asked of the model.
 		return self::check(
 			'internal_links',
-			__( 'Internal links', 'blogcraft-ai-writer' ),
+			__( 'Internal links', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%d', $actual ),
 			sprintf( '%d+', $target ),
@@ -483,10 +483,10 @@ class Blogcraft_Scorecard {
 
 		return self::check(
 			'passive',
-			__( 'Passive voice', 'blogcraft-ai-writer' ),
+			__( 'Passive voice', 'dicecodes-ai-blog-writer' ),
 			$pass,
 			sprintf( '%.0f%%', $actual ),
-			__( 'under 20%', 'blogcraft-ai-writer' ),
+			__( 'under 20%', 'dicecodes-ai-blog-writer' ),
 			2,
 			$repair
 		);

@@ -165,7 +165,7 @@ class Blogcraft_Seo {
 			return '';
 		}
 
-		return Blogcraft_Blocks::heading( __( 'Read next', 'blogcraft-ai-writer' ), 2 )
+		return Blogcraft_Blocks::heading( __( 'Read next', 'dicecodes-ai-blog-writer' ), 2 )
 			. "<!-- wp:list -->\n<ul class=\"wp-block-list\">\n" . $items . "</ul>\n<!-- /wp:list -->\n\n";
 	}
 
@@ -345,10 +345,10 @@ class Blogcraft_Seo {
 	 */
 	public static function seo_plugin_name( $id ) {
 		$names = array(
-			'yoast'    => __( 'Yoast SEO', 'blogcraft-ai-writer' ),
-			'rankmath' => __( 'Rank Math', 'blogcraft-ai-writer' ),
-			'seopress' => __( 'SEOPress', 'blogcraft-ai-writer' ),
-			'aioseo'   => __( 'All In One SEO', 'blogcraft-ai-writer' ),
+			'yoast'    => __( 'Yoast SEO', 'dicecodes-ai-blog-writer' ),
+			'rankmath' => __( 'Rank Math', 'dicecodes-ai-blog-writer' ),
+			'seopress' => __( 'SEOPress', 'dicecodes-ai-blog-writer' ),
+			'aioseo'   => __( 'All In One SEO', 'dicecodes-ai-blog-writer' ),
 		);
 
 		return isset( $names[ $id ] ) ? $names[ $id ] : '';
@@ -460,7 +460,7 @@ class Blogcraft_Seo {
 		$own = trim( (string) Blogcraft_Settings::get( 'ai_disclosure_text' ) );
 
 		$line = ( '' === $own )
-			? __( 'This article was drafted with AI from the sources listed, then checked and edited before publication.', 'blogcraft-ai-writer' )
+			? __( 'This article was drafted with AI from the sources listed, then checked and edited before publication.', 'dicecodes-ai-blog-writer' )
 			: $own;
 
 		return '<p class="blogcraft-author-disclosure">' . esc_html( $line ) . '</p>';
@@ -538,7 +538,7 @@ class Blogcraft_Seo {
 			return '';
 		}
 
-		return Blogcraft_Blocks::heading( __( 'What is covered', 'blogcraft-ai-writer' ), 2 )
+		return Blogcraft_Blocks::heading( __( 'What is covered', 'dicecodes-ai-blog-writer' ), 2 )
 			. Blogcraft_Blocks::unordered_list( $headings );
 	}
 
@@ -1047,7 +1047,7 @@ class Blogcraft_Seo {
 
 		$box .= '<p class="blogcraft-author-name">' . sprintf(
 			/* translators: %s: author name. */
-			esc_html__( 'Written by %s', 'blogcraft-ai-writer' ),
+			esc_html__( 'Written by %s', 'dicecodes-ai-blog-writer' ),
 			'<a href="' . esc_url( get_author_posts_url( $author_id ) ) . '" rel="author">' . esc_html( $name ) . '</a>'
 		);
 
@@ -1068,12 +1068,12 @@ class Blogcraft_Seo {
 				'' === $reviewer_credentials
 					? sprintf(
 						/* translators: %s: reviewer name. */
-						__( 'Reviewed by %s', 'blogcraft-ai-writer' ),
+						__( 'Reviewed by %s', 'dicecodes-ai-blog-writer' ),
 						$reviewer
 					)
 					: sprintf(
 						/* translators: 1: reviewer name. 2: their role or credentials. */
-						__( 'Reviewed by %1$s, %2$s', 'blogcraft-ai-writer' ),
+						__( 'Reviewed by %1$s, %2$s', 'dicecodes-ai-blog-writer' ),
 						$reviewer,
 						$reviewer_credentials
 					)

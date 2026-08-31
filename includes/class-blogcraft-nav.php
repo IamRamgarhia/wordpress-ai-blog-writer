@@ -27,16 +27,16 @@ class Blogcraft_Nav {
 	 */
 	public static function screens() {
 		$screens = array(
-			Blogcraft_Admin::MENU_SLUG    => __( 'Overview', 'blogcraft-ai-writer' ),
-			'blogcraft-write'             => __( 'Write a post', 'blogcraft-ai-writer' ),
-			Blogcraft_Progress::PAGE_SLUG => __( 'Being written', 'blogcraft-ai-writer' ),
-			'blogcraft-blueprint'         => __( 'How it writes', 'blogcraft-ai-writer' ),
-			'blogcraft-calendar'          => __( 'Calendar', 'blogcraft-ai-writer' ),
-			'blogcraft-library'           => __( 'Written by AI', 'blogcraft-ai-writer' ),
-			'blogcraft-review'            => __( 'Needs review', 'blogcraft-ai-writer' ),
-			'blogcraft-activity'          => __( 'Activity', 'blogcraft-ai-writer' ),
-			'blogcraft-settings'          => __( 'Settings', 'blogcraft-ai-writer' ),
-			'blogcraft-help'              => __( 'Help', 'blogcraft-ai-writer' ),
+			Blogcraft_Admin::MENU_SLUG    => __( 'Overview', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-write'             => __( 'Write a post', 'dicecodes-ai-blog-writer' ),
+			Blogcraft_Progress::PAGE_SLUG => __( 'Being written', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-blueprint'         => __( 'How it writes', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-calendar'          => __( 'Calendar', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-library'           => __( 'Written by AI', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-review'            => __( 'Needs review', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-activity'          => __( 'Activity', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-settings'          => __( 'Settings', 'dicecodes-ai-blog-writer' ),
+			'blogcraft-help'              => __( 'Help', 'dicecodes-ai-blog-writer' ),
 		);
 
 		// A tab for an empty queue is a tab that is never worth clicking. It
@@ -79,7 +79,7 @@ class Blogcraft_Nav {
 		$current = self::current();
 		$waiting = count( Blogcraft_Review::pending_posts() );
 
-		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Blogcraft screens', 'blogcraft-ai-writer' ) . '">';
+		echo '<nav class="bc-nav" aria-label="' . esc_attr__( 'Blogcraft screens', 'dicecodes-ai-blog-writer' ) . '">';
 
 		foreach ( self::screens() as $slug => $label ) {
 			$bubble = '';

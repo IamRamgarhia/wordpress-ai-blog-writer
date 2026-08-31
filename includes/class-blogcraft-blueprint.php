@@ -43,17 +43,17 @@ class Blogcraft_Blueprint {
 	 */
 	public static function tones() {
 		return array(
-			'conversational' => __( 'Conversational', 'blogcraft-ai-writer' ),
-			'professional'   => __( 'Professional', 'blogcraft-ai-writer' ),
-			'friendly'       => __( 'Friendly', 'blogcraft-ai-writer' ),
-			'authoritative'  => __( 'Authoritative', 'blogcraft-ai-writer' ),
-			'plain'          => __( 'Plain and direct', 'blogcraft-ai-writer' ),
-			'witty'          => __( 'Witty', 'blogcraft-ai-writer' ),
-			'empathetic'     => __( 'Empathetic', 'blogcraft-ai-writer' ),
-			'journalistic'   => __( 'Journalistic', 'blogcraft-ai-writer' ),
-			'academic'       => __( 'Academic', 'blogcraft-ai-writer' ),
-			'enthusiastic'   => __( 'Enthusiastic', 'blogcraft-ai-writer' ),
-			'custom'         => __( 'Something else — I will describe it', 'blogcraft-ai-writer' ),
+			'conversational' => __( 'Conversational', 'dicecodes-ai-blog-writer' ),
+			'professional'   => __( 'Professional', 'dicecodes-ai-blog-writer' ),
+			'friendly'       => __( 'Friendly', 'dicecodes-ai-blog-writer' ),
+			'authoritative'  => __( 'Authoritative', 'dicecodes-ai-blog-writer' ),
+			'plain'          => __( 'Plain and direct', 'dicecodes-ai-blog-writer' ),
+			'witty'          => __( 'Witty', 'dicecodes-ai-blog-writer' ),
+			'empathetic'     => __( 'Empathetic', 'dicecodes-ai-blog-writer' ),
+			'journalistic'   => __( 'Journalistic', 'dicecodes-ai-blog-writer' ),
+			'academic'       => __( 'Academic', 'dicecodes-ai-blog-writer' ),
+			'enthusiastic'   => __( 'Enthusiastic', 'dicecodes-ai-blog-writer' ),
+			'custom'         => __( 'Something else — I will describe it', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -64,10 +64,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function points_of_view() {
 		return array(
-			'second'       => __( 'Second person — you', 'blogcraft-ai-writer' ),
-			'first_plural' => __( 'First person plural — we', 'blogcraft-ai-writer' ),
-			'first_person' => __( 'First person — I', 'blogcraft-ai-writer' ),
-			'third'        => __( 'Third person — they', 'blogcraft-ai-writer' ),
+			'second'       => __( 'Second person — you', 'dicecodes-ai-blog-writer' ),
+			'first_plural' => __( 'First person plural — we', 'dicecodes-ai-blog-writer' ),
+			'first_person' => __( 'First person — I', 'dicecodes-ai-blog-writer' ),
+			'third'        => __( 'Third person — they', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -81,10 +81,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function reading_levels() {
 		return array(
-			'simple'   => array( __( 'Simple — anyone can follow it', 'blogcraft-ai-writer' ), 70, 100 ),
-			'general'  => array( __( 'General — a wide audience', 'blogcraft-ai-writer' ), 60, 80 ),
-			'informed' => array( __( 'Informed — familiar with the subject', 'blogcraft-ai-writer' ), 45, 65 ),
-			'expert'   => array( __( 'Expert — assumes the vocabulary', 'blogcraft-ai-writer' ), 25, 55 ),
+			'simple'   => array( __( 'Simple — anyone can follow it', 'dicecodes-ai-blog-writer' ), 70, 100 ),
+			'general'  => array( __( 'General — a wide audience', 'dicecodes-ai-blog-writer' ), 60, 80 ),
+			'informed' => array( __( 'Informed — familiar with the subject', 'dicecodes-ai-blog-writer' ), 45, 65 ),
+			'expert'   => array( __( 'Expert — assumes the vocabulary', 'dicecodes-ai-blog-writer' ), 25, 55 ),
 		);
 	}
 
@@ -95,11 +95,11 @@ class Blogcraft_Blueprint {
 	 */
 	public static function intro_styles() {
 		return array(
-			'direct'    => __( 'Answer the question immediately', 'blogcraft-ai-writer' ),
-			'hook'      => __( 'Open with a hook', 'blogcraft-ai-writer' ),
-			'problem'   => __( 'Name the problem the reader has', 'blogcraft-ai-writer' ),
-			'statistic' => __( 'Open with a figure', 'blogcraft-ai-writer' ),
-			'story'     => __( 'Open with a short anecdote', 'blogcraft-ai-writer' ),
+			'direct'    => __( 'Answer the question immediately', 'dicecodes-ai-blog-writer' ),
+			'hook'      => __( 'Open with a hook', 'dicecodes-ai-blog-writer' ),
+			'problem'   => __( 'Name the problem the reader has', 'dicecodes-ai-blog-writer' ),
+			'statistic' => __( 'Open with a figure', 'dicecodes-ai-blog-writer' ),
+			'story'     => __( 'Open with a short anecdote', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -110,10 +110,10 @@ class Blogcraft_Blueprint {
 	 */
 	public static function conclusion_styles() {
 		return array(
-			'summary'    => __( 'Summarise the main points', 'blogcraft-ai-writer' ),
-			'next_steps' => __( 'Give the reader next steps', 'blogcraft-ai-writer' ),
-			'action'     => __( 'End on a call to action', 'blogcraft-ai-writer' ),
-			'none'       => __( 'No conclusion section', 'blogcraft-ai-writer' ),
+			'summary'    => __( 'Summarise the main points', 'dicecodes-ai-blog-writer' ),
+			'next_steps' => __( 'Give the reader next steps', 'dicecodes-ai-blog-writer' ),
+			'action'     => __( 'End on a call to action', 'dicecodes-ai-blog-writer' ),
+			'none'       => __( 'No conclusion section', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -124,12 +124,12 @@ class Blogcraft_Blueprint {
 	 */
 	public static function literary_devices() {
 		return array(
-			'analogy'  => __( 'Analogies', 'blogcraft-ai-writer' ),
-			'example'  => __( 'Concrete examples', 'blogcraft-ai-writer' ),
-			'anecdote' => __( 'Short anecdotes', 'blogcraft-ai-writer' ),
-			'question' => __( 'Rhetorical questions', 'blogcraft-ai-writer' ),
-			'contrast' => __( 'Before-and-after contrast', 'blogcraft-ai-writer' ),
-			'aside'    => __( 'Brief asides', 'blogcraft-ai-writer' ),
+			'analogy'  => __( 'Analogies', 'dicecodes-ai-blog-writer' ),
+			'example'  => __( 'Concrete examples', 'dicecodes-ai-blog-writer' ),
+			'anecdote' => __( 'Short anecdotes', 'dicecodes-ai-blog-writer' ),
+			'question' => __( 'Rhetorical questions', 'dicecodes-ai-blog-writer' ),
+			'contrast' => __( 'Before-and-after contrast', 'dicecodes-ai-blog-writer' ),
+			'aside'    => __( 'Brief asides', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -140,15 +140,15 @@ class Blogcraft_Blueprint {
 	 */
 	public static function audiences() {
 		return array(
-			''              => __( 'Not specified', 'blogcraft-ai-writer' ),
-			'beginners'     => __( 'Beginners', 'blogcraft-ai-writer' ),
-			'enthusiasts'   => __( 'Enthusiasts', 'blogcraft-ai-writer' ),
-			'professionals' => __( 'Professionals in the field', 'blogcraft-ai-writer' ),
-			'buyers'        => __( 'People deciding what to buy', 'blogcraft-ai-writer' ),
-			'owners'        => __( 'Small business owners', 'blogcraft-ai-writer' ),
-			'developers'    => __( 'Developers', 'blogcraft-ai-writer' ),
-			'students'      => __( 'Students', 'blogcraft-ai-writer' ),
-			'custom'        => __( 'Someone else — I will describe them', 'blogcraft-ai-writer' ),
+			''              => __( 'Not specified', 'dicecodes-ai-blog-writer' ),
+			'beginners'     => __( 'Beginners', 'dicecodes-ai-blog-writer' ),
+			'enthusiasts'   => __( 'Enthusiasts', 'dicecodes-ai-blog-writer' ),
+			'professionals' => __( 'Professionals in the field', 'dicecodes-ai-blog-writer' ),
+			'buyers'        => __( 'People deciding what to buy', 'dicecodes-ai-blog-writer' ),
+			'owners'        => __( 'Small business owners', 'dicecodes-ai-blog-writer' ),
+			'developers'    => __( 'Developers', 'dicecodes-ai-blog-writer' ),
+			'students'      => __( 'Students', 'dicecodes-ai-blog-writer' ),
+			'custom'        => __( 'Someone else — I will describe them', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -162,7 +162,7 @@ class Blogcraft_Blueprint {
 	public static function fields() {
 		return array(
 			// Voice.
-			'label'                 => array( 'string', __( 'Default', 'blogcraft-ai-writer' ) ),
+			'label'                 => array( 'string', __( 'Default', 'dicecodes-ai-blog-writer' ) ),
 			'tone'                  => array( 'choice', 'conversational' ),
 			'tone_custom'           => array( 'text', '' ),
 			'point_of_view'         => array( 'choice', 'second' ),

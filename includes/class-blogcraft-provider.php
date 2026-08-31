@@ -105,7 +105,7 @@ abstract class Blogcraft_Provider {
 			return $message;
 		}
 
-		return $message . ' — ' . __( 'That usually means the Model field holds something other than a model id (the name of your API key is the common one). Open Settings and use "Show the models on my account" to pick a real one.', 'blogcraft-ai-writer' );
+		return $message . ' — ' . __( 'That usually means the Model field holds something other than a model id (the name of your API key is the common one). Open Settings and use "Show the models on my account" to pick a real one.', 'dicecodes-ai-blog-writer' );
 	}
 
 	/**

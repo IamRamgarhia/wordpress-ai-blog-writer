@@ -1,4 +1,4 @@
-"""Regenerate languages/blogcraft-ai-writer.pot from the source.
+"""Regenerate languages/dicecodes-ai-blog-writer.pot from the source.
 
 The .pot file had drifted badly: 313 of 802 translatable strings were absent,
 because it was last written by hand-run tooling ten releases ago. A languages
@@ -18,8 +18,8 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-POT = os.path.join(ROOT, 'languages', 'blogcraft-ai-writer.pot')
-DOMAIN = 'blogcraft-ai-writer'
+POT = os.path.join(ROOT, 'languages', 'dicecodes-ai-blog-writer.pot')
+DOMAIN = 'dicecodes-ai-blog-writer'
 
 HEADER = '''# Copyright (C) Dicecodes
 # This file is distributed under the GPL-2.0-or-later license.
@@ -169,14 +169,14 @@ def main():
 
     if check:
         if existing == text:
-            print('languages/blogcraft-ai-writer.pot is current.')
+            print('languages/dicecodes-ai-blog-writer.pot is current.')
             return 0
 
-        print('languages/blogcraft-ai-writer.pot is out of date. Run: python bin/makepot.py')
+        print('languages/dicecodes-ai-blog-writer.pot is out of date. Run: python bin/makepot.py')
         return 1
 
     io.open(POT, 'w', encoding='utf-8', newline='\n').write(text)
-    print('wrote %d entries to languages/blogcraft-ai-writer.pot' % text.count('\nmsgid "'))
+    print('wrote %d entries to languages/dicecodes-ai-blog-writer.pot' % text.count('\nmsgid "'))
     return 0
 
 

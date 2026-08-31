@@ -54,18 +54,18 @@ class Blogcraft_Progress {
 	 */
 	public static function steps() {
 		return array(
-			'research'  => __( 'Reading what is already out there', 'blogcraft-ai-writer' ),
-			'outline'   => __( 'Planning the shape of the post', 'blogcraft-ai-writer' ),
-			'draft'     => __( 'Writing the opening', 'blogcraft-ai-writer' ),
-			'section'   => __( 'Writing each section', 'blogcraft-ai-writer' ),
-			'faq'       => __( 'Answering the questions readers ask', 'blogcraft-ai-writer' ),
-			'extras'    => __( 'Adding the extra sections', 'blogcraft-ai-writer' ),
-			'critique'  => __( 'Reading its own draft back critically', 'blogcraft-ai-writer' ),
-			'revise'    => __( 'Rewriting what it found wrong', 'blogcraft-ai-writer' ),
-			'verify'    => __( 'Checking links and scoring the result', 'blogcraft-ai-writer' ),
-			'publish'   => __( 'Creating the post', 'blogcraft-ai-writer' ),
-			'pictures'  => __( 'Finding the pictures', 'blogcraft-ai-writer' ),
-			'finishing' => __( 'Linking it up and telling the crawlers', 'blogcraft-ai-writer' ),
+			'research'  => __( 'Reading what is already out there', 'dicecodes-ai-blog-writer' ),
+			'outline'   => __( 'Planning the shape of the post', 'dicecodes-ai-blog-writer' ),
+			'draft'     => __( 'Writing the opening', 'dicecodes-ai-blog-writer' ),
+			'section'   => __( 'Writing each section', 'dicecodes-ai-blog-writer' ),
+			'faq'       => __( 'Answering the questions readers ask', 'dicecodes-ai-blog-writer' ),
+			'extras'    => __( 'Adding the extra sections', 'dicecodes-ai-blog-writer' ),
+			'critique'  => __( 'Reading its own draft back critically', 'dicecodes-ai-blog-writer' ),
+			'revise'    => __( 'Rewriting what it found wrong', 'dicecodes-ai-blog-writer' ),
+			'verify'    => __( 'Checking links and scoring the result', 'dicecodes-ai-blog-writer' ),
+			'publish'   => __( 'Creating the post', 'dicecodes-ai-blog-writer' ),
+			'pictures'  => __( 'Finding the pictures', 'dicecodes-ai-blog-writer' ),
+			'finishing' => __( 'Linking it up and telling the crawlers', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -95,8 +95,8 @@ class Blogcraft_Progress {
 	public static function register_menu() {
 		add_submenu_page(
 			'',
-			__( 'Writing a post', 'blogcraft-ai-writer' ),
-			__( 'Writing a post', 'blogcraft-ai-writer' ),
+			__( 'Writing a post', 'dicecodes-ai-blog-writer' ),
+			__( 'Writing a post', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render' )
@@ -142,15 +142,15 @@ class Blogcraft_Progress {
 				// the job itself, so a reload picks up where it was.
 				'elapsedAt' => self::elapsed_for( self::current_job_id() ),
 				'stepsAt'   => self::steps_done_for( self::current_job_id() ),
-				'working'   => __( 'Working...', 'blogcraft-ai-writer' ),
-				'failed'    => __( 'Something went wrong. The Activity screen has the details.', 'blogcraft-ai-writer' ),
+				'working'   => __( 'Working...', 'dicecodes-ai-blog-writer' ),
+				'failed'    => __( 'Something went wrong. The Activity screen has the details.', 'dicecodes-ai-blog-writer' ),
 				'total'     => count( self::steps() ),
 				/* translators: 1: step number reached. 2: steps in total. */
-				'stepOf'    => __( 'Step %1$d of %2$d', 'blogcraft-ai-writer' ),
+				'stepOf'    => __( 'Step %1$d of %2$d', 'dicecodes-ai-blog-writer' ),
 				/* translators: %s: a duration such as "40s" or "2m 10s". */
-				'elapsed'   => __( '%s elapsed', 'blogcraft-ai-writer' ),
+				'elapsed'   => __( '%s elapsed', 'dicecodes-ai-blog-writer' ),
 				/* translators: %s: a duration such as "40s" or "2m 10s". */
-				'remaining' => __( 'about %s left', 'blogcraft-ai-writer' ),
+				'remaining' => __( 'about %s left', 'dicecodes-ai-blog-writer' ),
 			)
 		);
 	}
@@ -234,19 +234,19 @@ class Blogcraft_Progress {
 	 */
 	public static function handle_advance() {
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( ! Blogcraft_Request::verify( self::ACTION, $nonce ) ) {
-			wp_send_json_error( array( 'message' => __( 'That page has expired. Reload it.', 'blogcraft-ai-writer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'That page has expired. Reload it.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
 		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( $job_id <= 0 ) {
-			wp_send_json_error( array( 'message' => __( 'No post to write.', 'blogcraft-ai-writer' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'No post to write.', 'dicecodes-ai-blog-writer' ) ), 400 );
 		}
 
 		Blogcraft_Worker::run_job( $job_id );
@@ -479,12 +479,12 @@ class Blogcraft_Progress {
 		Blogcraft_Nav::render();
 
 		if ( null === $job ) {
-			echo '<h1>' . esc_html__( 'Writing a post', 'blogcraft-ai-writer' ) . '</h1>';
-			echo '<p>' . esc_html__( 'There is no post here. Start one from Write a post.', 'blogcraft-ai-writer' ) . '</p>';
+			echo '<h1>' . esc_html__( 'Writing a post', 'dicecodes-ai-blog-writer' ) . '</h1>';
+			echo '<p>' . esc_html__( 'There is no post here. Start one from Write a post.', 'dicecodes-ai-blog-writer' ) . '</p>';
 			printf(
 				'<p><a class="button button-primary" href="%1$s">%2$s</a></p>',
 				esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
-				esc_html__( 'Write a post', 'blogcraft-ai-writer' )
+				esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' )
 			);
 			echo '</div>';
 
@@ -497,13 +497,13 @@ class Blogcraft_Progress {
 		if ( 'nothing' === $outcome ) {
 			printf(
 				'<div class="notice notice-info"><p>%s</p></div>',
-				esc_html__( 'Nothing left that another writing pass can reach, so no request was made and you were not charged for one. What is still failing is about your site rather than these words.', 'blogcraft-ai-writer' )
+				esc_html__( 'Nothing left that another writing pass can reach, so no request was made and you were not charged for one. What is still failing is about your site rather than these words.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
 		$topic = isset( $job->payload['topic'] ) ? (string) $job->payload['topic'] : '';
 
-		echo '<h1>' . esc_html( '' === $topic ? __( 'Writing a post', 'blogcraft-ai-writer' ) : $topic ) . '</h1>';
+		echo '<h1>' . esc_html( '' === $topic ? __( 'Writing a post', 'dicecodes-ai-blog-writer' ) : $topic ) . '</h1>';
 
 		$waiting = self::waiting_until( $job );
 
@@ -548,7 +548,7 @@ class Blogcraft_Progress {
 		Blogcraft_Request::verify_or_die( self::IMPROVE_ACTION, $nonce );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'blogcraft-ai-writer' ) );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -643,7 +643,7 @@ class Blogcraft_Progress {
 		Blogcraft_Request::verify_or_die( self::UNDO_ACTION, $nonce );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'blogcraft-ai-writer' ) );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'dicecodes-ai-blog-writer' ) );
 		}
 
 		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -698,7 +698,7 @@ class Blogcraft_Progress {
 		$after = ( false === $after ) ? $total : (int) $after;
 
 		echo '<section class="blogcraft-card" id="blogcraft-progress-card"><header>';
-		echo '<h2>' . esc_html__( 'What it is doing', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'What it is doing', 'dicecodes-ai-blog-writer' ) . '</h2>';
 
 		printf(
 			'<div class="bc-progress-bar"><span id="blogcraft-progress-fill" style="width:%d%%"></span></div>',
@@ -711,7 +711,7 @@ class Blogcraft_Progress {
 			esc_html(
 				sprintf(
 					/* translators: 1: steps finished. 2: steps in total. */
-					__( 'Step %1$d of %2$d', 'blogcraft-ai-writer' ),
+					__( 'Step %1$d of %2$d', 'dicecodes-ai-blog-writer' ),
 					(int) min( $done + ( $held ? 0 : 1 ), $total ),
 					(int) $total
 				)
@@ -724,8 +724,8 @@ class Blogcraft_Progress {
 			'<p id="blogcraft-progress-note">%s</p>',
 			esc_html(
 				$held
-					? __( 'Finished writing. Nothing has been added to your site yet.', 'blogcraft-ai-writer' )
-					: __( 'This runs while the page is open. Leaving is safe — it picks up where it stopped.', 'blogcraft-ai-writer' )
+					? __( 'Finished writing. Nothing has been added to your site yet.', 'dicecodes-ai-blog-writer' )
+					: __( 'This runs while the page is open. Leaving is safe — it picks up where it stopped.', 'dicecodes-ai-blog-writer' )
 			)
 		);
 		echo '</header>';
@@ -747,7 +747,7 @@ class Blogcraft_Progress {
 			. '<ul class="bc-live-heads" id="blogcraft-live-heads"></ul>'
 			. '</div>',
 			$held ? ' hidden' : '',
-			esc_html__( 'The title and the headings appear here as they are decided.', 'blogcraft-ai-writer' )
+			esc_html__( 'The title and the headings appear here as they are decided.', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<ol class="blogcraft-steps" id="blogcraft-progress-steps">';
@@ -829,14 +829,14 @@ class Blogcraft_Progress {
 
 		echo '<section class="blogcraft-card bc-prospects-card">';
 		echo '<div class="bc-prospects-head">';
-		echo '<h2>' . esc_html__( 'What would hold this back', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'What would hold this back', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		printf( '<p>%s</p>', esc_html( Blogcraft_Prospects::caveat() ) );
 		echo '</div>';
 
 		if ( empty( $blockers ) ) {
 			printf(
 				'<p class="bc-prospects-clear">%s</p>',
-				esc_html__( 'Nothing this plugin can see. It does not duplicate a post you already have, it says something that is yours, it is the length it was written to be, and your site points at it.', 'blogcraft-ai-writer' )
+				esc_html__( 'Nothing this plugin can see. It does not duplicate a post you already have, it says something that is yours, it is the length it was written to be, and your site points at it.', 'dicecodes-ai-blog-writer' )
 			);
 			echo '</section>';
 
@@ -891,25 +891,25 @@ class Blogcraft_Progress {
 			'<div class="bc-score-dial %1$s"><strong>%2$d</strong><span>%3$s</span></div>',
 			esc_attr( $clears ? 'is-ok' : 'is-under' ),
 			(int) $score,
-			esc_html__( 'out of 100', 'blogcraft-ai-writer' )
+			esc_html__( 'out of 100', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<div class="bc-score-words">';
-		echo '<h2>' . esc_html__( 'How it scored', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'How it scored', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		printf(
 			'<p>%s</p>',
 			esc_html(
 				$clears
 					? sprintf(
 						/* translators: 1: number of checks passed. 2: checks in total. 3: the threshold set in settings. */
-						__( 'Passed %1$d of %2$d checks, and clears your bar of %3$d.', 'blogcraft-ai-writer' ),
+						__( 'Passed %1$d of %2$d checks, and clears your bar of %3$d.', 'dicecodes-ai-blog-writer' ),
 						count( $passed ),
 						count( $passed ) + count( $failed ),
 						$threshold
 					)
 					: sprintf(
 						/* translators: 1: number of checks passed. 2: checks in total. 3: the threshold set in settings. */
-						__( 'Passed %1$d of %2$d checks, which is under your bar of %3$d. You can still create it — it lands as a draft.', 'blogcraft-ai-writer' ),
+						__( 'Passed %1$d of %2$d checks, which is under your bar of %3$d. You can still create it — it lands as a draft.', 'dicecodes-ai-blog-writer' ),
 						count( $passed ),
 						count( $passed ) + count( $failed ),
 						$threshold
@@ -926,20 +926,20 @@ class Blogcraft_Progress {
 			if ( 0 === $gap ) {
 				$line = sprintf(
 					/* translators: %d: the score, unchanged. */
-					__( 'The second pass left it at %d. Nothing measurable changed.', 'blogcraft-ai-writer' ),
+					__( 'The second pass left it at %d. Nothing measurable changed.', 'dicecodes-ai-blog-writer' ),
 					(int) $score
 				);
 			} elseif ( $gap > 0 ) {
 				$line = sprintf(
 					/* translators: 1: previous score. 2: how many points it gained. */
-					__( 'Up from %1$d after another pass, so that one bought %2$d points.', 'blogcraft-ai-writer' ),
+					__( 'Up from %1$d after another pass, so that one bought %2$d points.', 'dicecodes-ai-blog-writer' ),
 					(int) $before,
 					(int) $gap
 				);
 			} else {
 				$line = sprintf(
 					/* translators: %d: the previous, higher score. */
-					__( 'Down from %d. A rewrite is not guaranteed to improve anything, and this one did not.', 'blogcraft-ai-writer' ),
+					__( 'Down from %d. A rewrite is not guaranteed to improve anything, and this one did not.', 'dicecodes-ai-blog-writer' ),
 					(int) $before
 				);
 			}
@@ -956,7 +956,7 @@ class Blogcraft_Progress {
 		echo '</div></div>';
 
 		if ( empty( $failed ) && empty( $passed ) ) {
-			echo '<p>' . esc_html__( 'No checks were recorded for this draft.', 'blogcraft-ai-writer' ) . '</p></section>';
+			echo '<p>' . esc_html__( 'No checks were recorded for this draft.', 'dicecodes-ai-blog-writer' ) . '</p></section>';
 
 			return;
 		}
@@ -965,7 +965,7 @@ class Blogcraft_Progress {
 		// twenty-odd rows buries the four that need a decision among the
 		// sixteen that do not.
 		if ( ! empty( $failed ) ) {
-			echo '<h3 class="bc-check-heading">' . esc_html__( 'Worth a look', 'blogcraft-ai-writer' ) . '</h3>';
+			echo '<h3 class="bc-check-heading">' . esc_html__( 'Worth a look', 'dicecodes-ai-blog-writer' ) . '</h3>';
 			self::render_check_list( $failed, false );
 		}
 
@@ -975,7 +975,7 @@ class Blogcraft_Progress {
 				esc_html(
 					sprintf(
 						/* translators: %d: how many checks passed. */
-						_n( '%d check passed', '%d checks passed', count( $passed ), 'blogcraft-ai-writer' ),
+						_n( '%d check passed', '%d checks passed', count( $passed ), 'dicecodes-ai-blog-writer' ),
 						count( $passed )
 					)
 				)
@@ -1013,7 +1013,7 @@ class Blogcraft_Progress {
 		Blogcraft_Request::nonce_field( self::UNDO_ACTION );
 		printf(
 			'<button type="submit" class="button-link">%s</button>',
-			esc_html__( 'Put the earlier version back', 'blogcraft-ai-writer' )
+			esc_html__( 'Put the earlier version back', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</form>';
 	}
@@ -1045,7 +1045,7 @@ class Blogcraft_Progress {
 
 			printf(
 				'<button type="submit" class="button button-secondary">%s</button>',
-				esc_html__( 'Have another go at these', 'blogcraft-ai-writer' )
+				esc_html__( 'Have another go at these', 'dicecodes-ai-blog-writer' )
 			);
 
 			printf(
@@ -1057,7 +1057,7 @@ class Blogcraft_Progress {
 							'One more writing pass, aimed at the %d fault below that a rewrite can reach. It costs one request, and the draft is measured again afterwards. The post has already been through this once, so treat it as a second attempt rather than a fix.',
 							'One more writing pass, aimed at the %d faults below that a rewrite can reach. It costs one request, and the draft is measured again afterwards. The post has already been through this once, so treat it as a second attempt rather than a fix.',
 							count( $fixable ),
-							'blogcraft-ai-writer'
+							'dicecodes-ai-blog-writer'
 						),
 						count( $fixable )
 					)
@@ -1083,7 +1083,7 @@ class Blogcraft_Progress {
 				esc_html(
 					sprintf(
 						/* translators: %s: comma-separated names of checks a rewrite cannot fix. */
-						__( 'Rewriting will not change %s. That one is about your site rather than these words.', 'blogcraft-ai-writer' ),
+						__( 'Rewriting will not change %s. That one is about your site rather than these words.', 'dicecodes-ai-blog-writer' ),
 						implode( ', ', $names )
 					)
 				)
@@ -1114,7 +1114,7 @@ class Blogcraft_Progress {
 				esc_html(
 					sprintf(
 						/* translators: 1: what the check measured. 2: what it wanted. */
-						__( '%1$s — wanted %2$s', 'blogcraft-ai-writer' ),
+						__( '%1$s — wanted %2$s', 'dicecodes-ai-blog-writer' ),
 						isset( $check['actual'] ) ? (string) $check['actual'] : '',
 						isset( $check['target'] ) ? (string) $check['target'] : ''
 					)
@@ -1134,14 +1134,14 @@ class Blogcraft_Progress {
 	 */
 	private static function render_preview( $article, $outline ) {
 		echo '<section class="blogcraft-card bc-draft-card"><header>';
-		echo '<h2>' . esc_html__( 'The draft', 'blogcraft-ai-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Edit anything here before it becomes a post. Use Add Media to put a picture between the paragraphs. Nothing is on your site until you create it.', 'blogcraft-ai-writer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'The draft', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Edit anything here before it becomes a post. Use Add Media to put a picture between the paragraphs. Nothing is on your site until you create it.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</header>';
 
 		printf(
 			'<p class="bc-field"><label for="blogcraft-draft-title"><strong>%1$s</strong></label>'
 			. '<input type="text" id="blogcraft-draft-title" name="draft_title" class="large-text" value="%2$s" form="blogcraft-approve" /></p>',
-			esc_html__( 'Title', 'blogcraft-ai-writer' ),
+			esc_html__( 'Title', 'dicecodes-ai-blog-writer' ),
 			esc_attr( isset( $outline['title'] ) ? (string) $outline['title'] : '' )
 		);
 
@@ -1149,9 +1149,9 @@ class Blogcraft_Progress {
 			'<p class="bc-field"><label for="blogcraft-draft-meta"><strong>%1$s</strong></label>'
 			. '<textarea id="blogcraft-draft-meta" name="draft_meta" class="large-text" rows="2" form="blogcraft-approve">%2$s</textarea>'
 			. '<span class="description">%3$s</span></p>',
-			esc_html__( 'Search description', 'blogcraft-ai-writer' ),
+			esc_html__( 'Search description', 'dicecodes-ai-blog-writer' ),
 			esc_textarea( isset( $outline['meta_description'] ) ? (string) $outline['meta_description'] : '' ),
-			esc_html__( 'What shows under the title in search results.', 'blogcraft-ai-writer' )
+			esc_html__( 'What shows under the title in search results.', 'dicecodes-ai-blog-writer' )
 		);
 
 		// The same renderer that builds the post, so what is edited here is
@@ -1193,13 +1193,13 @@ class Blogcraft_Progress {
 		$threshold = (int) Blogcraft_Settings::get( 'quality_threshold' );
 
 		echo '<section class="blogcraft-card bc-decision-card"><header>';
-		echo '<h2>' . esc_html__( 'What happens to it', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'What happens to it', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		printf(
 			'<p>%s</p>',
 			esc_html(
 				$score < $threshold
-					? __( 'This scored below your bar. Creating it anyway is fine — it lands as a draft you can edit.', 'blogcraft-ai-writer' )
-					: __( 'Creating it adds it to your posts, using the editor your site is set up for.', 'blogcraft-ai-writer' )
+					? __( 'This scored below your bar. Creating it anyway is fine — it lands as a draft you can edit.', 'dicecodes-ai-blog-writer' )
+					: __( 'Creating it adds it to your posts, using the editor your site is set up for.', 'dicecodes-ai-blog-writer' )
 			)
 		);
 		echo '</header>';
@@ -1211,12 +1211,12 @@ class Blogcraft_Progress {
 		echo '<input type="hidden" name="action" value="blogcraft_approve_draft" />';
 		printf( '<input type="hidden" name="job" value="%d" />', (int) $job->id );
 		Blogcraft_Request::nonce_field( self::ACTION );
-		submit_button( __( 'Create the post', 'blogcraft-ai-writer' ), 'primary', 'submit', false );
+		submit_button( __( 'Create the post', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
 		echo ' ';
 		printf(
 			'<a class="button" href="%1$s">%2$s</a>',
 			esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
-			esc_html__( 'Leave it for now', 'blogcraft-ai-writer' )
+			esc_html__( 'Leave it for now', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</form></section>';
 	}
@@ -1234,13 +1234,13 @@ class Blogcraft_Progress {
 	 */
 	private static function render_waiting( $job, $resumes ) {
 		echo '<section class="blogcraft-card bc-waiting-card"><header>';
-		echo '<h2>' . esc_html__( 'Paused by your provider', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Paused by your provider', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		printf(
 			'<p>%s</p>',
 			esc_html(
 				sprintf(
 					/* translators: %s: a clock time, such as "3:45 pm". */
-					__( 'Your provider is rate limiting, so this is waiting rather than failing. It carries on by itself at about %s, and everything written so far is kept.', 'blogcraft-ai-writer' ),
+					__( 'Your provider is rate limiting, so this is waiting rather than failing. It carries on by itself at about %s, and everything written so far is kept.', 'dicecodes-ai-blog-writer' ),
 					$resumes
 				)
 			)
@@ -1255,9 +1255,9 @@ class Blogcraft_Progress {
 
 		printf(
 			'<p>%1$s <a href="%2$s">%3$s</a></p>',
-			esc_html__( 'You can close this page. Come back to it from', 'blogcraft-ai-writer' ),
+			esc_html__( 'You can close this page. Come back to it from', 'dicecodes-ai-blog-writer' ),
 			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
-			esc_html__( 'Written by AI', 'blogcraft-ai-writer' )
+			esc_html__( 'Written by AI', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '</section>';
@@ -1271,7 +1271,7 @@ class Blogcraft_Progress {
 	 */
 	private static function render_failure( $job ) {
 		echo '<section class="blogcraft-card"><header>';
-		echo '<h2>' . esc_html__( 'It stopped', 'blogcraft-ai-writer' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'It stopped', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		echo '</header>';
 
 		$error = trim( (string) $job->last_error );
@@ -1283,7 +1283,7 @@ class Blogcraft_Progress {
 		printf(
 			'<p><a class="button" href="%1$s">%2$s</a></p>',
 			esc_url( admin_url( 'admin.php?page=blogcraft-activity' ) ),
-			esc_html__( 'See the full log', 'blogcraft-ai-writer' )
+			esc_html__( 'See the full log', 'dicecodes-ai-blog-writer' )
 		);
 		echo '</section>';
 	}
