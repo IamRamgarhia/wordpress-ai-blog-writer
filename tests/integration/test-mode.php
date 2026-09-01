@@ -188,6 +188,8 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'bc_topic', $html, 'the form is gone again' );
 		$this->assertStringContainsString( 'value="blogcraft_save_brief"', $html );
-		$this->assertStringContainsString( 'Read my brief and my writing rules', $html );
+		// The sentence to say in the app is not here: it appears once there
+		// is a brief to say it about, which is when it is any use.
+		$this->assertStringNotContainsString( 'Read my brief and my writing rules', $html );
 	}
 }

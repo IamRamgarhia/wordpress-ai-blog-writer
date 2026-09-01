@@ -224,41 +224,53 @@ class Blogcraft_Generate {
 	}
 
 	/**
-	 * What to do once the brief is filled in.
+	 * The one thing worth saying before the form rather than after it.
+	 *
+	 * This used to be a standing panel explaining what to do once the
+	 * brief was saved, sitting above a form nobody had filled in yet.
+	 * The instruction moved into the confirmation, where it arrives at
+	 * the moment it is needed. What is left is the warning, which only
+	 * shows when it is true.
 	 *
 	 * @return void
 	 */
 	private static function render_brief_hand_off() {
-		$waiting   = Blogcraft_Brief::get();
-		$connected = ! empty( Blogcraft_Mcp_Auth::all() ) || ! empty( Blogcraft_Mcp_Oauth::clients() );
-
-		echo '<section class="blogcraft-card bc-handoff">';
-
-		if ( ! $connected ) {
-			printf(
-				'<p class="bc-mcp-warn">%1$s <a href="%2$s">%3$s</a></p>',
-				esc_html__( 'No app is connected yet, so nothing will collect this.', 'dicecodes-ai-blog-writer' ),
-				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-clients' ) ),
-				esc_html__( 'Connect one', 'dicecodes-ai-blog-writer' )
-			);
-		}
-
-		if ( ! empty( $waiting ) ) {
-			printf(
-				'<p class="bc-handoff-waiting">%s</p>',
-				esc_html(
-					sprintf(
-						/* translators: %s: the topic of the brief that is waiting. */
-						__( 'Waiting to be written: %s', 'dicecodes-ai-blog-writer' ),
-						$waiting['topic']
-					)
-				)
-			);
+		if ( self::app_connected() ) {
+			return;
 		}
 
 		printf(
-			'<p>%s</p>',
-			esc_html__( 'Save the brief below, then say this in your app:', 'dicecodes-ai-blog-writer' )
+			'<div class="notice notice-warning"><p>%1$s <a href="%2$s">%3$s</a></p></div>',
+			esc_html__( 'No app is connected yet, so nothing will collect this brief.', 'dicecodes-ai-blog-writer' ),
+			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-clients' ) ),
+			esc_html__( 'Connect one', 'dicecodes-ai-blog-writer' )
+		);
+	}
+
+	/**
+	 * Whether anything is listening for a brief.
+	 *
+	 * @return bool
+	 */
+	private static function app_connected() {
+		return ! empty( Blogcraft_Mcp_Auth::all() ) || ! empty( Blogcraft_Mcp_Oauth::clients() );
+	}
+
+	/**
+	 * The sentence to say in the app, shown once there is a brief for it.
+	 *
+	 * @return void
+	 */
+	private static function render_brief_saved() {
+		if ( ! Blogcraft_Brief::waiting() ) {
+			return;
+		}
+
+		echo '<div class="blogcraft-card bc-handoff">';
+
+		printf(
+			'<p><strong>%s</strong></p>',
+			esc_html__( 'Now say this in your app:', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo wp_kses(
@@ -270,12 +282,7 @@ class Blogcraft_Generate {
 			Blogcraft_Markup::allowed()
 		);
 
-		printf(
-			'<p class="description">%s</p>',
-			esc_html__( 'It collects the topic, the angle, anything only you know, and every choice you changed below. Then it drafts, scores itself against your checks, fixes what failed, and saves a draft here.', 'dicecodes-ai-blog-writer' )
-		);
-
-		echo '</section>';
+		echo '</div>';
 	}
 	/**
 	 * Where the writing happens when an app does it.
@@ -397,6 +404,7 @@ class Blogcraft_Generate {
 
 		if ( $client ) {
 			self::render_brief_hand_off();
+			self::render_brief_saved();
 		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" id="blogcraft-compose">';

@@ -174,4 +174,34 @@ class Test_Blogcraft_Brief extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'No app is connected yet', $html );
 	}
+
+	public function test_the_instruction_waits_until_there_is_a_brief_for_it() {
+		// It was a standing panel above a form nobody had filled in yet,
+		// telling them what to do after they had. Backwards, and unchanging,
+		// so by the second visit it was furniture.
+		Blogcraft_Mcp_Auth::issue( get_current_user_id(), 'an app' );
+
+		ob_start();
+		Blogcraft_Generate::render();
+		$before = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( 'Read my brief and my writing rules', $before );
+
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => 'Something to write',
+				'angle'     => '',
+				'evidence'  => '',
+				'overrides' => array(),
+				'placement' => array(),
+			)
+		);
+
+		ob_start();
+		Blogcraft_Generate::render();
+		$after = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Read my brief and my writing rules', $after );
+		$this->assertStringContainsString( 'data-copy=', $after, 'the instruction cannot be copied' );
+	}
 }
