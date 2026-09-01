@@ -163,6 +163,11 @@ class Blogcraft_Blueprint {
 		return array(
 			// Voice.
 			'label'                 => array( 'string', __( 'Default', 'dicecodes-ai-blog-writer' ) ),
+			// Which shape these rules were started from. It changes nothing
+			// about the writing — every field it set stays editable — and is
+			// kept only so the screen can show which card built the page in
+			// front of you.
+			'archetype'             => array( 'string', '' ),
 			'tone'                  => array( 'choice', 'conversational' ),
 			'tone_custom'           => array( 'text', '' ),
 			'point_of_view'         => array( 'choice', 'second' ),

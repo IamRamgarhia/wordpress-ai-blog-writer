@@ -130,15 +130,15 @@ class Blogcraft_Mcp_Tools {
 							'type'        => 'string',
 							'description' => 'The search-result line, around 155 characters.',
 						),
-						'seo_title' => array(
+						'seo_title'        => array(
 							'type'        => 'string',
 							'description' => 'The search-result title, which is not the page heading. It has to earn the click and is cut off near sixty characters. Optional; the title is used otherwise.',
 						),
-						'topic' => array(
+						'topic'            => array(
 							'type'        => 'string',
 							'description' => 'What the post is about, in a few words. Used to pick pictures and to decide which older posts should link to this one.',
 						),
-						'category' => array(
+						'category'         => array(
 							'type'        => 'string',
 							'description' => 'The category name. Created if it does not exist. Without one the post lands in Uncategorised.',
 						),
@@ -166,15 +166,15 @@ class Blogcraft_Mcp_Tools {
 						'html'             => array( 'type' => 'string' ),
 						'slug'             => array( 'type' => 'string' ),
 						'meta_description' => array( 'type' => 'string' ),
-						'seo_title' => array(
+						'seo_title'        => array(
 							'type'        => 'string',
 							'description' => 'The search-result title, which is not the page heading. It has to earn the click and is cut off near sixty characters. Optional; the title is used otherwise.',
 						),
-						'topic' => array(
+						'topic'            => array(
 							'type'        => 'string',
 							'description' => 'What the post is about, in a few words. Used to pick pictures and to decide which older posts should link to this one.',
 						),
-						'category' => array(
+						'category'         => array(
 							'type'        => 'string',
 							'description' => 'The category name. Created if it does not exist. Without one the post lands in Uncategorised.',
 						),
@@ -714,7 +714,7 @@ class Blogcraft_Mcp_Tools {
 			// Without this wp_update_post silently drops both dates and
 			// publishes now. The call reports success either way, so the
 			// only sign is a post that went out a week early.
-			$update['edit_date']     = true;
+			$update['edit_date'] = true;
 		}
 
 		$done = wp_update_post( $update, true );

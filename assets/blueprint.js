@@ -265,7 +265,18 @@
 			body.append( 'shape', button.getAttribute( 'data-shape' ) );
 
 			for ( var i = 0; i < shapes.length; i++ ) {
-				shapes[ i ].classList.toggle( 'is-chosen', shapes[ i ] === button );
+				var on = shapes[ i ] === button;
+
+				shapes[ i ].classList.toggle( 'is-chosen', on );
+				shapes[ i ].setAttribute( 'aria-pressed', on ? 'true' : 'false' );
+			}
+
+			// Saved with everything else the shape filled in, so the mark
+			// survives the save rather than lasting until the reload.
+			var remember = document.getElementById( 'bc_archetype' );
+
+			if ( remember ) {
+				remember.value = button.getAttribute( 'data-shape' ) || '';
 			}
 
 			ask( body, function () {} );

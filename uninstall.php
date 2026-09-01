@@ -94,17 +94,6 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 
-		// Running totals for jobs that never reached a post. A wildcard is
-		// the only way to reach them; the options API has no such call.
-		global $wpdb;
-
-		$wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
-				$wpdb->esc_like( 'blogcraft_usage_job_' ) . '%'
-			)
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- one prefix sweep at uninstall; there is no options API for a wildcard.
-
 		// The posts themselves are the user's and stay. Everything Blogcraft
 		// attached to them goes, because the note at the top of this file says
 		// every trace is removed and it was not true of any of these.

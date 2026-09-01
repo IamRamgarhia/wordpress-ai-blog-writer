@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.79.0
+Stable tag: 0.80.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,10 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
+
+= 0.80.0 =
+* The shape your writing rules were started from stays marked. Pressing one fills in about twenty fields and marked the card it came from, but nothing wrote that down — so the next visit showed eight identical cards with no sign of which one built the rules in front of you
+* Removed the one direct database query in the uninstaller. The running token totals it existed to sweep up are held as transients now, which expire on their own, so there is nothing left to sweep
 
 = 0.79.0 =
 * You can keep more than one provider set up and switch between them. The settings held exactly one, so comparing a cheap model against a good one, or a paid account against a local model that costs nothing, meant retyping the whole card and pasting the key back in from wherever you keep it. Most people did that once and never went back

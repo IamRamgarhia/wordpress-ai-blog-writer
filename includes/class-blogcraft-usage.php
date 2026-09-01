@@ -29,6 +29,15 @@ class Blogcraft_Usage {
 	const META = '_blogcraft_usage';
 
 	/**
+	 * How long a running total survives without being claimed.
+	 *
+	 * A job takes minutes. A day is the point past which one is never
+	 * coming back, and letting it expire on its own is why nothing has
+	 * to sweep these up later.
+	 */
+	const HOLD = DAY_IN_SECONDS;
+
+	/**
 	 * The job being run, set once per request by the worker.
 	 *
 	 * @var int
@@ -70,10 +79,10 @@ class Blogcraft_Usage {
 
 		$so_far = self::running( self::$job );
 
-		$so_far['provider']   = (string) $provider;
-		$so_far['prompt']    += max( 0, (int) $prompt );
+		$so_far['provider']    = (string) $provider;
+		$so_far['prompt']     += max( 0, (int) $prompt );
 		$so_far['completion'] += max( 0, (int) $completion );
-		$so_far['requests']  += 1;
+		$so_far['requests']   += 1;
 
 		// Every stage may answer as a different model — a cheap one for the
 		// outline and a better one for the prose is a normal arrangement — so
@@ -84,7 +93,7 @@ class Blogcraft_Usage {
 			$so_far['models'][] = $model;
 		}
 
-		update_option( self::key( self::$job ), $so_far, false );
+		set_transient( self::key( self::$job ), $so_far, self::HOLD );
 	}
 
 	/**
@@ -103,7 +112,7 @@ class Blogcraft_Usage {
 		}
 
 		update_post_meta( (int) $post_id, self::META, $total );
-		delete_option( self::key( $job_id ) );
+		delete_transient( self::key( $job_id ) );
 	}
 
 	/**
@@ -240,7 +249,7 @@ class Blogcraft_Usage {
 	 * @return array
 	 */
 	private static function running( $job_id ) {
-		$stored = get_option( self::key( $job_id ), array() );
+		$stored = get_transient( self::key( $job_id ) );
 
 		return wp_parse_args(
 			is_array( $stored ) ? $stored : array(),
@@ -257,6 +266,10 @@ class Blogcraft_Usage {
 
 	/**
 	 * Where a job's running total is kept.
+	 *
+	 * A transient rather than an option: it expires on its own, so an
+	 * abandoned job leaves nothing to clean up, and uninstall does not
+	 * need a direct query to reach a set of names by prefix.
 	 *
 	 * @param int $job_id The job.
 	 * @return string

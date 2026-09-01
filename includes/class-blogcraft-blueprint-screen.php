@@ -176,7 +176,7 @@ class Blogcraft_Blueprint_Screen {
 		self::render_rail();
 
 		echo '<div class="bc-panes">';
-		self::pane_start();
+		self::pane_start( $blueprint );
 		self::pane_voice( $blueprint );
 		self::pane_structure( $blueprint );
 		self::pane_seo( $blueprint );
@@ -296,22 +296,38 @@ class Blogcraft_Blueprint_Screen {
 	 *
 	 * Neither saves. Both fill the controls in, and everything stays editable.
 	 *
+	 * @param array $blueprint The saved rules.
 	 * @return void
 	 */
-	private static function pane_start() {
+	private static function pane_start( $blueprint ) {
 		self::pane_open( 'start', true );
 
 		echo '<p class="bc-note">' . esc_html__( 'Both of these fill in the controls on the other tabs. Nothing is saved until you press Save changes, and every field stays yours to change.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
 		echo '<h3 class="bc-subhead">' . esc_html__( 'A shape', 'dicecodes-ai-blog-writer' ) . '</h3>';
+		// What the saved rules were started from, so the card that built
+		// them is still marked after a save and a reload. The class was
+		// only ever added by the script, in the moment, and went the
+		// instant the page was loaded again.
+		$chosen = isset( $blueprint['archetype'] ) ? (string) $blueprint['archetype'] : '';
+
+		printf(
+			'<input type="hidden" name="archetype" id="bc_archetype" value="%s" />',
+			esc_attr( $chosen )
+		);
+
 		echo '<div class="bc-shapes">';
 
 		foreach ( Blogcraft_Archetypes::all() as $slug => $shape ) {
+			$is = ( $slug === $chosen );
+
 			printf(
-				'<button type="button" class="bc-shape" data-shape="%1$s"><strong>%2$s</strong><span>%3$s</span></button>',
+				'<button type="button" class="bc-shape%4$s" data-shape="%1$s" aria-pressed="%5$s"><strong>%2$s</strong><span>%3$s</span></button>',
 				esc_attr( $slug ),
 				esc_html( $shape['label'] ),
-				esc_html( $shape['blurb'] )
+				esc_html( $shape['blurb'] ),
+				$is ? ' is-chosen' : '',
+				$is ? 'true' : 'false'
 			);
 		}
 
