@@ -806,6 +806,153 @@ a.bc-nav-item:hover {
 	}
 }
 
+/* ------------------------------------------------ connecting an app. */
+
+/* The result of the check that runs when a token is issued. Three states,
+   because "could not reach my own address" is genuinely different from
+   "the connection is broken" — plenty of hosts block loopback while
+   answering the outside world perfectly. */
+.bc-mcp-test {
+	margin: 0 0 16px;
+	padding: 12px 16px;
+	border-left: 3px solid var(--bc-line);
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
+	font-size: var(--bc-t-md);
+}
+
+.bc-mcp-test.is-good {
+	border-left-color: var(--bc-ok);
+	background: var(--bc-surface-soft);
+}
+
+.bc-mcp-test.is-unsure {
+	border-left-color: var(--bc-warn);
+	background: var(--bc-warn-soft);
+}
+
+.bc-mcp-test.is-bad {
+	border-left-color: var(--bc-bad);
+	background: var(--bc-surface-soft);
+}
+
+.bc-mcp-steps {
+	counter-reset: bc-mcp;
+	margin: 0 0 24px;
+	padding: 0;
+	list-style: none;
+}
+
+.bc-mcp-steps > li {
+	counter-increment: bc-mcp;
+	position: relative;
+	margin: 0 0 16px;
+	padding-left: 40px;
+}
+
+.bc-mcp-steps > li::before {
+	content: counter(bc-mcp);
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: var(--bc-accent-soft);
+	color: var(--bc-accent);
+	font-size: var(--bc-t-sm);
+	font-weight: 700;
+}
+
+.bc-mcp-steps strong {
+	display: block;
+	font-size: var(--bc-t-md);
+}
+
+/* The address is the thing being copied, so it gets the width to show
+   itself. Inside a list item large-text alone was truncating it. */
+.bc-mcp-steps input[type="text"] {
+	width: 100%;
+	max-width: 640px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: var(--bc-t-sm);
+}
+
+.bc-mcp-steps p {
+	margin: 2px 0 8px;
+	color: var(--bc-ink-soft);
+}
+
+/* One panel per app, because the options differ and the wrong one fails
+   with a message that does not say what to pick instead. */
+.bc-mcp-clients {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.bc-mcp-client {
+	padding: 16px 18px;
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	background: var(--bc-surface);
+}
+
+.bc-mcp-client h4 {
+	margin: 0 0 4px;
+	font-size: var(--bc-t-md);
+}
+
+.bc-mcp-where {
+	margin: 0 0 8px;
+	font-size: var(--bc-t-sm);
+	color: var(--bc-muted);
+}
+
+.bc-mcp-client ul {
+	margin: 0;
+	padding-left: 18px;
+	font-size: var(--bc-t-md);
+}
+
+.bc-mcp-client li {
+	margin-bottom: 4px;
+}
+
+.bc-mcp-warn {
+	margin: 10px 0 0;
+	font-size: var(--bc-t-sm);
+	color: var(--bc-warn);
+}
+
+.bc-mcp-command {
+	margin: 0;
+	padding: 10px 12px;
+	overflow-x: auto;
+	border-radius: var(--bc-r-sm);
+	background: var(--bc-hair);
+	font-size: var(--bc-t-sm);
+}
+
+.bc-token-fresh {
+	margin: 0 0 16px;
+	padding: 14px 16px;
+	border-left: 3px solid var(--bc-accent);
+	border-radius: 0 var(--bc-r-md) var(--bc-r-md) 0;
+	background: var(--bc-accent-soft);
+}
+
+.bc-token-issue {
+	margin-top: 12px;
+}
+
+.bc-client-heading {
+	margin: 24px 0 10px;
+	font-size: var(--bc-t-lg);
+}
+
 /* ------------------------------------------------------- the help copy. */
 
 /* One sentence, set slightly larger, so a section can be judged from its

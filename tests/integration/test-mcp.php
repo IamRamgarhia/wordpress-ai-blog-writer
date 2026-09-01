@@ -377,10 +377,13 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'blogcraft_mcp_issue', $html, 'there is no way to issue a token' );
 	}
 
-	public function test_the_screen_shows_nothing_to_connect_to_while_it_is_off() {
-		// The address and the token controls are the two things worth
-		// hiding: offering them before the server will answer is an
-		// invitation to a connection that silently fails.
+	public function test_the_card_is_usable_without_saving_first() {
+		// It used to show a sentence telling you to tick a box and save
+		// before it would show you anything — so connecting took a tick, a
+		// save, and then a hunt for the button that had appeared. The
+		// address, the steps and the token control are all on the card from
+		// the first visit now, and issuing a token is what switches
+		// connections on.
 		Blogcraft_Settings::set( 'mcp_enabled', false );
 		wp_set_current_user( $this->author );
 
@@ -388,10 +391,56 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		Blogcraft_Connection::render();
 		$html = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'bc-card-clients', $html );
-		$this->assertStringNotContainsString( 'blogcraft_mcp_issue', $html );
+		$this->assertStringContainsString( esc_attr( Blogcraft_Mcp::endpoint() ), $html, 'the address is hidden until something is saved' );
+		$this->assertStringContainsString( 'blogcraft_mcp_issue', $html, 'the token control is hidden until something is saved' );
 	}
 
+	public function test_the_server_still_refuses_while_it_is_switched_off() {
+		// Showing the card is not the same as accepting connections. The
+		// screen explains itself to anybody; the endpoint answers nobody
+		// until it is on.
+		Blogcraft_Settings::set( 'mcp_enabled', false );
+
+		$this->assertSame( 404, $this->rpc( 'server/discover' )['status'] );
+	}
+
+	public function test_issuing_a_token_switches_connections_on() {
+		// The step that used to be a separate tick-and-save.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$at     = strpos( $source, 'function handle_mcp_issue(' );
+		$next   = strpos( $source, 'public static function', $at + 10 );
+		$body   = substr( $source, $at, ( false === $next ) ? null : $next - $at );
+
+		$this->assertStringContainsString( "set( 'mcp_enabled', true )", $body );
+	}
+
+	public function test_issuing_a_token_tests_the_connection() {
+		// Both faults this feature has had were invisible from inside PHP
+		// and obvious from one real request, so issuing a token makes one.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$at     = strpos( $source, 'function handle_mcp_issue(' );
+		$next   = strpos( $source, 'public static function', $at + 10 );
+		$body   = substr( $source, $at, ( false === $next ) ? null : $next - $at );
+
+		$this->assertStringContainsString( 'self_test', $body );
+	}
+
+	public function test_the_card_names_the_options_each_app_needs() {
+		// Claude Desktop offers four ways to authenticate and three OAuth
+		// arrangements. Picking the wrong one fails with a message about
+		// client registration that says nothing about what to do instead,
+		// so the card names the two choices that work.
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Claude Desktop', $html );
+		$this->assertStringContainsString( 'ChatGPT', $html );
+		$this->assertStringContainsString( 'Authorization', $html );
+		$this->assertStringContainsString( 'Always required', $html, 'the card does not warn about the option that fails' );
+	}
 	public function test_the_card_says_what_a_client_cannot_do() {
 		// Somebody who switches this on and then goes looking for
 		// scheduled posts has been let down by this screen.
@@ -428,7 +477,8 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		// fixed exactly this for the Gemini key.
 		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$at     = strpos( $source, 'function handle_mcp_issue(' );
-		$body   = substr( $source, $at, 900 );
+		$next   = strpos( $source, 'public static function', $at + 10 );
+		$body   = substr( $source, $at, ( false === $next ) ? null : $next - $at );
 
 		$this->assertStringContainsString( 'set_transient', $body );
 		$this->assertStringNotContainsString( 'add_query_arg', $body );

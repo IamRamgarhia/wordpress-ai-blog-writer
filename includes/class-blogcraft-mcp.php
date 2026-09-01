@@ -97,6 +97,105 @@ class Blogcraft_Mcp {
 	}
 
 	/**
+	 * Call our own endpoint the way a client will, and say what happened.
+	 *
+	 * Every fault this feature has had so far was invisible from inside PHP and
+	 * obvious from one real request: a route registered at an address WordPress
+	 * then normalised away, and an Authorization header that Apache never
+	 * passes through. Both looked perfect in a unit test.
+	 *
+	 * So issuing a token runs this. Somebody who presses the button and is told
+	 * it works has been told something worth knowing, and somebody whose server
+	 * cannot answer finds out here rather than from an app that says only that
+	 * it could not connect.
+	 *
+	 * @param string $token A token that should be accepted.
+	 * @return array Keys: ok, unknown, message.
+	 */
+	public static function self_test( $token ) {
+		$response = wp_remote_post(
+			self::endpoint(),
+			array(
+				'timeout'     => 15,
+				'redirection' => 0,
+				'headers'     => array(
+					'content-type'  => 'application/json',
+					'authorization' => 'Bearer ' . $token,
+				),
+				'body'        => (string) wp_json_encode(
+					array(
+						'jsonrpc' => '2.0',
+						'id'      => 1,
+						'method'  => 'tools/list',
+					)
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			// The site could not reach itself. Usually a host that does not
+			// route loopback requests, in which case an app on the internet
+			// may still connect perfectly — so this is reported as unproven
+			// rather than as a failure.
+			return array(
+				'ok'      => false,
+				'unknown' => true,
+				'message' => sprintf(
+					/* translators: %s: the error this server reported. */
+					__( 'Token issued, but this server could not call its own address to check it: %s. Plenty of hosts block that while still answering the outside world, so try connecting from your app before worrying.', 'dicecodes-ai-blog-writer' ),
+					$response->get_error_message()
+				),
+			);
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+
+		if ( 404 === $code ) {
+			return array(
+				'ok'      => false,
+				'unknown' => false,
+				'message' => __( 'The address came back as not found. Save this page with the box ticked and try again. If it keeps happening, something on this site is blocking the WordPress REST API.', 'dicecodes-ai-blog-writer' ),
+			);
+		}
+
+		if ( 401 === $code ) {
+			return array(
+				'ok'      => false,
+				'unknown' => false,
+				'message' => __( 'The address answered but would not accept the token. That normally means your server removes the Authorization header before WordPress sees it, which is common on Apache. Adding the line CGIPassAuth On to your .htaccess usually fixes it; otherwise ask your host to pass Authorization through.', 'dicecodes-ai-blog-writer' ),
+			);
+		}
+
+		if ( 200 !== $code || ! isset( $body['result']['tools'] ) ) {
+			return array(
+				'ok'      => false,
+				'unknown' => false,
+				'message' => sprintf(
+					/* translators: %d: an HTTP status code. */
+					__( 'The address answered with %d instead of the list of tools. Something between your app and WordPress is changing the response, and a security plugin or a firewall is the usual cause.', 'dicecodes-ai-blog-writer' ),
+					$code
+				),
+			);
+		}
+
+		return array(
+			'ok'      => true,
+			'unknown' => false,
+			'message' => sprintf(
+				/* translators: %d: how many tools the site offers. */
+				_n(
+					'Tested and working. Your site answered with %d tool ready to use.',
+					'Tested and working. Your site answered with %d tools ready to use.',
+					count( $body['result']['tools'] ),
+					'dicecodes-ai-blog-writer'
+				),
+				count( $body['result']['tools'] )
+			),
+		);
+	}
+
+	/**
 	 * Register the route.
 	 *
 	 * @return void

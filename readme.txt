@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.71.0
+Stable tag: 0.72.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.72.0 =
+* Connecting an app is one button now. It used to be: tick a box, save the page, come back, find the controls that had appeared, then issue a token. Everything is on the card from the first visit, and issuing a token is what switches connections on — pressing that button is not an ambiguous statement of intent
+* Issuing a token also tests it. The site calls its own address exactly as an app will and reports what came back, so a server that strips the Authorization header or blocks the REST API says so here rather than leaving you with an app that only says it could not connect
+* The card names the exact options each app needs. Claude Desktop offers four ways to authenticate and three OAuth arrangements, and the one it picks by itself fails with a message about registering an OAuth client that does not say what to choose instead. Set Authentication to None and add the Authorization header; the card says so, and warns about the option that fails
+* Step by step rather than three paragraphs, with the address to copy in the step that asks you to copy it, and "How this works" going to the instructions rather than unfolding a summary of them
+
 = 0.71.0 =
 * A second way to supply a model, for anyone already paying for Claude, ChatGPT or a similar app. Instead of this site calling a provider with your key, the app connects to this site and does the writing, while the writing rules, the twenty-five checks and the publishing stay here. No API key, and nothing leaves your site: the connection comes in
 * Settings, Connect an AI client. Switch it on, issue a token, and paste the address and the token into whatever you use. It speaks the Model Context Protocol, so it is not tied to one app
@@ -188,9 +194,5 @@ everything is here, oldest at the bottom.
 * The documentation address no longer contains the old term either. The review named URLs specifically, and a link on the author's own domain still spells out a name that belongs to somebody else
 * readme.txt names where development happens, which guideline 4 asks for: the source ships in full, but the build scripts do not, so the repository is linked
 * Trimmed two paragraphs of argument out of External Services. That section had crossed the 5,000-character ceiling and would have been truncated on the listing — the same fault as the changelog, one section along, and the test only covered the changelog. It covers every section now
-
-= 0.67.0 =
-* Renamed to Dicecodes AI Blog Writer, slug dicecodes-ai-blog-writer. The directory review flagged "Blogcraft" as a term belonging to somebody else in the same field, and a name that could be read as another company's is worth losing however good it sounded. The author's own brand goes at the front, which is the pattern the directory asks for
-* The text domain follows the slug, as it must. Nothing that identifies stored data moved: the option names, the capability, the admin addresses and the class names are unchanged, so an existing install keeps its settings and its record of every post written
 Older releases are listed in changelog.txt, which ships with the plugin.
 
