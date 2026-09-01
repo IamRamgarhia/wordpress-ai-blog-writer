@@ -2503,3 +2503,10 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: var(--bc-t-xs);
 	margin: var(--bc-s2) 0 0;
 }
+
+/* The way out of a screen that no longer explains itself in full. */
+
+.bc-page-docs {
+	font-size: var(--bc-t-sm);
+	margin: var(--bc-s2) 0 0;
+}

@@ -220,7 +220,7 @@ class Blogcraft_Readiness {
 			'' !== $niche && '' !== $audience,
 			3,
 			__( 'A described voice and reader', 'dicecodes-ai-blog-writer' ),
-			__( 'Set once, in Settings, and sent with every request afterwards. It is the difference between posts that sound like your blog and posts that sound like every other AI blog. There is a button there that reads your existing posts and fills it in for you.', 'dicecodes-ai-blog-writer' )
+			__( 'Sent with every request. A button in Settings fills it in from your posts.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 

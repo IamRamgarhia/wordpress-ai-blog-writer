@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.77.0
+Stable tag: 0.78.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,11 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.78.0 =
+* The Write a post screen is a screen you fill in, not one you read. Every field on it carried a paragraph explaining itself and several carried two — the explanation for the evidence box ran to three sentences, and the topic field had two separate paragraphs above and below it. One line each now
+* That page links to the documentation, which it never did. The detail that came off the screen is there rather than gone
+* Shorter wording on the research and voice prompts too, and on the settings card that explains research
+
 = 0.77.0 =
 * Every post now says what wrote it: the provider, the model, the tokens in and out, and the score. A panel on the post itself. The numbers were already being handed over on every reply and thrown away — the month total could say thirteen thousand tokens and nothing could say which post spent them, or which model wrote any given piece
 * A post written from Claude or ChatGPT says so instead, and says nothing was billed here, because the model ran on their subscription
@@ -189,15 +194,5 @@ everything is here, oldest at the bottom.
 * The connect card asks which app you are using and then shows the steps for that one. It used to print a general four-step list and, underneath it, a different set of steps for every app it knows about, all at once — which is not thoroughness, it is a question about which list you are meant to be following
 * Fewer words on every step, and the address sits on its own with a button rather than inside a numbered instruction to copy it
 * Your choice of app is remembered, so coming back to check a step does not mean picking it again
-
-= 0.74.0 =
-* You can now sign an app in, instead of copying a token into it. Paste the address, approve the connection on your own site, and that is the whole of it. This is what Claude and ChatGPT have always needed: their connector dialogs have no field for a request header, so they ask the site where to sign in, and this site had nowhere to point them. That is why it answered "couldn't connect to the server" no matter what the address was
-* The approval screen says what a connected app will be able to do and, just as plainly, what it will not — it cannot touch a post it did not write, write anything while you are away, or read your settings and keys
-* Tokens still work and still never expire, for editors and machines that would rather use one. Signing in is what the apps that cannot use a token now do instead
-* Copy buttons on the address, the token and the command. Each of those has to arrive in another window exactly right, and losing the last character of an address produces an error that blames the server
-* Step by step for each app, in the order you do them, rather than a paragraph describing the arrangement
-* The result of the connection test stays on the screen until you dismiss it. It used to vanish on the next page load, which is the worst possible behaviour for the one message that explains a failure
-* Says so when this site is on plain permalinks, which is the one setting that stops signing in from working, and links straight to the setting
-* Fixed: deleting the plugin left the list of connected apps behind. The check that should have caught that only recognised a stored value if it had been given a particular sort of name, which is no check at all — it looks at what is stored now
 Older releases are listed in changelog.txt, which ships with the plugin.
 

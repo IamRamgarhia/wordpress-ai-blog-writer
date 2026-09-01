@@ -218,7 +218,17 @@ class Blogcraft_Generate {
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
 		echo '<h1>' . esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, critiques its own work, rewrites, then checks the result before anything reaches your site.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, checks its own work and rewrites before anything reaches your site.', 'dicecodes-ai-blog-writer' ) . '</p>';
+
+		// Every field on this screen used to carry a paragraph explaining
+		// itself, and several carried two. A screen you fill in is not a
+		// screen you read. The explanations live in the documentation now,
+		// which this page had no link to at all.
+		printf(
+			'<p class="bc-page-docs"><a href="%1$s">%2$s</a></p>',
+			esc_url( Blogcraft_Docs::url( 'how-it-writes' ) ),
+			esc_html__( 'How it writes, and what every field here does', 'dicecodes-ai-blog-writer' )
+		);
 		echo '</div>';
 
 		if ( is_array( $notice ) ) {
@@ -252,7 +262,7 @@ class Blogcraft_Generate {
 
 		printf(
 			'<p class="bc-commit-say">%s</p>',
-			esc_html__( 'You are taken to a live progress screen while it writes, and shown the finished draft and its score before anything reaches your site.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'You watch it write, and see the draft and its score before it lands.', 'dicecodes-ai-blog-writer' )
 		);
 
 		if ( Blogcraft_Provider_Registry::is_configured() ) {
@@ -393,7 +403,7 @@ class Blogcraft_Generate {
 		if ( ! $researching && ! Blogcraft_Research::has_search_provider() ) {
 			$gaps[] = array(
 				'title' => __( 'It has nothing to read but its own memory', 'dicecodes-ai-blog-writer' ),
-				'why'   => __( 'With research on, the model is handed current sources and the finished draft is checked against them. With everything off it writes from training data, which dates badly and can cite nothing. The two free sources need no account.', 'dicecodes-ai-blog-writer' ),
+				'why'   => __( 'Without sources it writes from memory, which dates badly. Two free sources need no account.', 'dicecodes-ai-blog-writer' ),
 				'url'   => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
 				'link'  => __( 'Switch one on', 'dicecodes-ai-blog-writer' ),
 			);
@@ -813,7 +823,7 @@ class Blogcraft_Generate {
 
 		echo '<aside class="bc-readiness">';
 		echo '<h2>' . esc_html__( 'Before you write', 'dicecodes-ai-blog-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'These are set once and used by every post afterwards. Skipping them is the difference between a post that sounds like your blog and one that sounds like every other AI blog.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'Set once, then used by every post.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '<ul>';
 
 		foreach ( $missing as $item ) {
@@ -918,21 +928,21 @@ class Blogcraft_Generate {
 
 		echo Blogcraft_Controls::row(
 			__( 'Topic', 'dicecodes-ai-blog-writer' ),
-			__( 'A sentence works better than a keyword. Say what the post should actually answer.', 'dicecodes-ai-blog-writer' ),
-			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'dicecodes-ai-blog-writer' ) . '" /><p class="bc-only-this">' . esc_html__( 'This is the only thing you have to fill in. Everything below already has an answer, taken from your standing rules.', 'dicecodes-ai-blog-writer' ) . '</p><p class="bc-clash" id="bc-clash" hidden></p>',
+			__( 'A sentence beats a keyword. Say what the post should answer.', 'dicecodes-ai-blog-writer' ),
+			'<input type="text" class="bc-text bc-text-lead" name="topic" id="bc_topic" value="" required autocomplete="off" placeholder="' . esc_attr__( 'How to choose a standing desk for a small home office', 'dicecodes-ai-blog-writer' ) . '" /><p class="bc-only-this">' . esc_html__( 'The only field you have to fill in.', 'dicecodes-ai-blog-writer' ) . '</p><p class="bc-clash" id="bc-clash" hidden></p>',
 			'bc_topic'
 		);
 
 		echo Blogcraft_Controls::row(
 			__( 'Angle for this post', 'dicecodes-ai-blog-writer' ),
-			__( 'Anything true of this one post only. This is what stops every post reading the same.', 'dicecodes-ai-blog-writer' ),
+			__( 'Anything true of this post only. Stops them all reading the same.', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Controls::area( 'instructions', '', __( 'Compare three price brackets and say which is worth it.', 'dicecodes-ai-blog-writer' ), 2 ),
 			'bc_instructions'
 		);
 
 		echo Blogcraft_Controls::row(
 			__( 'What you know that nobody else does', 'dicecodes-ai-blog-writer' ),
-			__( 'Your own numbers, results, prices, or what happened when you tried it. This is the only part of a post a model cannot produce, and it is what separates a page worth reading from a summary of pages that already exist. Everything here is used as fact and never invented beyond.', 'dicecodes-ai-blog-writer' ),
+			__( 'Your own numbers, prices, or what happened when you tried it. Used as fact, never invented beyond.', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Controls::area(
 				'evidence',
 				'',
@@ -954,7 +964,7 @@ class Blogcraft_Generate {
 			. '<p class="bc-suggest-lead">%3$s</p><ul id="blogcraft-suggest-list"></ul></div>'
 			. '</div>',
 			esc_html__( 'What should I write about this?', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'Reads your topic and asks four questions only you can answer. It never answers them for you — invented facts are exactly what this field exists to avoid.', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Asks four questions only you can answer, for the box above.', 'dicecodes-ai-blog-writer' ),
 			esc_html__( 'Answer any of these in the box above, in your own words:', 'dicecodes-ai-blog-writer' )
 		);
 
@@ -987,7 +997,7 @@ class Blogcraft_Generate {
 	private static function render_brief_tabs( $bp ) {
 		echo '<div class="bc-tabs-head">';
 		echo '<h2>' . esc_html__( 'Everything else about this post', 'dicecodes-ai-blog-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'These start from your standing rules and change this post only. Pictures and Publishing are here too.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'Changes this post only.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="bc-tabs" role="tablist">';
@@ -1465,7 +1475,7 @@ class Blogcraft_Generate {
 		echo '<aside class="bc-outcome" aria-labelledby="bc-outcome-title">';
 		echo '<div class="bc-outcome-head">';
 		echo '<h2 id="bc-outcome-title">' . esc_html__( 'What you will get', 'dicecodes-ai-blog-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'The shape of the post, not its words. Updates as you change anything.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '<p>' . esc_html__( 'The shape of it, not the words.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		printf(
@@ -1534,7 +1544,7 @@ class Blogcraft_Generate {
 
 		$out .= sprintf(
 			'<p class="bc-hint">%s</p>',
-			esc_html__( 'Token estimates are deliberately generous. Your provider bills you, not us.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Deliberately generous. Your provider bills you, not us.', 'dicecodes-ai-blog-writer' )
 		);
 
 		foreach ( $warnings as $warning ) {

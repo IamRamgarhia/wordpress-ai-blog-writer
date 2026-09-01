@@ -1751,7 +1751,7 @@ class Blogcraft_Connection {
 			'research'   => array(
 				'anchor' => 'research',
 				'lines'  => array(
-					__( 'This is the single biggest lever on whether a post is worth reading. With research on, the model is handed current sources and writes from them. With it off, it writes from memory, which is exactly the kind of page search engines now discount.', 'dicecodes-ai-blog-writer' ),
+					__( 'The biggest lever on quality. Without sources it writes from memory, which search engines discount.', 'dicecodes-ai-blog-writer' ),
 					__( 'Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'dicecodes-ai-blog-writer' ),
 					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'dicecodes-ai-blog-writer' ),
 				),

@@ -3,6 +3,11 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.78.0 =
+* The Write a post screen is a screen you fill in, not one you read. Every field on it carried a paragraph explaining itself and several carried two — the explanation for the evidence box ran to three sentences, and the topic field had two separate paragraphs above and below it. One line each now
+* That page links to the documentation, which it never did. The detail that came off the screen is there rather than gone
+* Shorter wording on the research and voice prompts too, and on the settings card that explains research
+
 = 0.77.0 =
 * Every post now says what wrote it: the provider, the model, the tokens in and out, and the score. A panel on the post itself. The numbers were already being handed over on every reply and thrown away — the month total could say thirteen thousand tokens and nothing could say which post spent them, or which model wrote any given piece
 * A post written from Claude or ChatGPT says so instead, and says nothing was billed here, because the model ran on their subscription
