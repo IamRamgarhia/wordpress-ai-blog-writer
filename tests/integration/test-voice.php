@@ -84,7 +84,15 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 		$this->describe( array( 'avoid_subjects' => 'Instant coffee' ) );
 		$this->describe( array( 'experience' => 'I ran a cafe for six years.' ) );
 
-		$prompt = Blogcraft_Voice::system_prompt();
+		// The whole prompt, both halves. The tone and the reader are the
+		// blueprint's to state now, and asking only this half for them
+		// would be asking it to say them twice again.
+		Blogcraft_Prompts::use_blueprint( Blogcraft_Blueprint::get() );
+
+		$whole = new ReflectionMethod( 'Blogcraft_Prompts', 'base_system' );
+		$whole->setAccessible( true );
+
+		$prompt = (string) $whole->invoke( null );
 
 		$this->assertStringContainsString( 'Specialty coffee brewing', $prompt );
 		$this->assertStringContainsString( 'Home baristas', $prompt );

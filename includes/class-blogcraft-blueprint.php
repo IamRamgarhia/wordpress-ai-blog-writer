@@ -857,6 +857,40 @@ class Blogcraft_Blueprint {
 			$blueprint[ $field ] = $value;
 		}
 
+		// These two were free text on the old screen and are choices
+		// here, so they are matched on the word that decides them.
+		// Anything that matches nothing is left at its default rather
+		// than guessed at.
+		$spoken = array(
+			'point_of_view' => array(
+				'first person plural' => 'first_plural',
+				'first person'        => 'first_person',
+				'second person'       => 'second',
+				'third person'        => 'third',
+			),
+			'reading_level' => array(
+				'simple'   => 'simple',
+				'general'  => 'general',
+				'informed' => 'informed',
+				'expert'   => 'expert',
+			),
+		);
+
+		foreach ( $spoken as $field => $words ) {
+			$said = strtolower( trim( (string) Blogcraft_Settings::get( 'voice_' . $field ) ) );
+
+			if ( '' === $said || $blueprint[ $field ] !== $defaults[ $field ] ) {
+				continue;
+			}
+
+			foreach ( $words as $needle => $choice ) {
+				if ( false !== strpos( $said, $needle ) ) {
+					$blueprint[ $field ] = $choice;
+					break;
+				}
+			}
+		}
+
 		$tone = trim( (string) Blogcraft_Settings::get( 'voice_tone' ) );
 
 		if ( '' !== $tone && $blueprint['tone'] === $defaults['tone'] ) {
