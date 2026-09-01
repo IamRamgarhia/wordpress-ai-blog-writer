@@ -76,6 +76,11 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		delete_option( 'blogcraft_welcomed' );
 		delete_option( 'blogcraft_welcome_pending' );
 
+		// Connection tokens for AI clients. These are credentials, so they
+		// go with everything else rather than outliving the plugin that
+		// issued them.
+		delete_option( 'blogcraft_mcp_tokens' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 
 		// The posts themselves are the user's and stay. Everything Blogcraft
@@ -83,6 +88,8 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// every trace is removed and it was not true of any of these.
 		$post_meta = array(
 			'_blogcraft_generated',
+			'_blogcraft_mcp',
+			'_blogcraft_evidence',
 			'_blogcraft_words',
 			'_blogcraft_quality',
 			'_blogcraft_quality_reasons',

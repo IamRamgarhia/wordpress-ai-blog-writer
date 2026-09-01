@@ -45,6 +45,13 @@ class Blogcraft_Settings_Schema {
 			// sitting above every route that costs nothing. An empty value
 			// is a real state the rest of the code already handles: nothing
 			// is configured until the reader says which.
+			// Off until chosen. This one opens a route that can publish
+			// posts, so it is the last setting that should default on.
+			'mcp_enabled'                     => array(
+				'default' => false,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'provider_type'                   => array(
 				'default' => '',
 				'type'    => 'string',

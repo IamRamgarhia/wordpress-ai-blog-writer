@@ -71,6 +71,12 @@ class Blogcraft {
 		Blogcraft_Autopilot::init();
 		Blogcraft_Indexnow::init();
 
+		// Registers a REST route, so it runs for every request rather than
+		// only in the admin: the client connecting is an application, not a
+		// browser, and it never loads an admin screen. The route itself
+		// refuses everything until the reader switches it on.
+		Blogcraft_Mcp::init();
+
 		if ( is_admin() ) {
 			// Schema changes used to arrive only through the activation hook,
 			// which a one-click update never fires — so an update that needed

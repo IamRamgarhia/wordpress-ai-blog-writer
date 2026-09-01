@@ -681,6 +681,10 @@ msgstr ""
 msgid "Cheaper model for the bulk"
 msgstr ""
 
+#: includes/class-blogcraft-mcp-tools.php:93
+msgid "Check for an existing post"
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:1049
 #: includes/class-blogcraft-connection.php:854
 msgid "Check it works"
@@ -829,6 +833,10 @@ msgstr ""
 
 #: includes/class-blogcraft-connection.php:141
 msgid "Could not read a model list. Check the key is right, or type the model id yourself — the link beside this field goes to your provider's list."
+msgstr ""
+
+#: includes/class-blogcraft-mcp-tools.php:108
+msgid "Create a draft"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1375
@@ -1234,6 +1242,10 @@ msgstr ""
 msgid "Fills these in from what you have already published. Nothing is saved until you press save."
 msgstr ""
 
+#: includes/class-blogcraft-mcp-tools.php:74
+msgid "Find posts to link to"
+msgstr ""
+
 #: includes/class-blogcraft-progress.php:67
 msgid "Finding the pictures"
 msgstr ""
@@ -1347,6 +1359,10 @@ msgstr ""
 #: includes/class-blogcraft-connection.php:190
 #: includes/class-blogcraft-connection.php:301
 msgid "Get a key from %s"
+msgstr ""
+
+#: includes/class-blogcraft-mcp-tools.php:34
+msgid "Get the writing rules"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:398
@@ -2648,6 +2664,10 @@ msgstr ""
 msgid "Provider could not be reached."
 msgstr ""
 
+#: includes/class-blogcraft-mcp-tools.php:153
+msgid "Publish a draft"
+msgstr ""
+
 #: includes/class-blogcraft-generate.php:1439
 msgid "Publish at"
 msgstr ""
@@ -2800,6 +2820,10 @@ msgstr ""
 msgid "Recent jobs"
 msgstr ""
 
+#: includes/class-blogcraft-mcp-resources.php:41
+msgid "Recent posts"
+msgstr ""
+
 #: includes/class-blogcraft-overview.php:501
 msgid "Recently written"
 msgstr ""
@@ -2880,6 +2904,10 @@ msgstr ""
 #. translators: %s: reviewer name.
 #: includes/class-blogcraft-seo.php:1071
 msgid "Reviewed by %s"
+msgstr ""
+
+#: includes/class-blogcraft-mcp-tools.php:135
+msgid "Revise a draft"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:418
@@ -2975,6 +3003,10 @@ msgstr ""
 #: includes/class-blogcraft-library.php:350
 #: includes/class-blogcraft-overview.php:514
 msgid "Score"
+msgstr ""
+
+#: includes/class-blogcraft-mcp-tools.php:43
+msgid "Score a draft"
 msgstr ""
 
 #. translators: %d: quality score out of 100.
@@ -3428,6 +3460,10 @@ msgstr ""
 msgid "Text is kept out of generated images by default. Image models render lettering as convincing gibberish."
 msgstr ""
 
+#: includes/class-blogcraft-mcp.php:125
+msgid "That connection token is not valid for this site."
+msgstr ""
+
 #: includes/class-blogcraft-emulate.php:50
 msgid "That does not look like a web address."
 msgstr ""
@@ -3819,6 +3855,10 @@ msgstr ""
 msgid "This scored below your bar. Creating it anyway is fine — it lands as a draft you can edit."
 msgstr ""
 
+#: includes/class-blogcraft-mcp.php:117
+msgid "This site is not accepting AI client connections."
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:924
 msgid "Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own."
 msgstr ""
@@ -4038,6 +4078,10 @@ msgstr ""
 #: includes/class-blogcraft-welcome.php:85
 #: includes/class-blogcraft-welcome.php:86
 msgid "Welcome to Dicecodes AI Blog Writer"
+msgstr ""
+
+#: includes/class-blogcraft-mcp-resources.php:48
+msgid "What counts as finished"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:78
@@ -4427,6 +4471,10 @@ msgstr ""
 
 #: includes/class-blogcraft-docs.php:252
 msgid "Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both."
+msgstr ""
+
+#: includes/class-blogcraft-mcp-resources.php:34
+msgid "Writing rules"
 msgstr ""
 
 #: includes/class-blogcraft-progress.php:59
