@@ -45,8 +45,12 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 		// while nobody is watching. Neither happens on a site an app drives.
 		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
 
-		$this->assertFalse( Blogcraft_Mode::allows( 'blogcraft-write' ) );
 		$this->assertFalse( Blogcraft_Mode::allows( 'blogcraft-calendar' ) );
+
+		// Write a post stays. It cannot do its usual job here, but
+		// taking it away removed the answer to "where do I write?"
+		// without putting one anywhere.
+		$this->assertTrue( Blogcraft_Mode::allows( 'blogcraft-write' ) );
 
 		// And everything else still is. Naming only the exceptions means a
 		// screen added later is available until somebody decides otherwise,
@@ -63,9 +67,12 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 		Blogcraft_Nav::render();
 		$html = (string) ob_get_clean();
 
-		$this->assertStringNotContainsString( 'page=blogcraft-write', $html );
 		$this->assertStringNotContainsString( 'page=blogcraft-calendar', $html );
 		$this->assertStringContainsString( 'page=blogcraft-settings', $html );
+
+		// The first question anybody has is where to write, and the
+		// navigation is where they look for it.
+		$this->assertStringContainsString( 'page=blogcraft-write', $html );
 	}
 
 	public function test_a_bookmarked_screen_explains_itself_rather_than_breaking() {
@@ -74,11 +81,10 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
 
 		ob_start();
-		Blogcraft_Generate::render();
+		Blogcraft_Calendar::render();
 		$html = (string) ob_get_clean();
 
 		$this->assertStringContainsString( 'Not on this setup', $html );
-		$this->assertStringNotContainsString( 'bc_topic', $html, 'the form rendered anyway' );
 	}
 
 	public function test_every_screen_named_as_mode_only_is_a_screen_that_exists() {
@@ -168,5 +174,21 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 				);
 			}
 		}
+	}
+
+	public function test_the_write_screen_says_where_the_writing_happens() {
+		// Somebody on this path opens Write a post and needs two things:
+		// to be told the writing happens in their app, and the sentence to
+		// say there.
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
+
+		ob_start();
+		Blogcraft_Generate::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'You write in Claude or ChatGPT', $html );
+		$this->assertStringContainsString( 'Read my writing rules and write a post about X', $html );
+		$this->assertStringContainsString( 'data-copy=', $html, 'the instruction cannot be copied' );
+		$this->assertStringNotContainsString( 'bc_topic', $html, 'the provider form rendered anyway' );
 	}
 }

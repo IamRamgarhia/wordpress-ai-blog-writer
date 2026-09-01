@@ -95,6 +95,26 @@ class Blogcraft_Generate {
 			BLOGCRAFT_VERSION
 		);
 
+		// admin.js is a series of independent blocks that each return
+		// early when their markup is absent, so loading it here costs
+		// nothing and is what makes the copy buttons work.
+		wp_enqueue_script(
+			'blogcraft-admin',
+			BLOGCRAFT_URL . 'assets/admin.js',
+			array(),
+			BLOGCRAFT_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'blogcraft-admin',
+			'blogcraftProviders',
+			array(
+				'copied'     => __( 'Copied', 'dicecodes-ai-blog-writer' ),
+				'copyFailed' => __( 'Press Ctrl+C to copy', 'dicecodes-ai-blog-writer' ),
+			)
+		);
+
 		wp_enqueue_script(
 			'blogcraft-compose',
 			BLOGCRAFT_URL . 'assets/compose.js',
@@ -203,16 +223,80 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * Where the writing happens when an app does it.
+	 *
+	 * @return void
+	 */
+	private static function render_client_write() {
+		echo '<div class="wrap blogcraft-page">';
+		Blogcraft_Nav::render();
+
+		echo '<div class="blogcraft-head">';
+		printf( '<h1>%s</h1>', esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' ) );
+		printf(
+			'<p>%s</p>',
+			esc_html__( 'You write in Claude or ChatGPT. The post lands here.', 'dicecodes-ai-blog-writer' )
+		);
+		echo '</div>';
+
+		echo '<section class="blogcraft-card">';
+
+		echo '<ol class="bc-mcp-howto">';
+		printf(
+			'<li>%s</li>',
+			esc_html__( 'Open the app you connected.', 'dicecodes-ai-blog-writer' )
+		);
+		printf(
+			'<li>%s</li>',
+			esc_html__( 'Say this, with your own subject in place of X:', 'dicecodes-ai-blog-writer' )
+		);
+		echo '</ol>';
+
+		// The sentence itself, ready to copy. Anybody at this screen has
+		// the other window open already.
+		echo wp_kses(
+			Blogcraft_Connection::copyable(
+				__( 'Read my writing rules and write a post about X for my site.', 'dicecodes-ai-blog-writer' ),
+				__( 'Copy this instruction', 'dicecodes-ai-blog-writer' ),
+				true
+			),
+			Blogcraft_Markup::allowed()
+		);
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'It reads your rules, drafts, scores itself against your checks, fixes what failed, and saves a draft here. Nothing is published until it clears your threshold.', 'dicecodes-ai-blog-writer' )
+		);
+
+		$connected = ! empty( Blogcraft_Mcp_Auth::all() ) || ! empty( Blogcraft_Mcp_Oauth::clients() );
+
+		printf(
+			'<p><a class="button%1$s" href="%2$s">%3$s</a> <a class="button" href="%4$s">%5$s</a></p>',
+			$connected ? '' : ' button-primary',
+			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-clients' ) ),
+			$connected
+				? esc_html__( 'Connected apps', 'dicecodes-ai-blog-writer' )
+				: esc_html__( 'Connect an app first', 'dicecodes-ai-blog-writer' ),
+			esc_url( admin_url( 'admin.php?page=blogcraft-blueprint' ) ),
+			esc_html__( 'How it writes', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '</section>';
+		echo '</div>';
+	}
+
+	/**
 	 * Render the screen.
 	 *
 	 * @return void
 	 */
 	public static function render() {
-		// Writing here means calling a provider, or running while nobody
-		// is watching. Neither happens on a site an app drives, and a
-		// form that cannot be submitted is worse than a plain answer.
-		if ( ! Blogcraft_Mode::allows( 'blogcraft-write' ) ) {
-			Blogcraft_Mode::render_unavailable( 'blogcraft-write' );
+		// On the client path the writing happens in somebody else's
+		// application, so this screen says so and hands over the two
+		// things needed to do it there. A form that cannot be submitted
+		// would be worse, and no screen at all was worse still.
+		if ( Blogcraft_Mode::is_client() ) {
+			self::render_client_write();
 
 			return;
 		}

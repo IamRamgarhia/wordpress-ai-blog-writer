@@ -111,14 +111,16 @@ class Blogcraft_Mode {
 	 */
 	public static function screens() {
 		return array(
-			// Calls a provider on the spot. With no key there is nothing for
-			// it to call, and the page is a form that cannot be submitted.
-			'blogcraft-write'    => self::API,
-
 			// Scheduled and unattended writing, which needs something running
 			// when nobody is watching. An application the reader opens is not
 			// that.
 			'blogcraft-calendar' => self::API,
+
+			// Write a post is deliberately not here. It cannot do its usual
+			// job on the client path, but taking it out of the navigation
+			// removed the answer to "where do I write?" without putting one
+			// anywhere — and that is the first question anybody has. It
+			// stays, and says where the writing happens instead.
 		);
 	}
 

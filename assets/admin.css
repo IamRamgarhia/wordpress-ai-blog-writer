@@ -813,6 +813,9 @@ a.bc-nav-item:hover {
    "the connection is broken" — plenty of hosts block loopback while
    answering the outside world perfectly. */
 .bc-mcp-test {
+	align-items: flex-start;
+	display: flex;
+	gap: var(--bc-s2);
 	margin: 0 0 16px;
 	padding: 12px 16px;
 	border-left: 3px solid var(--bc-line);
@@ -833,55 +836,6 @@ a.bc-nav-item:hover {
 .bc-mcp-test.is-bad {
 	border-left-color: var(--bc-bad);
 	background: var(--bc-surface-soft);
-}
-
-.bc-mcp-steps {
-	counter-reset: bc-mcp;
-	margin: 0 0 24px;
-	padding: 0;
-	list-style: none;
-}
-
-.bc-mcp-steps > li {
-	counter-increment: bc-mcp;
-	position: relative;
-	margin: 0 0 16px;
-	padding-left: 40px;
-}
-
-.bc-mcp-steps > li::before {
-	content: counter(bc-mcp);
-	position: absolute;
-	left: 0;
-	top: 0;
-	display: grid;
-	place-items: center;
-	width: 26px;
-	height: 26px;
-	border-radius: 50%;
-	background: var(--bc-accent-soft);
-	color: var(--bc-accent);
-	font-size: var(--bc-t-sm);
-	font-weight: 700;
-}
-
-.bc-mcp-steps strong {
-	display: block;
-	font-size: var(--bc-t-md);
-}
-
-/* The address is the thing being copied, so it gets the width to show
-   itself. Inside a list item large-text alone was truncating it. */
-.bc-mcp-steps input[type="text"] {
-	width: 100%;
-	max-width: 640px;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: var(--bc-t-sm);
-}
-
-.bc-mcp-steps p {
-	margin: 2px 0 8px;
-	color: var(--bc-ink-soft);
 }
 
 /* One panel per app, because the options differ and the wrong one fails
@@ -2385,27 +2339,6 @@ body[class*="page_blogcraft"] #wpcontent {
    went by faster than it could be read, which for the one message that
    explains a failure is the worst possible behaviour. */
 
-.bc-mcp-test {
-	align-items: flex-start;
-	border: 1px solid var(--bc-line);
-	border-radius: var(--bc-r-md);
-	display: flex;
-	gap: var(--bc-s2);
-	margin: 0 0 var(--bc-s3);
-	padding: var(--bc-s3);
-}
-
-.bc-mcp-test.is-good {
-	border-color: var(--bc-ok);
-}
-
-.bc-mcp-test.is-unsure {
-	border-color: var(--bc-warn);
-}
-
-.bc-mcp-test.is-bad {
-	border-color: var(--bc-bad);
-}
 
 .bc-mcp-test p {
 	flex: 1 1 auto;

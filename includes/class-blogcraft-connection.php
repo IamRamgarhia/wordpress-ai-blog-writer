@@ -1476,7 +1476,7 @@ class Blogcraft_Connection {
 	 * @param bool   $block Whether it is long enough to want its own line.
 	 * @return string Markup, already escaped.
 	 */
-	private static function copyable( $value, $label, $block = false ) {
+	public static function copyable( $value, $label, $block = false ) {
 		return sprintf(
 			'<span class="bc-copy%4$s"><input type="text" class="large-text code" readonly="readonly" value="%1$s" /><button type="button" class="button bc-copy-button" data-copy="%1$s" aria-label="%3$s">%2$s</button><span class="bc-copy-said" role="status" aria-live="polite"></span></span>',
 			esc_attr( $value ),
@@ -1860,7 +1860,7 @@ class Blogcraft_Connection {
 				'lines'     => array(
 					__( 'The card above has this site call a provider with your key. This one is the other way round: an app you already pay for connects to this site and does the writing, while the writing rules, the checks and the publishing stay here. If you have a Claude or ChatGPT subscription, this costs nothing extra.', 'dicecodes-ai-blog-writer' ),
 					__( 'It works with anything that speaks the Model Context Protocol — Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others. Switch it on, issue a token, and paste the address and the token into that app. Your site has to be reachable over HTTPS from the internet for the app to find it.', 'dicecodes-ai-blog-writer' ),
-					__( 'A connected client can read your rules, score a draft, create and revise drafts, and publish above your quality threshold. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing needs the provider card above, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
+					__( 'A connected client can read your rules, score and revise drafts, and publish above your threshold — adding the pictures, tags and links as it goes. It cannot write on a schedule, touch a post it did not create, or use your research sources. Scheduled writing needs an API key, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
 					__( 'A token is a key to this site. It is shown once, stored only as a fingerprint, and stops working the moment the person it was issued to loses permission to write here. Revoke any you are not using.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
