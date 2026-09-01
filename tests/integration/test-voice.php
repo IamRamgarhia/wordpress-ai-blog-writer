@@ -6,6 +6,19 @@
  */
 
 class Test_Blogcraft_Voice extends WP_UnitTestCase {
+	/**
+	 * Describe the voice where it now lives.
+	 *
+	 * @param array $values Blueprint fields to set.
+	 * @return void
+	 */
+	private function describe( $values ) {
+		Blogcraft_Blueprint::save(
+			Blogcraft_Blueprint::DEFAULT_SLUG,
+			array_merge( Blogcraft_Blueprint::get(), $values )
+		);
+	}
+
 
 	public function set_up() {
 		parent::set_up();
@@ -36,7 +49,7 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 
 	public function test_is_configured_tracks_the_niche_field() {
 		$this->assertFalse( Blogcraft_Voice::is_configured() );
-		Blogcraft_Settings::set( 'voice_niche', 'Specialty coffee brewing' );
+		$this->describe( array( 'niche' => 'Specialty coffee brewing' ) );
 		$this->assertTrue( Blogcraft_Voice::is_configured() );
 	}
 
@@ -56,7 +69,7 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 	}
 
 	public function test_banned_words_merge_user_additions_without_duplicates() {
-		Blogcraft_Settings::set( 'voice_banned_words', "synergy\ndelve" );
+		$this->describe( array( 'banned_phrases' => "synergy\ndelve" ) );
 		$banned = Blogcraft_Voice::banned_words();
 
 		$this->assertContains( 'synergy', $banned );
@@ -64,12 +77,12 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 	}
 
 	public function test_system_prompt_includes_configured_fields() {
-		Blogcraft_Settings::set( 'voice_niche', 'Specialty coffee brewing' );
-		Blogcraft_Settings::set( 'voice_audience', 'Home baristas who already own a grinder' );
-		Blogcraft_Settings::set( 'voice_tone', 'Direct and practical' );
-		Blogcraft_Settings::set( 'voice_style_rules', "No em dashes\nShort paragraphs" );
-		Blogcraft_Settings::set( 'voice_banned_topics', 'Instant coffee' );
-		Blogcraft_Settings::set( 'voice_experience', 'I ran a cafe for six years.' );
+		$this->describe( array( 'niche' => 'Specialty coffee brewing' ) );
+		$this->describe( array( 'audience' => 'custom', 'audience_custom' => 'Home baristas who already own a grinder' ) );
+		$this->describe( array( 'tone' => 'custom', 'tone_custom' => 'Direct and practical' ) );
+		$this->describe( array( 'style_rules' => "No em dashes\nShort paragraphs" ) );
+		$this->describe( array( 'avoid_subjects' => 'Instant coffee' ) );
+		$this->describe( array( 'experience' => 'I ran a cafe for six years.' ) );
 
 		$prompt = Blogcraft_Voice::system_prompt();
 
@@ -82,7 +95,7 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 	}
 
 	public function test_voice_reaches_the_actual_prompts() {
-		Blogcraft_Settings::set( 'voice_niche', 'Specialty coffee brewing' );
+		$this->describe( array( 'niche' => 'Specialty coffee brewing' ) );
 
 		$messages = Blogcraft_Prompts::outline( 'Cold brew' );
 
@@ -91,7 +104,7 @@ class Test_Blogcraft_Voice extends WP_UnitTestCase {
 	}
 
 	public function test_every_stage_carries_the_voice() {
-		Blogcraft_Settings::set( 'voice_niche', 'Specialty coffee brewing' );
+		$this->describe( array( 'niche' => 'Specialty coffee brewing' ) );
 
 		$article = array( 'sections' => array( array( 'heading' => 'H' ) ) );
 

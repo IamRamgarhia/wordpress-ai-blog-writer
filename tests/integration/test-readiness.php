@@ -29,8 +29,17 @@ class Test_Blogcraft_Readiness extends WP_UnitTestCase {
 	}
 
 	public function test_a_full_brief_scores_well() {
-		Blogcraft_Settings::set( 'voice_niche', 'Office furniture, tested properly.' );
-		Blogcraft_Settings::set( 'voice_audience', 'People setting up a home office on a budget.' );
+		Blogcraft_Blueprint::save(
+			Blogcraft_Blueprint::DEFAULT_SLUG,
+			array_merge(
+				Blogcraft_Blueprint::get(),
+				array(
+					'niche'           => 'Office furniture, tested properly.',
+					'audience'        => 'custom',
+					'audience_custom' => 'People setting up a home office on a budget.',
+				)
+			)
+		);
 		Blogcraft_Settings::set( 'research_wikipedia', true );
 
 		$state = Blogcraft_Readiness::assess(
@@ -68,7 +77,10 @@ class Test_Blogcraft_Readiness extends WP_UnitTestCase {
 	}
 
 	public function test_a_described_voice_is_only_satisfied_by_both_halves() {
-		Blogcraft_Settings::set( 'voice_niche', 'Coffee equipment.' );
+		Blogcraft_Blueprint::save(
+			Blogcraft_Blueprint::DEFAULT_SLUG,
+			array_merge( Blogcraft_Blueprint::get(), array( 'niche' => 'Coffee equipment.' ) )
+		);
 
 		$state = Blogcraft_Readiness::assess( '', '', '' );
 

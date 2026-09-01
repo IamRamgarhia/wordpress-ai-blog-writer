@@ -240,12 +240,12 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 	public function test_it_suggests_without_saving_anything() {
 		$this->publish( 'A post', '<p>I tried it. We liked it. It worked.</p>' );
 
-		$before = (string) Blogcraft_Settings::get( 'voice_style_rules' );
+		$before = (string) Blogcraft_Blueprint::get()['style_rules'];
 
 		$suggestion = Blogcraft_Learn::suggest();
 
-		$this->assertNotEmpty( $suggestion['fields']['voice_style_rules'] );
-		$this->assertSame( $before, (string) Blogcraft_Settings::get( 'voice_style_rules' ), 'settings were changed without asking' );
+		$this->assertNotEmpty( $suggestion['fields']['style_rules'] );
+		$this->assertSame( $before, (string) Blogcraft_Blueprint::get()['style_rules'], 'the blueprint was changed without asking' );
 	}
 
 	// ------------------------------------------------------------ placement.
