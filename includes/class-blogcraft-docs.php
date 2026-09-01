@@ -177,6 +177,36 @@ class Blogcraft_Docs {
 					__( 'Leave the base URL blank unless you are pointing at a proxy of your own.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
+			'clients'           => array(
+				'title'  => __( 'Writing from Claude or ChatGPT', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'An app you already pay for connects to this site, instead of this site calling a provider.', 'dicecodes-ai-blog-writer' ),
+				'steps'  => array(
+					array(
+						__( 'Switch it on', 'dicecodes-ai-blog-writer' ),
+						__( 'Settings, Connect an AI client. Tick the box and save.', 'dicecodes-ai-blog-writer' ),
+					),
+					array(
+						__( 'Issue a token', 'dicecodes-ai-blog-writer' ),
+						__( 'Name it after the machine you will use it from. It is shown once.', 'dicecodes-ai-blog-writer' ),
+					),
+					array(
+						__( 'Add it to your app', 'dicecodes-ai-blog-writer' ),
+						__( 'Paste the address and the token where that app adds a connector or an MCP server.', 'dicecodes-ai-blog-writer' ),
+					),
+					array(
+						__( 'Ask it to write', 'dicecodes-ai-blog-writer' ),
+						__( '"Write a post about X for my site." It reads your rules, drafts, scores itself and saves a draft here.', 'dicecodes-ai-blog-writer' ),
+					),
+				),
+				'points' => array(
+					__( 'Works with anything that speaks the Model Context Protocol: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others.', 'dicecodes-ai-blog-writer' ),
+					__( 'Nothing leaves your site. The connection comes in, so no research or picture service is contacted at all.', 'dicecodes-ai-blog-writer' ),
+					__( 'Publishing still obeys your quality threshold. A draft under it is refused, exactly as it would be here.', 'dicecodes-ai-blog-writer' ),
+					__( 'It cannot write on a schedule. Something has to be running when nobody is watching, and that is what a provider key is for.', 'dicecodes-ai-blog-writer' ),
+					__( 'It cannot touch a post it did not create, and reads nothing a visitor could not already see.', 'dicecodes-ai-blog-writer' ),
+					__( 'Your site must be reachable over HTTPS from the internet. A local install is not.', 'dicecodes-ai-blog-writer' ),
+				),
+			),
 			'research'          => array(
 				'title'  => __( 'Research', 'dicecodes-ai-blog-writer' ),
 				'lead'   => __( 'The biggest single lever on whether a post is worth reading.', 'dicecodes-ai-blog-writer' ),

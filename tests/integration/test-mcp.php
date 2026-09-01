@@ -34,6 +34,12 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		// sees it.
 		Blogcraft_Capabilities::add();
 
+		// The navigation counts open jobs, so rendering the settings screen
+		// queries a table that will not exist otherwise. The errors are
+		// harmless and that is the problem: noise in the output is where a
+		// real failure goes unnoticed.
+		Blogcraft_Migrator::migrate();
+
 		$this->author = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
 		delete_option( Blogcraft_Mcp_Auth::OPTION );
@@ -329,6 +335,77 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 
 			$this->assertIsArray( $decoded, $resource['uri'] . ' did not return JSON' );
 		}
+	}
+
+	// -------------------------------------------------------- the screen.
+
+	public function test_the_settings_screen_offers_the_endpoint_and_a_token() {
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'bc-card-clients', $html, 'the card is not on the screen' );
+		$this->assertStringContainsString( esc_attr( Blogcraft_Mcp::endpoint() ), $html, 'the address to paste is not shown' );
+		$this->assertStringContainsString( 'blogcraft_mcp_issue', $html, 'there is no way to issue a token' );
+	}
+
+	public function test_the_screen_shows_nothing_to_connect_to_while_it_is_off() {
+		// The address and the token controls are the two things worth
+		// hiding: offering them before the server will answer is an
+		// invitation to a connection that silently fails.
+		Blogcraft_Settings::set( 'mcp_enabled', false );
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'bc-card-clients', $html );
+		$this->assertStringNotContainsString( 'blogcraft_mcp_issue', $html );
+	}
+
+	public function test_the_card_says_what_a_client_cannot_do() {
+		// Somebody who switches this on and then goes looking for
+		// scheduled posts has been let down by this screen.
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'bc-cannot', $html );
+		$this->assertStringContainsString( 'schedule', $html );
+	}
+
+	public function test_issuing_and_revoking_are_guarded() {
+		// Both are entry points that change a credential, so both are
+		// held to the same rule as every other one in the plugin.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		foreach ( array( 'handle_mcp_issue', 'handle_mcp_revoke' ) as $method ) {
+			$at = strpos( $source, 'function ' . $method . '(' );
+
+			$this->assertNotFalse( $at, $method . ' is gone' );
+			$this->assertStringContainsString(
+				'verify_or_die',
+				substr( $source, $at, 600 ),
+				$method . ' changes a credential without verifying anything'
+			);
+		}
+	}
+
+	public function test_a_token_is_never_put_in_a_url() {
+		// A secret in an address is written into every server log along
+		// the way and into the browser's own history. The plugin already
+		// fixed exactly this for the Gemini key.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$at     = strpos( $source, 'function handle_mcp_issue(' );
+		$body   = substr( $source, $at, 900 );
+
+		$this->assertStringContainsString( 'set_transient', $body );
+		$this->assertStringNotContainsString( 'add_query_arg', $body );
 	}
 
 	public function test_an_unknown_tool_or_resource_is_refused() {

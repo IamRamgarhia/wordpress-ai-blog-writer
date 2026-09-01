@@ -30,6 +30,15 @@ class Blogcraft_Connection {
 	 * Nonce action for the connection test.
 	 */
 	const TEST_ACTION = 'blogcraft_test_connection';
+	/**
+	 * Nonce action for issuing a connection token.
+	 */
+	const MCP_ISSUE_ACTION = 'blogcraft_mcp_issue';
+
+	/**
+	 * Nonce action for revoking one.
+	 */
+	const MCP_REVOKE_ACTION = 'blogcraft_mcp_revoke';
 
 	/**
 	 * Transient prefix holding the last result for one user.
@@ -46,6 +55,8 @@ class Blogcraft_Connection {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
+		add_action( 'admin_post_blogcraft_mcp_issue', array( __CLASS__, 'handle_mcp_issue' ) );
+		add_action( 'admin_post_blogcraft_mcp_revoke', array( __CLASS__, 'handle_mcp_revoke' ) );
 		add_action( 'wp_ajax_blogcraft_learn_voice', array( __CLASS__, 'handle_learn' ) );
 		add_action( 'wp_ajax_blogcraft_list_models', array( __CLASS__, 'handle_list_models' ) );
 	}
@@ -417,6 +428,8 @@ class Blogcraft_Connection {
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'dicecodes-ai-blog-writer' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'dicecodes-ai-blog-writer' ),
 			'indexnow_enabled'        => __( 'Tell Bing and Yandex about each post as it goes live', 'dicecodes-ai-blog-writer' ),
+
+			'mcp_enabled'             => __( 'Let an AI client connect to this site', 'dicecodes-ai-blog-writer' ),
 		);
 	}
 
@@ -645,8 +658,10 @@ class Blogcraft_Connection {
 
 		self::close_card();
 
+		self::render_client_card();
+
 		self::open_card(
-			'02',
+			'03',
 			__( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
 			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Dicecodes AI Blog Writer it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
 			'pictures'
@@ -686,7 +701,7 @@ class Blogcraft_Connection {
 		self::close_card();
 
 		self::open_card(
-			'03',
+			'04',
 			__( 'Research', 'dicecodes-ai-blog-writer' ),
 			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'dicecodes-ai-blog-writer' ),
 			'research'
@@ -730,7 +745,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 		self::close_card();
 
-		self::open_card( '04', __( 'Describe your voice', 'dicecodes-ai-blog-writer' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'dicecodes-ai-blog-writer' ), 'voice' );
+		self::open_card( '05', __( 'Describe your voice', 'dicecodes-ai-blog-writer' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'dicecodes-ai-blog-writer' ), 'voice' );
 		if ( Blogcraft_Learn::sample( 1 ) ) {
 			printf(
 				'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
@@ -773,7 +788,7 @@ class Blogcraft_Connection {
 		echo '</tbody></table>';
 
 		self::close_card();
-		self::open_card( '05', __( 'Automation', 'dicecodes-ai-blog-writer' ), __( 'Optional. Turn these on once the writing looks right to you.', 'dicecodes-ai-blog-writer' ), 'automation' );
+		self::open_card( '06', __( 'Automation', 'dicecodes-ai-blog-writer' ), __( 'Optional. Turn these on once the writing looks right to you.', 'dicecodes-ai-blog-writer' ), 'automation' );
 		echo '<table class="form-table" role="presentation"><tbody>';
 
 		foreach ( self::toggle_fields() as $name => $label ) {
@@ -834,7 +849,7 @@ class Blogcraft_Connection {
 		self::close_card();
 		echo '</form>';
 
-		self::open_card( '06', __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ), __( 'What happens to everything it has stored.', 'dicecodes-ai-blog-writer' ), 'removal' );
+		self::open_card( '07', __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ), __( 'What happens to everything it has stored.', 'dicecodes-ai-blog-writer' ), 'removal' );
 
 		printf(
 			'<p class="bc-removal-lead">%s</p>',
@@ -851,7 +866,7 @@ class Blogcraft_Connection {
 		);
 
 		self::close_card();
-		self::open_card( '07', __( 'Check it works', 'dicecodes-ai-blog-writer' ), __( 'Sends one very short request and reports what the provider says back.', 'dicecodes-ai-blog-writer' ), 'test' );
+		self::open_card( '08', __( 'Check it works', 'dicecodes-ai-blog-writer' ), __( 'Sends one very short request and reports what the provider says back.', 'dicecodes-ai-blog-writer' ), 'test' );
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
 		Blogcraft_Request::nonce_field( self::TEST_ACTION );
@@ -867,6 +882,251 @@ class Blogcraft_Connection {
 		echo '</div>';
 
 		echo '</div>';
+	}
+
+	/**
+	 * The card that lets an AI client drive this site.
+	 *
+	 * Its own renderer rather than a few rows in the provider card, because it
+	 * is the other half of the same question — where the model comes from —
+	 * and the two answers are not variations of each other. One spends a key
+	 * you own; this one spends a subscription you already pay for, and moves
+	 * the writing into an app outside WordPress.
+	 *
+	 * @return void
+	 */
+	private static function render_client_card() {
+		self::open_card(
+			'02',
+			__( 'Connect an AI client', 'dicecodes-ai-blog-writer' ),
+			__( 'Write from Claude, ChatGPT or your editor, using the subscription you already have, and let the posts land here. No API key.', 'dicecodes-ai-blog-writer' ),
+			'clients'
+		);
+
+		printf(
+			'<p class="bc-client-lead">%s</p>',
+			esc_html__( 'This is the other way round from the card above. Instead of this site calling a provider, an app you already use connects to this site and does the writing — while the writing rules, the twenty-five checks and the publishing stay here. Nothing is sent anywhere: the connection comes in.', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+		self::checkbox_row( 'mcp_enabled', __( 'Let an AI client connect to this site', 'dicecodes-ai-blog-writer' ) );
+		echo '</tbody></table>';
+
+		if ( ! Blogcraft_Mcp::is_enabled() ) {
+			printf(
+				'<p class="bc-hint">%s</p>',
+				esc_html__( 'Switch that on and save, and the address to paste into your client appears here along with a way to issue a token.', 'dicecodes-ai-blog-writer' )
+			);
+
+			self::close_card();
+
+			return;
+		}
+
+		printf(
+			'<p class="bc-client-endpoint-label">%s</p>',
+			esc_html__( 'Paste this address into your client:', 'dicecodes-ai-blog-writer' )
+		);
+
+		printf(
+			'<input type="text" class="large-text code" readonly="readonly" onfocus="this.select()" value="%s" />',
+			esc_attr( Blogcraft_Mcp::endpoint() )
+		);
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'Works with Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and anything else that speaks the Model Context Protocol. Your site has to be reachable over HTTPS from the internet — a laptop install will not do.', 'dicecodes-ai-blog-writer' )
+		);
+
+		self::render_mcp_tokens();
+		self::render_mcp_limits();
+
+		self::close_card();
+	}
+
+	/**
+	 * The tokens issued for this site, and a way to make another.
+	 *
+	 * @return void
+	 */
+	private static function render_mcp_tokens() {
+		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Connection tokens', 'dicecodes-ai-blog-writer' ) );
+
+		// Shown exactly once, and never from the address bar: a secret in a
+		// URL is written into every server log and the browser's history,
+		// which is the same mistake this plugin already fixed for the Gemini
+		// key.
+		$fresh = get_transient( 'blogcraft_mcp_new_' . get_current_user_id() );
+
+		if ( is_string( $fresh ) && '' !== $fresh ) {
+			delete_transient( 'blogcraft_mcp_new_' . get_current_user_id() );
+
+			printf(
+				'<div class="bc-token-fresh"><p><strong>%1$s</strong></p><input type="text" class="large-text code" readonly="readonly" onfocus="this.select()" value="%2$s" /><p class="description">%3$s</p></div>',
+				esc_html__( 'Copy this now. It is not shown again.', 'dicecodes-ai-blog-writer' ),
+				esc_attr( $fresh ),
+				esc_html__( 'Only a fingerprint of it is stored here, so it cannot be looked up later. Lose it and issue another.', 'dicecodes-ai-blog-writer' )
+			);
+		}
+
+		$tokens = Blogcraft_Mcp_Auth::all();
+
+		if ( empty( $tokens ) ) {
+			printf(
+				'<p class="bc-hint">%s</p>',
+				esc_html__( 'No tokens yet. Issue one and paste it into your client alongside the address above.', 'dicecodes-ai-blog-writer' )
+			);
+		} else {
+			echo '<table class="widefat striped bc-token-table"><thead><tr>';
+			printf( '<th>%s</th>', esc_html__( 'Name', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Created', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Last used', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Revoke', 'dicecodes-ai-blog-writer' ) );
+			echo '</tr></thead><tbody>';
+
+			foreach ( $tokens as $fingerprint => $record ) {
+				$label = trim( (string) $record['label'] );
+
+				echo '<tr>';
+				printf( '<td>%s</td>', esc_html( '' === $label ? __( 'Unnamed', 'dicecodes-ai-blog-writer' ) : $label ) );
+				printf(
+					'<td>%s</td>',
+					esc_html( wp_date( get_option( 'date_format' ), (int) $record['created'] ) )
+				);
+				printf(
+					'<td>%s</td>',
+					esc_html(
+						empty( $record['used'] )
+							? __( 'Never', 'dicecodes-ai-blog-writer' )
+							: wp_date( get_option( 'date_format' ), (int) $record['used'] )
+					)
+				);
+
+				echo '<td>';
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+				echo '<input type="hidden" name="action" value="blogcraft_mcp_revoke" />';
+				printf( '<input type="hidden" name="fingerprint" value="%s" />', esc_attr( $fingerprint ) );
+				Blogcraft_Request::nonce_field( self::MCP_REVOKE_ACTION );
+				printf(
+					'<button type="submit" class="button-link delete">%s</button>',
+					esc_html__( 'Revoke', 'dicecodes-ai-blog-writer' )
+				);
+				echo '</form>';
+				echo '</td></tr>';
+			}
+
+			echo '</tbody></table>';
+		}
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-token-issue">';
+		echo '<input type="hidden" name="action" value="blogcraft_mcp_issue" />';
+		Blogcraft_Request::nonce_field( self::MCP_ISSUE_ACTION );
+		printf(
+			'<input type="text" name="label" class="regular-text" placeholder="%s" />',
+			esc_attr__( 'What is it for — "my laptop", "Claude Desktop"', 'dicecodes-ai-blog-writer' )
+		);
+		echo ' ';
+		submit_button( __( 'Issue a token', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
+		echo '</form>';
+	}
+
+	/**
+	 * What a connected client can and cannot do.
+	 *
+	 * On the card rather than in the documentation. Somebody who switches this
+	 * on and then goes looking for scheduled posts has been let down by this
+	 * screen, not by the plugin.
+	 *
+	 * @return void
+	 */
+	private static function render_mcp_limits() {
+		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'What a connected client can do', 'dicecodes-ai-blog-writer' ) );
+
+		$can = array(
+			__( 'Read your writing rules and the posts you have already published', 'dicecodes-ai-blog-writer' ),
+			__( 'Score a draft against all twenty-five checks and be told what to fix', 'dicecodes-ai-blog-writer' ),
+			__( 'Create and revise drafts here, as real blocks', 'dicecodes-ai-blog-writer' ),
+			__( 'Publish, but only above the quality threshold you set', 'dicecodes-ai-blog-writer' ),
+		);
+
+		$cannot = array(
+			__( 'Write on a schedule — that needs the provider card above, because something has to be running', 'dicecodes-ai-blog-writer' ),
+			__( 'Touch any post it did not create itself', 'dicecodes-ai-blog-writer' ),
+			__( 'Use the research sources or the picture services', 'dicecodes-ai-blog-writer' ),
+			__( 'Read anything a visitor to your site could not already see', 'dicecodes-ai-blog-writer' ),
+		);
+
+		echo '<div class="bc-client-limits">';
+
+		echo '<ul class="bc-can">';
+		foreach ( $can as $line ) {
+			printf( '<li>%s</li>', esc_html( $line ) );
+		}
+		echo '</ul>';
+
+		echo '<ul class="bc-cannot">';
+		foreach ( $cannot as $line ) {
+			printf( '<li>%s</li>', esc_html( $line ) );
+		}
+		echo '</ul>';
+
+		echo '</div>';
+	}
+
+	/**
+	 * Issue a connection token.
+	 *
+	 * @return void
+	 */
+	public static function handle_mcp_issue() {
+		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::MCP_ISSUE_ACTION, $nonce );
+
+		$label  = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		$secret = Blogcraft_Mcp_Auth::issue( get_current_user_id(), $label );
+
+		if ( '' !== $secret ) {
+			// Held for one minute, for one user, and deleted on first render.
+			// Long enough to survive the redirect, short enough that it is
+			// not sitting in the options table afterwards.
+			set_transient( 'blogcraft_mcp_new_' . get_current_user_id(), $secret, MINUTE_IN_SECONDS );
+		}
+
+		wp_safe_redirect( self::settings_url( 'bc-card-clients' ) );
+		exit;
+	}
+
+	/**
+	 * Revoke one.
+	 *
+	 * @return void
+	 */
+	public static function handle_mcp_revoke() {
+		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::MCP_REVOKE_ACTION, $nonce );
+
+		$fingerprint = isset( $_POST['fingerprint'] ) ? sanitize_text_field( wp_unslash( $_POST['fingerprint'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+
+		if ( '' !== $fingerprint ) {
+			Blogcraft_Mcp_Auth::revoke( $fingerprint );
+		}
+
+		wp_safe_redirect( self::settings_url( 'bc-card-clients' ) );
+		exit;
+	}
+
+	/**
+	 * This screen, optionally at one of its cards.
+	 *
+	 * @param string $anchor Card id, or ''.
+	 * @return string
+	 */
+	private static function settings_url( $anchor = '' ) {
+		$url = admin_url( 'admin.php?page=blogcraft-settings' );
+
+		return ( '' === $anchor ) ? $url : $url . '#' . $anchor;
 	}
 
 	/**
@@ -922,6 +1182,15 @@ class Blogcraft_Connection {
 					__( 'Dicecodes AI Blog Writer has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'dicecodes-ai-blog-writer' ),
 					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'dicecodes-ai-blog-writer' ),
 					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'dicecodes-ai-blog-writer' ),
+				),
+			),
+			'clients'    => array(
+				'anchor' => 'clients',
+				'lines'  => array(
+					__( 'The card above has this site call a provider with your key. This one is the other way round: an app you already pay for connects to this site and does the writing, while the writing rules, the checks and the publishing stay here. If you have a Claude or ChatGPT subscription, this costs nothing extra.', 'dicecodes-ai-blog-writer' ),
+					__( 'It works with anything that speaks the Model Context Protocol — Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others. Switch it on, issue a token, and paste the address and the token into that app. Your site has to be reachable over HTTPS from the internet for the app to find it.', 'dicecodes-ai-blog-writer' ),
+					__( 'A connected client can read your rules, score a draft, create and revise drafts, and publish above your quality threshold. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing needs the provider card above, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
+					__( 'A token is a key to this site. It is shown once, stored only as a fingerprint, and stops working the moment the person it was issued to loses permission to write here. Revoke any you are not using.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'pictures'   => array(
