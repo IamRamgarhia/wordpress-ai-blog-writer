@@ -1572,17 +1572,17 @@ class Blogcraft_Connection {
 		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'What a connected client can do', 'dicecodes-ai-blog-writer' ) );
 
 		$can = array(
-			__( 'Read your writing rules and the posts you have already published', 'dicecodes-ai-blog-writer' ),
-			__( 'Score a draft against all twenty-five checks and be told what to fix', 'dicecodes-ai-blog-writer' ),
-			__( 'Create and revise drafts here, as real blocks', 'dicecodes-ai-blog-writer' ),
-			__( 'Publish, but only above the quality threshold you set', 'dicecodes-ai-blog-writer' ),
+			__( 'Read your rules and published posts', 'dicecodes-ai-blog-writer' ),
+			__( 'Score a draft and be told what to fix', 'dicecodes-ai-blog-writer' ),
+			__( 'Create, revise and re-read drafts here', 'dicecodes-ai-blog-writer' ),
+			__( 'Publish above your threshold, with pictures, tags and links added', 'dicecodes-ai-blog-writer' ),
 		);
 
 		$cannot = array(
-			__( 'Write on a schedule — that needs the provider card above, because something has to be running', 'dicecodes-ai-blog-writer' ),
-			__( 'Touch any post it did not create itself', 'dicecodes-ai-blog-writer' ),
-			__( 'Use the research sources or the picture services', 'dicecodes-ai-blog-writer' ),
-			__( 'Read anything a visitor to your site could not already see', 'dicecodes-ai-blog-writer' ),
+			__( 'Write on a schedule — that needs an API key', 'dicecodes-ai-blog-writer' ),
+			__( 'Touch a post it did not write', 'dicecodes-ai-blog-writer' ),
+			__( 'Use your research sources — it uses its own', 'dicecodes-ai-blog-writer' ),
+			__( 'Read anything a visitor could not already see', 'dicecodes-ai-blog-writer' ),
 		);
 
 		echo '<div class="bc-client-limits">';

@@ -53,6 +53,12 @@ class Blogcraft_Cost {
 	 * @return void
 	 */
 	public static function record( $provider, $model, $prompt_tokens, $completion_tokens ) {
+		// The provider and the model were arguments this method took and
+		// then discarded, so the screen could say the month had cost
+		// thirteen thousand tokens and nothing could say which post
+		// spent them, or which model wrote any given piece.
+		Blogcraft_Usage::add( $provider, $model, $prompt_tokens, $completion_tokens );
+
 		$month  = self::current_month();
 		$stored = self::raw();
 

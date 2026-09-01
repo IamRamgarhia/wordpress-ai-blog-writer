@@ -1027,6 +1027,11 @@ class Blogcraft_Mcp_Tools {
 		update_post_meta( $post_id, '_blogcraft_mcp', 1 );
 		update_post_meta( $post_id, '_blogcraft_generated', 1 );
 
+		// Nothing was spent here: the model ran in somebody else's
+		// application on their subscription. Saying so is more use
+		// than an empty panel that reads as a bug.
+		Blogcraft_Usage::by_client( $post_id );
+
 		// post_excerpt, not a key of our own: it is where mode A already
 		// puts the search description and where the SEO code reads it.
 		if ( isset( $args['meta_description'] ) ) {

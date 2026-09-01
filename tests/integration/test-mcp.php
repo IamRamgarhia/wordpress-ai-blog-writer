@@ -865,4 +865,27 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 			);
 		}
 	}
+
+	public function test_a_post_says_what_wrote_it() {
+		// The provider, the model and the token counts were arguments the
+		// cost recorder took and threw away, so nothing could say which
+		// model wrote a given post. A post written by a connected app has
+		// no token cost at all, and saying that is more use than an empty
+		// panel that reads as a bug.
+		$post_id = $this->draft();
+
+		$usage = Blogcraft_Usage::of( $post_id );
+
+		$this->assertSame( 'client', $usage['provider'] );
+		$this->assertSame( 0, (int) $usage['requests'] );
+
+		$post = get_post( $post_id );
+
+		ob_start();
+		Blogcraft_Usage::render_box( $post );
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'connected AI client', $html );
+		$this->assertStringNotContainsString( 'Tokens:', $html, 'it claims a token cost it did not have' );
+	}
 }

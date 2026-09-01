@@ -114,6 +114,12 @@ class Blogcraft_Worker {
 		}
 
 		Blogcraft_Cron_Health::record_heartbeat();
+
+		// A post is written across several requests, so the running
+		// total cannot live in a static. This is the one place that
+		// knows which job the calls that follow belong to.
+		Blogcraft_Usage::watch( (int) $job->id );
+
 		self::execute( $job );
 
 		return true;

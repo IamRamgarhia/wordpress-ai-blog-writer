@@ -1318,6 +1318,8 @@ class Blogcraft_Pipeline {
 
 		update_post_meta( $post_id, '_blogcraft_topic', isset( $payload['topic'] ) ? (string) $payload['topic'] : '' );
 
+		Blogcraft_Usage::claim( (int) $job->id, $post_id );
+
 		$payload['post_id'] = $post_id;
 
 		// Everything above is a meta write and returns in milliseconds. What

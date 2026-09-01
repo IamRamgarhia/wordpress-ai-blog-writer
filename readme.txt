@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.76.0
+Stable tag: 0.77.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
+
+= 0.77.0 =
+* Every post now says what wrote it: the provider, the model, the tokens in and out, and the score. A panel on the post itself. The numbers were already being handed over on every reply and thrown away — the month total could say thirteen thousand tokens and nothing could say which post spent them, or which model wrote any given piece
+* A post written from Claude or ChatGPT says so instead, and says nothing was billed here, because the model ran on their subscription
+* Fixed: the AI client card still listed pictures among the things a connected app cannot use. It has been able to since the last release
+* Shorter wording again across the connect card and the chooser
 
 = 0.76.0 =
 * A post written from Claude or ChatGPT is now finished the way every other post here is: a featured image, pictures under the headings, the search title, the category and tags, links added from older posts pointing at the new one, and a submission to the search engines that accept one. It used to go out with none of that — a draft that happened to be public

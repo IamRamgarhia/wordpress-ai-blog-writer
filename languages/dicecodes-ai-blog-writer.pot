@@ -55,6 +55,11 @@ msgstr ""
 msgid "%1$d queued, %2$d skipped as too similar to a post you have or one already waiting."
 msgstr ""
 
+#. translators: 1: tokens sent, 2: tokens returned, 3: number of requests.
+#: includes/class-blogcraft-usage.php:214
+msgid "%1$s in, %2$s out, over %3$s requests"
+msgstr ""
+
 #. translators: 1: application name, 2: WordPress display name.
 #: includes/class-blogcraft-mcp-oauth.php:354
 msgid "%1$s is asking to connect to this site as %2$s."
@@ -1009,12 +1014,12 @@ msgstr ""
 msgid "Create and edit drafts, which it writes itself"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1577
-msgid "Create and revise drafts here, as real blocks"
-msgstr ""
-
 #: includes/class-blogcraft-progress.php:1214
 msgid "Create the post"
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:1577
+msgid "Create, revise and re-read drafts here"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1511
@@ -2146,6 +2151,10 @@ msgstr ""
 msgid "Model name missing"
 msgstr ""
 
+#: includes/class-blogcraft-usage.php:203
+msgid "Model:"
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:657
 msgid "Monthly token cap"
 msgstr ""
@@ -2411,6 +2420,10 @@ msgstr ""
 msgid "Not specified"
 msgstr ""
 
+#: includes/class-blogcraft-usage.php:175
+msgid "Not written by this plugin."
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:934
 msgid "Nothing contacts a picture service until you switch one on. The default is free."
 msgstr ""
@@ -2493,6 +2506,10 @@ msgstr ""
 
 #: includes/class-blogcraft-welcome.php:428
 msgid "On the Write screen there is a field asking what you know that nobody else does. It is the heaviest check on the finished post and the only part of a page a model genuinely cannot produce."
+msgstr ""
+
+#: includes/class-blogcraft-usage.php:191
+msgid "On their subscription. Nothing was billed to you here."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1875
@@ -2982,6 +2999,10 @@ msgstr ""
 msgid "Provider could not be reached."
 msgstr ""
 
+#: includes/class-blogcraft-usage.php:196
+msgid "Provider:"
+msgstr ""
+
 #: includes/class-blogcraft-mcp-tools.php:192
 msgid "Publish a draft"
 msgstr ""
@@ -2990,16 +3011,16 @@ msgstr ""
 msgid "Publish a draft it wrote, once it clears your threshold"
 msgstr ""
 
+#: includes/class-blogcraft-connection.php:1578
+msgid "Publish above your threshold, with pictures, tags and links added"
+msgstr ""
+
 #: includes/class-blogcraft-generate.php:1439
 msgid "Publish at"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:968
 msgid "Publish it"
-msgstr ""
-
-#: includes/class-blogcraft-connection.php:1578
-msgid "Publish, but only above the quality threshold you set"
 msgstr ""
 
 #: includes/class-blogcraft-library.php:394
@@ -3084,7 +3105,7 @@ msgid "Read a draft back"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1585
-msgid "Read anything a visitor to your site could not already see"
+msgid "Read anything a visitor could not already see"
 msgstr ""
 
 #: includes/class-blogcraft-library.php:294
@@ -3125,7 +3146,7 @@ msgid "Read the guides"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1575
-msgid "Read your writing rules and the posts you have already published"
+msgid "Read your rules and published posts"
 msgstr ""
 
 #: includes/class-blogcraft-mcp-oauth.php:411
@@ -3375,12 +3396,16 @@ msgstr ""
 msgid "Score a draft"
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1576
-msgid "Score a draft against all twenty-five checks and be told what to fix"
-msgstr ""
-
 #: includes/class-blogcraft-mcp-oauth.php:413
 msgid "Score a draft against your quality checks"
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:1576
+msgid "Score a draft and be told what to fix"
+msgstr ""
+
+#: includes/class-blogcraft-usage.php:228
+msgid "Score:"
 msgstr ""
 
 #. translators: %d: quality score out of 100.
@@ -4392,6 +4417,10 @@ msgstr ""
 msgid "Tokens, roughly"
 msgstr ""
 
+#: includes/class-blogcraft-usage.php:210
+msgid "Tokens:"
+msgstr ""
+
 #: includes/class-blogcraft-blueprint-screen.php:719
 msgid "Tolerance"
 msgstr ""
@@ -4415,12 +4444,9 @@ msgstr ""
 msgid "Topic queue"
 msgstr ""
 
+#: includes/class-blogcraft-connection.php:1583
 #: includes/class-blogcraft-mcp-oauth.php:425
 msgid "Touch a post it did not write"
-msgstr ""
-
-#: includes/class-blogcraft-connection.php:1583
-msgid "Touch any post it did not create itself"
 msgstr ""
 
 #: includes/class-blogcraft-generate.php:594
@@ -4529,16 +4555,16 @@ msgstr ""
 msgid "Use contractions. Write the way people speak."
 msgstr ""
 
-#: includes/class-blogcraft-connection.php:1584
-msgid "Use the research sources or the picture services"
-msgstr ""
-
 #: includes/class-blogcraft-docs.php:182
 msgid "Use the subscription you already pay for. No API key, and usually no token either."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:928
 msgid "Use the subscription you already pay for. No API key."
+msgstr ""
+
+#: includes/class-blogcraft-connection.php:1584
+msgid "Use your research sources — it uses its own"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:618
@@ -4976,7 +5002,7 @@ msgid "Write on"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1582
-msgid "Write on a schedule — that needs the provider card above, because something has to be running"
+msgid "Write on a schedule — that needs an API key"
 msgstr ""
 
 #: includes/class-blogcraft-overview.php:164
@@ -5065,7 +5091,12 @@ msgstr ""
 #: includes/class-blogcraft-library.php:57
 #: includes/class-blogcraft-nav.php:35
 #: includes/class-blogcraft-progress.php:1260
+#: includes/class-blogcraft-usage.php:155
 msgid "Written by AI"
+msgstr ""
+
+#: includes/class-blogcraft-usage.php:186
+msgid "Written by:"
 msgstr ""
 
 #: includes/class-blogcraft-archetypes.php:190
@@ -5211,6 +5242,10 @@ msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:283
 msgid "[what this post is about, described by the model]"
+msgstr ""
+
+#: includes/class-blogcraft-usage.php:187
+msgid "a connected AI client"
 msgstr ""
 
 #: includes/class-blogcraft-structure.php:199

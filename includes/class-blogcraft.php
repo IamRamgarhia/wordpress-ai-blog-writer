@@ -75,6 +75,7 @@ class Blogcraft {
 		// only in the admin: the client connecting is an application, not a
 		// browser, and it never loads an admin screen. The route itself
 		// refuses everything until the reader switches it on.
+		Blogcraft_Usage::init();
 		Blogcraft_Mcp::init();
 
 		// The other half of the same door: applications whose connector
