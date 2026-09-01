@@ -91,6 +91,9 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// live one rather than outliving the plugin that stored them.
 		delete_option( 'blogcraft_saved_providers' );
 
+		// A brief nobody collected.
+		delete_option( 'blogcraft_pending_brief' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 

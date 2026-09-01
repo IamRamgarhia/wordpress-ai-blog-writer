@@ -394,6 +394,7 @@ class Blogcraft_Mcp {
 			' ',
 			array(
 				'This is a WordPress site you can write for.',
+				'Call get_brief first: the owner may already have written down the topic, the angle and what only they know.',
 				'Read blogcraft://writing-rules first and follow it; it is the standing brief for this site.',
 				'Call find_duplicate before writing, so you do not compete with a post that already exists.',
 				'Call suggest_internal_links and weave those links into sentences rather than listing them.',

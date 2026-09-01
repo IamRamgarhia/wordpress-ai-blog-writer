@@ -54,6 +54,7 @@ class Blogcraft_Generate {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ), 15 );
 		add_action( 'admin_post_blogcraft_queue_topic', array( __CLASS__, 'handle_queue' ) );
+		add_action( 'admin_post_blogcraft_save_brief', array( __CLASS__, 'handle_brief' ) );
 		add_action( 'admin_post_blogcraft_run_queue_now', array( __CLASS__, 'handle_run_now' ) );
 		add_action( 'admin_post_blogcraft_bulk_topics', array( __CLASS__, 'handle_bulk' ) );
 		add_action( 'admin_post_blogcraft_rollback', array( __CLASS__, 'handle_rollback' ) );
@@ -223,6 +224,60 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * What to do once the brief is filled in.
+	 *
+	 * @return void
+	 */
+	private static function render_brief_hand_off() {
+		$waiting   = Blogcraft_Brief::get();
+		$connected = ! empty( Blogcraft_Mcp_Auth::all() ) || ! empty( Blogcraft_Mcp_Oauth::clients() );
+
+		echo '<section class="blogcraft-card bc-handoff">';
+
+		if ( ! $connected ) {
+			printf(
+				'<p class="bc-mcp-warn">%1$s <a href="%2$s">%3$s</a></p>',
+				esc_html__( 'No app is connected yet, so nothing will collect this.', 'dicecodes-ai-blog-writer' ),
+				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-clients' ) ),
+				esc_html__( 'Connect one', 'dicecodes-ai-blog-writer' )
+			);
+		}
+
+		if ( ! empty( $waiting ) ) {
+			printf(
+				'<p class="bc-handoff-waiting">%s</p>',
+				esc_html(
+					sprintf(
+						/* translators: %s: the topic of the brief that is waiting. */
+						__( 'Waiting to be written: %s', 'dicecodes-ai-blog-writer' ),
+						$waiting['topic']
+					)
+				)
+			);
+		}
+
+		printf(
+			'<p>%s</p>',
+			esc_html__( 'Save the brief below, then say this in your app:', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo wp_kses(
+			Blogcraft_Connection::copyable(
+				__( 'Read my brief and my writing rules, then write that post.', 'dicecodes-ai-blog-writer' ),
+				__( 'Copy this instruction', 'dicecodes-ai-blog-writer' ),
+				true
+			),
+			Blogcraft_Markup::allowed()
+		);
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'It collects the topic, the angle, anything only you know, and every choice you changed below. Then it drafts, scores itself against your checks, fixes what failed, and saves a draft here.', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '</section>';
+	}
+	/**
 	 * Where the writing happens when an app does it.
 	 *
 	 * @return void
@@ -291,15 +346,6 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function render() {
-		// On the client path the writing happens in somebody else's
-		// application, so this screen says so and hands over the two
-		// things needed to do it there. A form that cannot be submitted
-		// would be worse, and no screen at all was worse still.
-		if ( Blogcraft_Mode::is_client() ) {
-			self::render_client_write();
-
-			return;
-		}
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
@@ -310,8 +356,17 @@ class Blogcraft_Generate {
 		echo '<div class="wrap blogcraft-page blogcraft-compose-page">';
 		Blogcraft_Nav::render();
 		echo '<div class="blogcraft-head">';
+		$client = Blogcraft_Mode::is_client();
+
 		echo '<h1>' . esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Give it a topic. It researches, drafts, checks its own work and rewrites before anything reaches your site.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		printf(
+			'<p>%s</p>',
+			esc_html(
+				$client
+					? __( 'Fill this in, then ask your app to write. It collects the brief from here.', 'dicecodes-ai-blog-writer' )
+					: __( 'Give it a topic. It researches, drafts, checks its own work and rewrites before anything reaches your site.', 'dicecodes-ai-blog-writer' )
+			)
+		);
 
 		// Every field on this screen used to carry a paragraph explaining
 		// itself, and several carried two. A screen you fill in is not a
@@ -333,15 +388,22 @@ class Blogcraft_Generate {
 			);
 		}
 
-		if ( ! Blogcraft_Provider_Registry::is_configured() ) {
+		if ( ! $client && ! Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
 				esc_html__( 'No AI provider is configured yet. Set one up under Dicecodes AI Blog Writer → Settings first.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
+		if ( $client ) {
+			self::render_brief_hand_off();
+		}
+
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" id="blogcraft-compose">';
-		echo '<input type="hidden" name="action" value="blogcraft_queue_topic" />';
+		printf(
+			'<input type="hidden" name="action" value="%s" />',
+			esc_attr( $client ? 'blogcraft_save_brief' : 'blogcraft_queue_topic' )
+		);
 		echo '<input type="hidden" name="bc_compose" value="1" />';
 		Blogcraft_Request::nonce_field( self::QUEUE_ACTION );
 
@@ -358,7 +420,14 @@ class Blogcraft_Generate {
 			esc_html__( 'You watch it write, and see the draft and its score before it lands.', 'dicecodes-ai-blog-writer' )
 		);
 
-		if ( Blogcraft_Provider_Registry::is_configured() ) {
+		// On the client path there is no provider to be missing, and the
+		// button does not start the writing — it hands the brief over.
+		if ( Blogcraft_Mode::is_client() ) {
+			printf(
+				'<button type="submit" class="bc-save">%s</button>',
+				esc_html__( 'Save this brief', 'dicecodes-ai-blog-writer' )
+			);
+		} elseif ( Blogcraft_Provider_Registry::is_configured() ) {
 			printf(
 				'<button type="submit" class="bc-save">%s</button>',
 				// "Queue" described the old behaviour, where the post was
@@ -1699,6 +1768,52 @@ class Blogcraft_Generate {
 
 	/**
 	 * Queue a submitted topic.
+	 *
+	 * @return void
+	 */
+	/**
+	 * Keep a brief for a connected app to collect.
+	 *
+	 * The same form as handle_queue reads, going somewhere else. The
+	 * fields are identical because the brief is identical — the only
+	 * difference is which side of the connection does the writing.
+	 *
+	 * @return void
+	 */
+	public static function handle_brief() {
+		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::QUEUE_ACTION, $nonce );
+
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to write posts here.', 'dicecodes-ai-blog-writer' ) );
+		}
+
+		// Verified above by Blogcraft_Request::verify_or_die().
+		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		if ( '' === $topic ) {
+			self::back( false, __( 'Please enter a topic.', 'dicecodes-ai-blog-writer' ) );
+		}
+
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => $topic,
+				'angle'     => isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'evidence'  => isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'overrides' => self::overrides_from( wp_unslash( $_POST ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
+				'placement' => self::placement_from( $_POST ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is cast or sanitised inside placement_from().
+			)
+		);
+
+		self::back(
+			true,
+			__( 'Saved. Ask your app to write it — it will collect this brief.', 'dicecodes-ai-blog-writer' )
+		);
+	}
+
+	/**
+	 * Start writing the post the form describes.
 	 *
 	 * @return void
 	 */

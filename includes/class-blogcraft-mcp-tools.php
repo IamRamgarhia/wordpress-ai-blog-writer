@@ -30,6 +30,15 @@ class Blogcraft_Mcp_Tools {
 	public static function definitions() {
 		return array(
 			array(
+				'name'        => 'get_brief',
+				'title'       => __( 'Get the brief', 'dicecodes-ai-blog-writer' ),
+				'description' => 'The post the site owner has asked for: the topic, the angle, anything only they know, and any per-post choices that differ from the standing rules. Call this first whenever you are asked to write, and follow it. Returns nothing when no brief is waiting, in which case ask what to write about.',
+				'inputSchema' => array(
+					'type'       => 'object',
+					'properties' => new stdClass(),
+				),
+			),
+			array(
 				'name'        => 'get_writing_rules',
 				'title'       => __( 'Get the writing rules', 'dicecodes-ai-blog-writer' ),
 				'description' => 'The standing brief every post on this site is written to: length, sections, sentence and paragraph limits, reading ease, the subject, the voice, banned phrasing, and which blocks a post should contain. Read this before drafting anything.',
@@ -291,6 +300,9 @@ class Blogcraft_Mcp_Tools {
 		}
 
 		switch ( $name ) {
+			case 'get_brief':
+				return self::brief();
+
 			case 'get_writing_rules':
 				return self::writing_rules();
 
@@ -745,6 +757,29 @@ class Blogcraft_Mcp_Tools {
 	// ------------------------------------------------------------ helpers.
 
 	/**
+	 * The brief waiting on the site, if there is one.
+	 *
+	 * The Write a post screen still has its whole form on this path.
+	 * Reducing it to a sentence to paste threw away the topic, the
+	 * angle, the evidence box and every per-post override — which are
+	 * the things that make a post specific rather than generic. They
+	 * are filled in there and collected here.
+	 *
+	 * @return array
+	 */
+	private static function brief() {
+		$text = Blogcraft_Brief::as_text();
+
+		if ( '' === $text ) {
+			return self::ok(
+				'No brief is waiting. Ask what the post should be about, and what the author knows about it that nobody else does.'
+			);
+		}
+
+		return self::ok( $text );
+	}
+
+	/**
 	 * Put the post where it belongs: category, tags, search title.
 	 *
 	 * Without this every post written over MCP landed in Uncategorised
@@ -1059,6 +1094,11 @@ class Blogcraft_Mcp_Tools {
 		}
 
 		self::place( $post_id, $args );
+
+		// The brief has been acted on. Leaving it would hand the next
+		// conversation a topic this site has just covered, which is the
+		// duplicate find_duplicate exists to prevent.
+		Blogcraft_Brief::clear();
 	}
 
 	/**
