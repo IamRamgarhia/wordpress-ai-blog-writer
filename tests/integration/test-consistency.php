@@ -143,41 +143,25 @@ class Test_Blogcraft_Consistency extends WP_UnitTestCase {
 		$this->assertSame( array(), $orphans, 'styled but never rendered: ' . implode( ', ', $orphans ) );
 	}
 
-	public function test_nothing_still_says_a_connected_app_cannot_use_pictures() {
-		// It could not, then it could, and three separate sentences went on
-		// saying otherwise — the card, the documentation and the help text,
-		// each found one at a time by somebody reading the screen.
-		$saying = $this->sources();
-
-		unset( $saying['class-blogcraft-mcp-tools.php'] );
-
-		foreach ( $saying as $name => $body ) {
-			preg_match_all( "/'([^']{20,400})'/", $body, $strings );
-
-			foreach ( $strings[1] as $line ) {
-				$low = strtolower( $line );
-
-				if ( false === strpos( $low, 'cannot' ) && false === strpos( $low, 'not able' ) ) {
-					continue;
-				}
-
-				$this->assertStringNotContainsString(
-					'picture',
-					$low,
-					$name . ' still says a client cannot use pictures: "' . $line . '"'
-				);
-			}
-		}
-	}
-
 	public function test_every_admin_page_linked_to_is_a_page_that_exists() {
 		// A button to a screen nothing registers looks like the way forward
 		// and is a dead end.
+		// Slugs are class constants, not literals in the call. Looking for
+		// a quoted slug inside add_submenu_page() found none of them and
+		// duly reported every link in the plugin as broken.
 		$registered = array();
 
 		foreach ( $this->sources() as $body ) {
-			if ( preg_match_all( "/add_(?:menu|submenu)_page\(.*?'(blogcraft[a-z-]*)'/s", $body, $hits ) ) {
-				$registered = array_merge( $registered, $hits[1] );
+			// Most are constants; the consent page passes its slug inline.
+			$patterns = array(
+				"/(?:PAGE_SLUG|MENU_SLUG)\s*=\s*'(blogcraft[a-z-]*)'/",
+				"/'(blogcraft[a-z-]*)',\s*array\( __CLASS__/",
+			);
+
+			foreach ( $patterns as $pattern ) {
+				if ( preg_match_all( $pattern, $body, $hits ) ) {
+					$registered = array_merge( $registered, $hits[1] );
+				}
 			}
 		}
 

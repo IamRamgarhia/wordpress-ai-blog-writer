@@ -838,58 +838,6 @@ a.bc-nav-item:hover {
 	background: var(--bc-surface-soft);
 }
 
-/* One panel per app, because the options differ and the wrong one fails
-   with a message that does not say what to pick instead. */
-.bc-mcp-clients {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: 16px;
-	margin-bottom: 24px;
-}
-
-.bc-mcp-client {
-	padding: 16px 18px;
-	border: 1px solid var(--bc-line);
-	border-radius: var(--bc-r-md);
-	background: var(--bc-surface);
-}
-
-.bc-mcp-client h4 {
-	margin: 0 0 4px;
-	font-size: var(--bc-t-md);
-}
-
-.bc-mcp-where {
-	margin: 0 0 8px;
-	font-size: var(--bc-t-sm);
-	color: var(--bc-muted);
-}
-
-.bc-mcp-client ul {
-	margin: 0;
-	padding-left: 18px;
-	font-size: var(--bc-t-md);
-}
-
-.bc-mcp-client li {
-	margin-bottom: 4px;
-}
-
-.bc-mcp-warn {
-	margin: 10px 0 0;
-	font-size: var(--bc-t-sm);
-	color: var(--bc-warn);
-}
-
-.bc-mcp-command {
-	margin: 0;
-	padding: 10px 12px;
-	overflow-x: auto;
-	border-radius: var(--bc-r-sm);
-	background: var(--bc-hair);
-	font-size: var(--bc-t-sm);
-}
-
 .bc-token-fresh {
 	margin: 0 0 16px;
 	padding: 14px 16px;
