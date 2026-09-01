@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.81.0
+Stable tag: 0.82.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
+
+= 0.82.0 =
+* Write a post keeps its whole form when an AI client does the writing. It had been cut down to a single sentence to copy, which threw away the topic field, the angle, the box for what only you know, and every per-post choice — the things that make a post yours rather than generic. Fill it in as before and press Save this brief
+* Your connected app collects that brief the moment you ask it to write: the topic, the angle, your own figures, and any choice you changed for this post. It is the same brief the plugin would have written from
+* Only the choices that differ from your standing rules are passed along. A brief that repeats every setting is one nothing reads to the end of
+* The screen says when no app is connected, because without one the form is a wait that never ends
 
 = 0.81.0 =
 * Every screen now knows which of the two ways this site is set up. A site driven by Claude was still offered a Write a post screen that calls a provider it has no key for, and a Calendar for scheduled writing that cannot happen on that path — both failing at the moment somebody tried them, which is the worst place to find out. They are no longer offered, and following an old link to one explains what changed instead of showing a form that cannot be submitted
