@@ -204,6 +204,21 @@ class Test_Blogcraft_Seo_Autopilot extends WP_UnitTestCase {
 		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'pending' ) );
 	}
 
+	public function test_the_client_path_never_writes_unattended() {
+		// The chooser tells anyone picking the AI client that there is no
+		// scheduled writing on that path. Somebody who used the provider
+		// path first has autopilot switched on and topics queued, so the
+		// promise has to be kept by the tick and not by hiding a checkbox.
+		Blogcraft_Settings::set( 'autopilot_enabled', true );
+		Blogcraft_Settings::set( 'autopilot_per_day', 5 );
+		Blogcraft_Settings::set( 'autopilot_topics', "First topic
+Second topic" );
+		Blogcraft_Settings::set( 'setup_path', 'client' );
+
+		$this->assertFalse( Blogcraft_Autopilot::tick() );
+		$this->assertSame( 0, Blogcraft_Queue::count_by_status( 'pending' ) );
+	}
+
 	public function test_tick_queues_a_topic_when_enabled() {
 		Blogcraft_Settings::set( 'autopilot_enabled', true );
 		Blogcraft_Settings::set( 'autopilot_per_day', 5 );

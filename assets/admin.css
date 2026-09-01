@@ -2211,3 +2211,126 @@ body[class*="page_blogcraft"] #wpcontent {
 	color: var(--bc-faint);
 	font-weight: 400;
 }
+
+/* ---------------------------------------------------- the path chooser.
+   The first thing on the settings screen, because the answer decides what
+   the rest of it is for. Two cards side by side so the trade is read as a
+   comparison rather than as a list of features with a button under it. */
+
+.bc-path-ask {
+	margin-bottom: var(--bc-s5);
+}
+
+.bc-path-lead {
+	color: var(--bc-ink-soft);
+	font-size: var(--bc-t-md);
+	margin: 0 0 var(--bc-s4);
+	max-width: 60ch;
+}
+
+.bc-path-options {
+	display: grid;
+	gap: var(--bc-s4);
+	grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+}
+
+.bc-path-option {
+	background: var(--bc-surface-soft);
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	display: flex;
+	flex-direction: column;
+	padding: var(--bc-s4);
+}
+
+.bc-path-option:hover {
+	border-color: var(--bc-accent);
+}
+
+.bc-path-option h3 {
+	font-size: var(--bc-t-lg);
+	margin: 0 0 var(--bc-s1);
+}
+
+.bc-path-how {
+	color: var(--bc-ink-soft);
+	font-size: var(--bc-t-sm);
+	margin: 0 0 var(--bc-s3);
+}
+
+/* What you get and what you do not, marked so the difference survives
+   without colour: a reader who cannot tell green from red still has the
+   tick and the cross. */
+.bc-path-gets,
+.bc-path-lacks {
+	font-size: var(--bc-t-sm);
+	list-style: none;
+	margin: 0 0 var(--bc-s2);
+	padding: 0;
+}
+
+.bc-path-gets li,
+.bc-path-lacks li {
+	padding-inline-start: 1.5em;
+	position: relative;
+	margin-bottom: var(--bc-s1);
+}
+
+.bc-path-gets li::before {
+	color: var(--bc-ok);
+	content: "\2713";
+	inset-inline-start: 0;
+	position: absolute;
+}
+
+.bc-path-lacks li {
+	color: var(--bc-muted);
+}
+
+.bc-path-lacks li::before {
+	color: var(--bc-bad);
+	content: "\00d7";
+	inset-inline-start: 0;
+	position: absolute;
+}
+
+/* The button sits at the bottom of whichever card is taller, so the two
+   line up however much text each one carries. */
+.bc-path-option .button {
+	align-self: flex-start;
+	margin-top: auto;
+}
+
+/* ------------------------------------------- and the way back to it.
+   Always on the screen once a path is chosen. Somebody who picked one and
+   found the other suited them better should not have to work out how to
+   undo it. */
+
+.bc-path-now {
+	align-items: center;
+	background: var(--bc-surface-soft);
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s2) var(--bc-s3);
+	margin-bottom: var(--bc-s4);
+	padding: var(--bc-s3) var(--bc-s4);
+}
+
+.bc-path-current {
+	flex: 1 1 20rem;
+	font-size: var(--bc-t-sm);
+	margin: 0;
+}
+
+.bc-path-now form {
+	margin: 0;
+}
+
+.bc-path-keep {
+	color: var(--bc-muted);
+	flex: 1 1 100%;
+	font-size: var(--bc-t-xs);
+	margin: 0;
+}

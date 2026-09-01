@@ -46,9 +46,18 @@ class Blogcraft_Mcp {
 	const REST_ROUTE = '/v1';
 
 	/**
-	 * The protocol version this server implements.
+	 * The newest protocol version this server implements.
 	 */
 	const PROTOCOL = '2026-07-28';
+
+	/**
+	 * The version to answer with when a client asks for one we do not know.
+	 *
+	 * The most widely implemented revision rather than the newest, because
+	 * an unknown version means the client is older than this server, not
+	 * newer, and the older side is the one that cannot adapt.
+	 */
+	const FALLBACK = '2025-06-18';
 
 	/**
 	 * JSON-RPC: the request was not understood.
@@ -205,9 +214,19 @@ class Blogcraft_Mcp {
 			self::REST_NAMESPACE,
 			self::REST_ROUTE,
 			array(
-				'methods'             => 'POST',
-				'callback'            => array( __CLASS__, 'handle' ),
-				'permission_callback' => array( __CLASS__, 'permitted' ),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( __CLASS__, 'handle' ),
+					'permission_callback' => array( __CLASS__, 'permitted' ),
+				),
+				// Registered only so the answer is 405 rather than 404. A client
+				// opening the optional server-to-client stream reads 404 as "no
+				// MCP server here" and stops before it ever posts anything.
+				array(
+					'methods'             => 'GET, DELETE',
+					'callback'            => array( __CLASS__, 'no_stream' ),
+					'permission_callback' => array( __CLASS__, 'permitted' ),
+				),
 			)
 		);
 	}
@@ -255,22 +274,25 @@ class Blogcraft_Mcp {
 			return self::error( null, self::INVALID_REQUEST, 'Not a JSON-RPC request.' );
 		}
 
-		$id     = isset( $body['id'] ) ? $body['id'] : null;
 		$method = (string) $body['method'];
 		$params = isset( $body['params'] ) && is_array( $body['params'] ) ? $body['params'] : array();
 
-		$version = self::requested_version( $params );
-
-		if ( '' !== $version && self::PROTOCOL !== $version ) {
-			return self::error(
-				$id,
-				self::INVALID_REQUEST,
-				'Unsupported protocol version.',
-				array( 'supportedVersions' => array( self::PROTOCOL ) )
-			);
+		// A notification is a request with no id, and it wants no answer.
+		// The handshake sends one the moment initialize returns, and a
+		// client that gets a JSON-RPC envelope back for it treats the
+		// server as broken. Absence of the member is the definition, so
+		// array_key_exists rather than isset: a null id is a malformed
+		// request, which is a different thing and not this.
+		if ( ! array_key_exists( 'id', $body ) ) {
+			return new WP_REST_Response( null, 202 );
 		}
 
+		$id = $body['id'];
+
 		switch ( $method ) {
+			case 'initialize':
+				return self::result( $id, self::hello( $params ) );
+
 			case 'server/discover':
 				return self::result( $id, self::discovery() );
 
@@ -305,6 +327,106 @@ class Blogcraft_Mcp {
 		return self::error( $id, self::METHOD_NOT_FOUND, 'No such method: ' . $method );
 	}
 
+	/**
+	 * Every revision whose shapes this server is compatible with.
+	 *
+	 * @return array
+	 */
+	public static function spoken() {
+		return array( self::PROTOCOL, '2025-11-25', '2025-06-18', '2025-03-26' );
+	}
+
+	/**
+	 * The version to conduct this conversation in.
+	 *
+	 * Negotiated, never refused. The client names what it speaks and the
+	 * server answers with something it also speaks; refusing the whole
+	 * request over a version string leaves the client nowhere to go.
+	 *
+	 * @param array $params Request params.
+	 * @return string
+	 */
+	private static function negotiated( $params ) {
+		$asked = self::requested_version( $params );
+
+		return in_array( $asked, self::spoken(), true ) ? $asked : self::FALLBACK;
+	}
+
+	/**
+	 * The handshake.
+	 *
+	 * The first thing every client sends, and until it is answered nothing
+	 * else is attempted — which is why a server missing it reports as
+	 * unreachable rather than as incomplete, and why the settings screen
+	 * could call it healthy while Claude refused to connect. The draft this
+	 * was first written against renamed it server/discover. No shipping
+	 * client implements that name, so both are answered.
+	 *
+	 * @param array $params Request params.
+	 * @return array
+	 */
+	private static function hello( $params ) {
+		return array(
+			'protocolVersion' => self::negotiated( $params ),
+			'capabilities'    => array(
+				'tools'     => array( 'listChanged' => false ),
+				'resources' => array(
+					'listChanged' => false,
+					'subscribe'   => false,
+				),
+			),
+			'serverInfo'      => array(
+				'name'    => 'dicecodes-ai-blog-writer',
+				'title'   => get_bloginfo( 'name' ),
+				'version' => BLOGCRAFT_VERSION,
+			),
+			'instructions'    => self::instructions(),
+		);
+	}
+
+	/**
+	 * How a connected client should use this site.
+	 *
+	 * @return string
+	 */
+	private static function instructions() {
+		return implode(
+			' ',
+			array(
+				'This is a WordPress site you can write for.',
+				'Read blogcraft://writing-rules before drafting anything, and follow it.',
+				'Call find_duplicate first, so you do not repeat a post that already exists.',
+				'Draft, then call check_draft, fix what it reports, and check again.',
+				'Only call publish_draft once the score clears the threshold check_draft names.',
+			)
+		);
+	}
+
+	/**
+	 * The answer to a request for the optional stream, which is not offered.
+	 *
+	 * @param WP_REST_Request $request Incoming request.
+	 * @return WP_REST_Response
+	 */
+	public static function no_stream( $request ) {
+		unset( $request );
+
+		$response = new WP_REST_Response(
+			array(
+				'jsonrpc' => '2.0',
+				'id'      => null,
+				'error'   => array(
+					'code'    => self::INVALID_REQUEST,
+					'message' => 'This server does not open a stream. Send JSON-RPC over POST.',
+				),
+			),
+			405
+		);
+
+		$response->header( 'Allow', 'POST' );
+
+		return $response;
+	}
 	/**
 	 * What this server is and what it can do.
 	 *
@@ -417,11 +539,15 @@ class Blogcraft_Mcp {
 	 * @return string
 	 */
 	private static function requested_version( $params ) {
-		if ( empty( $params['_meta']['io.modelcontextprotocol/protocolVersion'] ) ) {
-			return '';
+		if ( ! empty( $params['protocolVersion'] ) ) {
+			return (string) $params['protocolVersion'];
 		}
 
-		return (string) $params['_meta']['io.modelcontextprotocol/protocolVersion'];
+		if ( ! empty( $params['_meta']['io.modelcontextprotocol/protocolVersion'] ) ) {
+			return (string) $params['_meta']['io.modelcontextprotocol/protocolVersion'];
+		}
+
+		return '';
 	}
 
 	/**

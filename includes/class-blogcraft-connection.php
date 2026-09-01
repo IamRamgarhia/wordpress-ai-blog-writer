@@ -36,6 +36,11 @@ class Blogcraft_Connection {
 	const MCP_ISSUE_ACTION = 'blogcraft_mcp_issue';
 
 	/**
+	 * Nonce action for choosing or switching the setup path.
+	 */
+	const PATH_ACTION = 'blogcraft_choose_path';
+
+	/**
 	 * Nonce action for revoking one.
 	 */
 	const MCP_REVOKE_ACTION = 'blogcraft_mcp_revoke';
@@ -55,6 +60,7 @@ class Blogcraft_Connection {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
+		add_action( 'admin_post_blogcraft_choose_path', array( __CLASS__, 'handle_choose_path' ) );
 		add_action( 'admin_post_blogcraft_mcp_issue', array( __CLASS__, 'handle_mcp_issue' ) );
 		add_action( 'admin_post_blogcraft_mcp_revoke', array( __CLASS__, 'handle_mcp_revoke' ) );
 		add_action( 'wp_ajax_blogcraft_learn_voice', array( __CLASS__, 'handle_learn' ) );
@@ -505,383 +511,680 @@ class Blogcraft_Connection {
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
 
-		self::open_card( '01', __( 'Connect a provider', 'dicecodes-ai-blog-writer' ), __( 'Your key, your account, your bill. Nothing is sent to us.', 'dicecodes-ai-blog-writer' ), 'provider' );
-		echo '<table class="form-table" role="presentation"><tbody>';
+		// Asked before anything else, because the answer decides what the
+		// rest of this screen is for.
+		self::render_path_chooser();
 
-		echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		$groups = Blogcraft_Provider_Registry::groups();
-		$chosen = ( '' !== $type );
+		if ( self::shows( 'provider' ) ) {
+			self::open_card_for( 'provider' );
+			echo '<table class="form-table" role="presentation"><tbody>';
 
-		echo '<select name="provider_type" id="blogcraft_provider_type">';
+			echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			$groups = Blogcraft_Provider_Registry::groups();
+			$chosen = ( '' !== $type );
 
-		// A real first option rather than a default. Nineteen providers
-		// and one of them preselected is a decision made on the reader's
-		// behalf, and it was OpenAI: paid, card first, and above every
-		// route that costs nothing.
-		printf(
-			'<option value=""%1$s>%2$s</option>',
-			selected( $chosen, false, false ),
-			esc_html__( 'Choose a provider…', 'dicecodes-ai-blog-writer' )
-		);
+			echo '<select name="provider_type" id="blogcraft_provider_type">';
 
-		// Grouped, free first. The labels always said which were free; in
-		// a flat list of nineteen that only helped somebody who read all
-		// nineteen, and the two sitting at the top of it both want a card
-		// before they will answer anything.
-		foreach ( Blogcraft_Provider_Registry::grouped_types() as $class_name => $members ) {
+			// A real first option rather than a default. Nineteen providers
+			// and one of them preselected is a decision made on the reader's
+			// behalf, and it was OpenAI: paid, card first, and above every
+			// route that costs nothing.
 			printf(
-				'<optgroup label="%s">',
-				esc_attr( isset( $groups[ $class_name ] ) ? $groups[ $class_name ] : $class_name )
+				'<option value=""%1$s>%2$s</option>',
+				selected( $chosen, false, false ),
+				esc_html__( 'Choose a provider…', 'dicecodes-ai-blog-writer' )
 			);
 
-			foreach ( $members as $id => $label ) {
+			// Grouped, free first. The labels always said which were free; in
+			// a flat list of nineteen that only helped somebody who read all
+			// nineteen, and the two sitting at the top of it both want a card
+			// before they will answer anything.
+			foreach ( Blogcraft_Provider_Registry::grouped_types() as $class_name => $members ) {
 				printf(
-					'<option value="%s"%s>%s</option>',
-					esc_attr( $id ),
-					selected( $type, $id, false ),
-					esc_html( $label )
+					'<optgroup label="%s">',
+					esc_attr( isset( $groups[ $class_name ] ) ? $groups[ $class_name ] : $class_name )
+				);
+
+				foreach ( $members as $id => $label ) {
+					printf(
+						'<option value="%s"%s>%s</option>',
+						esc_attr( $id ),
+						selected( $type, $id, false ),
+						esc_html( $label )
+					);
+				}
+
+				echo '</optgroup>';
+			}
+
+			echo '</select>';
+			printf(
+				'<p class="bc-hint">%s</p>',
+				esc_html__( 'Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock.', 'dicecodes-ai-blog-writer' )
+			);
+			printf(
+				'<p class="bc-hint">%s</p>',
+				esc_html__( 'The groups describe what the provider charges, not what this plugin charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'dicecodes-ai-blog-writer' )
+			);
+			echo '</td></tr>';
+
+			// A key saved for a different provider is not a key you have. Showing
+			// its mask made the field claim otherwise, and the model list then
+			// failed against the wrong service with nothing explaining why.
+			$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
+			$key_fits = ( '' !== $key ) && ( '' === $owner || $owner === $type );
+
+			echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			printf(
+				'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
+				esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'dicecodes-ai-blog-writer' ) )
+			);
+
+			if ( '' !== $key && ! $key_fits ) {
+				$types = Blogcraft_Provider_Registry::types();
+
+				printf(
+					'<p class="bc-key-mismatch" id="blogcraft-key-mismatch">%s</p>',
+					esc_html(
+						sprintf(
+							/* translators: %s: the provider the saved key belongs to. */
+							__( 'The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place.', 'dicecodes-ai-blog-writer' ),
+							isset( $types[ $owner ] ) ? $types[ $owner ] : $owner
+						)
+					)
+				);
+			} else {
+				echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			}
+
+			echo wp_kses( self::clear_key_control( 'provider_api_key', $key ), Blogcraft_Markup::allowed() );
+			self::render_provider_help( $type );
+			echo '</td></tr>';
+
+			$default_base = Blogcraft_Provider_Registry::default_base_url( $type );
+
+			// A provider that issues no keys — the ones running on this machine
+			// — has nothing to wait for, so it gets the model fields straight
+			// away. An unchosen provider is not one of those: help() falls back
+			// to the custom endpoint, whose key_url is empty, so without the
+			// first test an empty select would read as "needs no key" and open
+			// the model fields before there was anything to ask.
+			$help    = Blogcraft_Provider_Registry::help( $type );
+			$keyless = $chosen && ( '' === trim( (string) $help['key_url'] ) );
+
+			if ( ! $key_fits && ! $keyless ) {
+				// Asking which model to use before there is a key to ask with was
+				// the wrong way round. The list of models comes from the account,
+				// so until a key is saved the only thing this screen could offer
+				// was an empty box and a button that fails — and typing a model id
+				// from memory is the commonest way to end up with a setup that
+				// looks finished and errors on the first post.
+				printf(
+					'<tr><th scope="row"></th><td><p class="bc-await-key">%s</p></td></tr>',
+					esc_html(
+						$chosen
+							? __( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'dicecodes-ai-blog-writer' )
+							: __( 'Choose a provider above and press Save settings. Which key to paste, which address to use and which models exist all follow from that one choice, so it is the only thing this screen asks for first.', 'dicecodes-ai-blog-writer' )
+					)
 				);
 			}
 
-			echo '</optgroup>';
-		}
+			// Skipped rather than returned early: the spending cap below and every
+			// card after this one are still worth showing to somebody who has not
+			// pasted a key yet.
+			foreach ( ( $key_fits || $keyless ) ? self::common_fields() : array() as $name => $field ) {
+				self::text_row(
+					$name,
+					$field[0],
+					'',
+					$field[1],
+					'provider_base_url' === $name ? $default_base : ''
+				);
 
-		echo '</select>';
-		printf(
-			'<p class="bc-hint">%s</p>',
-			esc_html__( 'Spending nothing is a supported way to use this plugin, not a trial of it. The first group runs a model on this machine and contacts nobody; the second gives away usage for a key with no card attached. Everything works the same either way — there is no paid tier here to unlock.', 'dicecodes-ai-blog-writer' )
-		);
-		printf(
-			'<p class="bc-hint">%s</p>',
-			esc_html__( 'The groups describe what the provider charges, not what this plugin charges. Allowances move on their schedule, not this plugin\'s, so the link under each choice goes to their own page for the current figure rather than a number written into a plugin.', 'dicecodes-ai-blog-writer' )
-		);
-		echo '</td></tr>';
-
-		// A key saved for a different provider is not a key you have. Showing
-		// its mask made the field claim otherwise, and the model list then
-		// failed against the wrong service with nothing explaining why.
-		$owner    = (string) Blogcraft_Settings::get( 'provider_key_owner' );
-		$key_fits = ( '' !== $key ) && ( '' === $owner || $owner === $type );
-
-		echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		printf(
-			'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
-			esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'dicecodes-ai-blog-writer' ) )
-		);
-
-		if ( '' !== $key && ! $key_fits ) {
-			$types = Blogcraft_Provider_Registry::types();
-
-			printf(
-				'<p class="bc-key-mismatch" id="blogcraft-key-mismatch">%s</p>',
-				esc_html(
-					sprintf(
-						/* translators: %s: the provider the saved key belongs to. */
-						__( 'The key you have saved is for %s. Paste one for the provider you just chose — the link below goes to the right place.', 'dicecodes-ai-blog-writer' ),
-						isset( $types[ $owner ] ) ? $types[ $owner ] : $owner
-					)
-				)
-			);
-		} else {
-			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		}
-
-		echo wp_kses( self::clear_key_control( 'provider_api_key', $key ), Blogcraft_Markup::allowed() );
-		self::render_provider_help( $type );
-		echo '</td></tr>';
-
-		$default_base = Blogcraft_Provider_Registry::default_base_url( $type );
-
-		// A provider that issues no keys — the ones running on this machine
-		// — has nothing to wait for, so it gets the model fields straight
-		// away. An unchosen provider is not one of those: help() falls back
-		// to the custom endpoint, whose key_url is empty, so without the
-		// first test an empty select would read as "needs no key" and open
-		// the model fields before there was anything to ask.
-		$help    = Blogcraft_Provider_Registry::help( $type );
-		$keyless = $chosen && ( '' === trim( (string) $help['key_url'] ) );
-
-		if ( ! $key_fits && ! $keyless ) {
-			// Asking which model to use before there is a key to ask with was
-			// the wrong way round. The list of models comes from the account,
-			// so until a key is saved the only thing this screen could offer
-			// was an empty box and a button that fails — and typing a model id
-			// from memory is the commonest way to end up with a setup that
-			// looks finished and errors on the first post.
-			printf(
-				'<tr><th scope="row"></th><td><p class="bc-await-key">%s</p></td></tr>',
-				esc_html(
-					$chosen
-						? __( 'Paste your key above and press Save settings. The model list is read from your own account, so it can only be offered once there is a key to ask with — and it appears here as soon as there is.', 'dicecodes-ai-blog-writer' )
-						: __( 'Choose a provider above and press Save settings. Which key to paste, which address to use and which models exist all follow from that one choice, so it is the only thing this screen asks for first.', 'dicecodes-ai-blog-writer' )
-				)
-			);
-		}
-
-		// Skipped rather than returned early: the spending cap below and every
-		// card after this one are still worth showing to somebody who has not
-		// pasted a key yet.
-		foreach ( ( $key_fits || $keyless ) ? self::common_fields() : array() as $name => $field ) {
-			self::text_row(
-				$name,
-				$field[0],
-				'',
-				$field[1],
-				'provider_base_url' === $name ? $default_base : ''
-			);
-
-			// The model field gets a way to ask the provider what this account
-			// can actually use, because "type the id exactly" is an invitation
-			// to type the name of the key instead — and that failure only
-			// surfaces hours later as an error from the provider.
-			if ( 'provider_model' === $name ) {
-				self::render_model_picker();
-				self::render_draft_model_row();
+				// The model field gets a way to ask the provider what this account
+				// can actually use, because "type the id exactly" is an invitation
+				// to type the name of the key instead — and that failure only
+				// surfaces hours later as an error from the provider.
+				if ( 'provider_model' === $name ) {
+					self::render_model_picker();
+					self::render_draft_model_row();
+				}
 			}
-		}
 
-		self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'dicecodes-ai-blog-writer' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'dicecodes-ai-blog-writer' ) );
+			self::number_row( 'monthly_token_cap', __( 'Monthly token cap', 'dicecodes-ai-blog-writer' ), __( 'Stops generation once this many tokens are used in a month. Zero means no limit.', 'dicecodes-ai-blog-writer' ) );
 
-		foreach ( self::custom_fields() as $name => $label ) {
-			self::text_row( $name, $label, 'blogcraft-custom-only' );
-		}
+			foreach ( self::custom_fields() as $name => $label ) {
+				self::text_row( $name, $label, 'blogcraft-custom-only' );
+			}
 
-		echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		printf(
-			'<textarea name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
-			esc_textarea( (string) Blogcraft_Settings::get( 'provider_request_template' ) )
-		);
-		echo '<p class="description">' . esc_html__( 'Custom provider only. Use {{prompt}} and {{model}} as placeholders.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		echo '</td></tr>';
-
-		echo '</tbody></table>';
-
-		self::close_card();
-
-		self::render_client_card();
-
-		self::open_card(
-			'03',
-			__( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
-			__( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell Dicecodes AI Blog Writer it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
-			'pictures'
-		);
-		echo '<table class="form-table" role="presentation"><tbody>';
-
-		foreach ( self::picture_toggles() as $name => $label ) {
-			self::checkbox_row( $name, $label );
-		}
-
-		echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		echo '<select name="image_provider" id="blogcraft_image_provider">';
-		foreach ( Blogcraft_Images::providers() as $id => $label ) {
+			echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
 			printf(
-				'<option value="%s"%s>%s</option>',
-				esc_attr( $id ),
-				selected( (string) Blogcraft_Settings::get( 'image_provider' ), $id, false ),
-				esc_html( $label )
+				'<textarea name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
+				esc_textarea( (string) Blogcraft_Settings::get( 'provider_request_template' ) )
 			);
+			echo '<p class="description">' . esc_html__( 'Custom provider only. Use {{prompt}} and {{model}} as placeholders.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			echo '</td></tr>';
+
+			echo '</tbody></table>';
+
+			self::close_card();
 		}
-		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Whichever you pick, Dicecodes AI Blog Writer falls back through the others so a post is never left without an image.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		echo '</td></tr>';
 
-		self::number_row(
-			'monthly_image_cap',
-			__( 'Most paid images per month', 'dicecodes-ai-blog-writer' ),
-			__( 'Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'dicecodes-ai-blog-writer' )
-		);
+		if ( self::shows( 'clients' ) ) {
+			self::render_client_card();
+		}
 
-		self::image_model_rows();
+		if ( self::shows( 'pictures' ) ) {
+			self::open_card_for( 'pictures' );
+			echo '<table class="form-table" role="presentation"><tbody>';
 
-		self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'dicecodes-ai-blog-writer' ) );
-		self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'dicecodes-ai-blog-writer' ) );
+			foreach ( self::picture_toggles() as $name => $label ) {
+				self::checkbox_row( $name, $label );
+			}
 
-		echo '</tbody></table>';
-		self::close_card();
+			echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			echo '<select name="image_provider" id="blogcraft_image_provider">';
+			foreach ( Blogcraft_Images::providers() as $id => $label ) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr( $id ),
+					selected( (string) Blogcraft_Settings::get( 'image_provider' ), $id, false ),
+					esc_html( $label )
+				);
+			}
+			echo '</select>';
+			echo '<p class="description">' . esc_html__( 'Whichever you pick, Dicecodes AI Blog Writer falls back through the others so a post is never left without an image.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			echo '</td></tr>';
 
-		self::open_card(
-			'04',
-			__( 'Research', 'dicecodes-ai-blog-writer' ),
-			__( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'dicecodes-ai-blog-writer' ),
-			'research'
-		);
-		echo '<table class="form-table" role="presentation"><tbody>';
+			self::number_row(
+				'monthly_image_cap',
+				__( 'Most paid images per month', 'dicecodes-ai-blog-writer' ),
+				__( 'Only counts pictures made by a service that charges. Zero means no limit. Past the limit, posts fall back to the free image sources rather than stopping.', 'dicecodes-ai-blog-writer' )
+			);
 
-		echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		echo '<select name="research_provider" id="blogcraft_research_provider">';
-		foreach ( Blogcraft_Research::providers() as $id => $label ) {
+			self::image_model_rows();
+
+			self::secret_row( 'pexels_api_key', __( 'Pexels API key', 'dicecodes-ai-blog-writer' ) );
+			self::secret_row( 'pixabay_api_key', __( 'Pixabay API key', 'dicecodes-ai-blog-writer' ) );
+
+			echo '</tbody></table>';
+			self::close_card();
+		}
+
+		if ( self::shows( 'research' ) ) {
+			self::open_card_for( 'research' );
+			echo '<table class="form-table" role="presentation"><tbody>';
+
+			echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			echo '<select name="research_provider" id="blogcraft_research_provider">';
+			foreach ( Blogcraft_Research::providers() as $id => $label ) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr( $id ),
+					selected( (string) Blogcraft_Settings::get( 'research_provider' ), $id, false ),
+					esc_html( $label )
+				);
+			}
+			echo '</select></td></tr>';
+
+			foreach ( Blogcraft_Research::free_sources() as $name => $label ) {
+				self::checkbox_row( $name, $label );
+			}
+
+			self::text_row( 'research_base_url', __( 'SearXNG URL', 'dicecodes-ai-blog-writer' ) );
+
+			echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			$research_key = (string) Blogcraft_Settings::get( 'research_api_key' );
 			printf(
-				'<option value="%s"%s>%s</option>',
-				esc_attr( $id ),
-				selected( (string) Blogcraft_Settings::get( 'research_provider' ), $id, false ),
-				esc_html( $label )
+				'<input type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
+				esc_attr( '' === $research_key ? __( 'Not set', 'dicecodes-ai-blog-writer' ) : Blogcraft_Crypto::mask( $research_key ) )
 			);
+			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			echo wp_kses( self::clear_key_control( 'research_api_key', $research_key ), Blogcraft_Markup::allowed() );
+			echo '</td></tr>';
+
+			self::textarea_row(
+				'research_urls',
+				__( 'Always read these URLs', 'dicecodes-ai-blog-writer' ),
+				__( 'One per line. Read for every post, whether or not a search provider is set.', 'dicecodes-ai-blog-writer' )
+			);
+
+			echo '</tbody></table>';
+			self::close_card();
 		}
-		echo '</select></td></tr>';
 
-		foreach ( Blogcraft_Research::free_sources() as $name => $label ) {
-			self::checkbox_row( $name, $label );
+		if ( self::shows( 'voice' ) ) {
+			self::open_card_for( 'voice' );
+			if ( Blogcraft_Learn::sample( 1 ) ) {
+				printf(
+					'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
+					esc_html__( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
+					esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'dicecodes-ai-blog-writer' )
+				);
+			}
+
+			echo '<table class="form-table" role="presentation"><tbody>';
+
+			foreach ( self::voice_area_fields() as $name => $meta ) {
+				self::textarea_row( $name, $meta[0], $meta[1] );
+			}
+
+			foreach ( self::voice_text_fields() as $name => $label ) {
+				self::text_row( $name, $label );
+			}
+
+			self::text_row(
+				'author_credentials',
+				__( 'What the author does', 'dicecodes-ai-blog-writer' ),
+				'',
+				__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'dicecodes-ai-blog-writer' )
+			);
+
+			self::text_row(
+				'reviewer_name',
+				__( 'Reviewed by', 'dicecodes-ai-blog-writer' ),
+				'',
+				__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'dicecodes-ai-blog-writer' )
+			);
+
+			self::text_row(
+				'reviewer_credentials',
+				__( 'What the reviewer does', 'dicecodes-ai-blog-writer' ),
+				'',
+				__( 'Their role or qualification.', 'dicecodes-ai-blog-writer' )
+			);
+
+			echo '</tbody></table>';
+
+			self::close_card();
 		}
+		if ( self::shows( 'automation' ) ) {
+			self::open_card_for( 'automation' );
+			echo '<table class="form-table" role="presentation"><tbody>';
 
-		self::text_row( 'research_base_url', __( 'SearXNG URL', 'dicecodes-ai-blog-writer' ) );
+			foreach ( self::toggle_fields() as $name => $label ) {
+				self::checkbox_row( $name, $label );
+			}
 
-		echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		$research_key = (string) Blogcraft_Settings::get( 'research_api_key' );
-		printf(
-			'<input type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
-			esc_attr( '' === $research_key ? __( 'Not set', 'dicecodes-ai-blog-writer' ) : Blogcraft_Crypto::mask( $research_key ) )
-		);
-		echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		echo wp_kses( self::clear_key_control( 'research_api_key', $research_key ), Blogcraft_Markup::allowed() );
-		echo '</td></tr>';
+			self::text_row(
+				'ai_disclosure_text',
+				__( 'Wording of that line', 'dicecodes-ai-blog-writer' ),
+				'',
+				__( 'Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it.', 'dicecodes-ai-blog-writer' )
+			);
 
-		self::textarea_row(
-			'research_urls',
-			__( 'Always read these URLs', 'dicecodes-ai-blog-writer' ),
-			__( 'One per line. Read for every post, whether or not a search provider is set.', 'dicecodes-ai-blog-writer' )
-		);
-
-		echo '</tbody></table>';
-		self::close_card();
-
-		self::open_card( '05', __( 'Describe your voice', 'dicecodes-ai-blog-writer' ), __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'dicecodes-ai-blog-writer' ), 'voice' );
-		if ( Blogcraft_Learn::sample( 1 ) ) {
 			printf(
-				'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
-				esc_html__( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
-				esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'dicecodes-ai-blog-writer' )
+				'<tr><th scope="row"></th><td><p class="description">%s</p></td></tr>',
+				esc_html__( 'Announcing a post sends its address to IndexNow, which is Microsoft\'s open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way.', 'dicecodes-ai-blog-writer' )
 			);
+
+			self::textarea_row(
+				'autopilot_topics',
+				__( 'Topic queue', 'dicecodes-ai-blog-writer' ),
+				__( 'One topic per line. Each is used once, then removed from this list. Dicecodes AI Blog Writer, Calendar shows when each one will be written.', 'dicecodes-ai-blog-writer' )
+			);
+			self::weekday_row();
+			self::hour_row();
+			self::number_row(
+				'quality_threshold',
+				__( 'Hold posts scoring below', 'dicecodes-ai-blog-writer' ),
+				__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'dicecodes-ai-blog-writer' )
+			);
+			self::number_row(
+				'refresh_after_days',
+				__( 'Consider a post stale after', 'dicecodes-ai-blog-writer' ),
+				__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'dicecodes-ai-blog-writer' )
+			);
+			self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'dicecodes-ai-blog-writer' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'dicecodes-ai-blog-writer' ) );
+
+			echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
+			echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
+			printf(
+				'<option value="draft"%s>%s</option>',
+				selected( 'publish' !== Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
+				esc_html__( 'Saved as drafts for review', 'dicecodes-ai-blog-writer' )
+			);
+			printf(
+				'<option value="publish"%s>%s</option>',
+				selected( 'publish' === Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
+				esc_html__( 'Published immediately', 'dicecodes-ai-blog-writer' )
+			);
+			echo '</select>';
+			echo '<p class="description">' . esc_html__( 'Drafts are safer. Nothing goes live until you have read it.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			echo '</td></tr>';
+
+			echo '</tbody></table>';
+			echo '<div class="blogcraft-actions">';
+			submit_button( __( 'Save settings', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
+			echo '</div>';
+			self::close_card();
 		}
-
-		echo '<table class="form-table" role="presentation"><tbody>';
-
-		foreach ( self::voice_area_fields() as $name => $meta ) {
-			self::textarea_row( $name, $meta[0], $meta[1] );
-		}
-
-		foreach ( self::voice_text_fields() as $name => $label ) {
-			self::text_row( $name, $label );
-		}
-
-		self::text_row(
-			'author_credentials',
-			__( 'What the author does', 'dicecodes-ai-blog-writer' ),
-			'',
-			__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'dicecodes-ai-blog-writer' )
-		);
-
-		self::text_row(
-			'reviewer_name',
-			__( 'Reviewed by', 'dicecodes-ai-blog-writer' ),
-			'',
-			__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'dicecodes-ai-blog-writer' )
-		);
-
-		self::text_row(
-			'reviewer_credentials',
-			__( 'What the reviewer does', 'dicecodes-ai-blog-writer' ),
-			'',
-			__( 'Their role or qualification.', 'dicecodes-ai-blog-writer' )
-		);
-
-		echo '</tbody></table>';
-
-		self::close_card();
-		self::open_card( '06', __( 'Automation', 'dicecodes-ai-blog-writer' ), __( 'Optional. Turn these on once the writing looks right to you.', 'dicecodes-ai-blog-writer' ), 'automation' );
-		echo '<table class="form-table" role="presentation"><tbody>';
-
-		foreach ( self::toggle_fields() as $name => $label ) {
-			self::checkbox_row( $name, $label );
-		}
-
-		self::text_row(
-			'ai_disclosure_text',
-			__( 'Wording of that line', 'dicecodes-ai-blog-writer' ),
-			'',
-			__( 'Leave blank for the default, which says the post was drafted with AI from the listed sources and then checked. Google asks for three things: that automation was involved, how, and why it helped — so if you write your own, keep those in it.', 'dicecodes-ai-blog-writer' )
-		);
-
-		printf(
-			'<tr><th scope="row"></th><td><p class="description">%s</p></td></tr>',
-			esc_html__( 'Announcing a post sends its address to IndexNow, which is Microsoft\'s open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way.', 'dicecodes-ai-blog-writer' )
-		);
-
-		self::textarea_row(
-			'autopilot_topics',
-			__( 'Topic queue', 'dicecodes-ai-blog-writer' ),
-			__( 'One topic per line. Each is used once, then removed from this list. Dicecodes AI Blog Writer, Calendar shows when each one will be written.', 'dicecodes-ai-blog-writer' )
-		);
-		self::weekday_row();
-		self::hour_row();
-		self::number_row(
-			'quality_threshold',
-			__( 'Hold posts scoring below', 'dicecodes-ai-blog-writer' ),
-			__( 'Out of 100. Anything lower is held for review instead of published, whatever you chose above.', 'dicecodes-ai-blog-writer' )
-		);
-		self::number_row(
-			'refresh_after_days',
-			__( 'Consider a post stale after', 'dicecodes-ai-blog-writer' ),
-			__( 'Days. Refreshing an existing post is usually worth more than publishing a new one, because the URL keeps whatever history it has earned.', 'dicecodes-ai-blog-writer' )
-		);
-		self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'dicecodes-ai-blog-writer' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'dicecodes-ai-blog-writer' ) );
-
-		echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
-		printf(
-			'<option value="draft"%s>%s</option>',
-			selected( 'publish' !== Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
-			esc_html__( 'Saved as drafts for review', 'dicecodes-ai-blog-writer' )
-		);
-		printf(
-			'<option value="publish"%s>%s</option>',
-			selected( 'publish' === Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
-			esc_html__( 'Published immediately', 'dicecodes-ai-blog-writer' )
-		);
-		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Drafts are safer. Nothing goes live until you have read it.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		echo '</td></tr>';
-
-		echo '</tbody></table>';
-		echo '<div class="blogcraft-actions">';
-		submit_button( __( 'Save settings', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
-		echo '</div>';
-		self::close_card();
 		echo '</form>';
 
-		self::open_card( '07', __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ), __( 'What happens to everything it has stored.', 'dicecodes-ai-blog-writer' ), 'removal' );
+		if ( self::shows( 'removal' ) ) {
+			self::open_card_for( 'removal' );
 
-		printf(
-			'<p class="bc-removal-lead">%s</p>',
-			esc_html__( 'Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away.', 'dicecodes-ai-blog-writer' )
-		);
+			printf(
+				'<p class="bc-removal-lead">%s</p>',
+				esc_html__( 'Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away.', 'dicecodes-ai-blog-writer' )
+			);
 
-		echo '<table class="form-table" role="presentation"><tbody>';
-		self::checkbox_row( 'purge_on_delete', __( 'Delete all of it instead, when the plugin is deleted', 'dicecodes-ai-blog-writer' ) );
-		echo '</tbody></table>';
+			echo '<table class="form-table" role="presentation"><tbody>';
+			self::checkbox_row( 'purge_on_delete', __( 'Delete all of it instead, when the plugin is deleted', 'dicecodes-ai-blog-writer' ) );
+			echo '</tbody></table>';
 
-		printf(
-			'<p class="bc-removal-warn">%s</p>',
-			esc_html__( 'With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay.', 'dicecodes-ai-blog-writer' )
-		);
+			printf(
+				'<p class="bc-removal-warn">%s</p>',
+				esc_html__( 'With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay.', 'dicecodes-ai-blog-writer' )
+			);
 
-		self::close_card();
-		self::open_card( '08', __( 'Check it works', 'dicecodes-ai-blog-writer' ), __( 'Sends one very short request and reports what the provider says back.', 'dicecodes-ai-blog-writer' ), 'test' );
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
-		Blogcraft_Request::nonce_field( self::TEST_ACTION );
-		echo '<div class="blogcraft-actions">';
-		submit_button( __( 'Test connection', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
-		echo '<p class="blogcraft-hint">' . esc_html__( 'Save your settings first.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		echo '</div>';
-		echo '</form>';
-		self::close_card();
+			self::close_card();
+		}
+		if ( self::shows( 'test' ) ) {
+			self::open_card_for( 'test' );
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			echo '<input type="hidden" name="action" value="blogcraft_test_connection" />';
+			Blogcraft_Request::nonce_field( self::TEST_ACTION );
+			echo '<div class="blogcraft-actions">';
+			submit_button( __( 'Test connection', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
+			echo '<p class="blogcraft-hint">' . esc_html__( 'Save your settings first.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			echo '</div>';
+			echo '</form>';
+			self::close_card();
+		}
 
 		echo '</div>';
 		self::render_jump();
 		echo '</div>';
 
 		echo '</div>';
+	}
+
+	/**
+	 * Every card on this screen, in order, and which path it belongs to.
+	 *
+	 * One list, because there were two: the cards and the rail beside them each
+	 * kept their own copy, so inserting a card renumbered one and left the
+	 * other saying "02 Connect a picture service" beside a card that said
+	 * "02 Connect an AI client". Numbering now comes from position in this
+	 * array and the rail is built from the same entries the screen renders.
+	 *
+	 * @return array Slug => title, rail subtitle, card description, paths.
+	 */
+	private static function cards() {
+		return array(
+			'provider'   => array(
+				'title' => __( 'Connect a provider', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Key, model, spending cap', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Your key, your account, your bill. Nothing is sent to us.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api' ),
+			),
+			'clients'    => array(
+				'title' => __( 'Connect an AI client', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Claude, ChatGPT, your editor', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Write from an app you already pay for, and let the posts land here. No API key.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'client' ),
+			),
+			'pictures'   => array(
+				'title' => __( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Who draws them, and what it costs', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell this plugin it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api' ),
+			),
+			'research'   => array(
+				'title' => __( 'Research', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Where facts come from', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api' ),
+			),
+			'voice'      => array(
+				'title' => __( 'Describe your voice', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Subject, reader, style', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api', 'client' ),
+			),
+			'automation' => array(
+				'title' => __( 'Automation', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'Schedule, images, links, quality', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Optional. Turn these on once the writing looks right to you.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api' ),
+			),
+			'removal'    => array(
+				'title' => __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'What happens to your settings', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'What happens to everything it has stored.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api', 'client' ),
+			),
+			'test'       => array(
+				'title' => __( 'Check it works', 'dicecodes-ai-blog-writer' ),
+				'sub'   => __( 'One short live request', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Sends one very short request and reports what the provider says back.', 'dicecodes-ai-blog-writer' ),
+				'paths' => array( 'api' ),
+			),
+		);
+	}
+
+	/**
+	 * Which path this site is set up on.
+	 *
+	 * @return string 'api' or 'client'.
+	 */
+	public static function path() {
+		$stored = (string) Blogcraft_Settings::get( 'setup_path' );
+
+		return ( 'client' === $stored ) ? 'client' : 'api';
+	}
+
+	/**
+	 * Whether the reader has ever answered the question.
+	 *
+	 * @return bool
+	 */
+	private static function path_chosen() {
+		return in_array( (string) Blogcraft_Settings::get( 'setup_path' ), array( 'api', 'client' ), true );
+	}
+
+	/**
+	 * The cards belonging to the current path, in order.
+	 *
+	 * @return array
+	 */
+	private static function visible_cards() {
+		$path = self::path();
+		$out  = array();
+
+		foreach ( self::cards() as $slug => $card ) {
+			if ( in_array( $path, $card['paths'], true ) ) {
+				$out[ $slug ] = $card;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Whether one card belongs on the screen right now.
+	 *
+	 * @param string $slug Card slug.
+	 * @return bool
+	 */
+	private static function shows( $slug ) {
+		return isset( self::visible_cards()[ $slug ] );
+	}
+
+	/**
+	 * Open a card, numbered by where it falls among the visible ones.
+	 *
+	 * @param string $slug Card slug.
+	 * @return void
+	 */
+	private static function open_card_for( $slug ) {
+		$visible = self::visible_cards();
+		$step    = array_search( $slug, array_keys( $visible ), true ) + 1;
+
+		self::open_card(
+			sprintf( '%02d', (int) $step ),
+			$visible[ $slug ]['title'],
+			$visible[ $slug ]['desc'],
+			$slug
+		);
+	}
+
+	/**
+	 * The question this screen opens with, and the way back to it.
+	 *
+	 * Asked first because the answer decides what the rest of the screen is
+	 * for. Two ways to supply a model is not a detail to discover half way
+	 * down a settings page — and somebody who picks one and finds the other
+	 * suited them better should not have to work out how to undo it, so the
+	 * way back is always on the screen.
+	 *
+	 * @return void
+	 */
+	private static function render_path_chooser() {
+		if ( self::path_chosen() ) {
+			self::render_path_switch();
+
+			return;
+		}
+
+		echo '<section class="blogcraft-card bc-path-ask" id="bc-card-path">';
+		printf( '<h2>%s</h2>', esc_html__( 'How do you want to write?', 'dicecodes-ai-blog-writer' ) );
+		printf(
+			'<p class="bc-path-lead">%s</p>',
+			esc_html__( 'Two ways, and you can change your mind at any time. Nothing here is locked either way.', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '<div class="bc-path-options">';
+
+		self::render_path_option(
+			'api',
+			__( 'Inside WordPress', 'dicecodes-ai-blog-writer' ),
+			__( 'You write here. The plugin calls an AI provider with a key from your account.', 'dicecodes-ai-blog-writer' ),
+			array(
+				__( 'Everything the plugin does', 'dicecodes-ai-blog-writer' ),
+				__( 'Posts written on a schedule while you sleep', 'dicecodes-ai-blog-writer' ),
+				__( 'Research sources, pictures, art direction', 'dicecodes-ai-blog-writer' ),
+				__( 'Free with a local model, or on a provider free tier', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				__( 'Needs an API key, or a model on your own machine', 'dicecodes-ai-blog-writer' ),
+				__( 'A paid provider bills you per post', 'dicecodes-ai-blog-writer' ),
+			)
+		);
+
+		self::render_path_option(
+			'client',
+			__( 'From Claude or ChatGPT', 'dicecodes-ai-blog-writer' ),
+			__( 'You write in an app you already pay for. It connects here and the posts land in WordPress.', 'dicecodes-ai-blog-writer' ),
+			array(
+				__( 'Costs nothing beyond the subscription you have', 'dicecodes-ai-blog-writer' ),
+				__( 'The same twenty-five checks and the same quality gate', 'dicecodes-ai-blog-writer' ),
+				__( 'Your writing rules and voice, read by the app', 'dicecodes-ai-blog-writer' ),
+				__( 'Nothing leaves your site — the connection comes in', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				__( 'No scheduled or unattended writing at all', 'dicecodes-ai-blog-writer' ),
+				__( 'No research sources, pictures or art direction', 'dicecodes-ai-blog-writer' ),
+				__( 'Needs an app that speaks MCP, and a site on public HTTPS', 'dicecodes-ai-blog-writer' ),
+			)
+		);
+
+		echo '</div>';
+		echo '</section>';
+	}
+
+	/**
+	 * One of the two choices.
+	 *
+	 * @param string $path    Path key.
+	 * @param string $title   What it is called.
+	 * @param string $lead    One sentence on how it works.
+	 * @param array  $gets    What you get.
+	 * @param array  $lacks   What you do not.
+	 * @return void
+	 */
+	private static function render_path_option( $path, $title, $lead, $gets, $lacks ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-path-option">';
+		echo '<input type="hidden" name="action" value="blogcraft_choose_path" />';
+		printf( '<input type="hidden" name="path" value="%s" />', esc_attr( $path ) );
+		Blogcraft_Request::nonce_field( self::PATH_ACTION );
+
+		printf( '<h3>%s</h3>', esc_html( $title ) );
+		printf( '<p class="bc-path-how">%s</p>', esc_html( $lead ) );
+
+		echo '<ul class="bc-path-gets">';
+		foreach ( $gets as $line ) {
+			printf( '<li>%s</li>', esc_html( $line ) );
+		}
+		echo '</ul>';
+
+		echo '<ul class="bc-path-lacks">';
+		foreach ( $lacks as $line ) {
+			printf( '<li>%s</li>', esc_html( $line ) );
+		}
+		echo '</ul>';
+
+		submit_button( __( 'Set this up', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
+		echo '</form>';
+	}
+
+	/**
+	 * The line that says which way this site is set up, and offers the other.
+	 *
+	 * @return void
+	 */
+	private static function render_path_switch() {
+		$is_api = ( 'api' === self::path() );
+
+		echo '<div class="bc-path-now">';
+
+		printf(
+			'<p class="bc-path-current"><strong>%1$s</strong> %2$s</p>',
+			esc_html( $is_api ? __( 'Writing inside WordPress.', 'dicecodes-ai-blog-writer' ) : __( 'Writing from an AI client.', 'dicecodes-ai-blog-writer' ) ),
+			esc_html(
+				$is_api
+					? __( 'The plugin calls a provider with your key.', 'dicecodes-ai-blog-writer' )
+					: __( 'An app you already pay for connects here and does the writing.', 'dicecodes-ai-blog-writer' )
+			)
+		);
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="blogcraft_choose_path" />';
+		printf( '<input type="hidden" name="path" value="%s" />', esc_attr( $is_api ? 'client' : 'api' ) );
+		Blogcraft_Request::nonce_field( self::PATH_ACTION );
+		printf(
+			'<button type="submit" class="button">%s</button>',
+			esc_html( $is_api ? __( 'Switch to an AI client', 'dicecodes-ai-blog-writer' ) : __( 'Switch to an API key', 'dicecodes-ai-blog-writer' ) )
+		);
+		echo '</form>';
+
+		printf(
+			'<p class="bc-path-keep">%s</p>',
+			esc_html__( 'Switching only changes which settings are shown. Nothing is deleted, and switching back brings everything as you left it.', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '</div>';
+	}
+
+	/**
+	 * Record which way this site is set up.
+	 *
+	 * @return void
+	 */
+	public static function handle_choose_path() {
+		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::PATH_ACTION, $nonce );
+
+		$path = isset( $_POST['path'] ) ? sanitize_key( wp_unslash( $_POST['path'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+
+		if ( in_array( $path, array( 'api', 'client' ), true ) ) {
+			Blogcraft_Settings::set( 'setup_path', $path );
+		}
+
+		wp_safe_redirect( self::settings_url() );
+		exit;
 	}
 
 	/**
@@ -896,12 +1199,7 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function render_client_card() {
-		self::open_card(
-			'02',
-			__( 'Connect an AI client', 'dicecodes-ai-blog-writer' ),
-			__( 'Write from Claude, ChatGPT or your editor, using the subscription you already have, and let the posts land here. No API key.', 'dicecodes-ai-blog-writer' ),
-			'clients'
-		);
+		self::open_card_for( 'clients' );
 
 		printf(
 			'<p class="bc-client-lead">%s</p>',
@@ -1473,15 +1771,7 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function render_jump() {
-		$sections = array(
-			'provider'   => array( __( 'Connect a provider', 'dicecodes-ai-blog-writer' ), __( 'Key, model, spending cap', 'dicecodes-ai-blog-writer' ) ),
-			'pictures'   => array( __( 'Connect a picture service', 'dicecodes-ai-blog-writer' ), __( 'Who draws them, and what it costs', 'dicecodes-ai-blog-writer' ) ),
-			'research'   => array( __( 'Research', 'dicecodes-ai-blog-writer' ), __( 'Where facts come from', 'dicecodes-ai-blog-writer' ) ),
-			'voice'      => array( __( 'Describe your voice', 'dicecodes-ai-blog-writer' ), __( 'Subject, reader, style', 'dicecodes-ai-blog-writer' ) ),
-			'automation' => array( __( 'Automation', 'dicecodes-ai-blog-writer' ), __( 'Schedule, images, links, quality', 'dicecodes-ai-blog-writer' ) ),
-			'removal'    => array( __( 'If you delete this plugin', 'dicecodes-ai-blog-writer' ), __( 'What happens to your settings', 'dicecodes-ai-blog-writer' ) ),
-			'test'       => array( __( 'Check it works', 'dicecodes-ai-blog-writer' ), __( 'One short live request', 'dicecodes-ai-blog-writer' ) ),
-		);
+		$sections = self::visible_cards();
 
 		echo '<div class="bc-jump-col">';
 		echo '<nav class="bc-jump" aria-label="' . esc_attr__( 'Sections on this page', 'dicecodes-ai-blog-writer' ) . '">';
@@ -1494,8 +1784,8 @@ class Blogcraft_Connection {
 				'<a class="bc-jump-item" href="#bc-card-%1$s" data-target="bc-card-%1$s"><span class="bc-jump-step">%2$02d</span><span class="bc-jump-text"><span class="bc-jump-label">%3$s</span><span class="bc-jump-sub">%4$s</span></span></a>',
 				esc_attr( $slug ),
 				(int) $step,
-				esc_html( $parts[0] ),
-				esc_html( $parts[1] )
+				esc_html( $parts['title'] ),
+				esc_html( $parts['sub'] )
 			);
 			++$step;
 		}

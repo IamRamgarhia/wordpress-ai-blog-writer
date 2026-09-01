@@ -104,7 +104,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		// The rule, not one example of it. Every method the server answers is
 		// tried with no credential, so a method added later without a thought
 		// for authentication fails here rather than in the wild.
-		$methods = array( 'server/discover', 'tools/list', 'tools/call', 'resources/list', 'resources/read', 'ping' );
+		$methods = array( 'initialize', 'server/discover', 'tools/list', 'tools/call', 'resources/list', 'resources/read', 'ping' );
 
 		foreach ( $methods as $method ) {
 			$out = $this->rpc( $method, array(), '' );
@@ -191,7 +191,10 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'tools', $out['body']['result']['capabilities'] );
 	}
 
-	public function test_a_protocol_version_we_do_not_speak_is_refused_with_the_one_we_do() {
+	public function test_a_version_we_do_not_know_still_gets_a_working_answer() {
+		// This used to assert the opposite: an unrecognised version got
+		// the whole request refused. That is the behaviour a client has
+		// no answer to, and the test made it look deliberate.
 		$out = $this->rpc(
 			'tools/list',
 			array(
@@ -199,8 +202,8 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertArrayHasKey( 'error', $out['body'] );
-		$this->assertContains( Blogcraft_Mcp::PROTOCOL, $out['body']['error']['data']['supportedVersions'] );
+		$this->assertArrayNotHasKey( 'error', $out['body'] );
+		$this->assertNotEmpty( $out['body']['result']['tools'] );
 	}
 
 	public function test_an_unknown_method_is_a_json_rpc_error_not_a_crash() {
@@ -366,6 +369,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 	// -------------------------------------------------------- the screen.
 
 	public function test_the_settings_screen_offers_the_endpoint_and_a_token() {
+		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
 		ob_start();
@@ -385,6 +389,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		// the first visit now, and issuing a token is what switches
 		// connections on.
 		Blogcraft_Settings::set( 'mcp_enabled', false );
+		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
 		ob_start();
@@ -430,6 +435,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		// arrangements. Picking the wrong one fails with a message about
 		// client registration that says nothing about what to do instead,
 		// so the card names the two choices that work.
+		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
 		ob_start();
@@ -444,6 +450,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 	public function test_the_card_says_what_a_client_cannot_do() {
 		// Somebody who switches this on and then goes looking for
 		// scheduled posts has been let down by this screen.
+		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
 		ob_start();
@@ -490,5 +497,126 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 
 		$resource = $this->rpc( 'resources/read', array( 'uri' => 'blogcraft://nothing' ) );
 		$this->assertSame( Blogcraft_Mcp::INVALID_PARAMS, $resource['body']['error']['code'] );
+	}
+
+	// ------------------------------------------------- the handshake.
+
+	public function test_initialize_is_answered() {
+		// The method every shipping client sends first. This server was
+		// written against a draft that renamed it server/discover, so it
+		// answered every question a client asked except the one it asks
+		// before all the others — and reported as unreachable, not as
+		// incomplete. Nothing in the suite noticed, because the suite
+		// spoke the same dialect back to it.
+		$out = $this->rpc( 'initialize', array(),
+			$this->token
+		);
+
+		$this->assertSame( 200, $out['status'] );
+		$this->assertArrayNotHasKey( 'error', $out['body'] );
+
+		$result = $out['body']['result'];
+
+		$this->assertArrayHasKey( 'protocolVersion', $result );
+		$this->assertArrayHasKey( 'capabilities', $result );
+		$this->assertArrayHasKey( 'serverInfo', $result );
+		$this->assertSame( 'dicecodes-ai-blog-writer', $result['serverInfo']['name'] );
+		$this->assertSame( BLOGCRAFT_VERSION, $result['serverInfo']['version'] );
+	}
+
+	public function test_every_capability_it_claims_is_one_it_answers() {
+		// Claiming a capability is a promise that the matching list
+		// method works. A client that believes the claim and gets
+		// method-not-found treats the server as broken, so the claim and
+		// the behaviour are asserted together rather than separately.
+		$claimed = $this->rpc( 'initialize' )['body']['result']['capabilities'];
+
+		foreach ( array_keys( $claimed ) as $capability ) {
+			$out = $this->rpc( $capability . '/list' );
+
+			$this->assertArrayNotHasKey(
+				'error',
+				$out['body'],
+				$capability . ' is advertised but ' . $capability . '/list is not answered'
+			);
+		}
+	}
+
+	public function test_the_version_is_negotiated_and_never_refused() {
+		// Refusing the request over a version string leaves the client
+		// nowhere to go. Whatever it asks for, it gets a version back and
+		// decides for itself.
+		$asked = array( '2025-03-26', '2025-06-18', '2025-11-25', Blogcraft_Mcp::PROTOCOL, '1999-01-01', '' );
+
+		foreach ( $asked as $version ) {
+			$out = $this->rpc( 'initialize', array( 'protocolVersion' => $version ) );
+
+			$this->assertArrayNotHasKey( 'error', $out['body'], $version . ' was refused' );
+
+			$answered = $out['body']['result']['protocolVersion'];
+
+			$this->assertContains(
+				$answered,
+				Blogcraft_Mcp::spoken(),
+				'answered with a version it does not speak'
+			);
+
+			if ( in_array( $version, Blogcraft_Mcp::spoken(), true ) ) {
+				$this->assertSame( $version, $answered, 'did not echo a version it speaks' );
+			}
+		}
+	}
+
+	public function test_a_notification_gets_no_answer() {
+		// notifications/initialized arrives the moment initialize returns
+		// and carries no id. A JSON-RPC envelope sent back for it is a
+		// protocol error on our side.
+		$request = new WP_REST_Request( 'POST', '/' . Blogcraft_Mcp::REST_NAMESPACE . Blogcraft_Mcp::REST_ROUTE );
+		$request->set_header( 'authorization', 'Bearer ' . $this->token );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array( 'jsonrpc' => '2.0', 'method' => 'notifications/initialized' )
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 202, $response->get_status() );
+		$this->assertNull( $response->get_data() );
+	}
+
+	public function test_asking_for_the_stream_is_not_a_missing_route() {
+		// A client opening the optional server-to-client stream reads 404
+		// as "there is no MCP server at this address" and stops before it
+		// posts anything — which is what Claude reported while every POST
+		// in this file passed. 405 says the address is right and the
+		// method is not.
+		foreach ( array( 'GET', 'DELETE' ) as $method ) {
+			$request = new WP_REST_Request( $method, '/' . Blogcraft_Mcp::REST_NAMESPACE . Blogcraft_Mcp::REST_ROUTE );
+			$request->set_header( 'authorization', 'Bearer ' . $this->token );
+
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertSame( 405, $response->get_status(), $method . ' was not routed' );
+			$this->assertSame( 'POST', $response->get_headers()['Allow'] );
+		}
+	}
+
+	public function test_a_client_can_complete_the_opening_exchange() {
+		// The four calls a client makes before it will show the server as
+		// connected, in the order it makes them. Each assertion here has
+		// an equivalent above; the sequence is what none of them covered.
+		$hello = $this->rpc( 'initialize', array( 'protocolVersion' => '2025-06-18' ) );
+		$this->assertSame( '2025-06-18', $hello['body']['result']['protocolVersion'] );
+
+		$tools = $this->rpc( 'tools/list' );
+		$this->assertNotEmpty( $tools['body']['result']['tools'] );
+
+		$resources = $this->rpc( 'resources/list' );
+		$this->assertNotEmpty( $resources['body']['result']['resources'] );
+
+		$ping = $this->rpc( 'ping' );
+		$this->assertArrayNotHasKey( 'error', $ping['body'] );
 	}
 }

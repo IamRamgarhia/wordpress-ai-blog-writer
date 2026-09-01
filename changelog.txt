@@ -3,6 +3,15 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.73.0 =
+* Fixed: no AI client could connect. The server answered every question a client asks except the one it asks before all the others. It was built against a draft of the protocol that renames the opening handshake, and no shipping application uses that name — so Claude, ChatGPT and the rest got as far as "couldn't connect to the server" and stopped. The handshake every client actually sends is answered now, and the old name still works
+* Fixed: asking for the optional event stream returned "no route here" rather than "not that method". A client reads the first as proof there is no server at the address and gives up before it sends anything
+* Fixed: a protocol version the site did not recognise had the whole request refused, which leaves the client nowhere to go. The version is negotiated now, and four revisions are accepted
+* Fixed: the notification a client sends immediately after connecting was answered as though it were a question, which is a protocol error on our side
+* The settings screen opens by asking how you want to write, with what each way includes and what it rules out, side by side. Choosing shows the settings for that way and hides the ones that would do nothing. The way back is on the screen from then on, and switching deletes nothing
+* Fixed: the jump list beside the settings disagreed with the cards it pointed at, so step 02 in the list was step 03 on the screen. The list and the cards are one list now
+* Choosing the AI client is honoured rather than described: scheduled writing does not run on that path, which is what the screen has always said about it
+
 = 0.72.0 =
 * Connecting an app is one button now. It used to be: tick a box, save the page, come back, find the controls that had appeared, then issue a token. Everything is on the card from the first visit, and issuing a token is what switches connections on — pressing that button is not an ambiguous statement of intent
 * Issuing a token also tests it. The site calls its own address exactly as an app will and reports what came back, so a server that strips the Authorization header or blocks the REST API says so here rather than leaving you with an app that only says it could not connect

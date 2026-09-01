@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.72.0
+Stable tag: 0.73.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,15 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.73.0 =
+* Fixed: no AI client could connect. The server answered every question a client asks except the one it asks before all the others. It was built against a draft of the protocol that renames the opening handshake, and no shipping application uses that name — so Claude, ChatGPT and the rest got as far as "couldn't connect to the server" and stopped. The handshake every client actually sends is answered now, and the old name still works
+* Fixed: asking for the optional event stream returned "no route here" rather than "not that method". A client reads the first as proof there is no server at the address and gives up before it sends anything
+* Fixed: a protocol version the site did not recognise had the whole request refused, which leaves the client nowhere to go. The version is negotiated now, and four revisions are accepted
+* Fixed: the notification a client sends immediately after connecting was answered as though it were a question, which is a protocol error on our side
+* The settings screen opens by asking how you want to write, with what each way includes and what it rules out, side by side. Choosing shows the settings for that way and hides the ones that would do nothing. The way back is on the screen from then on, and switching deletes nothing
+* Fixed: the jump list beside the settings disagreed with the cards it pointed at, so step 02 in the list was step 03 on the screen. The list and the cards are one list now
+* Choosing the AI client is honoured rather than described: scheduled writing does not run on that path, which is what the screen has always said about it
+
 = 0.72.0 =
 * Connecting an app is one button now. It used to be: tick a box, save the page, come back, find the controls that had appeared, then issue a token. Everything is on the card from the first visit, and issuing a token is what switches connections on — pressing that button is not an ambiguous statement of intent
 * Issuing a token also tests it. The site calls its own address exactly as an app will and reports what came back, so a server that strips the Authorization header or blocks the REST API says so here rather than leaving you with an app that only says it could not connect
@@ -181,18 +190,5 @@ everything is here, oldest at the bottom.
 * Settings, Connect an AI client. Switch it on, issue a token, and paste the address and the token into whatever you use. It speaks the Model Context Protocol, so it is not tied to one app
 * A connected client can read your rules, score a draft against every check, create and revise drafts, and publish — but only above the quality threshold you set, exactly as a post written here would have to be. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing still needs a provider key, because something has to be running when nobody is watching
 * Tokens are shown once and stored only as a fingerprint. One stops working the moment the person it was issued to loses permission to write here, so a token cannot outlive the account behind it
-
-= 0.70.0 =
-* The plugin puts nothing in the dashboard notice area at all. The one notice it had — a warning that the queue has stalled — was already capability-gated, shown only on this plugin's own screens, dismissible and switchable off, which guideline 11 permits. But that space belongs to the whole dashboard, and the surest way not to misuse it is not to occupy it. The warning is drawn as part of our own page instead, under the navigation
-* It also says how to fix the thing it is warning about, which the guideline asks for and a dismiss link on its own does not do: the first link now goes to the automation instructions, and dismissing is the second
-
-= 0.69.0 =
-* The admin menu says "AI Blog Writer" rather than the full plugin name. The sidebar column is about 160px wide, so the whole name wrapped onto two lines and knocked every item below it out of alignment. add_menu_page takes the browser title and the sidebar label separately, and only the readme heading and the Plugin Name header are required to agree
-
-= 0.68.0 =
-* The old name is out of the interface as well as the header. Renaming the plugin left the previous name on every screen, in the WP-CLI commands, and in the User-Agent sent to every research service — which is where somebody would actually have read it. Thirty-four strings, four commands and the request header now carry the real name
-* The documentation address no longer contains the old term either. The review named URLs specifically, and a link on the author's own domain still spells out a name that belongs to somebody else
-* readme.txt names where development happens, which guideline 4 asks for: the source ships in full, but the build scripts do not, so the repository is linked
-* Trimmed two paragraphs of argument out of External Services. That section had crossed the 5,000-character ceiling and would have been truncated on the listing — the same fault as the changelog, one section along, and the test only covered the changelog. It covers every section now
 Older releases are listed in changelog.txt, which ships with the plugin.
 

@@ -313,6 +313,15 @@ class Blogcraft_Autopilot {
 	 * @return bool Whether a topic was queued.
 	 */
 	public static function tick() {
+		// A site set up to be driven by an AI client has nothing to run
+		// unattended: the model lives in somebody else's application and
+		// this site cannot open a conversation with it. The chooser says
+		// so in as many words, and this is what makes it true rather than
+		// a claim on a settings screen.
+		if ( 'client' === (string) Blogcraft_Settings::get( 'setup_path' ) ) {
+			return false;
+		}
+
 		if ( ! Blogcraft_Settings::get( 'autopilot_enabled' ) ) {
 			return false;
 		}

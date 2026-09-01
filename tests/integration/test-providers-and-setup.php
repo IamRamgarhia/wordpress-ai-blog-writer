@@ -395,4 +395,121 @@ class Test_Blogcraft_Providers_And_Setup extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'Connect a provider', $body, 'the refusal does not say where to go' );
 	}
+
+	// ------------------------------------------- the rail and the cards.
+
+	/**
+	 * Render the settings screen with one path already chosen.
+	 *
+	 * @param string $path Which path to set up.
+	 * @return string
+	 */
+	private function screen( $path ) {
+		Blogcraft_Settings::set( 'setup_path', $path );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		ob_start();
+		Blogcraft_Connection::render();
+
+		return (string) ob_get_clean();
+	}
+
+	public function test_the_rail_and_the_cards_number_the_same_things() {
+		// The bug: the rail kept its own hardcoded copy of the card list,
+		// so inserting a card renumbered the cards and left the rail
+		// saying "02 Connect a picture service" beside a card headed
+		// "02 Connect an AI client". Asserted as the rule rather than one
+		// example: every card, on every path, so the next card inserted
+		// fails here instead of on somebody's screen.
+		foreach ( array( 'api', 'client' ) as $path ) {
+			$html = $this->screen( $path );
+
+			$rail  = array();
+			$cards = array();
+
+			preg_match_all(
+				'#class="bc-jump-item" href="\#bc-card-([a-z]+)"[^>]*><span class="bc-jump-step">(\d+)<#',
+				$html,
+				$rail,
+				PREG_SET_ORDER
+			);
+
+			preg_match_all(
+				'#<section class="blogcraft-card" id="bc-card-([a-z]+)"><header><span class="blogcraft-step">(\d+)<#',
+				$html,
+				$cards,
+				PREG_SET_ORDER
+			);
+
+			$in_rail = array();
+			foreach ( $rail as $entry ) {
+				$in_rail[ $entry[1] ] = $entry[2];
+			}
+
+			$on_screen = array();
+			foreach ( $cards as $entry ) {
+				$on_screen[ $entry[1] ] = $entry[2];
+			}
+
+			$this->assertNotEmpty( $in_rail, $path . ': the rail rendered nothing' );
+			$this->assertSame(
+				$on_screen,
+				$in_rail,
+				$path . ': the rail and the cards disagree about which step is which'
+			);
+		}
+	}
+
+	public function test_the_question_is_asked_first_and_only_once() {
+		// Two ways of supplying a model is not something to discover half
+		// way down a settings screen, so it is asked before anything
+		// else — and once answered it is never asked again.
+		delete_option( 'blogcraft_settings' );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$fresh = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'bc-path-options', $fresh, 'the question is not asked' );
+		$this->assertSame( strpos( $fresh, 'bc-card-' ), strpos( $fresh, 'bc-card-path' ), 'a card comes before the question' );
+
+		$chosen = $this->screen( 'api' );
+
+		$this->assertStringNotContainsString( 'bc-path-options', $chosen, 'still asking after it was answered' );
+	}
+
+	public function test_the_way_back_is_always_on_the_screen() {
+		// Somebody who picks one and finds the other suited them better
+		// should not have to work out how to undo it.
+		foreach ( array( 'api' => 'client', 'client' => 'api' ) as $now => $other ) {
+			$html = $this->screen( $now );
+
+			$this->assertStringContainsString( 'bc-path-now', $html, $now . ': no way back' );
+			$this->assertStringContainsString(
+				'value="' . $other . '"',
+				$html,
+				$now . ': the switch does not offer the other path'
+			);
+		}
+	}
+
+	public function test_each_path_shows_only_what_belongs_to_it() {
+		// The point of asking: a provider key card on a site being driven
+		// by Claude is a setting that does nothing, and a token card on a
+		// site with a provider key is the same thing in reverse.
+		$api    = $this->screen( 'api' );
+		$client = $this->screen( 'client' );
+
+		$this->assertStringContainsString( 'bc-card-provider', $api );
+		$this->assertStringNotContainsString( 'bc-card-clients', $api );
+
+		$this->assertStringContainsString( 'bc-card-clients', $client );
+		$this->assertStringNotContainsString( 'bc-card-provider', $client );
+
+		// Automation is promised on one path and ruled out on the other,
+		// which is the sharpest thing the chooser claims.
+		$this->assertStringContainsString( 'bc-card-automation', $api );
+		$this->assertStringNotContainsString( 'bc-card-automation', $client );
+	}
 }
