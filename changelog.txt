@@ -3,6 +3,11 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.83.0 =
+* Fixed: your voice was described in two places and the model was told both. Settings had a Describe your voice card, How it writes had a Voice tab, and they were not two views of one thing — they were two stores, and every request carried two versions of the tone, the reader, the point of view, the reading level, the banned words and the subjects to avoid. Fill in one and the model got two answers to the same question
+* How it writes now owns all of it. What the blog is about, your style rules and your own experience have moved onto its Voice tab, along with the Learn from my posts button. Nothing you had typed is lost — it is carried over the first time you open the screen
+* The Settings card is now a line pointing at where the voice lives
+
 = 0.82.0 =
 * Write a post keeps its whole form when an AI client does the writing. It had been cut down to a single sentence to copy, which threw away the topic field, the angle, the box for what only you know, and every per-post choice — the things that make a post yours rather than generic. Fill it in as before and press Save this brief
 * Your connected app collects that brief the moment you ask it to write: the topic, the angle, your own figures, and any choice you changed for this post. It is the same brief the plugin would have written from

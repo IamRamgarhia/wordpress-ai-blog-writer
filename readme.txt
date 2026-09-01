@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.82.0
+Stable tag: 0.83.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,11 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.83.0 =
+* Fixed: your voice was described in two places and the model was told both. Settings had a Describe your voice card, How it writes had a Voice tab, and they were not two views of one thing — they were two stores, and every request carried two versions of the tone, the reader, the point of view, the reading level, the banned words and the subjects to avoid. Fill in one and the model got two answers to the same question
+* How it writes now owns all of it. What the blog is about, your style rules and your own experience have moved onto its Voice tab, along with the Learn from my posts button. Nothing you had typed is lost — it is carried over the first time you open the screen
+* The Settings card is now a line pointing at where the voice lives
+
 = 0.82.0 =
 * Write a post keeps its whole form when an AI client does the writing. It had been cut down to a single sentence to copy, which threw away the topic field, the angle, the box for what only you know, and every per-post choice — the things that make a post yours rather than generic. Fill it in as before and press Save this brief
 * Your connected app collects that brief the moment you ask it to write: the topic, the angle, your own figures, and any choice you changed for this post. It is the same brief the plugin would have written from
@@ -196,11 +201,5 @@ everything is here, oldest at the bottom.
 * The Write a post screen is a screen you fill in, not one you read. Every field on it carried a paragraph explaining itself and several carried two — the explanation for the evidence box ran to three sentences, and the topic field had two separate paragraphs above and below it. One line each now
 * That page links to the documentation, which it never did. The detail that came off the screen is there rather than gone
 * Shorter wording on the research and voice prompts too, and on the settings card that explains research
-
-= 0.77.0 =
-* Every post now says what wrote it: the provider, the model, the tokens in and out, and the score. A panel on the post itself. The numbers were already being handed over on every reply and thrown away — the month total could say thirteen thousand tokens and nothing could say which post spent them, or which model wrote any given piece
-* A post written from Claude or ChatGPT says so instead, and says nothing was billed here, because the model ran on their subscription
-* Fixed: the AI client card still listed pictures among the things a connected app cannot use. It has been able to since the last release
-* Shorter wording again across the connect card and the chooser
 Older releases are listed in changelog.txt, which ships with the plugin.
 
