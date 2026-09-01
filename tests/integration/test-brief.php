@@ -114,7 +114,7 @@ class Test_Blogcraft_Brief extends WP_UnitTestCase {
 		// Returning nothing would leave the app guessing whether the call
 		// failed or the answer was empty.
 		$out = Blogcraft_Mcp_Tools::call( 'get_brief', array() );
-		$said = (string) $out['content'][0]['text'];
+		$said = (string) $out['text'];
 
 		$this->assertStringContainsString( 'No brief is waiting', $said );
 		$this->assertStringContainsString( 'Ask what the post should be about', $said );
@@ -133,7 +133,7 @@ class Test_Blogcraft_Brief extends WP_UnitTestCase {
 
 		$out = Blogcraft_Mcp_Tools::call( 'get_brief', array() );
 
-		$this->assertStringContainsString( 'Sharpening a chisel', (string) $out['content'][0]['text'] );
+		$this->assertStringContainsString( 'Sharpening a chisel', (string) $out['text'] );
 	}
 
 	public function test_writing_the_post_clears_the_brief() {

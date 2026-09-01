@@ -176,19 +176,18 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_the_write_screen_says_where_the_writing_happens() {
-		// Somebody on this path opens Write a post and needs two things:
-		// to be told the writing happens in their app, and the sentence to
-		// say there.
+	public function test_the_write_screen_keeps_its_form_and_changes_where_it_goes() {
+		// It briefly became a sentence to paste, which threw away the
+		// topic, the angle and the evidence box — the fields that make a
+		// post specific rather than generic.
 		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
 
 		ob_start();
 		Blogcraft_Generate::render();
 		$html = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'You write in Claude or ChatGPT', $html );
-		$this->assertStringContainsString( 'Read my writing rules and write a post about X', $html );
-		$this->assertStringContainsString( 'data-copy=', $html, 'the instruction cannot be copied' );
-		$this->assertStringNotContainsString( 'bc_topic', $html, 'the provider form rendered anyway' );
+		$this->assertStringContainsString( 'bc_topic', $html, 'the form is gone again' );
+		$this->assertStringContainsString( 'value="blogcraft_save_brief"', $html );
+		$this->assertStringContainsString( 'Read my brief and my writing rules', $html );
 	}
 }
