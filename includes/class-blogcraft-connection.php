@@ -1267,10 +1267,10 @@ class Blogcraft_Connection {
 	 * @param string $id    Which saved setup.
 	 * @param string $does  save, use or forget.
 	 * @param string $label What the button says.
-	 * @param string $class Button class.
+	 * @param string $style Button class.
 	 * @return void
 	 */
-	private static function saved_button( $id, $does, $label, $class ) {
+	private static function saved_button( $id, $does, $label, $style ) {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="blogcraft_saved_provider" />';
 		printf( '<input type="hidden" name="do" value="%s" />', esc_attr( $does ) );
@@ -1278,7 +1278,7 @@ class Blogcraft_Connection {
 		Blogcraft_Request::nonce_field( self::SAVED_ACTION );
 		printf(
 			'<button type="submit" class="%1$s">%2$s</button>',
-			esc_attr( $class ),
+			esc_attr( $style ),
 			esc_html( $label )
 		);
 		echo '</form>';
