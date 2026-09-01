@@ -16,3 +16,14 @@ rr.json
 sg.html
 junit.xml
 phpunit-out.txt
+
+# Planning, research and handover notes. These are how the work gets
+# thought about, not part of the plugin, and the build never shipped
+# them — but the repository is public, so they were on display to
+# anybody reading it. They stay on disk and out of git.
+#
+# docs/site/index.html is deliberately not here: it is the public
+# documentation page, which is a deliverable rather than a note.
+ai-blog-plugin-research.md
+docs/*.md
+docs/superpowers/
