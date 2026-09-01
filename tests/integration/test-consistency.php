@@ -96,11 +96,17 @@ class Test_Blogcraft_Consistency extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Duplicates that predate this rule.
+	 * Second blocks that are meant to be there.
 	 *
-	 * Listed rather than fixed, because untangling them needs somebody
-	 * looking at the screens they style. The list may shrink and must never
-	 * grow.
+	 * These were listed as debt when this check was written. They are
+	 * not: admin.css has a base layer and, after it, a glass layer that
+	 * deliberately restyles some of the same components — the comment
+	 * above the second .blogcraft-card block says as much. The rest set
+	 * properties the first block never touches.
+	 *
+	 * The two that were real faults, .bc-shape and .bc-mcp-test, are not
+	 * here, because they were fixed rather than excused. Anything added
+	 * to this list should be a deliberate override and nothing else.
 	 *
 	 * @return array
 	 */
