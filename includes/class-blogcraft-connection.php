@@ -41,6 +41,11 @@ class Blogcraft_Connection {
 	const PATH_ACTION = 'blogcraft_choose_path';
 
 	/**
+	 * Nonce action for saving, switching or forgetting a provider.
+	 */
+	const SAVED_ACTION = 'blogcraft_saved_provider';
+
+	/**
 	 * Nonce action for revoking one.
 	 */
 	const MCP_REVOKE_ACTION = 'blogcraft_mcp_revoke';
@@ -61,6 +66,7 @@ class Blogcraft_Connection {
 		add_action( 'admin_post_blogcraft_save_settings', array( __CLASS__, 'handle_save' ) );
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
 		add_action( 'admin_post_blogcraft_choose_path', array( __CLASS__, 'handle_choose_path' ) );
+		add_action( 'admin_post_blogcraft_saved_provider', array( __CLASS__, 'handle_saved_provider' ) );
 		add_action( 'admin_post_blogcraft_mcp_issue', array( __CLASS__, 'handle_mcp_issue' ) );
 		add_action( 'admin_post_blogcraft_mcp_test_seen', array( __CLASS__, 'handle_mcp_test_seen' ) );
 		add_action( 'admin_post_blogcraft_mcp_revoke', array( __CLASS__, 'handle_mcp_revoke' ) );
@@ -520,6 +526,7 @@ class Blogcraft_Connection {
 
 		if ( self::shows( 'provider' ) ) {
 			self::open_card_for( 'provider' );
+			self::render_saved_providers();
 			echo '<table class="form-table" role="presentation"><tbody>';
 
 			echo '<tr><th scope="row"><label for="blogcraft_provider_type">' . esc_html__( 'Provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
@@ -1190,6 +1197,124 @@ class Blogcraft_Connection {
 		exit;
 	}
 
+	/**
+	 * The providers already set up here, and the way between them.
+	 *
+	 * One provider in the settings meant comparing two was retyping the
+	 * card, key and all, every time you wanted the other. Most people
+	 * did that once.
+	 *
+	 * @return void
+	 */
+	private static function render_saved_providers() {
+		$saved = Blogcraft_Connections::all();
+
+		if ( ! empty( $saved ) ) {
+			echo '<ul class="bc-saved">';
+
+			foreach ( $saved as $id => $record ) {
+				$live = Blogcraft_Connections::is_live( $record );
+
+				printf( '<li class="bc-saved-item%s">', $live ? ' is-live' : '' );
+
+				printf(
+					'<span class="bc-saved-name">%1$s</span><span class="bc-saved-what">%2$s</span>',
+					esc_html( $record['label'] ),
+					esc_html( Blogcraft_Connections::describe( $record ) )
+				);
+
+				if ( $live ) {
+					printf( '<span class="bc-saved-live">%s</span>', esc_html__( 'In use', 'dicecodes-ai-blog-writer' ) );
+				} else {
+					self::saved_button( $id, 'use', __( 'Use this', 'dicecodes-ai-blog-writer' ), 'button' );
+				}
+
+				self::saved_button( $id, 'forget', __( 'Forget', 'dicecodes-ai-blog-writer' ), 'button-link' );
+
+				echo '</li>';
+			}
+
+			echo '</ul>';
+		}
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-saved-add">';
+		echo '<input type="hidden" name="action" value="blogcraft_saved_provider" />';
+		echo '<input type="hidden" name="do" value="save" />';
+		Blogcraft_Request::nonce_field( self::SAVED_ACTION );
+		printf(
+			'<input type="text" name="label" class="regular-text" placeholder="%s" />',
+			esc_attr__( 'Name this setup — "GPT-5", "my local model"', 'dicecodes-ai-blog-writer' )
+		);
+		printf(
+			'<button type="submit" class="button">%s</button>',
+			esc_html__( 'Save this one', 'dicecodes-ai-blog-writer' )
+		);
+		echo '</form>';
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'Saves the key and model below, so you can switch back without retyping them.', 'dicecodes-ai-blog-writer' )
+		);
+	}
+
+	/**
+	 * One button that acts on one saved provider.
+	 *
+	 * A form each rather than links: switching providers and forgetting a
+	 * key are both things a crawler should not be able to do by following
+	 * a URL.
+	 *
+	 * @param string $id    Which saved setup.
+	 * @param string $does  save, use or forget.
+	 * @param string $label What the button says.
+	 * @param string $class Button class.
+	 * @return void
+	 */
+	private static function saved_button( $id, $does, $label, $class ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="blogcraft_saved_provider" />';
+		printf( '<input type="hidden" name="do" value="%s" />', esc_attr( $does ) );
+		printf( '<input type="hidden" name="id" value="%s" />', esc_attr( $id ) );
+		Blogcraft_Request::nonce_field( self::SAVED_ACTION );
+		printf(
+			'<button type="submit" class="%1$s">%2$s</button>',
+			esc_attr( $class ),
+			esc_html( $label )
+		);
+		echo '</form>';
+	}
+
+	/**
+	 * Save, switch to, or forget a provider.
+	 *
+	 * @return void
+	 */
+	public static function handle_saved_provider() {
+		// Read here, verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::SAVED_ACTION, $nonce );
+
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to change providers on this site.', 'dicecodes-ai-blog-writer' ) );
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified above.
+		$does  = isset( $_POST['do'] ) ? sanitize_key( wp_unslash( $_POST['do'] ) ) : '';
+		$id    = isset( $_POST['id'] ) ? sanitize_text_field( wp_unslash( $_POST['id'] ) ) : '';
+		$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		if ( 'save' === $does ) {
+			Blogcraft_Connections::save( $label );
+		} elseif ( 'use' === $does ) {
+			Blogcraft_Connections::activate( $id );
+		} elseif ( 'forget' === $does ) {
+			Blogcraft_Connections::remove( $id );
+		}
+
+		wp_safe_redirect( self::settings_url() );
+		exit;
+	}
 	/**
 	 * The card that lets an AI client drive this site.
 	 *

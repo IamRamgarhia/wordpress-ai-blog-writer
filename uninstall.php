@@ -87,6 +87,10 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// to.
 		delete_option( 'blogcraft_mcp_clients' );
 
+		// Saved provider setups. These hold API keys, so they go with the
+		// live one rather than outliving the plugin that stored them.
+		delete_option( 'blogcraft_saved_providers' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 

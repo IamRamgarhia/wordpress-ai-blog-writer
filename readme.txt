@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.78.0
+Stable tag: 0.79.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
+
+= 0.79.0 =
+* You can keep more than one provider set up and switch between them. The settings held exactly one, so comparing a cheap model against a good one, or a paid account against a local model that costs nothing, meant retyping the whole card and pasting the key back in from wherever you keep it. Most people did that once and never went back
+* Name a setup, save it, and it is one button to return to. The key is stored encrypted the same way the live one is, and switching carries the whole setup — including the request shape a custom endpoint needs, which restored without it fails in a way that reads like a bad key
+* Ten setups are kept. Past that the oldest goes
+* A test now asserts that every provider setting is one a saved setup carries, so a setting added later cannot be silently dropped on every switch
 
 = 0.78.0 =
 * The Write a post screen is a screen you fill in, not one you read. Every field on it carried a paragraph explaining itself and several carried two — the explanation for the evidence box ran to three sentences, and the topic field had two separate paragraphs above and below it. One line each now

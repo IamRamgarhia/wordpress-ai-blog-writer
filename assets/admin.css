@@ -2510,3 +2510,53 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: var(--bc-t-sm);
 	margin: var(--bc-s2) 0 0;
 }
+
+/* ------------------------------------------- saved provider setups.
+   One provider in the settings meant comparing two was retyping the
+   card, key and all. This is the shelf beside it. */
+
+.bc-saved {
+	list-style: none;
+	margin: 0 0 var(--bc-s3);
+	padding: 0;
+}
+
+.bc-saved-item {
+	align-items: center;
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s2);
+	margin-bottom: var(--bc-s2);
+	padding: var(--bc-s2) var(--bc-s3);
+}
+
+.bc-saved-item.is-live {
+	border-color: var(--bc-accent);
+}
+
+.bc-saved-name {
+	font-weight: 600;
+}
+
+.bc-saved-what {
+	color: var(--bc-muted);
+	flex: 1 1 auto;
+	font-size: var(--bc-t-sm);
+}
+
+.bc-saved-live {
+	color: var(--bc-accent);
+	font-size: var(--bc-t-xs);
+}
+
+.bc-saved-item form {
+	margin: 0;
+}
+
+.bc-saved-add {
+	align-items: center;
+	display: flex;
+	gap: var(--bc-s2);
+}
