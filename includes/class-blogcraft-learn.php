@@ -301,22 +301,27 @@ class Blogcraft_Learn {
 
 		$fields = array();
 
+		// Blueprint field names: the voice lives there now, and these
+		// are put straight into that form by name.
 		if ( '' !== $written['niche'] ) {
-			$fields['voice_niche'] = $written['niche'];
+			$fields['niche'] = $written['niche'];
 		}
 
 		if ( '' !== $written['audience'] ) {
-			$fields['voice_audience'] = $written['audience'];
+			$fields['audience']        = 'custom';
+			$fields['audience_custom'] = $written['audience'];
 		}
 
 		if ( ! empty( $rules ) ) {
-			$fields['voice_style_rules'] = implode( "\n", $rules );
+			$fields['style_rules'] = implode( "\n", $rules );
 		}
 
+		// A choice here, not a sentence. The old screen took free text
+		// and this one has four buttons.
 		if ( 'first' === $seen['person'] ) {
-			$fields['voice_point_of_view'] = __( 'First person plural', 'dicecodes-ai-blog-writer' );
+			$fields['point_of_view'] = 'first_plural';
 		} elseif ( 'second' === $seen['person'] ) {
-			$fields['voice_point_of_view'] = __( 'Second person, addressing the reader', 'dicecodes-ai-blog-writer' );
+			$fields['point_of_view'] = 'second';
 		}
 
 		$notes = array(

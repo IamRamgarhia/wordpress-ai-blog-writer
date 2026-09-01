@@ -77,7 +77,7 @@ class Blogcraft_Voice {
 	 * @return array
 	 */
 	public static function banned_words() {
-		$custom = self::to_list( Blogcraft_Settings::get( 'voice_banned_words' ) );
+		$custom = self::to_list( Blogcraft_Blueprint::get()['banned_phrases'] );
 		$merged = array_merge( self::default_banned_words(), $custom );
 
 		return array_values( array_unique( $merged ) );
@@ -89,7 +89,7 @@ class Blogcraft_Voice {
 	 * @return bool
 	 */
 	public static function is_configured() {
-		return '' !== trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
+		return '' !== trim( (string) Blogcraft_Blueprint::get()['niche'] );
 	}
 
 	/**
@@ -103,34 +103,26 @@ class Blogcraft_Voice {
 	 * @return string
 	 */
 	public static function system_prompt() {
-		$lines = array();
+		// Everything here used to come from the voice_* settings, and
+		// Prompts::base_system() then appended the blueprint's own voice
+		// rules to it. Every request carried two versions of the tone, the
+		// reader, the point of view, the reading level, the banned words
+		// and the avoided subjects — set on two screens, with nothing
+		// keeping them in agreement.
+		//
+		// Only what the blueprint does not already say belongs here. The
+		// rest is its job, and it is the one with per-post overrides.
+		$blueprint = Blogcraft_Blueprint::get();
+		$lines     = array();
 
-		$niche = trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
+		$niche = trim( (string) $blueprint['niche'] );
+
 		if ( '' !== $niche ) {
 			$lines[] = 'This blog is about: ' . $niche;
 		}
 
-		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
-		if ( '' !== $audience ) {
-			$lines[] = 'You are writing for: ' . $audience;
-		}
+		$rules = self::to_list( $blueprint['style_rules'] );
 
-		$tone = trim( (string) Blogcraft_Settings::get( 'voice_tone' ) );
-		if ( '' !== $tone ) {
-			$lines[] = 'Tone: ' . $tone;
-		}
-
-		$pov = trim( (string) Blogcraft_Settings::get( 'voice_point_of_view' ) );
-		if ( '' !== $pov ) {
-			$lines[] = 'Point of view: ' . $pov;
-		}
-
-		$reading_level = trim( (string) Blogcraft_Settings::get( 'voice_reading_level' ) );
-		if ( '' !== $reading_level ) {
-			$lines[] = 'Reading level: ' . $reading_level;
-		}
-
-		$rules = self::to_list( Blogcraft_Settings::get( 'voice_style_rules' ) );
 		if ( ! empty( $rules ) ) {
 			$lines[] = 'Style rules you must follow:';
 
@@ -140,16 +132,13 @@ class Blogcraft_Voice {
 		}
 
 		$banned = self::banned_words();
+
 		if ( ! empty( $banned ) ) {
 			$lines[] = 'Never use these words or phrases: ' . implode( '; ', $banned ) . '.';
 		}
 
-		$avoid = self::to_list( Blogcraft_Settings::get( 'voice_banned_topics' ) );
-		if ( ! empty( $avoid ) ) {
-			$lines[] = 'Never write about: ' . implode( '; ', $avoid ) . '.';
-		}
+		$experience = trim( (string) $blueprint['experience'] );
 
-		$experience = trim( (string) Blogcraft_Settings::get( 'voice_experience' ) );
 		if ( '' !== $experience ) {
 			$lines[] = 'Where it fits naturally, draw on this first-hand experience rather than '
 				. 'writing in generalities. Do not invent details beyond it: ' . $experience;

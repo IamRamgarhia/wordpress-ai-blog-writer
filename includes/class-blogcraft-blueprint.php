@@ -37,6 +37,14 @@ class Blogcraft_Blueprint {
 	const DEFAULT_SLUG = 'default';
 
 	/**
+	 * How many times the voice settings have been folded into this.
+	 *
+	 * Raised when a new field arrives here from the old screen, so an
+	 * install that already ran the earlier pass runs the later one too.
+	 */
+	const MIGRATION = 2;
+
+	/**
 	 * Tones offered as presets.
 	 *
 	 * @return array Machine value => label.
@@ -168,6 +176,13 @@ class Blogcraft_Blueprint {
 			// kept only so the screen can show which card built the page in
 			// front of you.
 			'archetype'             => array( 'string', '' ),
+			// What the blog is about, the standing style rules and the
+			// first-hand experience to draw on. These lived in the settings
+			// and were sent as a second, separate system prompt alongside
+			// this one — two descriptions of one voice, kept on two screens.
+			'niche'                 => array( 'text', '' ),
+			'style_rules'           => array( 'list', '' ),
+			'experience'            => array( 'text', '' ),
 			'tone'                  => array( 'choice', 'conversational' ),
 			'tone_custom'           => array( 'text', '' ),
 			'point_of_view'         => array( 'choice', 'second' ),
@@ -802,33 +817,61 @@ class Blogcraft_Blueprint {
 	 * @return void
 	 */
 	public static function migrate_from_voice() {
-		if ( get_option( 'blogcraft_blueprints_migrated' ) ) {
+		// Version rather than a flag. The first pass carried the tone, the
+		// reader and the banned words; the second carries the three fields
+		// that had no home here until the two descriptions of one voice
+		// were merged into this one.
+		$done = (int) get_option( 'blogcraft_blueprints_migrated' );
+
+		if ( $done >= self::MIGRATION ) {
 			return;
 		}
 
-		$blueprint = self::defaults();
+		// Starting from defaults was right when this was new and empty.
+		// Doing it again over a blueprint somebody has since edited would
+		// throw their work away, so a later pass starts from what is saved.
+		$blueprint = ( $done > 0 ) ? self::get() : self::defaults();
+		$defaults  = self::defaults();
+
+		$carry = array(
+			'niche'          => 'voice_niche',
+			'style_rules'    => 'voice_style_rules',
+			'experience'     => 'voice_experience',
+			'avoid_subjects' => 'voice_banned_topics',
+			'banned_phrases' => 'voice_banned_words',
+		);
+
+		foreach ( $carry as $field => $setting ) {
+			$value = trim( (string) Blogcraft_Settings::get( $setting ) );
+
+			// Only where the blueprint has nothing of its own to say. An
+			// answer given here beats one left behind on the old screen.
+			if ( '' === $value ) {
+				continue;
+			}
+
+			if ( trim( (string) $blueprint[ $field ] ) !== trim( (string) $defaults[ $field ] ) ) {
+				continue;
+			}
+
+			$blueprint[ $field ] = $value;
+		}
 
 		$tone = trim( (string) Blogcraft_Settings::get( 'voice_tone' ) );
 
-		if ( '' !== $tone ) {
+		if ( '' !== $tone && $blueprint['tone'] === $defaults['tone'] ) {
 			$blueprint['tone']        = 'custom';
 			$blueprint['tone_custom'] = $tone;
 		}
 
 		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
 
-		if ( '' !== $audience ) {
+		if ( '' !== $audience && $blueprint['audience'] === $defaults['audience'] ) {
 			$blueprint['audience']        = 'custom';
 			$blueprint['audience_custom'] = $audience;
 		}
 
-		$banned = trim( (string) Blogcraft_Settings::get( 'voice_banned_words' ) );
-
-		if ( '' !== $banned ) {
-			$blueprint['banned_phrases'] = $banned;
-		}
-
 		self::save( self::DEFAULT_SLUG, $blueprint );
-		update_option( 'blogcraft_blueprints_migrated', 1, false );
+		update_option( 'blogcraft_blueprints_migrated', self::MIGRATION, false );
 	}
 }

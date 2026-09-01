@@ -116,7 +116,7 @@ class Blogcraft_Overview {
 		$blueprint = Blogcraft_Blueprint::get();
 
 		$described = ( '' !== trim( (string) $blueprint['audience_custom'] ) )
-			|| ( '' !== trim( (string) Blogcraft_Settings::get( 'voice_niche' ) ) );
+			|| ( '' !== trim( (string) $blueprint['niche'] ) );
 
 		$written = self::written_count() > 0;
 

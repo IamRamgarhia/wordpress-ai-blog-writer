@@ -95,6 +95,7 @@ class Blogcraft_Blueprint_Screen {
 			'blogcraftBlueprint',
 			array(
 				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+				'learning'     => __( 'Reading your posts...', 'dicecodes-ai-blog-writer' ),
 				'failed'       => __( 'The brief could not be refreshed. Save to see it applied.', 'dicecodes-ai-blog-writer' ),
 				'shapeSaved'   => __( 'Filled in on the other tabs. Nothing is saved until you press Save changes.', 'dicecodes-ai-blog-writer' ),
 				'shapeReading' => __( 'Reading the article...', 'dicecodes-ai-blog-writer' ),
@@ -369,6 +370,13 @@ class Blogcraft_Blueprint_Screen {
 		// tells nobody what to do about it.
 		Blogcraft_Request::require_provider();
 
+		// Reading the site's own posts and describing them. It answers
+		// in blueprint field names, and the script puts them into the
+		// form the same way a shape does.
+		if ( isset( $_POST['learn'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			wp_send_json_success( Blogcraft_Learn::suggest() );
+		}
+
 		$shape = isset( $_POST['shape'] ) ? sanitize_key( wp_unslash( $_POST['shape'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( '' !== $shape ) {
@@ -621,6 +629,33 @@ class Blogcraft_Blueprint_Screen {
 	 */
 	private static function pane_voice( $bp ) {
 		self::pane_open( 'voice' );
+
+		printf(
+			'<p class="bc-learn-row"><button type="button" class="button" id="bc-learn">%1$s</button> <span class="description">%2$s</span></p>',
+			esc_html__( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'dicecodes-ai-blog-writer' )
+		);
+
+		self::row(
+			__( 'What this blog is about', 'dicecodes-ai-blog-writer' ),
+			__( 'One or two sentences on the subject and the angle.', 'dicecodes-ai-blog-writer' ),
+			self::area( 'niche', $bp['niche'], __( 'Standing desks and home office kit, tested rather than summarised', 'dicecodes-ai-blog-writer' ), 3 ),
+			'bc_niche'
+		);
+
+		self::row(
+			__( 'Style rules', 'dicecodes-ai-blog-writer' ),
+			__( 'One per line. Followed on every post.', 'dicecodes-ai-blog-writer' ),
+			self::area( 'style_rules', $bp['style_rules'], "No em dashes\nShort paragraphs\nNever open with a question", 4 ),
+			'bc_style_rules'
+		);
+
+		self::row(
+			__( 'What you have done yourself', 'dicecodes-ai-blog-writer' ),
+			__( 'Drawn on where it fits. Never invented beyond.', 'dicecodes-ai-blog-writer' ),
+			self::area( 'experience', $bp['experience'], __( 'We have tested 40 desks since 2019 and run a workshop', 'dicecodes-ai-blog-writer' ), 3 ),
+			'bc_experience'
+		);
 
 		self::row(
 			__( 'Tone', 'dicecodes-ai-blog-writer' ),

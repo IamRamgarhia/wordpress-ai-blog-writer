@@ -528,8 +528,9 @@ class Blogcraft_Generate {
 	private static function render_gaps() {
 		$gaps = array();
 
-		$niche    = trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
-		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
+		$brief    = Blogcraft_Blueprint::get();
+		$niche    = trim( (string) $brief['niche'] );
+		$audience = trim( (string) $brief['audience_custom'] );
 
 		if ( '' === $niche || '' === $audience ) {
 			$gaps[] = array(

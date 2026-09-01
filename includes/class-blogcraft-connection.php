@@ -765,46 +765,18 @@ class Blogcraft_Connection {
 
 		if ( self::shows( 'voice' ) ) {
 			self::open_card_for( 'voice' );
-			if ( Blogcraft_Learn::sample( 1 ) ) {
-				printf(
-					'<p class="bc-learn-row"><button type="button" class="button bc-learn" id="blogcraft-learn">%1$s</button> <span class="description">%2$s</span></p><div class="bc-learn-notes" id="blogcraft-learn-notes" hidden></div>',
-					esc_html__( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
-					esc_html__( 'Fills these in from what you have already published. Nothing is saved until you press save.', 'dicecodes-ai-blog-writer' )
-				);
-			}
 
-			echo '<table class="form-table" role="presentation"><tbody>';
-
-			foreach ( self::voice_area_fields() as $name => $meta ) {
-				self::textarea_row( $name, $meta[0], $meta[1] );
-			}
-
-			foreach ( self::voice_text_fields() as $name => $label ) {
-				self::text_row( $name, $label );
-			}
-
-			self::text_row(
-				'author_credentials',
-				__( 'What the author does', 'dicecodes-ai-blog-writer' ),
-				'',
-				__( 'The role or qualification of whoever posts are credited to, for example "Head barista, twelve years". Published as an expertise signal alongside the byline.', 'dicecodes-ai-blog-writer' )
+			// The fields were here and on How it writes, and both were sent to
+			// the model on every request — two descriptions of one voice, kept
+			// on two screens with nothing holding them in agreement. That
+			// screen won: it is the one with per-post overrides, and the one
+			// the connected tools already read.
+			printf(
+				'<p>%1$s</p><p><a class="button" href="%2$s">%3$s</a></p>',
+				esc_html__( 'Your subject, your reader, your style rules and the words to avoid all live on How it writes.', 'dicecodes-ai-blog-writer' ),
+				esc_url( admin_url( 'admin.php?page=blogcraft-blueprint#voice' ) ),
+				esc_html__( 'Describe your voice', 'dicecodes-ai-blog-writer' )
 			);
-
-			self::text_row(
-				'reviewer_name',
-				__( 'Reviewed by', 'dicecodes-ai-blog-writer' ),
-				'',
-				__( 'A second, named person who checks posts before they go out. This is the strongest signal available to a site publishing with AI help, and the one thing a generated post cannot claim for itself. Leave blank if nobody does.', 'dicecodes-ai-blog-writer' )
-			);
-
-			self::text_row(
-				'reviewer_credentials',
-				__( 'What the reviewer does', 'dicecodes-ai-blog-writer' ),
-				'',
-				__( 'Their role or qualification.', 'dicecodes-ai-blog-writer' )
-			);
-
-			echo '</tbody></table>';
 
 			self::close_card();
 		}

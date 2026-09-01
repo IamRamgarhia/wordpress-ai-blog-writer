@@ -283,6 +283,25 @@
 		} );
 	}
 
+	var learn = document.getElementById( 'bc-learn' );
+
+	if ( learn ) {
+		learn.addEventListener( 'click', function () {
+			var label = learn.textContent;
+
+			learn.disabled = true;
+			learn.textContent = config.learning || label;
+
+			var body = new FormData();
+			body.append( 'learn', '1' );
+
+			ask( body, function () {
+				learn.disabled = false;
+				learn.textContent = label;
+			} );
+		} );
+	}
+
 	var go = document.getElementById( 'bc-match-go' );
 	var field = document.getElementById( 'bc-match-url' );
 

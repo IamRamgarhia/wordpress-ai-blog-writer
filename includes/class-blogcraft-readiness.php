@@ -107,8 +107,9 @@ class Blogcraft_Readiness {
 			);
 		}
 
-		$niche    = trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
-		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
+		$described = Blogcraft_Blueprint::get();
+		$niche     = trim( (string) $described['niche'] );
+		$audience  = trim( (string) $described['audience_custom'] );
 
 		$user = "A blogger is about to write a post and needs help planning it.\n\n"
 			. 'Topic: ' . $topic . "\n"
@@ -212,8 +213,9 @@ class Blogcraft_Readiness {
 	 * @return array
 	 */
 	private static function voice_check() {
-		$niche    = trim( (string) Blogcraft_Settings::get( 'voice_niche' ) );
-		$audience = trim( (string) Blogcraft_Settings::get( 'voice_audience' ) );
+		$described = Blogcraft_Blueprint::get();
+		$niche     = trim( (string) $described['niche'] );
+		$audience  = trim( (string) $described['audience_custom'] );
 
 		return self::item(
 			'voice',
