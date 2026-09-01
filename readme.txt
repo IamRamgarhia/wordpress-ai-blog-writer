@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.70.0
+Stable tag: 0.71.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.71.0 =
+* A second way to supply a model, for anyone already paying for Claude, ChatGPT or a similar app. Instead of this site calling a provider with your key, the app connects to this site and does the writing, while the writing rules, the twenty-five checks and the publishing stay here. No API key, and nothing leaves your site: the connection comes in
+* Settings, Connect an AI client. Switch it on, issue a token, and paste the address and the token into whatever you use. It speaks the Model Context Protocol, so it is not tied to one app
+* A connected client can read your rules, score a draft against every check, create and revise drafts, and publish — but only above the quality threshold you set, exactly as a post written here would have to be. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing still needs a provider key, because something has to be running when nobody is watching
+* Tokens are shown once and stored only as a fingerprint. One stops working the moment the person it was issued to loses permission to write here, so a token cannot outlive the account behind it
+
 = 0.70.0 =
 * The plugin puts nothing in the dashboard notice area at all. The one notice it had — a warning that the queue has stalled — was already capability-gated, shown only on this plugin's own screens, dismissible and switchable off, which guideline 11 permits. But that space belongs to the whole dashboard, and the surest way not to misuse it is not to occupy it. The warning is drawn as part of our own page instead, under the navigation
 * It also says how to fix the thing it is warning about, which the guideline asks for and a dismiss link on its own does not do: the first link now goes to the automation instructions, and dismissing is the second
@@ -186,13 +192,5 @@ everything is here, oldest at the bottom.
 = 0.67.0 =
 * Renamed to Dicecodes AI Blog Writer, slug dicecodes-ai-blog-writer. The directory review flagged "Blogcraft" as a term belonging to somebody else in the same field, and a name that could be read as another company's is worth losing however good it sounded. The author's own brand goes at the front, which is the pattern the directory asks for
 * The text domain follows the slug, as it must. Nothing that identifies stored data moved: the option names, the capability, the admin addresses and the class names are unchanged, so an existing install keeps its settings and its record of every post written
-
-= 0.66.0 =
-* uninstall.php could run outside an uninstall. Its guard accepted WP_UNINSTALL_PLUGIN or ABSPATH, and ABSPATH is defined on every WordPress request — so the second half was always true and the file would execute wherever it was reached. Only the constant that means "WordPress is deleting this plugin" is accepted now
-* The author box stylesheet is enqueued rather than printed. It echoed a <style> block into wp_head, which works but is invisible to everything else: no other plugin or theme could dequeue it, reorder it, or even see it was there. It is registered as a handle carrying inline rules, which costs the same number of requests, namely none
-* The structured-data block no longer passes JSON_UNESCAPED_SLASHES, which is what would have let a literal </script> reach the page, and adds JSON_HEX_TAG so angle brackets cannot either. The suppression comment that sat beside it was silencing a warning that had something to say
-* Nine places printed assembled markup behind a comment asserting it was already escaped. Every comment was accurate, and that is the problem: the safety held only while each helper stayed correct, and nobody could tell a true claim from a false one without reading the helper. They run through wp_kses against a fixed tag list now, so it is enforced rather than asserted
-* The SerpApi privacy link was a 404. Both of their documents live on one page under anchors, which is where it points now
-* Every external service in the readme names the host it actually contacts, so somebody reading a firewall log can match what they see against the list
 Older releases are listed in changelog.txt, which ships with the plugin.
 

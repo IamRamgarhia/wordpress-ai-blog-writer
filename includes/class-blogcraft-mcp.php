@@ -28,9 +28,22 @@ defined( 'ABSPATH' ) || exit;
 class Blogcraft_Mcp {
 
 	/**
-	 * REST namespace and route.
+	 * REST namespace, and the route inside it.
+	 *
+	 * Split rather than a namespace with a bare '/' route. That form
+	 * registers the path with a trailing slash, and WordPress trims the
+	 * trailing slash out of the ?rest_route= query argument — so on any
+	 * site with plain permalinks the endpoint answered 404 while the
+	 * namespace index cheerfully advertised it. Found by calling the
+	 * thing over HTTP; the internal dispatch the tests use does not go
+	 * through that normalisation and could not have shown it.
 	 */
-	const NAMESPACE_V1 = 'dicecodes/mcp/v1';
+	const REST_NAMESPACE = 'dicecodes/mcp';
+
+	/**
+	 * The versioned route within that namespace.
+	 */
+	const REST_ROUTE = '/v1';
 
 	/**
 	 * The protocol version this server implements.
@@ -80,7 +93,7 @@ class Blogcraft_Mcp {
 	 * @return string
 	 */
 	public static function endpoint() {
-		return rest_url( self::NAMESPACE_V1 );
+		return rest_url( self::REST_NAMESPACE . self::REST_ROUTE );
 	}
 
 	/**
@@ -90,8 +103,8 @@ class Blogcraft_Mcp {
 	 */
 	public static function register_route() {
 		register_rest_route(
-			self::NAMESPACE_V1,
-			'/',
+			self::REST_NAMESPACE,
+			self::REST_ROUTE,
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( __CLASS__, 'handle' ),

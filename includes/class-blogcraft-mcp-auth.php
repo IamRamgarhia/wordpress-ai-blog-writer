@@ -112,13 +112,53 @@ class Blogcraft_Mcp_Auth {
 	}
 
 	/**
+	 * The Authorization header, wherever this server happens to keep it.
+	 *
+	 * Apache does not pass Authorization through to PHP by default, so
+	 * $_SERVER['HTTP_AUTHORIZATION'] is simply absent and
+	 * WP_REST_Request::get_header() has nothing to return. On the majority
+	 * of real WordPress hosts that made every token look invalid, while a
+	 * unit test — which sets the header on the request object directly —
+	 * passed happily. It took calling the endpoint over HTTP to see it.
+	 *
+	 * Four places, in order of how much they can be trusted. getallheaders()
+	 * is last because it does not exist on every server, and first among
+	 * equals in that it is the only one that works on Apache.
+	 *
+	 * @param WP_REST_Request $request Incoming request.
+	 * @return string The header value, or ''.
+	 */
+	private static function presented_credential( $request ) {
+		$header = (string) $request->get_header( 'authorization' );
+
+		if ( '' !== $header ) {
+			return $header;
+		}
+
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- compared against a stored hash, never rendered or stored.
+		foreach ( array( 'HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION' ) as $key ) {
+			if ( ! empty( $_SERVER[ $key ] ) ) {
+				return trim( (string) wp_unslash( $_SERVER[ $key ] ) );
+			}
+		}
+		// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		if ( ! function_exists( 'getallheaders' ) ) {
+			return '';
+		}
+
+		$all = array_change_key_case( (array) getallheaders() );
+
+		return isset( $all['authorization'] ) ? trim( (string) $all['authorization'] ) : '';
+	}
+	/**
 	 * The user a request is authenticated as, if any.
 	 *
 	 * @param WP_REST_Request $request Incoming request.
 	 * @return int User id, or 0.
 	 */
 	public static function user_for( $request ) {
-		$header = (string) $request->get_header( 'authorization' );
+		$header = self::presented_credential( $request );
 
 		if ( 0 !== stripos( $header, 'bearer ' ) ) {
 			return 0;

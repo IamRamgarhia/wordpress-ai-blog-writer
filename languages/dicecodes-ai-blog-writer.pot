@@ -3599,7 +3599,7 @@ msgstr ""
 msgid "Text is kept out of generated images by default. Image models render lettering as convincing gibberish."
 msgstr ""
 
-#: includes/class-blogcraft-mcp.php:125
+#: includes/class-blogcraft-mcp.php:138
 msgid "That connection token is not valid for this site."
 msgstr ""
 
@@ -4002,7 +4002,7 @@ msgstr ""
 msgid "This scored below your bar. Creating it anyway is fine — it lands as a draft you can edit."
 msgstr ""
 
-#: includes/class-blogcraft-mcp.php:117
+#: includes/class-blogcraft-mcp.php:130
 msgid "This site is not accepting AI client connections."
 msgstr ""
 

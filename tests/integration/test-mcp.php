@@ -72,7 +72,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 	private function rpc( $method, $params = array(), $token = null ) {
 		$token = ( null === $token ) ? $this->token : $token;
 
-		$request = new WP_REST_Request( 'POST', '/' . Blogcraft_Mcp::NAMESPACE_V1 . '/' );
+		$request = new WP_REST_Request( 'POST', '/' . Blogcraft_Mcp::REST_NAMESPACE . Blogcraft_Mcp::REST_ROUTE );
 
 		if ( '' !== $token ) {
 			$request->set_header( 'authorization', 'Bearer ' . $token );
@@ -111,6 +111,32 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 
 			$this->assertSame( 401, $out['status'], $method . ' answered without a token' );
 		}
+	}
+
+	public function test_the_advertised_address_is_the_one_that_answers() {
+		// The bug this exists for: the route was registered under a
+		// namespace with a bare '/' route, which lands it at a path ending
+		// in a slash — and WordPress trims that slash out of the
+		// ?rest_route= argument, so every site on plain permalinks got a
+		// 404 from the address the settings screen told them to paste.
+		//
+		// The earlier tests built their own path and so agreed with the
+		// mistake. This one takes the address the plugin advertises and
+		// asks the server whether it serves it.
+		$advertised = Blogcraft_Mcp::endpoint();
+		$path       = (string) wp_parse_url( $advertised, PHP_URL_PATH );
+		$route      = '/' . ltrim( str_replace( rest_get_url_prefix(), '', $path ), '/' );
+
+		$this->assertStringNotContainsString( '//', ltrim( $route, '/' ), 'the advertised address has an empty path segment' );
+		$this->assertSame( $route, untrailingslashit( $route ), 'the advertised address ends in a slash, which ?rest_route= will strip' );
+
+		$registered = array_keys( rest_get_server()->get_routes() );
+
+		$this->assertContains(
+			'/' . Blogcraft_Mcp::REST_NAMESPACE . Blogcraft_Mcp::REST_ROUTE,
+			$registered,
+			'nothing is registered at the address the plugin tells people to use'
+		);
 	}
 
 	public function test_a_wrong_token_is_refused() {

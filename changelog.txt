@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.71.0 =
+* A second way to supply a model, for anyone already paying for Claude, ChatGPT or a similar app. Instead of this site calling a provider with your key, the app connects to this site and does the writing, while the writing rules, the twenty-five checks and the publishing stay here. No API key, and nothing leaves your site: the connection comes in
+* Settings, Connect an AI client. Switch it on, issue a token, and paste the address and the token into whatever you use. It speaks the Model Context Protocol, so it is not tied to one app
+* A connected client can read your rules, score a draft against every check, create and revise drafts, and publish — but only above the quality threshold you set, exactly as a post written here would have to be. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing still needs a provider key, because something has to be running when nobody is watching
+* Tokens are shown once and stored only as a fingerprint. One stops working the moment the person it was issued to loses permission to write here, so a token cannot outlive the account behind it
+
 = 0.70.0 =
 * The plugin puts nothing in the dashboard notice area at all. The one notice it had — a warning that the queue has stalled — was already capability-gated, shown only on this plugin's own screens, dismissible and switchable off, which guideline 11 permits. But that space belongs to the whole dashboard, and the surest way not to misuse it is not to occupy it. The warning is drawn as part of our own page instead, under the navigation
 * It also says how to fix the thing it is warning about, which the guideline asks for and a dismiss link on its own does not do: the first link now goes to the automation instructions, and dismissing is the second
