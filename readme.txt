@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.83.0
+Stable tag: 0.84.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,9 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.84.0 =
+* Housekeeping after the voice fix: one step layout was built from a different element than the two beside it, and the note explaining a list of duplicate style rules described deliberate work as something still to be sorted out. Neither changed how anything behaves
+
 = 0.83.0 =
 * Fixed: your voice was described in two places and the model was told both. Settings had a Describe your voice card, How it writes had a Voice tab, and they were not two views of one thing — they were two stores, and every request carried two versions of the tone, the reader, the point of view, the reading level, the banned words and the subjects to avoid. Fill in one and the model got two answers to the same question
 * How it writes now owns all of it. What the blog is about, your style rules and your own experience have moved onto its Voice tab, along with the Learn from my posts button. Nothing you had typed is lost — it is carried over the first time you open the screen
@@ -196,10 +199,5 @@ everything is here, oldest at the bottom.
 * Name a setup, save it, and it is one button to return to. The key is stored encrypted the same way the live one is, and switching carries the whole setup — including the request shape a custom endpoint needs, which restored without it fails in a way that reads like a bad key
 * Ten setups are kept. Past that the oldest goes
 * A test now asserts that every provider setting is one a saved setup carries, so a setting added later cannot be silently dropped on every switch
-
-= 0.78.0 =
-* The Write a post screen is a screen you fill in, not one you read. Every field on it carried a paragraph explaining itself and several carried two — the explanation for the evidence box ran to three sentences, and the topic field had two separate paragraphs above and below it. One line each now
-* That page links to the documentation, which it never did. The detail that came off the screen is there rather than gone
-* Shorter wording on the research and voice prompts too, and on the settings card that explains research
 Older releases are listed in changelog.txt, which ships with the plugin.
 
