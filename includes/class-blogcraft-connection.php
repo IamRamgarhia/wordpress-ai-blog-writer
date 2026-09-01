@@ -925,25 +925,25 @@ class Blogcraft_Connection {
 			'clients'    => array(
 				'title' => __( 'Connect an AI client', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'Claude, ChatGPT, your editor', 'dicecodes-ai-blog-writer' ),
-				'desc'  => __( 'Write from an app you already pay for, and let the posts land here. No API key.', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Use the subscription you already pay for. No API key.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'client' ),
 			),
 			'pictures'   => array(
 				'title' => __( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'Who draws them, and what it costs', 'dicecodes-ai-blog-writer' ),
-				'desc'  => __( 'Pictures come from a different kind of service than the writing does, so switching them on is how you tell this plugin it may contact one. Nothing here runs until you do. The default service is free and needs no key.', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Nothing contacts a picture service until you switch one on. The default is free.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'api' ),
 			),
 			'research'   => array(
 				'title' => __( 'Research', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'Where facts come from', 'dicecodes-ai-blog-writer' ),
-				'desc'  => __( 'Optional but it is the biggest lever on quality. Without sources the model writes from memory, which is what search engines discount. With none configured it falls back to your own posts.', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Optional, and the biggest single lever on quality.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'api' ),
 			),
 			'voice'      => array(
 				'title' => __( 'Describe your voice', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'Subject, reader, style', 'dicecodes-ai-blog-writer' ),
-				'desc'  => __( 'Sent with every request, so posts sound like your site instead of a template. The more specific, the less generic the writing.', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Sent with every request, so posts sound like your site.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'api', 'client' ),
 			),
 			'automation' => array(
@@ -961,7 +961,7 @@ class Blogcraft_Connection {
 			'test'       => array(
 				'title' => __( 'Check it works', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'One short live request', 'dicecodes-ai-blog-writer' ),
-				'desc'  => __( 'Sends one very short request and reports what the provider says back.', 'dicecodes-ai-blog-writer' ),
+				'desc'  => __( 'Sends one short request and reports what came back.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'api' ),
 			),
 		);
@@ -1055,7 +1055,7 @@ class Blogcraft_Connection {
 		printf( '<h2>%s</h2>', esc_html__( 'How do you want to write?', 'dicecodes-ai-blog-writer' ) );
 		printf(
 			'<p class="bc-path-lead">%s</p>',
-			esc_html__( 'Two ways, and you can change your mind at any time. Nothing here is locked either way.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Two ways to do this. You can switch whenever you like.', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '<div class="bc-path-options">';
@@ -1063,33 +1063,33 @@ class Blogcraft_Connection {
 		self::render_path_option(
 			'api',
 			__( 'Inside WordPress', 'dicecodes-ai-blog-writer' ),
-			__( 'You write here. The plugin calls an AI provider with a key from your account.', 'dicecodes-ai-blog-writer' ),
+			__( 'The plugin writes, using an API key from your account.', 'dicecodes-ai-blog-writer' ),
 			array(
-				__( 'Everything the plugin does', 'dicecodes-ai-blog-writer' ),
-				__( 'Posts written on a schedule while you sleep', 'dicecodes-ai-blog-writer' ),
-				__( 'Research sources, pictures, art direction', 'dicecodes-ai-blog-writer' ),
-				__( 'Free with a local model, or on a provider free tier', 'dicecodes-ai-blog-writer' ),
+				__( 'Everything the plugin can do', 'dicecodes-ai-blog-writer' ),
+				__( 'Writes on a schedule, unattended', 'dicecodes-ai-blog-writer' ),
+				__( 'Research sources for its facts', 'dicecodes-ai-blog-writer' ),
+				__( 'Free with a local model', 'dicecodes-ai-blog-writer' ),
 			),
 			array(
-				__( 'Needs an API key, or a model on your own machine', 'dicecodes-ai-blog-writer' ),
-				__( 'A paid provider bills you per post', 'dicecodes-ai-blog-writer' ),
+				__( 'Needs an API key, or a local model', 'dicecodes-ai-blog-writer' ),
+				__( 'A paid provider bills per post', 'dicecodes-ai-blog-writer' ),
 			)
 		);
 
 		self::render_path_option(
 			'client',
 			__( 'From Claude or ChatGPT', 'dicecodes-ai-blog-writer' ),
-			__( 'You write in an app you already pay for. It connects here and the posts land in WordPress.', 'dicecodes-ai-blog-writer' ),
+			__( 'Claude or ChatGPT writes, using the subscription you already pay for.', 'dicecodes-ai-blog-writer' ),
 			array(
-				__( 'Costs nothing beyond the subscription you have', 'dicecodes-ai-blog-writer' ),
-				__( 'The same twenty-five checks and the same quality gate', 'dicecodes-ai-blog-writer' ),
-				__( 'Your writing rules and voice, read by the app', 'dicecodes-ai-blog-writer' ),
-				__( 'Nothing leaves your site — the connection comes in', 'dicecodes-ai-blog-writer' ),
+				__( 'Nothing to pay beyond your subscription', 'dicecodes-ai-blog-writer' ),
+				__( 'The same checks and quality gate', 'dicecodes-ai-blog-writer' ),
+				__( 'Your rules, pictures, categories and tags', 'dicecodes-ai-blog-writer' ),
+				__( 'Nothing leaves your site', 'dicecodes-ai-blog-writer' ),
 			),
 			array(
-				__( 'No scheduled or unattended writing at all', 'dicecodes-ai-blog-writer' ),
-				__( 'No research sources, pictures or art direction', 'dicecodes-ai-blog-writer' ),
-				__( 'Needs an app that speaks MCP, and a site on public HTTPS', 'dicecodes-ai-blog-writer' ),
+				__( 'No scheduled or unattended writing', 'dicecodes-ai-blog-writer' ),
+				__( 'No research sources — the app uses its own', 'dicecodes-ai-blog-writer' ),
+				__( 'Needs a site on public HTTPS', 'dicecodes-ai-blog-writer' ),
 			)
 		);
 
@@ -1164,7 +1164,7 @@ class Blogcraft_Connection {
 
 		printf(
 			'<p class="bc-path-keep">%s</p>',
-			esc_html__( 'Switching only changes which settings are shown. Nothing is deleted, and switching back brings everything as you left it.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Switching only changes what is shown here. Nothing is deleted.', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo '</div>';
@@ -1206,7 +1206,7 @@ class Blogcraft_Connection {
 
 		printf(
 			'<p class="bc-client-lead">%s</p>',
-			esc_html__( 'This is the other way round from the card above. Instead of this site calling a provider, an app you already use connects to this site and does the writing — while the writing rules, the twenty-five checks and the publishing stay here. Nothing is sent anywhere: the connection comes in.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'An app you already pay for connects here and writes. Your rules, the checks and the publishing stay on this site.', 'dicecodes-ai-blog-writer' )
 		);
 
 		self::render_mcp_test_result();
@@ -1223,7 +1223,7 @@ class Blogcraft_Connection {
 
 		printf(
 			'<p class="description">%s</p>',
-			esc_html__( 'Untick and save to cut every connection off at once. Your tokens are kept, so ticking it again brings them all back.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Cuts every connection off. Tokens are kept.', 'dicecodes-ai-blog-writer' )
 		);
 
 		self::close_card();
@@ -1307,7 +1307,7 @@ class Blogcraft_Connection {
 
 		printf(
 			'<p class="bc-client-lead">%s</p>',
-			esc_html__( 'Paste this address into your app. It sends you back here to approve, and that is all — no token to keep.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Paste this into your app. It sends you back here to approve.', 'dicecodes-ai-blog-writer' )
 		);
 
 		echo wp_kses( self::copyable( $endpoint, __( 'Copy address', 'dicecodes-ai-blog-writer' ) ), Blogcraft_Markup::allowed() );
@@ -1468,7 +1468,7 @@ class Blogcraft_Connection {
 					__( 'Add a header named Authorization, with the value Bearer and then your token.', 'dicecodes-ai-blog-writer' ),
 				),
 				'copy'  => '',
-				'note'  => __( 'For apps that cannot sign in, and for machines with no browser to open.', 'dicecodes-ai-blog-writer' ),
+				'note'  => __( 'For apps that cannot sign in.', 'dicecodes-ai-blog-writer' ),
 			),
 		);
 	}

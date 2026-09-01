@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.75.0
+Stable tag: 0.76.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,15 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.76.0 =
+* A post written from Claude or ChatGPT is now finished the way every other post here is: a featured image, pictures under the headings, the search title, the category and tags, links added from older posts pointing at the new one, and a submission to the search engines that accept one. It used to go out with none of that — a draft that happened to be public
+* A draft can be listed and read back, so a conversation that ended half way through picks the post up instead of writing it again
+* Drafts can be scored by id rather than by pasting the text back, which also scores the pictures and everything else added since
+* Publishing can be scheduled for a date instead of going out now
+* Three new things a connected app can do: list your drafts, read one back, and add pictures before you publish
+* Fixed: scheduling silently published immediately. WordPress ignores a new date on an update unless it is told the date is deliberate, and the call reported success either way, so the only sign was a post that went out early
+* Less text on the settings screen, and the detail moved to the documentation each card already links to
+
 = 0.75.0 =
 * The connect card asks which app you are using and then shows the steps for that one. It used to print a general four-step list and, underneath it, a different set of steps for every app it knows about, all at once — which is not thoroughness, it is a question about which list you are meant to be following
 * Fewer words on every step, and the address sits on its own with a button rather than inside a numbered instruction to copy it
@@ -184,14 +193,5 @@ everything is here, oldest at the bottom.
 * The result of the connection test stays on the screen until you dismiss it. It used to vanish on the next page load, which is the worst possible behaviour for the one message that explains a failure
 * Says so when this site is on plain permalinks, which is the one setting that stops signing in from working, and links straight to the setting
 * Fixed: deleting the plugin left the list of connected apps behind. The check that should have caught that only recognised a stored value if it had been given a particular sort of name, which is no check at all — it looks at what is stored now
-
-= 0.73.0 =
-* Fixed: no AI client could connect. The server answered every question a client asks except the one it asks before all the others. It was built against a draft of the protocol that renames the opening handshake, and no shipping application uses that name — so Claude, ChatGPT and the rest got as far as "couldn't connect to the server" and stopped. The handshake every client actually sends is answered now, and the old name still works
-* Fixed: asking for the optional event stream returned "no route here" rather than "not that method". A client reads the first as proof there is no server at the address and gives up before it sends anything
-* Fixed: a protocol version the site did not recognise had the whole request refused, which leaves the client nowhere to go. The version is negotiated now, and four revisions are accepted
-* Fixed: the notification a client sends immediately after connecting was answered as though it were a question, which is a protocol error on our side
-* The settings screen opens by asking how you want to write, with what each way includes and what it rules out, side by side. Choosing shows the settings for that way and hides the ones that would do nothing. The way back is on the screen from then on, and switching deletes nothing
-* Fixed: the jump list beside the settings disagreed with the cards it pointed at, so step 02 in the list was step 03 on the screen. The list and the cards are one list now
-* Choosing the AI client is honoured rather than described: scheduled writing does not run on that path, which is what the screen has always said about it
 Older releases are listed in changelog.txt, which ships with the plugin.
 

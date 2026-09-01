@@ -677,4 +677,192 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		$ping = $this->rpc( 'ping' );
 		$this->assertArrayNotHasKey( 'error', $ping['body'] );
 	}
+
+	// ------------------------------------ everything a finished post has.
+
+	/**
+	 * Make a draft through the tools and return its id.
+	 *
+	 * @param array $extra Anything beyond a title and a body.
+	 * @return int
+	 */
+	private function draft( $extra = array() ) {
+		wp_set_current_user( $this->author );
+
+		$out = $this->rpc(
+			'tools/call',
+			array(
+				'name'      => 'create_draft',
+				'arguments' => array_merge(
+					array(
+						'title' => 'A post about kettles',
+						'html'  => '<h2>First</h2><p>Words about kettles that go on for a while.</p><h2>Second</h2><p>More of them.</p>',
+					),
+					$extra
+				),
+			)
+		);
+
+		$said = (string) $out['body']['result']['content'][0]['text'];
+		$hit  = array();
+
+		preg_match( '/draft (\\d+)/', $said, $hit );
+
+		$this->assertNotEmpty( $hit, 'no draft was created: ' . $said );
+
+		return (int) $hit[1];
+	}
+
+	public function test_a_draft_lands_somewhere_rather_than_in_uncategorised() {
+		// Every post written over MCP used to land in Uncategorised with
+		// no tags, because create_draft took a title and a body and
+		// nothing else.
+		$post_id = $this->draft(
+			array(
+				'category' => 'Kitchen',
+				'tags'     => array( 'kettles', 'descaling' ),
+			)
+		);
+
+		$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
+		$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
+
+		$this->assertContains( 'Kitchen', $categories );
+		$this->assertContains( 'kettles', $tags );
+		$this->assertContains( 'descaling', $tags );
+	}
+
+	public function test_a_draft_can_be_found_and_read_back_later() {
+		// A conversation that ended mid-draft used to lose it: nothing
+		// could list what had been written, so the next conversation
+		// started the post over.
+		$post_id = $this->draft();
+
+		$listed = $this->rpc( 'tools/call', array( 'name' => 'list_drafts', 'arguments' => array() ) );
+		$text   = (string) $listed['body']['result']['content'][0]['text'];
+
+		$this->assertStringContainsString( (string) $post_id, $text, 'the draft is not in the list' );
+
+		$read = $this->rpc(
+			'tools/call',
+			array( 'name' => 'read_draft', 'arguments' => array( 'post_id' => $post_id ) )
+		);
+
+		$body = (string) $read['body']['result']['content'][0]['text'];
+
+		$this->assertStringContainsString( 'A post about kettles', $body );
+		$this->assertStringContainsString( 'kettles', $body );
+	}
+
+	public function test_a_draft_can_be_scored_by_id() {
+		// Scoring the saved post rather than a string somebody sent means
+		// the number is about the post as it actually stands.
+		$post_id = $this->draft();
+
+		$out = $this->rpc(
+			'tools/call',
+			array( 'name' => 'check_draft', 'arguments' => array( 'post_id' => $post_id ) )
+		);
+
+		$this->assertArrayNotHasKey( 'error', $out['body'] );
+		$this->assertStringContainsString(
+			'out of 100',
+			(string) $out['body']['result']['content'][0]['text']
+		);
+	}
+
+	public function test_nothing_reaches_a_draft_that_is_not_ours() {
+		// The rule, over every tool that takes a post_id: a connected app
+		// may only touch what it wrote. A tool added later that forgets
+		// to check fails here.
+		wp_set_current_user( $this->author );
+
+		$theirs = self::factory()->post->create( array( 'post_status' => 'draft' ) );
+
+		foreach ( array( 'read_draft', 'add_pictures', 'update_draft', 'publish_draft', 'check_draft' ) as $tool ) {
+			$out = $this->rpc(
+				'tools/call',
+				array( 'name' => $tool, 'arguments' => array( 'post_id' => $theirs ) )
+			);
+
+			$this->assertStringContainsString(
+				'not a draft this connection created',
+				(string) $out['body']['result']['content'][0]['text'],
+				$tool . ' reached a post it did not write'
+			);
+		}
+	}
+
+	public function test_publishing_finishes_the_post_the_way_the_rest_of_the_plugin_does() {
+		// The gap this closes: a post published over MCP went out with no
+		// featured image, no search title, nothing linking to it and no
+		// submission to anybody — a draft that happened to be public.
+		//
+		// Asserted against the pipeline rather than a list written here,
+		// so a finishing step added to mode A later and not to this one
+		// fails here instead of going unnoticed.
+		$finishers = array(
+			'Blogcraft_Seo::write_seo_meta',
+			'Blogcraft_Images::attach_featured',
+			'Blogcraft_Images::add_section_images',
+			'Blogcraft_Backlinks::link_back',
+			'Blogcraft_Indexnow::submit',
+		);
+
+		$pipeline = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-pipeline.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$tools    = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-mcp-tools.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		foreach ( $finishers as $call ) {
+			$this->assertStringContainsString(
+				$call,
+				$pipeline,
+				$call . ' is not a finishing step any more; this test is out of date'
+			);
+
+			$this->assertStringContainsString(
+				$call,
+				$tools,
+				'mode A calls ' . $call . ' when finishing a post and the MCP tools do not'
+			);
+		}
+	}
+
+	public function test_publishing_can_be_scheduled_instead() {
+		$post_id = $this->draft();
+
+		// Past the quality gate, because scheduling is what is under test.
+		Blogcraft_Settings::set( 'quality_threshold', 0 );
+
+		$out = $this->rpc(
+			'tools/call',
+			array(
+				'name'      => 'publish_draft',
+				'arguments' => array(
+					'post_id'    => $post_id,
+					'publish_at' => gmdate( 'Y-m-d H:i:s', time() + WEEK_IN_SECONDS ),
+				),
+			)
+		);
+
+		$this->assertSame( 'future', get_post_status( $post_id ), (string) $out['body']['result']['content'][0]['text'] );
+	}
+
+	public function test_every_tool_offered_can_actually_be_called() {
+		// A tool in the list that the dispatcher does not know is a
+		// promise the server breaks the first time somebody takes it up.
+		wp_set_current_user( $this->author );
+
+		foreach ( Blogcraft_Mcp_Tools::definitions() as $tool ) {
+			$out = $this->rpc(
+				'tools/call',
+				array( 'name' => $tool['name'], 'arguments' => array() )
+			);
+
+			$this->assertStringNotContainsString(
+				'No such tool',
+				(string) $out['body']['result']['content'][0]['text'],
+				$tool['name'] . ' is offered but not dispatched'
+			);
+		}
+	}
 }

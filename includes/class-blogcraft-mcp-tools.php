@@ -41,13 +41,17 @@ class Blogcraft_Mcp_Tools {
 			array(
 				'name'        => 'check_draft',
 				'title'       => __( 'Score a draft', 'dicecodes-ai-blog-writer' ),
-				'description' => 'Measure a draft against this site\'s writing rules. Returns a score out of 100 and every check that was run, with what it found against what was wanted, and an instruction for each failure. Call this before creating a post, then revise against what it says and call it again.',
+				'description' => 'Measure a draft against this site\'s writing rules. Returns a score out of 100 and every check that was run, with what it found against what was wanted, and an instruction for each failure. Pass post_id to score a draft already saved here, or html to score something before saving it. Repeat this after every revision: the first score is a starting point, not a verdict.',
 				'inputSchema' => array(
 					'type'       => 'object',
 					'properties' => array(
+						'post_id'          => array(
+							'type'        => 'integer',
+							'description' => 'A draft saved here, to score exactly as it stands. Use this after add_pictures, because the saved post is no longer the html you sent.',
+						),
 						'html'             => array(
 							'type'        => 'string',
-							'description' => 'The article body as HTML.',
+							'description' => 'The article body as HTML, for scoring something not yet saved.',
 						),
 						'title'            => array(
 							'type'        => 'string',
@@ -66,7 +70,7 @@ class Blogcraft_Mcp_Tools {
 							'description' => 'Anything the author supplied that only they know: figures they measured, prices they paid, what went wrong when they tried it. Checked for on the page.',
 						),
 					),
-					'required'   => array( 'html' ),
+					'required'   => array(),
 				),
 			),
 			array(
@@ -124,7 +128,24 @@ class Blogcraft_Mcp_Tools {
 						),
 						'meta_description' => array(
 							'type'        => 'string',
-							'description' => 'The search-result line.',
+							'description' => 'The search-result line, around 155 characters.',
+						),
+						'seo_title' => array(
+							'type'        => 'string',
+							'description' => 'The search-result title, which is not the page heading. It has to earn the click and is cut off near sixty characters. Optional; the title is used otherwise.',
+						),
+						'topic' => array(
+							'type'        => 'string',
+							'description' => 'What the post is about, in a few words. Used to pick pictures and to decide which older posts should link to this one.',
+						),
+						'category' => array(
+							'type'        => 'string',
+							'description' => 'The category name. Created if it does not exist. Without one the post lands in Uncategorised.',
+						),
+						'tags'             => array(
+							'type'        => 'array',
+							'items'       => array( 'type' => 'string' ),
+							'description' => 'Tag names. Created if they do not exist.',
 						),
 					),
 					'required'   => array( 'title', 'html' ),
@@ -143,7 +164,25 @@ class Blogcraft_Mcp_Tools {
 						),
 						'title'            => array( 'type' => 'string' ),
 						'html'             => array( 'type' => 'string' ),
+						'slug'             => array( 'type' => 'string' ),
 						'meta_description' => array( 'type' => 'string' ),
+						'seo_title' => array(
+							'type'        => 'string',
+							'description' => 'The search-result title, which is not the page heading. It has to earn the click and is cut off near sixty characters. Optional; the title is used otherwise.',
+						),
+						'topic' => array(
+							'type'        => 'string',
+							'description' => 'What the post is about, in a few words. Used to pick pictures and to decide which older posts should link to this one.',
+						),
+						'category' => array(
+							'type'        => 'string',
+							'description' => 'The category name. Created if it does not exist. Without one the post lands in Uncategorised.',
+						),
+						'tags'             => array(
+							'type'        => 'array',
+							'items'       => array( 'type' => 'string' ),
+							'description' => 'Tag names. Created if they do not exist.',
+						),
 					),
 					'required'   => array( 'post_id' ),
 				),
@@ -151,13 +190,65 @@ class Blogcraft_Mcp_Tools {
 			array(
 				'name'        => 'publish_draft',
 				'title'       => __( 'Publish a draft', 'dicecodes-ai-blog-writer' ),
-				'description' => 'Publish a draft this tool created. Refused when the draft scores below the site\'s quality threshold — score it with check_draft and fix what it reports first.',
+				'description' => 'Publish a draft this tool created, and finish it the way this site finishes every post: search title and description, a featured image, links added to older posts pointing at this one, and a submission to the search engines that accept one. Refused when the draft scores below the site\'s quality threshold — score it with check_draft and fix what it reports first.',
+				'inputSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'post_id'    => array(
+							'type'        => 'integer',
+							'description' => 'The draft to publish.',
+						),
+						'publish_at' => array(
+							'type'        => 'string',
+							'description' => 'Optional. A date and time in the future, in the site\'s own timezone, to schedule it for instead of publishing now.',
+						),
+					),
+					'required'   => array( 'post_id' ),
+				),
+			),
+			array(
+				'name'        => 'list_drafts',
+				'title'       => __( 'List your drafts', 'dicecodes-ai-blog-writer' ),
+				'description' => 'The drafts written through this connection that are still unpublished, newest first. Use this to pick up work from an earlier conversation instead of starting the post again.',
+				'inputSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'limit' => array(
+							'type'        => 'integer',
+							'description' => 'How many to return. Defaults to ten.',
+						),
+					),
+				),
+			),
+			array(
+				'name'        => 'read_draft',
+				'title'       => __( 'Read a draft back', 'dicecodes-ai-blog-writer' ),
+				'description' => 'The current contents of a draft this connection created, as HTML, with its title, description and score. Read it before revising so you are editing what is actually saved.',
 				'inputSchema' => array(
 					'type'       => 'object',
 					'properties' => array(
 						'post_id' => array(
 							'type'        => 'integer',
-							'description' => 'The draft to publish.',
+							'description' => 'The draft to read.',
+						),
+					),
+					'required'   => array( 'post_id' ),
+				),
+			),
+			array(
+				'name'        => 'add_pictures',
+				'title'       => __( 'Add pictures', 'dicecodes-ai-blog-writer' ),
+				'description' => 'Give a draft a featured image, and a picture under each of its first few headings, using whichever picture service this site is set up with. Does nothing if the owner has not switched pictures on. Publishing does this too, so call it only when you want to see them before publishing.',
+				'inputSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'post_id' => array(
+							'type'        => 'integer',
+							'description' => 'The draft to illustrate.',
+						),
+						'topic'   => array(
+							'type'        => 'string',
+							'description' => 'What the post is about, so the pictures suit it. The title is used otherwise.',
 						),
 					),
 					'required'   => array( 'post_id' ),
@@ -193,7 +284,7 @@ class Blogcraft_Mcp_Tools {
 		// Every write re-checks the capability. The token already mapped to a
 		// user with it, but a tool that publishes should say so itself rather
 		// than inherit the assurance from three files away.
-		$writes = array( 'create_draft', 'update_draft', 'publish_draft' );
+		$writes = array( 'create_draft', 'update_draft', 'publish_draft', 'add_pictures' );
 
 		if ( in_array( $name, $writes, true ) && ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			return self::fail( 'This connection is not allowed to change posts on this site.' );
@@ -220,6 +311,15 @@ class Blogcraft_Mcp_Tools {
 
 			case 'publish_draft':
 				return self::publish_draft( $args );
+
+			case 'list_drafts':
+				return self::list_drafts( $args );
+
+			case 'read_draft':
+				return self::read_draft( $args );
+
+			case 'add_pictures':
+				return self::add_pictures( $args );
 		}
 
 		return self::fail( 'No such tool.' );
@@ -273,6 +373,30 @@ class Blogcraft_Mcp_Tools {
 	 * @return array
 	 */
 	private static function check_draft( $args ) {
+		// Scoring a saved draft rather than a string means the score is
+		// of the post as it stands, pictures and all, instead of the
+		// html somebody last happened to send.
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+
+		if ( $post_id > 0 ) {
+			$post = self::ours( $post_id );
+
+			if ( ! $post ) {
+				return self::fail( 'That is not a draft this connection created.' );
+			}
+
+			$args = array_merge(
+				array(
+					'html'             => $post->post_content,
+					'title'            => $post->post_title,
+					'slug'             => $post->post_name,
+					'meta_description' => (string) $post->post_excerpt,
+					'evidence'         => (string) get_post_meta( $post_id, '_blogcraft_evidence', true ),
+				),
+				$args
+			);
+		}
+
 		$html = isset( $args['html'] ) ? (string) $args['html'] : '';
 
 		if ( '' === trim( $html ) ) {
@@ -565,25 +689,309 @@ class Blogcraft_Mcp_Tools {
 			);
 		}
 
-		$done = wp_update_post(
-			array(
-				'ID'          => $post_id,
-				'post_status' => 'publish',
-			),
-			true
+		$update = array(
+			'ID'          => $post_id,
+			'post_status' => 'publish',
 		);
+
+		// A date in the future turns publishing into scheduling, which
+		// is WordPress's own behaviour for a future post_date. A date
+		// in the past is not an error worth refusing over; it just
+		// publishes now, which is what was asked for.
+		$when  = isset( $args['publish_at'] ) ? (string) $args['publish_at'] : '';
+		$stamp = ( '' === $when ) ? 0 : strtotime( $when );
+
+		if ( $stamp && $stamp > time() ) {
+			// GMT first and the local column derived from it, rather than
+			// arithmetic on the offset. Doing the sum by hand put the date
+			// in the past on any site east of Greenwich, and a post dated
+			// in the past is one WordPress publishes immediately — the
+			// exact opposite of what was asked for.
+			$update['post_status']   = 'future';
+			$update['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', $stamp );
+			$update['post_date']     = get_date_from_gmt( $update['post_date_gmt'] );
+
+			// Without this wp_update_post silently drops both dates and
+			// publishes now. The call reports success either way, so the
+			// only sign is a post that went out a week early.
+			$update['edit_date']     = true;
+		}
+
+		$done = wp_update_post( $update, true );
 
 		if ( is_wp_error( $done ) ) {
 			return self::fail( 'WordPress refused to publish it: ' . $done->get_error_message() );
 		}
 
+		$finished = self::finish( $post_id );
+
+		if ( 'future' === $update['post_status'] ) {
+			return self::ok(
+				sprintf(
+					'Scheduled for %1$s, scoring %2$d. %3$s%4$s',
+					get_the_date( '', $post_id ) . ' ' . get_the_time( '', $post_id ),
+					$score,
+					get_permalink( $post_id ),
+					$finished
+				)
+			);
+		}
+
 		return self::ok(
-			sprintf( 'Published, scoring %1$d. %2$s', $score, get_permalink( $post_id ) )
+			sprintf( 'Published, scoring %1$d. %2$s%3$s', $score, get_permalink( $post_id ), $finished )
 		);
 	}
 
 	// ------------------------------------------------------------ helpers.
 
+	/**
+	 * Put the post where it belongs: category, tags, search title.
+	 *
+	 * Without this every post written over MCP landed in Uncategorised
+	 * with no tags, which is not a finished post on any site that uses
+	 * either.
+	 *
+	 * @param int   $post_id The draft.
+	 * @param array $args    Tool arguments.
+	 * @return void
+	 */
+	private static function place( $post_id, $args ) {
+		$category = isset( $args['category'] ) ? trim( (string) $args['category'] ) : '';
+
+		if ( '' !== $category ) {
+			$term = term_exists( $category, 'category' );
+
+			if ( ! $term ) {
+				$term = wp_insert_term( $category, 'category' );
+			}
+
+			if ( ! is_wp_error( $term ) && isset( $term['term_id'] ) ) {
+				wp_set_post_terms( $post_id, array( (int) $term['term_id'] ), 'category' );
+			}
+		}
+
+		$tags = isset( $args['tags'] ) ? (array) $args['tags'] : array();
+		$tags = array_filter( array_map( 'sanitize_text_field', array_map( 'strval', $tags ) ) );
+
+		if ( ! empty( $tags ) ) {
+			wp_set_post_terms( $post_id, $tags, 'post_tag' );
+		}
+	}
+
+	/**
+	 * Everything this site does to a post once it goes live.
+	 *
+	 * Mode A does all of this in its finishing stages. A post written
+	 * over MCP went out with no featured image, no search title, nothing
+	 * linking to it and no submission to anybody — a draft that happened
+	 * to be public rather than a finished post.
+	 *
+	 * Nothing here may fail the publish. The post is already live; a
+	 * picture service being down is not a reason to report failure for
+	 * something that succeeded.
+	 *
+	 * @param int $post_id The post, now published.
+	 * @return string What was done, for the client to report.
+	 */
+	private static function finish( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return '';
+		}
+
+		$topic = (string) get_post_meta( $post_id, '_blogcraft_topic', true );
+		$topic = ( '' === $topic ) ? $post->post_title : $topic;
+		$did   = array();
+
+		// The search-result title is not the heading on the page: one is
+		// read by somebody who has arrived, the other has to earn the
+		// click.
+		$seo_title = (string) get_post_meta( $post_id, '_blogcraft_seo_title', true );
+
+		Blogcraft_Seo::write_seo_meta(
+			$post_id,
+			( '' === $seo_title ) ? $post->post_title : $seo_title,
+			(string) $post->post_excerpt
+		);
+
+		try {
+			if ( Blogcraft_Images::attach_featured( $post_id, $post->post_title, $topic ) ) {
+				$did[] = 'a featured image';
+			}
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error( 'The featured image could not be added.', array( 'reason' => $e->getMessage() ) );
+		}
+
+		try {
+			$added = Blogcraft_Images::add_section_images( $post_id, self::article_shape( $post ), 3 );
+
+			if ( $added ) {
+				$did[] = sprintf( '%d section pictures', (int) $added );
+			}
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error( 'Section pictures could not be added.', array( 'reason' => $e->getMessage() ) );
+		}
+
+		try {
+			// Every competing tool links only forward, leaving existing
+			// posts unaware the new one exists.
+			if ( Blogcraft_Backlinks::link_back( $post_id, $topic, 3 ) ) {
+				$did[] = 'links from older posts';
+			}
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error( 'Older posts could not be pointed at this one.', array( 'reason' => $e->getMessage() ) );
+		}
+
+		try {
+			// Does nothing unless the owner switched it on.
+			if ( Blogcraft_Indexnow::submit( $post_id ) ) {
+				$did[] = 'submitted to search engines';
+			}
+		} catch ( Throwable $e ) {
+			Blogcraft_Logger::error( 'The search engines could not be told.', array( 'reason' => $e->getMessage() ) );
+		}
+
+		if ( empty( $did ) ) {
+			return '';
+		}
+
+		return ' Added: ' . implode( ', ', $did ) . '.';
+	}
+
+	/**
+	 * A published post described the way the image helper expects.
+	 *
+	 * It wants the article structure mode A carried through its pipeline,
+	 * and all it reads from a section is the heading. Those are in the
+	 * saved post, so they are read back out rather than invented.
+	 *
+	 * @param WP_Post $post The post.
+	 * @return array
+	 */
+	private static function article_shape( $post ) {
+		$found = array();
+		preg_match_all( '#<h2[^>]*>(.*?)</h2>#is', (string) $post->post_content, $found );
+
+		$sections = array();
+
+		foreach ( $found[1] as $heading ) {
+			$text = trim( wp_strip_all_tags( $heading ) );
+
+			if ( '' !== $text ) {
+				$sections[] = array( 'heading' => $text );
+			}
+		}
+
+		return array( 'sections' => $sections );
+	}
+
+	/**
+	 * The unpublished drafts this connection made.
+	 *
+	 * A conversation that ends mid-draft used to lose the draft: nothing
+	 * could list it, so the next conversation started the post again.
+	 *
+	 * @param array $args Tool arguments.
+	 * @return array
+	 */
+	private static function list_drafts( $args ) {
+		$limit = isset( $args['limit'] ) ? (int) $args['limit'] : 10;
+		$limit = max( 1, min( 50, $limit ) );
+
+		$posts = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => array( 'draft', 'pending', 'future' ),
+				'posts_per_page' => $limit,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+				'meta_key'       => '_blogcraft_mcp', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- the point of the query is to find exactly these.
+			)
+		);
+
+		if ( empty( $posts ) ) {
+			return self::ok( 'No unpublished drafts from this connection.' );
+		}
+
+		$lines = array();
+
+		foreach ( $posts as $post ) {
+			$lines[] = sprintf(
+				'%1$d  %2$s  (%3$s, last changed %4$s)',
+				(int) $post->ID,
+				$post->post_title,
+				$post->post_status,
+				$post->post_modified
+			);
+		}
+
+		return self::ok( implode( "\n", $lines ) );
+	}
+
+	/**
+	 * One draft, as it is actually saved.
+	 *
+	 * @param array $args Tool arguments.
+	 * @return array
+	 */
+	private static function read_draft( $args ) {
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+		$post    = self::ours( $post_id );
+
+		if ( ! $post ) {
+			return self::fail( 'That is not a draft this connection created.' );
+		}
+
+		return self::ok(
+			sprintf(
+				"Title: %1\$s\nStatus: %2\$s\nDescription: %3\$s\n\n%4\$s",
+				$post->post_title,
+				$post->post_status,
+				(string) $post->post_excerpt,
+				(string) $post->post_content
+			)
+		);
+	}
+
+	/**
+	 * Illustrate a draft before it goes out.
+	 *
+	 * @param array $args Tool arguments.
+	 * @return array
+	 */
+	private static function add_pictures( $args ) {
+		$post_id = isset( $args['post_id'] ) ? (int) $args['post_id'] : 0;
+		$post    = self::ours( $post_id );
+
+		if ( ! $post ) {
+			return self::fail( 'That is not a draft this connection created.' );
+		}
+
+		if ( ! Blogcraft_Settings::get( 'images_enabled' ) ) {
+			return self::fail(
+				'Pictures are switched off for this site. The owner turns them on under Settings, Connect a picture service.'
+			);
+		}
+
+		$topic = isset( $args['topic'] ) ? trim( (string) $args['topic'] ) : '';
+		$topic = ( '' === $topic ) ? (string) get_post_meta( $post_id, '_blogcraft_topic', true ) : $topic;
+		$topic = ( '' === $topic ) ? $post->post_title : $topic;
+		$did   = 0;
+
+		try {
+			$did += (int) Blogcraft_Images::attach_featured( $post_id, $post->post_title, $topic );
+			$did += (int) Blogcraft_Images::add_section_images( $post_id, self::article_shape( $post ), 3 );
+		} catch ( Throwable $e ) {
+			return self::fail( 'The picture service could not be reached: ' . $e->getMessage() );
+		}
+
+		if ( $did < 1 ) {
+			return self::ok( 'Nothing to add — it already has the pictures it is getting.' );
+		}
+
+		return self::ok( sprintf( 'Added %d pictures. Read the draft in WordPress to see them.', $did ) );
+	}
 	/**
 	 * A post this connection is allowed to touch.
 	 *
@@ -633,6 +1041,19 @@ class Blogcraft_Mcp_Tools {
 		if ( isset( $args['evidence'] ) ) {
 			update_post_meta( $post_id, '_blogcraft_evidence', sanitize_textarea_field( (string) $args['evidence'] ) );
 		}
+
+		// The topic decides which pictures suit the post and which older
+		// posts should point at it, and publishing happens in a later
+		// call than the one that knew it.
+		if ( isset( $args['topic'] ) && '' !== trim( (string) $args['topic'] ) ) {
+			update_post_meta( $post_id, '_blogcraft_topic', sanitize_text_field( (string) $args['topic'] ) );
+		}
+
+		if ( isset( $args['seo_title'] ) && '' !== trim( (string) $args['seo_title'] ) ) {
+			update_post_meta( $post_id, '_blogcraft_seo_title', sanitize_text_field( (string) $args['seo_title'] ) );
+		}
+
+		self::place( $post_id, $args );
 	}
 
 	/**

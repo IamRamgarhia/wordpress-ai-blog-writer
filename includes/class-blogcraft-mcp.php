@@ -394,10 +394,14 @@ class Blogcraft_Mcp {
 			' ',
 			array(
 				'This is a WordPress site you can write for.',
-				'Read blogcraft://writing-rules before drafting anything, and follow it.',
-				'Call find_duplicate first, so you do not repeat a post that already exists.',
-				'Draft, then call check_draft, fix what it reports, and check again.',
-				'Only call publish_draft once the score clears the threshold check_draft names.',
+				'Read blogcraft://writing-rules first and follow it; it is the standing brief for this site.',
+				'Call find_duplicate before writing, so you do not compete with a post that already exists.',
+				'Call suggest_internal_links and weave those links into sentences rather than listing them.',
+				'Save with create_draft, giving it a topic, a category, tags, and an seo_title that is not just the heading.',
+				'Then loop: check_draft with the post_id, fix every failure it reports with update_draft, and check again.',
+				'Keep looping until the score stops rising. A first score is a starting point, not a verdict, and most drafts gain twenty points in two passes.',
+				'Only call publish_draft once you cannot raise the score further. It refuses anything under the site threshold anyway, and it adds the pictures, the search title and the internal links itself.',
+				'If a conversation ends mid-draft, call list_drafts and read_draft to pick the work up rather than starting again.',
 			)
 		);
 	}
