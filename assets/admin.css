@@ -2468,3 +2468,38 @@ body[class*="page_blogcraft"] #wpcontent {
 	display: flex;
 	gap: var(--bc-s2);
 }
+
+/* ------------------------------------------------- one app at a time.
+   The card used to print every app's steps at once, under a general set
+   that said something slightly different. Nobody uses four applications;
+   the other three only make you wonder which list you are meant to be
+   following. */
+
+.bc-app-pick {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s2);
+	margin-bottom: var(--bc-s3);
+}
+
+.bc-app-tab.is-chosen {
+	background: var(--bc-accent);
+	border-color: var(--bc-accent);
+	color: #fff;
+}
+
+.bc-app-steps {
+	border-inline-start: 2px solid var(--bc-accent);
+	padding-inline-start: var(--bc-s3);
+}
+
+.bc-app-steps .bc-mcp-howto {
+	font-size: var(--bc-t-sm);
+	margin: 0;
+}
+
+.bc-app-note {
+	color: var(--bc-muted);
+	font-size: var(--bc-t-xs);
+	margin: var(--bc-s2) 0 0;
+}

@@ -3,6 +3,11 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.75.0 =
+* The connect card asks which app you are using and then shows the steps for that one. It used to print a general four-step list and, underneath it, a different set of steps for every app it knows about, all at once — which is not thoroughness, it is a question about which list you are meant to be following
+* Fewer words on every step, and the address sits on its own with a button rather than inside a numbered instruction to copy it
+* Your choice of app is remembered, so coming back to check a step does not mean picking it again
+
 = 0.74.0 =
 * You can now sign an app in, instead of copying a token into it. Paste the address, approve the connection on your own site, and that is the whole of it. This is what Claude and ChatGPT have always needed: their connector dialogs have no field for a request header, so they ask the site where to sign in, and this site had nowhere to point them. That is why it answered "couldn't connect to the server" no matter what the address was
 * The approval screen says what a connected app will be able to do and, just as plainly, what it will not — it cannot touch a post it did not write, write anything while you are away, or read your settings and keys

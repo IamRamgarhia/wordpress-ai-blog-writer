@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.74.0
+Stable tag: 0.75.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,11 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.75.0 =
+* The connect card asks which app you are using and then shows the steps for that one. It used to print a general four-step list and, underneath it, a different set of steps for every app it knows about, all at once — which is not thoroughness, it is a question about which list you are meant to be following
+* Fewer words on every step, and the address sits on its own with a button rather than inside a numbered instruction to copy it
+* Your choice of app is remembered, so coming back to check a step does not mean picking it again
+
 = 0.74.0 =
 * You can now sign an app in, instead of copying a token into it. Paste the address, approve the connection on your own site, and that is the whole of it. This is what Claude and ChatGPT have always needed: their connector dialogs have no field for a request header, so they ask the site where to sign in, and this site had nowhere to point them. That is why it answered "couldn't connect to the server" no matter what the address was
 * The approval screen says what a connected app will be able to do and, just as plainly, what it will not — it cannot touch a post it did not write, write anything while you are away, or read your settings and keys
@@ -188,11 +193,5 @@ everything is here, oldest at the bottom.
 * The settings screen opens by asking how you want to write, with what each way includes and what it rules out, side by side. Choosing shows the settings for that way and hides the ones that would do nothing. The way back is on the screen from then on, and switching deletes nothing
 * Fixed: the jump list beside the settings disagreed with the cards it pointed at, so step 02 in the list was step 03 on the screen. The list and the cards are one list now
 * Choosing the AI client is honoured rather than described: scheduled writing does not run on that path, which is what the screen has always said about it
-
-= 0.72.0 =
-* Connecting an app is one button now. It used to be: tick a box, save the page, come back, find the controls that had appeared, then issue a token. Everything is on the card from the first visit, and issuing a token is what switches connections on — pressing that button is not an ambiguous statement of intent
-* Issuing a token also tests it. The site calls its own address exactly as an app will and reports what came back, so a server that strips the Authorization header or blocks the REST API says so here rather than leaving you with an app that only says it could not connect
-* The card names the exact options each app needs. Claude Desktop offers four ways to authenticate and three OAuth arrangements, and the one it picks by itself fails with a message about registering an OAuth client that does not say what to choose instead. Set Authentication to None and add the Authorization header; the card says so, and warns about the option that fails
-* Step by step rather than three paragraphs, with the address to copy in the step that asks you to copy it, and "How this works" going to the instructions rather than unfolding a summary of them
 Older releases are listed in changelog.txt, which ships with the plugin.
 

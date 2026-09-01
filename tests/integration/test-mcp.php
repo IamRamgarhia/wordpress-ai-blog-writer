@@ -430,11 +430,10 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'self_test', $body );
 	}
 
-	public function test_every_app_it_names_gets_steps_to_follow() {
-		// Named without instructions is worse than not named: it tells
-		// somebody their app is supported and leaves them to guess. The
-		// rule rather than a sample, so an app added later without steps
-		// fails here.
+	public function test_every_app_offered_has_steps_behind_it() {
+		// A name in the picker is a promise that choosing it shows you
+		// something. The rule rather than a sample, so an app added later
+		// without steps fails here instead of on a blank panel.
 		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
@@ -442,24 +441,46 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		Blogcraft_Connection::render();
 		$html = (string) ob_get_clean();
 
-		$blocks = array();
-		preg_match_all( '#<div class="bc-mcp-client">(.*?)</div>#s', $html, $blocks, PREG_SET_ORDER );
+		$tabs = array();
+		preg_match_all( '#id="bc-app-tab-([a-z]+)" aria-controls="bc-app-panel-([a-z]+)"#', $html, $tabs, PREG_SET_ORDER );
 
-		$this->assertNotEmpty( $blocks, 'the card names no apps at all' );
+		$this->assertNotEmpty( $tabs, 'the picker offers nothing' );
 
-		foreach ( $blocks as $block ) {
-			$name = array();
-			preg_match( '#<h4>([^<]*)</h4>#', $block[1], $name );
+		foreach ( $tabs as $tab ) {
+			$this->assertSame(
+				$tab[1],
+				$tab[2],
+				'a tab points at a panel that is not its own'
+			);
 
-			$this->assertNotEmpty( $name, 'an app block with no name' );
-			$this->assertStringContainsString(
-				'<ol class="bc-mcp-howto">',
-				$block[1],
-				$name[1] . ' is named but given no steps'
+			$panel = array();
+			preg_match( '#<div class="bc-app-steps" id="bc-app-panel-' . $tab[1] . '".*?</ol>#s', $html, $panel );
+
+			$this->assertNotEmpty(
+				$panel,
+				$tab[1] . ' is offered in the picker but has no steps'
 			);
 		}
 	}
 
+	public function test_only_one_set_of_steps_is_on_the_screen() {
+		// The card printed a general four-step list and then a different
+		// set for every app it knows, all at once. Two lists of
+		// instructions on one screen is not thoroughness, it is a
+		// question about which one to follow.
+		Blogcraft_Settings::set( 'setup_path', 'client' );
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString(
+			'bc-mcp-steps',
+			$html,
+			'the general step list is back alongside the per-app ones'
+		);
+	}
 	public function test_everything_worth_copying_has_a_button() {
 		// The address and the command both have to arrive in another
 		// window exactly right. Selecting a long one by hand and losing

@@ -538,3 +538,115 @@ function syncKey() {
 		say( button, fallbackCopy( text ) ? yes : no );
 	} );
 }() );
+
+/**
+ * One app's steps at a time.
+ *
+ * The panels are all in the page and this hides them, rather than the other
+ * way round: a browser running no script shows every set of steps, which is
+ * cluttered but complete. Hiding first and revealing with script would show
+ * nothing at all.
+ */
+( function () {
+	var pick = document.querySelector( '.bc-app-pick' );
+
+	if ( ! pick ) {
+		return;
+	}
+
+	var tabs = [].slice.call( pick.querySelectorAll( '.bc-app-tab' ) );
+
+	if ( ! tabs.length ) {
+		return;
+	}
+
+	function panelFor( tab ) {
+		return document.getElementById( tab.getAttribute( 'aria-controls' ) );
+	}
+
+	function show( chosen ) {
+		tabs.forEach( function ( tab ) {
+			var panel = panelFor( tab );
+			var on = tab === chosen;
+
+			tab.setAttribute( 'aria-selected', on ? 'true' : 'false' );
+			tab.classList.toggle( 'is-chosen', on );
+
+			// Only the selected tab is in the tab order, which is how a
+			// tablist is meant to behave: one stop, then arrow keys.
+			tab.tabIndex = on ? 0 : -1;
+
+			if ( panel ) {
+				panel.hidden = ! on;
+			}
+		} );
+
+		try {
+			window.localStorage.setItem( 'blogcraftApp', chosen.id );
+		} catch ( e ) {
+			// Private windows and blocked storage. Nothing here needs it.
+		}
+	}
+
+	function hideAll() {
+		tabs.forEach( function ( tab ) {
+			var panel = panelFor( tab );
+
+			tab.tabIndex = 0;
+
+			if ( panel ) {
+				panel.hidden = true;
+			}
+		} );
+	}
+
+	hideAll();
+
+	// Somebody who set this up once and came back to check a step should not
+	// have to remember which button they pressed last time.
+	var remembered = null;
+
+	try {
+		remembered = document.getElementById( window.localStorage.getItem( 'blogcraftApp' ) );
+	} catch ( e ) {
+		remembered = null;
+	}
+
+	if ( remembered && tabs.indexOf( remembered ) !== -1 ) {
+		show( remembered );
+	}
+
+	pick.addEventListener( 'click', function ( event ) {
+		var tab = event.target.closest ? event.target.closest( '.bc-app-tab' ) : null;
+
+		if ( tab ) {
+			show( tab );
+		}
+	} );
+
+	pick.addEventListener( 'keydown', function ( event ) {
+		var at = tabs.indexOf( document.activeElement );
+
+		if ( at === -1 ) {
+			return;
+		}
+
+		var to = at;
+
+		if ( 'ArrowRight' === event.key || 'ArrowDown' === event.key ) {
+			to = ( at + 1 ) % tabs.length;
+		} else if ( 'ArrowLeft' === event.key || 'ArrowUp' === event.key ) {
+			to = ( at - 1 + tabs.length ) % tabs.length;
+		} else if ( 'Home' === event.key ) {
+			to = 0;
+		} else if ( 'End' === event.key ) {
+			to = tabs.length - 1;
+		} else {
+			return;
+		}
+
+		event.preventDefault();
+		tabs[ to ].focus();
+		show( tabs[ to ] );
+	} );
+}() );
