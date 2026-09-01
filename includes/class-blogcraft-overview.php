@@ -229,10 +229,20 @@ class Blogcraft_Overview {
 	 * @return void
 	 */
 	private static function render_how() {
+		// The first and third steps are the two that differ. Describing a
+		// provider setup to a site that deliberately chose the other way,
+		// and pointing it at a screen that no longer exists there, is how
+		// the explanation ends up contradicting the checklist above it.
+		$client = Blogcraft_Mode::is_client();
+
 		$steps = array(
 			array(
-				__( 'Connect a provider, and a picture service', 'dicecodes-ai-blog-writer' ),
-				__( 'The writing needs a key from an AI provider — yours, billed to you. Pictures come from a separate service, and the one that runs by default needs no key at all.', 'dicecodes-ai-blog-writer' ),
+				$client
+					? __( 'Connect an app you already pay for', 'dicecodes-ai-blog-writer' )
+					: __( 'Connect a provider, and a picture service', 'dicecodes-ai-blog-writer' ),
+				$client
+					? __( 'Paste this site\'s address into Claude or ChatGPT and approve the connection here. No key, and nothing billed to you beyond the subscription you have.', 'dicecodes-ai-blog-writer' )
+					: __( 'The writing needs a key from an AI provider — yours, billed to you. Pictures come from a separate service, and the one that runs by default needs no key at all.', 'dicecodes-ai-blog-writer' ),
 				admin_url( 'admin.php?page=blogcraft-settings' ),
 				__( 'Settings', 'dicecodes-ai-blog-writer' ),
 			),
@@ -243,10 +253,18 @@ class Blogcraft_Overview {
 				__( 'How it writes', 'dicecodes-ai-blog-writer' ),
 			),
 			array(
-				__( 'Give it a topic, and anything only you know', 'dicecodes-ai-blog-writer' ),
-				__( 'The topic is the only field you have to fill in. The one worth filling in anyway is what you know that nobody else does: your own figures and results are used as fact and checked against the finished draft.', 'dicecodes-ai-blog-writer' ),
-				admin_url( 'admin.php?page=blogcraft-write' ),
-				__( 'Write a post', 'dicecodes-ai-blog-writer' ),
+				$client
+					? __( 'Ask it to write, and tell it what only you know', 'dicecodes-ai-blog-writer' )
+					: __( 'Give it a topic, and anything only you know', 'dicecodes-ai-blog-writer' ),
+				$client
+					? __( 'Say: read my writing rules and write a post about X. Give it your own figures and results too — they are used as fact and checked against the finished draft.', 'dicecodes-ai-blog-writer' )
+					: __( 'The topic is the only field you have to fill in. The one worth filling in anyway is what you know that nobody else does: your own figures and results are used as fact and checked against the finished draft.', 'dicecodes-ai-blog-writer' ),
+				$client
+					? admin_url( 'admin.php?page=blogcraft-help' )
+					: admin_url( 'admin.php?page=blogcraft-write' ),
+				$client
+					? __( 'How', 'dicecodes-ai-blog-writer' )
+					: __( 'Write a post', 'dicecodes-ai-blog-writer' ),
 			),
 			array(
 				__( 'Read it before anything goes out', 'dicecodes-ai-blog-writer' ),
@@ -475,11 +493,22 @@ class Blogcraft_Overview {
 		printf( '<p class="blogcraft-hint">%s</p>', esc_html( self::search_line() ) );
 
 		echo '<div class="blogcraft-actions">';
-		printf(
-			'<a class="button button-primary" href="%1$s">%2$s</a>',
-			esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
-			esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' )
-		);
+
+		// A button to a screen this setup does not have is worse than no
+		// button: it looks like the way forward and is a dead end.
+		if ( Blogcraft_Mode::allows( 'blogcraft-write' ) ) {
+			printf(
+				'<a class="button button-primary" href="%1$s">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=blogcraft-write' ) ),
+				esc_html__( 'Write a post', 'dicecodes-ai-blog-writer' )
+			);
+		} else {
+			printf(
+				'<a class="button button-primary" href="%1$s">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
+				esc_html__( 'Connect an app', 'dicecodes-ai-blog-writer' )
+			);
+		}
 		printf(
 			'<a class="button" href="%1$s">%2$s</a>',
 			esc_url( admin_url( 'admin.php?page=blogcraft-blueprint' ) ),

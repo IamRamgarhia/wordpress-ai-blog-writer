@@ -131,4 +131,42 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 			);
 		}
 	}
+
+	public function test_no_screen_links_anywhere_this_mode_cannot_go() {
+		// The rule, not the one example CI happened to catch. A button to
+		// a screen this setup does not have is worse than no button: it
+		// looks like the way forward and is a dead end. Asserted over every
+		// screen that stays available, so the next link added to any of
+		// them fails here.
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
+
+		$screens = array(
+			'Blogcraft_Overview',
+			'Blogcraft_Connection',
+		);
+
+		$barred = array();
+
+		foreach ( array_keys( Blogcraft_Mode::screens() ) as $slug ) {
+			if ( ! Blogcraft_Mode::allows( $slug ) ) {
+				$barred[] = $slug;
+			}
+		}
+
+		$this->assertNotEmpty( $barred, 'nothing is barred, so this proves nothing' );
+
+		foreach ( $screens as $screen ) {
+			ob_start();
+			call_user_func( array( $screen, 'render' ) );
+			$html = (string) ob_get_clean();
+
+			foreach ( $barred as $slug ) {
+				$this->assertStringNotContainsString(
+					'page=' . $slug,
+					$html,
+					$screen . ' links to ' . $slug . ', which this setup does not have'
+				);
+			}
+		}
+	}
 }
