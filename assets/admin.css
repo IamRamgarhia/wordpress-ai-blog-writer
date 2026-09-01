@@ -2560,3 +2560,34 @@ body[class*="page_blogcraft"] #wpcontent {
 	display: flex;
 	gap: var(--bc-s2);
 }
+
+/* --------------------------------------------- how this site writes.
+   There are two ways of working and nothing outside the settings said
+   which was in force. */
+
+.bc-mode-now {
+	align-items: center;
+	background: var(--bc-surface-soft);
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s2) var(--bc-s3);
+	margin-bottom: var(--bc-s4);
+	padding: var(--bc-s2) var(--bc-s3);
+}
+
+.bc-mode-tag {
+	background: var(--bc-accent-soft);
+	border-radius: var(--bc-r-pill);
+	color: var(--bc-accent);
+	font-size: var(--bc-t-xs);
+	font-weight: 600;
+	padding: 2px 10px;
+}
+
+.bc-mode-what {
+	color: var(--bc-ink-soft);
+	flex: 1 1 20rem;
+	font-size: var(--bc-t-sm);
+}

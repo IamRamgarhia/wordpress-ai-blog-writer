@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.81.0 =
+* Every screen now knows which of the two ways this site is set up. A site driven by Claude was still offered a Write a post screen that calls a provider it has no key for, and a Calendar for scheduled writing that cannot happen on that path — both failing at the moment somebody tried them, which is the worst place to find out. They are no longer offered, and following an old link to one explains what changed instead of showing a form that cannot be submitted
+* The overview says which way the site writes, and its setup checklist asks for the right things. It used to tell somebody who had chosen an AI client to go and add an API key, which is telling them to undo the choice they just made
+* Fixed: the preview outline on the write screen and the shape buttons on the blueprint screen shared one class name, so every style rule for either landed on both. It only looked right because of which block came last in the stylesheet
+* Fixed: a Windows checkout rewrote every file to Windows line endings, which fails the coding standard on the first line of each. The same code passed and then failed without a line of it changing
+
 = 0.80.0 =
 * The shape your writing rules were started from stays marked. Pressing one fills in about twenty fields and marked the card it came from, but nothing wrote that down — so the next visit showed eight identical cards with no sign of which one built the rules in front of you
 * Removed the one direct database query in the uninstaller. The running token totals it existed to sweep up are held as transients now, which expire on their own, so there is nothing left to sweep

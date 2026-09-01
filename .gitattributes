@@ -1,0 +1,16 @@
+# The working tree is checked out with LF, whatever core.autocrlf says.
+#
+# Without this, a Windows checkout rewrites every text file to CRLF, and
+# PHPCS fails the WordPress standard on the first line of each: "End of line
+# character is invalid". It only showed up after a branch switch, because
+# that is when git re-writes the files it touches — so the same tree passed
+# and then failed without a line of code changing.
+* text=auto eol=lf
+
+# Binary, never touched.
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
+*.woff binary
+*.woff2 binary

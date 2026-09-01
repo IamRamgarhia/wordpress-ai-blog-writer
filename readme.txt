@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.80.0
+Stable tag: 0.81.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.81.0 =
+* Every screen now knows which of the two ways this site is set up. A site driven by Claude was still offered a Write a post screen that calls a provider it has no key for, and a Calendar for scheduled writing that cannot happen on that path — both failing at the moment somebody tried them, which is the worst place to find out. They are no longer offered, and following an old link to one explains what changed instead of showing a form that cannot be submitted
+* The overview says which way the site writes, and its setup checklist asks for the right things. It used to tell somebody who had chosen an AI client to go and add an API key, which is telling them to undo the choice they just made
+* Fixed: the preview outline on the write screen and the shape buttons on the blueprint screen shared one class name, so every style rule for either landed on both. It only looked right because of which block came last in the stylesheet
+* Fixed: a Windows checkout rewrote every file to Windows line endings, which fails the coding standard on the first line of each. The same code passed and then failed without a line of it changing
+
 = 0.80.0 =
 * The shape your writing rules were started from stays marked. Pressing one fills in about twenty fields and marked the card it came from, but nothing wrote that down — so the next visit showed eight identical cards with no sign of which one built the rules in front of you
 * Removed the one direct database query in the uninstaller. The running token totals it existed to sweep up are held as transients now, which expire on their own, so there is nothing left to sweep
@@ -190,19 +196,5 @@ everything is here, oldest at the bottom.
 * A post written from Claude or ChatGPT says so instead, and says nothing was billed here, because the model ran on their subscription
 * Fixed: the AI client card still listed pictures among the things a connected app cannot use. It has been able to since the last release
 * Shorter wording again across the connect card and the chooser
-
-= 0.76.0 =
-* A post written from Claude or ChatGPT is now finished the way every other post here is: a featured image, pictures under the headings, the search title, the category and tags, links added from older posts pointing at the new one, and a submission to the search engines that accept one. It used to go out with none of that — a draft that happened to be public
-* A draft can be listed and read back, so a conversation that ended half way through picks the post up instead of writing it again
-* Drafts can be scored by id rather than by pasting the text back, which also scores the pictures and everything else added since
-* Publishing can be scheduled for a date instead of going out now
-* Three new things a connected app can do: list your drafts, read one back, and add pictures before you publish
-* Fixed: scheduling silently published immediately. WordPress ignores a new date on an update unless it is told the date is deliberate, and the call reported success either way, so the only sign was a post that went out early
-* Less text on the settings screen, and the detail moved to the documentation each card already links to
-
-= 0.75.0 =
-* The connect card asks which app you are using and then shows the steps for that one. It used to print a general four-step list and, underneath it, a different set of steps for every app it knows about, all at once — which is not thoroughness, it is a question about which list you are meant to be following
-* Fewer words on every step, and the address sits on its own with a button rather than inside a numbered instruction to copy it
-* Your choice of app is remembered, so coming back to check a step does not mean picking it again
 Older releases are listed in changelog.txt, which ships with the plugin.
 

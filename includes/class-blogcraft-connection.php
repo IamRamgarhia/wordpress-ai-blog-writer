@@ -980,9 +980,9 @@ class Blogcraft_Connection {
 	 * @return string 'api' or 'client'.
 	 */
 	public static function path() {
-		$stored = (string) Blogcraft_Settings::get( 'setup_path' );
-
-		return ( 'client' === $stored ) ? 'client' : 'api';
+		// Answered in one place now. This screen decides what to show,
+		// but it is not the only screen the answer changes.
+		return Blogcraft_Mode::current();
 	}
 
 	/**
@@ -991,7 +991,7 @@ class Blogcraft_Connection {
 	 * @return bool
 	 */
 	private static function path_chosen() {
-		return in_array( (string) Blogcraft_Settings::get( 'setup_path' ), array( 'api', 'client' ), true );
+		return Blogcraft_Mode::chosen();
 	}
 
 	/**

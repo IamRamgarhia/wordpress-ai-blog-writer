@@ -39,6 +39,7 @@ class Blogcraft_Overview {
 		echo '<p>' . esc_html__( 'What is set up, what it has written, and what needs you.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
+		self::render_mode();
 		self::render_setup();
 		self::render_how();
 		self::render_attention();
@@ -134,35 +135,86 @@ class Blogcraft_Overview {
 			}
 		}
 
-		return array(
+		// The first two steps are the whole of the difference between
+		// the two ways of working. Telling somebody who chose an AI
+		// client to go and add an API key is telling them to undo the
+		// choice they just made.
+		if ( Blogcraft_Mode::is_client() ) {
+			$first = array(
+				array(
+					'title'  => __( 'Connect an AI client', 'dicecodes-ai-blog-writer' ),
+					'detail' => __( 'Paste the address into Claude or ChatGPT and approve it here.', 'dicecodes-ai-blog-writer' ),
+					'done'   => ! empty( Blogcraft_Mcp_Auth::all() ) || ! empty( Blogcraft_Mcp_Oauth::clients() ),
+					'url'    => admin_url( 'admin.php?page=blogcraft-settings#bc-card-clients' ),
+					'action' => __( 'Connect', 'dicecodes-ai-blog-writer' ),
+				),
+			);
+		} else {
+			$first = array(
+				array(
+					'title'  => __( 'Connect a provider', 'dicecodes-ai-blog-writer' ),
+					'detail' => __( 'Your key, your account, your bill.', 'dicecodes-ai-blog-writer' ),
+					'done'   => Blogcraft_Provider_Registry::is_configured(),
+					'url'    => admin_url( 'admin.php?page=blogcraft-settings' ),
+					'action' => __( 'Set it up', 'dicecodes-ai-blog-writer' ),
+				),
+				array(
+					'title'  => __( 'Choose what it may read', 'dicecodes-ai-blog-writer' ),
+					'detail' => __( 'Nothing is contacted until you say so. Wikipedia and Hacker News need no key.', 'dicecodes-ai-blog-writer' ),
+					'done'   => $decided,
+					'url'    => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
+					'action' => __( 'Choose', 'dicecodes-ai-blog-writer' ),
+				),
+			);
+		}
+
+		return array_merge(
+			$first,
 			array(
-				'title'  => __( 'Connect a provider', 'dicecodes-ai-blog-writer' ),
-				'detail' => __( 'Your key, your account, your bill.', 'dicecodes-ai-blog-writer' ),
-				'done'   => Blogcraft_Provider_Registry::is_configured(),
-				'url'    => admin_url( 'admin.php?page=blogcraft-settings' ),
-				'action' => __( 'Set it up', 'dicecodes-ai-blog-writer' ),
-			),
-			array(
-				'title'  => __( 'Choose what it may read', 'dicecodes-ai-blog-writer' ),
-				'detail' => __( 'Nothing is contacted until you say so. Wikipedia and Hacker News need no key.', 'dicecodes-ai-blog-writer' ),
-				'done'   => $decided,
-				'url'    => admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
-				'action' => __( 'Choose', 'dicecodes-ai-blog-writer' ),
-			),
-			array(
-				'title'  => __( 'Say who you write for', 'dicecodes-ai-blog-writer' ),
-				'detail' => __( 'Without this, posts read like every other tool\'s.', 'dicecodes-ai-blog-writer' ),
-				'done'   => $described,
-				'url'    => admin_url( 'admin.php?page=blogcraft-blueprint' ),
-				'action' => __( 'Describe it', 'dicecodes-ai-blog-writer' ),
-			),
-			array(
-				'title'  => __( 'Write one post', 'dicecodes-ai-blog-writer' ),
-				'detail' => __( 'Read it before you turn anything on a schedule.', 'dicecodes-ai-blog-writer' ),
-				'done'   => $written,
-				'url'    => admin_url( 'admin.php?page=blogcraft-write' ),
-				'action' => __( 'Write one', 'dicecodes-ai-blog-writer' ),
-			),
+				array(
+					'title'  => __( 'Say who you write for', 'dicecodes-ai-blog-writer' ),
+					'detail' => __( 'Without this, posts read like every other tool\'s.', 'dicecodes-ai-blog-writer' ),
+					'done'   => $described,
+					'url'    => admin_url( 'admin.php?page=blogcraft-blueprint' ),
+					'action' => __( 'Describe it', 'dicecodes-ai-blog-writer' ),
+				),
+				array(
+					'title'  => __( 'Write one post', 'dicecodes-ai-blog-writer' ),
+					'detail' => Blogcraft_Mode::is_client()
+						? __( 'Ask your app: "read my writing rules and write a post about X".', 'dicecodes-ai-blog-writer' )
+						: __( 'Read it before you turn anything on a schedule.', 'dicecodes-ai-blog-writer' ),
+					'done'   => $written,
+					'url'    => Blogcraft_Mode::is_client()
+						? admin_url( 'admin.php?page=blogcraft-help' )
+						: admin_url( 'admin.php?page=blogcraft-write' ),
+					'action' => Blogcraft_Mode::is_client()
+						? __( 'How', 'dicecodes-ai-blog-writer' )
+						: __( 'Write one', 'dicecodes-ai-blog-writer' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * How this site writes, said once, at the top.
+	 *
+	 * There are two ways of working and nothing outside the settings
+	 * screen said which one was in force, so the overview described a
+	 * provider setup to sites that had deliberately chosen the other.
+	 *
+	 * @return void
+	 */
+	private static function render_mode() {
+		if ( ! Blogcraft_Mode::chosen() ) {
+			return;
+		}
+
+		printf(
+			'<div class="bc-mode-now"><span class="bc-mode-tag">%1\$s</span><span class="bc-mode-what">%2\$s</span><a href="%3\$s">%4\$s</a></div>',
+			esc_html( Blogcraft_Mode::label() ),
+			esc_html( Blogcraft_Mode::summary() ),
+			esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
+			esc_html__( 'Change', 'dicecodes-ai-blog-writer' )
 		);
 	}
 

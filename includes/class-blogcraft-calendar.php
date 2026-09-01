@@ -87,6 +87,15 @@ class Blogcraft_Calendar {
 	 * @return void
 	 */
 	public static function render() {
+		// Writing here means calling a provider, or running while nobody
+		// is watching. Neither happens on a site an app drives, and a
+		// form that cannot be submitted is worse than a plain answer.
+		if ( ! Blogcraft_Mode::allows( 'blogcraft-calendar' ) ) {
+			Blogcraft_Mode::render_unavailable( 'blogcraft-calendar' );
+
+			return;
+		}
+
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
 		}

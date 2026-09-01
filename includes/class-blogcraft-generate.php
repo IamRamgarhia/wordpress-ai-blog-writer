@@ -208,6 +208,15 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function render() {
+		// Writing here means calling a provider, or running while nobody
+		// is watching. Neither happens on a site an app drives, and a
+		// form that cannot be submitted is worse than a plain answer.
+		if ( ! Blogcraft_Mode::allows( 'blogcraft-write' ) ) {
+			Blogcraft_Mode::render_unavailable( 'blogcraft-write' );
+
+			return;
+		}
+
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
 		}
@@ -1498,7 +1507,7 @@ class Blogcraft_Generate {
 		$warnings = Blogcraft_Preview::warnings( $blueprint, $shape );
 		$tokens   = Blogcraft_Preview::tokens( $blueprint );
 
-		$out = '<ol class="bc-shape">';
+		$out = '<ol class="bc-outline">';
 
 		foreach ( $shape as $block ) {
 			$words = ( $block['words'] > 0 )

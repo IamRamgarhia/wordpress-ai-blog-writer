@@ -46,6 +46,15 @@ class Blogcraft_Nav {
 			unset( $screens['blogcraft-review'] );
 		}
 
+		// A screen that cannot work on this setup is worse than a missing
+		// one: it fails at the moment somebody tries to use it, which is
+		// the worst place to find out.
+		foreach ( array_keys( $screens ) as $slug ) {
+			if ( ! Blogcraft_Mode::allows( $slug ) ) {
+				unset( $screens[ $slug ] );
+			}
+		}
+
 		// The progress screen is reached by an id in the address and has no
 		// menu entry, so refreshing or closing the tab left a post being
 		// written with nothing anywhere pointing back at it. It appears only

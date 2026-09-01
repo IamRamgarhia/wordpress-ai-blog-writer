@@ -782,14 +782,18 @@
 	opacity: 0.45;
 }
 
-.bc-shape {
+/* The outline preview on the write screen. It shared the class name
+   bc-shape with the archetype buttons on the blueprint screen, so
+   every rule for one landed on the other and it only looked right by
+   the accident of which block came last. */
+.bc-outline {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	counter-reset: none;
 }
 
-.bc-shape li {
+.bc-outline li {
 	display: flex;
 	align-items: baseline;
 	gap: 8px;
@@ -800,7 +804,7 @@
 }
 
 /* Sections are the article; the furniture around them reads quieter. */
-.bc-shape .bc-shape-section {
+.bc-outline .bc-shape-section {
 	border-left-color: var(--bp-accent);
 }
 

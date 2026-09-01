@@ -3,7 +3,7 @@
  * Plugin Name:       Dicecodes AI Blog Writer
  * Plugin URI:        https://dicecodes.com/ai-blog-writer/
  * Description:       AI blog writer that researches first, writes in your voice, and checks its own work.
- * Version:           0.80.0
+ * Version:           0.81.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Dicecodes
@@ -62,7 +62,7 @@ if ( defined( 'BLOGCRAFT_VERSION' ) ) {
 	return;
 }
 
-define( 'BLOGCRAFT_VERSION', '0.80.0' );
+define( 'BLOGCRAFT_VERSION', '0.81.0' );
 define( 'BLOGCRAFT_DB_VERSION', '1' );
 define( 'BLOGCRAFT_FILE', __FILE__ );
 define( 'BLOGCRAFT_PATH', plugin_dir_path( __FILE__ ) );
