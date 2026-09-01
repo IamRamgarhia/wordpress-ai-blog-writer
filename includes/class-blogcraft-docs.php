@@ -179,23 +179,23 @@ class Blogcraft_Docs {
 			),
 			'clients'           => array(
 				'title'  => __( 'Writing from Claude or ChatGPT', 'dicecodes-ai-blog-writer' ),
-				'lead'   => __( 'Use the subscription you already pay for. No API key.', 'dicecodes-ai-blog-writer' ),
+				'lead'   => __( 'Use the subscription you already pay for. No API key, and usually no token either.', 'dicecodes-ai-blog-writer' ),
 				'steps'  => array(
 					array(
-						__( 'Open the card', 'dicecodes-ai-blog-writer' ),
-						__( 'Settings, then Connect an AI client. Everything you need is on it.', 'dicecodes-ai-blog-writer' ),
+						__( 'Choose the AI client way', 'dicecodes-ai-blog-writer' ),
+						__( 'Settings. The first question on the screen is which way you want to write. Pick the second one.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Press Issue a token', 'dicecodes-ai-blog-writer' ),
-						__( 'Name it after the app you will use. This also switches connections on and tests them.', 'dicecodes-ai-blog-writer' ),
+						__( 'Copy the address', 'dicecodes-ai-blog-writer' ),
+						__( 'It is the first thing on the card, with a button that copies it.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Copy the token now', 'dicecodes-ai-blog-writer' ),
-						__( 'It is shown once. Copy the address above it too.', 'dicecodes-ai-blog-writer' ),
+						__( 'Paste it into your app', 'dicecodes-ai-blog-writer' ),
+						__( 'Claude: Settings, Connectors, Add custom connector. ChatGPT: Settings, Connectors, Advanced, Developer mode, Create.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
-						__( 'Add both to your app', 'dicecodes-ai-blog-writer' ),
-						__( 'The exact options for each app are below. Pick the wrong one and it will not connect.', 'dicecodes-ai-blog-writer' ),
+						__( 'Approve the connection', 'dicecodes-ai-blog-writer' ),
+						__( 'The app sends you back here. Sign in if you are asked, read what it will be allowed to do, then press Approve.', 'dicecodes-ai-blog-writer' ),
 					),
 					array(
 						__( 'Ask it to write', 'dicecodes-ai-blog-writer' ),
@@ -203,16 +203,17 @@ class Blogcraft_Docs {
 					),
 				),
 				'points' => array(
-					__( 'Claude Desktop: Settings, Connectors, Add custom connector. Paste the address, then set Authentication to None.', 'dicecodes-ai-blog-writer' ),
-					__( 'Still in Claude Desktop: under Additional request headers, add Authorization with the value Bearer followed by your token.', 'dicecodes-ai-blog-writer' ),
-					__( 'Do not leave Claude Desktop on "Always required". It starts a sign-in this site does not offer yet and fails with a message about registering an OAuth client.', 'dicecodes-ai-blog-writer' ),
-					__( 'ChatGPT: Settings, Connectors, Advanced, Developer mode. Add the connector, choose no authentication, add the same Authorization header.', 'dicecodes-ai-blog-writer' ),
-					__( 'Claude Code, Cursor, VS Code: one command, shown on the card, with the address and token already filled in.', 'dicecodes-ai-blog-writer' ),
+					__( 'Claude Code, Cursor and VS Code take one command instead. It is on the card, ready to copy.', 'dicecodes-ai-blog-writer' ),
+					__( 'Your permalinks must not be set to Plain. On that setting the address an app looks up to find the sign-in never reaches WordPress.', 'dicecodes-ai-blog-writer' ),
+					__( 'The app then reports that your site is not an MCP server, which is not what is wrong with it.', 'dicecodes-ai-blog-writer' ),
 					__( 'Your site must be reachable over HTTPS from the internet. A laptop install will not work.', 'dicecodes-ai-blog-writer' ),
-					__( 'If the token is refused, your server is stripping the Authorization header. Add CGIPassAuth On to your .htaccess, or ask your host to pass it through.', 'dicecodes-ai-blog-writer' ),
+					__( 'If an app cannot sign in, issue a token on the card instead, and set that app to no authentication.', 'dicecodes-ai-blog-writer' ),
+					__( 'Then add a request header named Authorization, with the value Bearer followed by a space and the token.', 'dicecodes-ai-blog-writer' ),
+					__( 'If a token is refused, your server is stripping the Authorization header. Add CGIPassAuth On to your .htaccess, or ask your host to pass it through.', 'dicecodes-ai-blog-writer' ),
 					__( 'A connected app can read your rules, score a draft, create and revise drafts, and publish above your threshold.', 'dicecodes-ai-blog-writer' ),
 					__( 'It cannot write on a schedule, touch a post it did not create, or use your research and picture services.', 'dicecodes-ai-blog-writer' ),
-					__( 'Scheduled writing needs a provider key on the card above, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
+					__( 'Scheduled writing needs a provider key on the other path, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
+					__( 'Disconnect an app at any time from the same card. Revoking its token cuts it off immediately.', 'dicecodes-ai-blog-writer' ),
 				),
 			),
 			'research'          => array(

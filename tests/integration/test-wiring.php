@@ -304,6 +304,24 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 					$written[ $key ] = $key;
 				}
 			}
+
+			// The pattern above only sees a constant if somebody named it
+			// OPTION, which makes the rule depend on the same care it exists
+			// to check for — and it duly missed the OAuth client store,
+			// declared as CLIENTS. So: any constant actually passed to an
+			// option function, whatever it is called, resolved to what it
+			// holds.
+			$named = array();
+
+			if ( preg_match_all( "/(?:get|update|add|delete)_option\(\s*(?:self::|static::)?([A-Z][A-Z0-9_]*)\b/", $body, $hits ) ) {
+				$named = array_unique( $hits[1] );
+			}
+
+			foreach ( $named as $constant ) {
+				if ( preg_match( "/const\s+" . preg_quote( $constant, "/" ) . "\s*=\s*'(blogcraft_[a-z_]+)'/", $body, $found ) ) {
+					$written[ $found[1] ] = $found[1];
+				}
+			}
 		}
 
 		$missed = array();

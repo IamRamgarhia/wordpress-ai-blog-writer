@@ -81,7 +81,14 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// issued them.
 		delete_option( 'blogcraft_mcp_tokens' );
 
+		// And the apps those tokens were issued to. A client id is not a
+		// secret, but leaving the list behind means the next install
+		// inherits a set of approved redirect addresses it never agreed
+		// to.
+		delete_option( 'blogcraft_mcp_clients' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
+		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 
 		// The posts themselves are the user's and stay. Everything Blogcraft
 		// attached to them goes, because the note at the top of this file says

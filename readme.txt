@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.73.0
+Stable tag: 0.74.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,16 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.74.0 =
+* You can now sign an app in, instead of copying a token into it. Paste the address, approve the connection on your own site, and that is the whole of it. This is what Claude and ChatGPT have always needed: their connector dialogs have no field for a request header, so they ask the site where to sign in, and this site had nowhere to point them. That is why it answered "couldn't connect to the server" no matter what the address was
+* The approval screen says what a connected app will be able to do and, just as plainly, what it will not — it cannot touch a post it did not write, write anything while you are away, or read your settings and keys
+* Tokens still work and still never expire, for editors and machines that would rather use one. Signing in is what the apps that cannot use a token now do instead
+* Copy buttons on the address, the token and the command. Each of those has to arrive in another window exactly right, and losing the last character of an address produces an error that blames the server
+* Step by step for each app, in the order you do them, rather than a paragraph describing the arrangement
+* The result of the connection test stays on the screen until you dismiss it. It used to vanish on the next page load, which is the worst possible behaviour for the one message that explains a failure
+* Says so when this site is on plain permalinks, which is the one setting that stops signing in from working, and links straight to the setting
+* Fixed: deleting the plugin left the list of connected apps behind. The check that should have caught that only recognised a stored value if it had been given a particular sort of name, which is no check at all — it looks at what is stored now
+
 = 0.73.0 =
 * Fixed: no AI client could connect. The server answered every question a client asks except the one it asks before all the others. It was built against a draft of the protocol that renames the opening handshake, and no shipping application uses that name — so Claude, ChatGPT and the rest got as far as "couldn't connect to the server" and stopped. The handshake every client actually sends is answered now, and the old name still works
 * Fixed: asking for the optional event stream returned "no route here" rather than "not that method". A client reads the first as proof there is no server at the address and gives up before it sends anything
@@ -184,11 +194,5 @@ everything is here, oldest at the bottom.
 * Issuing a token also tests it. The site calls its own address exactly as an app will and reports what came back, so a server that strips the Authorization header or blocks the REST API says so here rather than leaving you with an app that only says it could not connect
 * The card names the exact options each app needs. Claude Desktop offers four ways to authenticate and three OAuth arrangements, and the one it picks by itself fails with a message about registering an OAuth client that does not say what to choose instead. Set Authentication to None and add the Authorization header; the card says so, and warns about the option that fails
 * Step by step rather than three paragraphs, with the address to copy in the step that asks you to copy it, and "How this works" going to the instructions rather than unfolding a summary of them
-
-= 0.71.0 =
-* A second way to supply a model, for anyone already paying for Claude, ChatGPT or a similar app. Instead of this site calling a provider with your key, the app connects to this site and does the writing, while the writing rules, the twenty-five checks and the publishing stay here. No API key, and nothing leaves your site: the connection comes in
-* Settings, Connect an AI client. Switch it on, issue a token, and paste the address and the token into whatever you use. It speaks the Model Context Protocol, so it is not tied to one app
-* A connected client can read your rules, score a draft against every check, create and revise drafts, and publish — but only above the quality threshold you set, exactly as a post written here would have to be. It cannot write on a schedule, touch a post it did not create, or reach your research and picture services. Scheduled writing still needs a provider key, because something has to be running when nobody is watching
-* Tokens are shown once and stored only as a fingerprint. One stops working the moment the person it was issued to loses permission to write here, so a token cannot outlive the account behind it
 Older releases are listed in changelog.txt, which ships with the plugin.
 

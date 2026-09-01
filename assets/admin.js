@@ -436,3 +436,105 @@ function syncKey() {
 			} );
 	} );
 }() );
+
+/**
+ * Copy buttons.
+ *
+ * Every value on the connect card is a string that has to arrive in another
+ * window exactly right — an address, a token, a command. Selecting a long one
+ * by hand and missing the last character produces an error that blames the
+ * server, so nobody should be doing it by hand.
+ *
+ * Delegated from the document rather than bound per button, because the token
+ * row appears after the page has loaded and would otherwise be the one button
+ * that does nothing.
+ */
+( function () {
+	var SAID_FOR = 1600;
+
+	function fallbackCopy( text ) {
+		// execCommand is deprecated and still the only thing that works when
+		// the page is not on https, which a site being set up often is not.
+		var field = document.createElement( 'textarea' );
+
+		field.value = text;
+		field.setAttribute( 'readonly', '' );
+		field.style.position = 'fixed';
+		field.style.top = '-1000px';
+
+		document.body.appendChild( field );
+		field.select();
+
+		var done = false;
+
+		try {
+			done = document.execCommand( 'copy' );
+		} catch ( e ) {
+			done = false;
+		}
+
+		document.body.removeChild( field );
+
+		return done;
+	}
+
+	function say( button, message ) {
+		var said = button.parentNode.querySelector( '.bc-copy-said' );
+
+		if ( ! said ) {
+			return;
+		}
+
+		said.textContent = message;
+
+		window.setTimeout( function () {
+			said.textContent = '';
+		}, SAID_FOR );
+	}
+
+	// Selecting the whole value on focus, which used to be an inline
+	// onfocus attribute. wp_kses strips event handlers whatever the
+	// allowlist says, so the attribute never reached the browser at all.
+	document.addEventListener( 'focus', function ( event ) {
+		var field = event.target;
+
+		if ( field && field.matches && field.matches( '.bc-copy input, .bc-token-fresh input' ) ) {
+			field.select();
+		}
+	}, true );
+
+	document.addEventListener( 'click', function ( event ) {
+		var button = event.target.closest ? event.target.closest( '.bc-copy-button' ) : null;
+
+		if ( ! button ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		var text = button.getAttribute( 'data-copy' ) || '';
+
+		if ( ! text ) {
+			return;
+		}
+
+		var config = window.blogcraftProviders || {};
+		var yes = config.copied || 'Copied';
+		var no = config.copyFailed || 'Press Ctrl+C to copy';
+
+		if ( navigator.clipboard && navigator.clipboard.writeText ) {
+			navigator.clipboard.writeText( text ).then(
+				function () {
+					say( button, yes );
+				},
+				function () {
+					say( button, fallbackCopy( text ) ? yes : no );
+				}
+			);
+
+			return;
+		}
+
+		say( button, fallbackCopy( text ) ? yes : no );
+	} );
+}() );

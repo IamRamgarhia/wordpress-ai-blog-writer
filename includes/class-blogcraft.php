@@ -77,6 +77,10 @@ class Blogcraft {
 		// refuses everything until the reader switches it on.
 		Blogcraft_Mcp::init();
 
+		// The other half of the same door: applications whose connector
+		// dialog has no field for a header have to be signed in instead.
+		Blogcraft_Mcp_Oauth::init();
+
 		if ( is_admin() ) {
 			// Schema changes used to arrive only through the activation hook,
 			// which a one-click update never fires — so an update that needed

@@ -41,9 +41,12 @@ class Blogcraft_Mcp_Auth {
 	 *
 	 * @param int    $user_id Owner.
 	 * @param string $label   What the reader called it, for their own benefit.
+	 * @param array  $extra   Anything the issuer wants remembered: the app it
+	 *                        belongs to, when it expires, whether it is a
+	 *                        refresh token rather than an access one.
 	 * @return string The secret, or '' when it could not be issued.
 	 */
-	public static function issue( $user_id, $label = '' ) {
+	public static function issue( $user_id, $label = '', $extra = array() ) {
 		$user_id = (int) $user_id;
 
 		if ( $user_id <= 0 ) {
@@ -53,11 +56,20 @@ class Blogcraft_Mcp_Auth {
 		$secret = bin2hex( random_bytes( self::BYTES ) );
 		$tokens = self::all();
 
-		$tokens[ self::fingerprint( $secret ) ] = array(
-			'user'    => $user_id,
-			'label'   => sanitize_text_field( $label ),
-			'created' => time(),
-			'used'    => 0,
+		$tokens[ self::fingerprint( $secret ) ] = array_merge(
+			array(
+				'user'    => $user_id,
+				'label'   => sanitize_text_field( $label ),
+				'created' => time(),
+				'used'    => 0,
+				// A token typed in by hand has nobody to refresh it and no
+				// app behind it, so these are the defaults rather than the
+				// exception. 0 means it does not expire.
+				'kind'    => 'access',
+				'expires' => 0,
+				'client'  => '',
+			),
+			$extra
 		);
 
 		update_option( self::OPTION, $tokens, false );
@@ -111,6 +123,56 @@ class Blogcraft_Mcp_Auth {
 		return hash( 'sha256', (string) $secret );
 	}
 
+	/**
+	 * Find a stored token by the secret somebody presents.
+	 *
+	 * Returns the record with its fingerprint attached, so a caller that
+	 * needs to revoke what it just read does not have to hash the secret a
+	 * second time and get the salt wrong.
+	 *
+	 * @param string $secret The token as presented.
+	 * @param string $kind   Which sort it must be.
+	 * @return array The record, or an empty array.
+	 */
+	public static function record_for( $secret, $kind = 'access' ) {
+		$secret = trim( (string) $secret );
+
+		if ( '' === $secret ) {
+			return array();
+		}
+
+		$tokens = self::all();
+		$key    = self::fingerprint( $secret );
+
+		if ( ! isset( $tokens[ $key ] ) ) {
+			return array();
+		}
+
+		$record = $tokens[ $key ];
+
+		// Records issued before any of this existed have no kind, and they
+		// are all access tokens.
+		$is = isset( $record['kind'] ) ? (string) $record['kind'] : 'access';
+
+		if ( $is !== $kind ) {
+			return array();
+		}
+
+		// An expired token is gone, not merely refused: leaving it in the
+		// store means the list on the settings screen fills up with dead
+		// entries nobody can tell apart from live ones.
+		$expires = isset( $record['expires'] ) ? (int) $record['expires'] : 0;
+
+		if ( $expires > 0 && $expires < time() ) {
+			self::revoke( $key );
+
+			return array();
+		}
+
+		$record['fingerprint'] = $key;
+
+		return $record;
+	}
 	/**
 	 * The Authorization header, wherever this server happens to keep it.
 	 *
@@ -170,14 +232,13 @@ class Blogcraft_Mcp_Auth {
 			return 0;
 		}
 
-		$tokens = self::all();
-		$key    = self::fingerprint( $secret );
+		$record = self::record_for( $secret );
 
-		if ( ! isset( $tokens[ $key ] ) ) {
+		if ( empty( $record ) ) {
 			return 0;
 		}
 
-		$user_id = (int) $tokens[ $key ]['user'];
+		$user_id = (int) $record['user'];
 
 		// The token names a user; the user still has to be allowed. A token
 		// outliving the permission it was issued under is the failure this
@@ -186,8 +247,12 @@ class Blogcraft_Mcp_Auth {
 			return 0;
 		}
 
-		$tokens[ $key ]['used'] = time();
-		update_option( self::OPTION, $tokens, false );
+		$tokens = self::all();
+
+		if ( isset( $tokens[ $record['fingerprint'] ] ) ) {
+			$tokens[ $record['fingerprint'] ]['used'] = time();
+			update_option( self::OPTION, $tokens, false );
+		}
 
 		return $user_id;
 	}

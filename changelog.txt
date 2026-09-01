@@ -3,6 +3,16 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.74.0 =
+* You can now sign an app in, instead of copying a token into it. Paste the address, approve the connection on your own site, and that is the whole of it. This is what Claude and ChatGPT have always needed: their connector dialogs have no field for a request header, so they ask the site where to sign in, and this site had nowhere to point them. That is why it answered "couldn't connect to the server" no matter what the address was
+* The approval screen says what a connected app will be able to do and, just as plainly, what it will not — it cannot touch a post it did not write, write anything while you are away, or read your settings and keys
+* Tokens still work and still never expire, for editors and machines that would rather use one. Signing in is what the apps that cannot use a token now do instead
+* Copy buttons on the address, the token and the command. Each of those has to arrive in another window exactly right, and losing the last character of an address produces an error that blames the server
+* Step by step for each app, in the order you do them, rather than a paragraph describing the arrangement
+* The result of the connection test stays on the screen until you dismiss it. It used to vanish on the next page load, which is the worst possible behaviour for the one message that explains a failure
+* Says so when this site is on plain permalinks, which is the one setting that stops signing in from working, and links straight to the setting
+* Fixed: deleting the plugin left the list of connected apps behind. The check that should have caught that only recognised a stored value if it had been given a particular sort of name, which is no check at all — it looks at what is stored now
+
 = 0.73.0 =
 * Fixed: no AI client could connect. The server answered every question a client asks except the one it asks before all the others. It was built against a draft of the protocol that renames the opening handshake, and no shipping application uses that name — so Claude, ChatGPT and the rest got as far as "couldn't connect to the server" and stopped. The handshake every client actually sends is answered now, and the old name still works
 * Fixed: asking for the optional event stream returned "no route here" rather than "not that method". A client reads the first as proof there is no server at the address and gives up before it sends anything

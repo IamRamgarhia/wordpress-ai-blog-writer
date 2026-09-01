@@ -62,6 +62,7 @@ class Blogcraft_Connection {
 		add_action( 'admin_post_blogcraft_test_connection', array( __CLASS__, 'handle_test' ) );
 		add_action( 'admin_post_blogcraft_choose_path', array( __CLASS__, 'handle_choose_path' ) );
 		add_action( 'admin_post_blogcraft_mcp_issue', array( __CLASS__, 'handle_mcp_issue' ) );
+		add_action( 'admin_post_blogcraft_mcp_test_seen', array( __CLASS__, 'handle_mcp_test_seen' ) );
 		add_action( 'admin_post_blogcraft_mcp_revoke', array( __CLASS__, 'handle_mcp_revoke' ) );
 		add_action( 'wp_ajax_blogcraft_learn_voice', array( __CLASS__, 'handle_learn' ) );
 		add_action( 'wp_ajax_blogcraft_list_models', array( __CLASS__, 'handle_list_models' ) );
@@ -197,32 +198,34 @@ class Blogcraft_Connection {
 			'blogcraft-admin',
 			'blogcraftProviders',
 			array(
-				'help'      => Blogcraft_Provider_Registry::help_map(),
-				'bases'     => Blogcraft_Provider_Registry::base_url_map(),
+				'help'       => Blogcraft_Provider_Registry::help_map(),
+				'bases'      => Blogcraft_Provider_Registry::base_url_map(),
 				/* translators: %s: default API address for the selected provider. */
-				'baseText'  => __( 'Leave blank to use %s.', 'dicecodes-ai-blog-writer' ),
-				'baseNone'  => __( 'Required for a custom endpoint. There is no default to fall back to.', 'dicecodes-ai-blog-writer' ),
-				'baseTail'  => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'dicecodes-ai-blog-writer' ),
+				'baseText'   => __( 'Leave blank to use %s.', 'dicecodes-ai-blog-writer' ),
+				'baseNone'   => __( 'Required for a custom endpoint. There is no default to fall back to.', 'dicecodes-ai-blog-writer' ),
+				'baseTail'   => __( 'Point it at a proxy, a self-hosted model, or any compatible service.', 'dicecodes-ai-blog-writer' ),
 				/* translators: %s: provider name, such as OpenAI. */
-				'keyText'   => __( 'Get a key from %s', 'dicecodes-ai-blog-writer' ),
-				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-				'nonce'     => wp_create_nonce( self::SAVE_ACTION ),
-				'learning'  => __( 'Reading your posts...', 'dicecodes-ai-blog-writer' ),
-				'learned'   => __( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
-				'failed'    => __( 'Your posts could not be read. Fill the fields in yourself.', 'dicecodes-ai-blog-writer' ),
-				'asking'    => __( 'Asking your provider...', 'dicecodes-ai-blog-writer' ),
-				'askModel'  => __( 'Show the models on my account', 'dicecodes-ai-blog-writer' ),
+				'keyText'    => __( 'Get a key from %s', 'dicecodes-ai-blog-writer' ),
+				'copied'     => __( 'Copied', 'dicecodes-ai-blog-writer' ),
+				'copyFailed' => __( 'Press Ctrl+C to copy', 'dicecodes-ai-blog-writer' ),
+				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+				'nonce'      => wp_create_nonce( self::SAVE_ACTION ),
+				'learning'   => __( 'Reading your posts...', 'dicecodes-ai-blog-writer' ),
+				'learned'    => __( 'Learn from my posts', 'dicecodes-ai-blog-writer' ),
+				'failed'     => __( 'Your posts could not be read. Fill the fields in yourself.', 'dicecodes-ai-blog-writer' ),
+				'asking'     => __( 'Asking your provider...', 'dicecodes-ai-blog-writer' ),
+				'askModel'   => __( 'Show the models on my account', 'dicecodes-ai-blog-writer' ),
 				/* translators: %d: how many models the provider returned. */
-				'gotModels' => __( '%d models on your account. Pick one and it fills the box above.', 'dicecodes-ai-blog-writer' ),
-				'pickModel' => __( 'Pick a model...', 'dicecodes-ai-blog-writer' ),
+				'gotModels'  => __( '%d models on your account. Pick one and it fills the box above.', 'dicecodes-ai-blog-writer' ),
+				'pickModel'  => __( 'Pick a model...', 'dicecodes-ai-blog-writer' ),
 				// Which provider the saved key belongs to, so the field can
 				// stop claiming a key the moment the provider changes. The
 				// key itself is never sent to the browser.
-				'keyOwner'  => (string) Blogcraft_Settings::get( 'provider_key_owner' ),
-				'keyMask'   => '' === (string) Blogcraft_Settings::get( 'provider_api_key' )
+				'keyOwner'   => (string) Blogcraft_Settings::get( 'provider_key_owner' ),
+				'keyMask'    => '' === (string) Blogcraft_Settings::get( 'provider_api_key' )
 					? __( 'Not set', 'dicecodes-ai-blog-writer' )
 					: Blogcraft_Crypto::mask( (string) Blogcraft_Settings::get( 'provider_api_key' ) ),
-				'keyNone'   => __( 'Not set', 'dicecodes-ai-blog-writer' ),
+				'keyNone'    => __( 'Not set', 'dicecodes-ai-blog-writer' ),
 			)
 		);
 	}
@@ -1227,18 +1230,32 @@ class Blogcraft_Connection {
 	}
 
 	/**
+	 * Where the last self-test result is kept for one reader.
+	 *
+	 * User meta rather than a transient read once and thrown away. The
+	 * result explaining why a connection failed is the single most useful
+	 * thing on this screen, and it used to disappear on the first page
+	 * load after it appeared — including the load that happened when
+	 * somebody scrolled up and refreshed to read it again.
+	 */
+	const MCP_TEST_META = 'blogcraft_mcp_test';
+
+	/**
+	 * Nonce action for dismissing that result.
+	 */
+	const MCP_TEST_ACTION = 'blogcraft_mcp_test_seen';
+
+	/**
 	 * The result of the check that ran when the token was issued.
 	 *
 	 * @return void
 	 */
 	private static function render_mcp_test_result() {
-		$test = get_transient( 'blogcraft_mcp_test_' . get_current_user_id() );
+		$test = get_user_meta( get_current_user_id(), self::MCP_TEST_META, true );
 
-		if ( ! is_array( $test ) ) {
+		if ( ! is_array( $test ) || empty( $test ) ) {
 			return;
 		}
-
-		delete_transient( 'blogcraft_mcp_test_' . get_current_user_id() );
 
 		$state = 'is-bad';
 
@@ -1248,46 +1265,74 @@ class Blogcraft_Connection {
 			$state = 'is-unsure';
 		}
 
+		printf( '<div class="bc-mcp-test %s">', esc_attr( $state ) );
+		printf( '<p>%s</p>', esc_html( (string) $test['message'] ) );
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-mcp-test-dismiss">';
+		echo '<input type="hidden" name="action" value="blogcraft_mcp_test_seen" />';
+		Blogcraft_Request::nonce_field( self::MCP_TEST_ACTION );
 		printf(
-			'<p class="bc-mcp-test %1$s">%2$s</p>',
-			esc_attr( $state ),
-			esc_html( (string) $test['message'] )
+			'<button type="submit" class="button-link">%s</button>',
+			esc_html__( 'Dismiss', 'dicecodes-ai-blog-writer' )
 		);
+		echo '</form>';
+
+		echo '</div>';
 	}
 
 	/**
+	 * Forget it, once somebody says they have read it.
+	 *
+	 * @return void
+	 */
+	public static function handle_mcp_test_seen() {
+		// Read here, verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
+		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		Blogcraft_Request::verify_or_die( self::MCP_TEST_ACTION, $nonce );
+
+		delete_user_meta( get_current_user_id(), self::MCP_TEST_META );
+
+		wp_safe_redirect( self::settings_url() );
+		exit;
+	}
+	/**
 	 * What to do, in the order you have to do it.
 	 *
-	 * Written as steps because that is what somebody at this screen is doing:
-	 * they have an app open in another window and they are copying two things
-	 * into it. Prose describing the arrangement does not help with that.
+	 * Steps because that is what somebody at this screen is doing: they
+	 * have another window open and they are moving values into it. Prose
+	 * describing the arrangement does not help with that.
 	 *
 	 * @return void
 	 */
 	private static function render_mcp_steps() {
+		$endpoint = Blogcraft_Mcp::endpoint();
+
 		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Connect your app', 'dicecodes-ai-blog-writer' ) );
 
-		$endpoint = Blogcraft_Mcp::endpoint();
+		printf(
+			'<p class="bc-client-lead">%s</p>',
+			esc_html__( 'Most apps only need the address. They will send you back here to approve the connection, and that is the whole of it — no token to copy, nothing to keep.', 'dicecodes-ai-blog-writer' )
+		);
 
 		echo '<ol class="bc-mcp-steps">';
 
 		printf(
-			'<li><strong>%1$s</strong><p>%2$s</p><input type="text" class="large-text code" readonly="readonly" onfocus="this.select()" value="%3$s" /></li>',
+			'<li><strong>%1$s</strong><p>%2$s</p>%3$s</li>',
 			esc_html__( 'Copy this address', 'dicecodes-ai-blog-writer' ),
 			esc_html__( 'Your app asks for it when you add a connector or an MCP server.', 'dicecodes-ai-blog-writer' ),
-			esc_attr( $endpoint )
+			wp_kses( self::copyable( $endpoint, __( 'Copy address', 'dicecodes-ai-blog-writer' ) ), Blogcraft_Markup::allowed() )
 		);
 
 		printf(
 			'<li><strong>%1$s</strong><p>%2$s</p></li>',
-			esc_html__( 'Issue a token below', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'It appears once. Copy it before you leave this page. Issuing one also tests the connection and tells you if anything is wrong.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Paste it into your app', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'Where exactly, and which options to pick, is below — one short list per app.', 'dicecodes-ai-blog-writer' )
 		);
 
 		printf(
 			'<li><strong>%1$s</strong><p>%2$s</p></li>',
-			esc_html__( 'Add both to your app', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'Exactly where and which options to pick depends on the app. The three most common are below.', 'dicecodes-ai-blog-writer' )
+			esc_html__( 'Approve it here', 'dicecodes-ai-blog-writer' ),
+			esc_html__( 'The app sends you back to this site to sign in and approve. You will see exactly what it is allowed to do before you agree.', 'dicecodes-ai-blog-writer' )
 		);
 
 		printf(
@@ -1298,84 +1343,159 @@ class Blogcraft_Connection {
 
 		echo '</ol>';
 
+		self::render_permalink_warning();
 		self::render_mcp_clients( $endpoint );
 	}
 
 	/**
-	 * The exact options to choose, per app.
+	 * Say so when signing in cannot work on this site.
 	 *
-	 * Claude Desktop's dialog offers four ways to authenticate and three OAuth
-	 * arrangements, and picking the wrong one fails with a message about client
-	 * registration that says nothing about what to do instead. Naming the two
-	 * choices that work is the difference between this taking a minute and it
-	 * taking an evening.
+	 * The discovery documents live at fixed addresses under /.well-known/,
+	 * and on plain permalinks the web server never hands those to
+	 * WordPress at all. The app then reports that the address is not an
+	 * MCP server, which is both wrong and impossible to act on.
+	 *
+	 * @return void
+	 */
+	private static function render_permalink_warning() {
+		if ( '' !== (string) get_option( 'permalink_structure' ) ) {
+			return;
+		}
+
+		printf(
+			'<p class="bc-mcp-warn">%1$s <a href="%2$s">%3$s</a></p>',
+			esc_html__( 'Signing in will not work while this site uses plain permalinks, because the address an app has to look up never reaches WordPress. Any setting other than Plain fixes it. Tokens below still work either way.', 'dicecodes-ai-blog-writer' ),
+			esc_url( admin_url( 'options-permalink.php' ) ),
+			esc_html__( 'Open permalink settings', 'dicecodes-ai-blog-writer' )
+		);
+	}
+
+	/**
+	 * A value with a button that copies it.
+	 *
+	 * Every one of these is a string somebody has to get into another
+	 * window exactly right. Selecting a long address by hand and missing
+	 * the last character produces an error that blames the server.
+	 *
+	 * @param string $value What to copy.
+	 * @param string $label What the button says.
+	 * @param bool   $block Whether it is long enough to want its own line.
+	 * @return string Markup, already escaped.
+	 */
+	private static function copyable( $value, $label, $block = false ) {
+		return sprintf(
+			'<span class="bc-copy%5$s"><input type="text" class="large-text code" readonly="readonly" value="%1$s" /><button type="button" class="button bc-copy-button" data-copy="%1$s" aria-label="%3$s">%2$s</button><span class="bc-copy-said" role="status" aria-live="polite"></span></span>',
+			esc_attr( $value ),
+			esc_html__( 'Copy', 'dicecodes-ai-blog-writer' ),
+			esc_attr( $label ),
+			'',
+			$block ? ' is-block' : ''
+		);
+	}
+
+	/**
+	 * The exact steps to follow, per app.
+	 *
+	 * Claude's dialog offers four ways to authenticate and three OAuth
+	 * arrangements, and picking the wrong one fails with a message about
+	 * client registration that says nothing about what to do instead.
+	 * Numbered here rather than described, because somebody reading this
+	 * has the other window open and is working through it.
 	 *
 	 * @param string $endpoint The address to connect to.
 	 * @return void
 	 */
 	private static function render_mcp_clients( $endpoint ) {
-		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Where to put it', 'dicecodes-ai-blog-writer' ) );
+		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Step by step, for each app', 'dicecodes-ai-blog-writer' ) );
 
 		echo '<div class="bc-mcp-clients">';
 
-		// Claude Desktop.
-		echo '<div class="bc-mcp-client">';
-		printf( '<h4>%s</h4>', esc_html__( 'Claude Desktop', 'dicecodes-ai-blog-writer' ) );
-		printf(
-			'<p class="bc-mcp-where">%s</p>',
-			esc_html__( 'Settings, Connectors, Add custom connector.', 'dicecodes-ai-blog-writer' )
-		);
-		echo '<ul>';
-		printf( '<li>%s</li>', esc_html__( 'Paste the address above.', 'dicecodes-ai-blog-writer' ) );
-		printf(
-			'<li>%s <strong>%s</strong></li>',
-			esc_html__( 'Authentication:', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'None', 'dicecodes-ai-blog-writer' )
-		);
-		printf(
-			'<li>%s <code>Authorization</code> %s <code>Bearer YOUR-TOKEN</code></li>',
-			esc_html__( 'Additional request headers: add', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'with the value', 'dicecodes-ai-blog-writer' )
-		);
-		echo '</ul>';
-		printf(
-			'<p class="bc-mcp-warn">%s</p>',
-			esc_html__( 'Do not leave Authentication on "Always required". That starts a sign-in flow this site does not offer yet, and fails with a message about registering an OAuth client.', 'dicecodes-ai-blog-writer' )
-		);
-		echo '</div>';
+		foreach ( self::client_guides( $endpoint ) as $guide ) {
+			echo '<div class="bc-mcp-client">';
 
-		// ChatGPT.
-		echo '<div class="bc-mcp-client">';
-		printf( '<h4>%s</h4>', esc_html__( 'ChatGPT', 'dicecodes-ai-blog-writer' ) );
-		printf(
-			'<p class="bc-mcp-where">%s</p>',
-			esc_html__( 'Settings, Connectors, Advanced, Developer mode. Then add a connector.', 'dicecodes-ai-blog-writer' )
-		);
-		echo '<ul>';
-		printf( '<li>%s</li>', esc_html__( 'Paste the address above.', 'dicecodes-ai-blog-writer' ) );
-		printf(
-			'<li>%s <code>Authorization: Bearer YOUR-TOKEN</code></li>',
-			esc_html__( 'Choose no authentication, then add the header', 'dicecodes-ai-blog-writer' )
-		);
-		echo '</ul>';
-		echo '</div>';
+			printf( '<h4>%s</h4>', esc_html( $guide['name'] ) );
+			printf( '<p class="bc-mcp-where">%s</p>', esc_html( $guide['needs'] ) );
 
-		// Claude Code.
-		echo '<div class="bc-mcp-client">';
-		printf( '<h4>%s</h4>', esc_html__( 'Claude Code, Cursor, VS Code', 'dicecodes-ai-blog-writer' ) );
-		printf(
-			'<p class="bc-mcp-where">%s</p>',
-			esc_html__( 'One command, or the same two values in the app\'s MCP settings file.', 'dicecodes-ai-blog-writer' )
-		);
-		printf(
-			'<pre class="bc-mcp-command"><code>claude mcp add --transport http dicecodes %s --header "Authorization: Bearer YOUR-TOKEN"</code></pre>',
-			esc_html( $endpoint )
-		);
-		echo '</div>';
+			echo '<ol class="bc-mcp-howto">';
+			foreach ( $guide['steps'] as $step ) {
+				printf( '<li>%s</li>', esc_html( $step ) );
+			}
+			echo '</ol>';
+
+			if ( '' !== $guide['copy'] ) {
+				// Not escaped again: copyable() escapes everything it puts out.
+				echo wp_kses( $guide['copy'], Blogcraft_Markup::allowed() );
+			}
+
+			if ( '' !== $guide['warn'] ) {
+				printf( '<p class="bc-mcp-warn">%s</p>', esc_html( $guide['warn'] ) );
+			}
+
+			echo '</div>';
+		}
 
 		echo '</div>';
 	}
 
+	/**
+	 * The apps worth naming, and what each one needs doing.
+	 *
+	 * @param string $endpoint The address to connect to.
+	 * @return array
+	 */
+	private static function client_guides( $endpoint ) {
+		return array(
+			array(
+				'name'  => __( 'Claude', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'The address only. No token.', 'dicecodes-ai-blog-writer' ),
+				'steps' => array(
+					__( 'Open Settings, then Connectors.', 'dicecodes-ai-blog-writer' ),
+					__( 'Press Add custom connector.', 'dicecodes-ai-blog-writer' ),
+					__( 'Give it any name you like, and paste the address into the second box.', 'dicecodes-ai-blog-writer' ),
+					__( 'Press Add. It will check the server and then send you to this site.', 'dicecodes-ai-blog-writer' ),
+					__( 'Sign in to WordPress if you are asked, then press Approve.', 'dicecodes-ai-blog-writer' ),
+					__( 'You land back in Claude with the connector switched on.', 'dicecodes-ai-blog-writer' ),
+				),
+				'copy'  => '',
+				'warn'  => __( 'If it says it cannot find the authorization server, this site is on plain permalinks. Change that setting and try again.', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				'name'  => __( 'ChatGPT', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'The address only. No token.', 'dicecodes-ai-blog-writer' ),
+				'steps' => array(
+					__( 'Open Settings, then Connectors.', 'dicecodes-ai-blog-writer' ),
+					__( 'Open Advanced and turn on Developer mode.', 'dicecodes-ai-blog-writer' ),
+					__( 'Press Create, and paste the address in.', 'dicecodes-ai-blog-writer' ),
+					__( 'Choose OAuth when it asks how to authenticate.', 'dicecodes-ai-blog-writer' ),
+					__( 'Approve the connection on this site when it sends you here.', 'dicecodes-ai-blog-writer' ),
+				),
+				'copy'  => '',
+				'warn'  => '',
+			),
+			array(
+				'name'  => __( 'Claude Code, Cursor, VS Code', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'One command. Signs you in the same way.', 'dicecodes-ai-blog-writer' ),
+				'steps' => array(
+					__( 'Copy the command below and run it in your terminal.', 'dicecodes-ai-blog-writer' ),
+					__( 'A browser opens on this site. Approve the connection.', 'dicecodes-ai-blog-writer' ),
+					__( 'Back in the editor, ask it to read your writing rules.', 'dicecodes-ai-blog-writer' ),
+				),
+				'copy'  => self::copyable( 'claude mcp add --transport http dicecodes ' . $endpoint, __( 'Copy command', 'dicecodes-ai-blog-writer' ), true ),
+				'warn'  => '',
+			),
+			array(
+				'name'  => __( 'Anything else', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'A token, for apps that want a header instead.', 'dicecodes-ai-blog-writer' ),
+				'steps' => array(
+					__( 'Issue a token below and copy it.', 'dicecodes-ai-blog-writer' ),
+					__( 'In the app, set authentication to None.', 'dicecodes-ai-blog-writer' ),
+					__( 'Add a request header named Authorization, with the value Bearer followed by a space and your token.', 'dicecodes-ai-blog-writer' ),
+				),
+				'copy'  => '',
+				'warn'  => __( 'A token never expires and is not tied to a browser, so this also suits a machine that has no way to open one.', 'dicecodes-ai-blog-writer' ),
+			),
+		);
+	}
 	/**
 	 * The tokens issued for this site, and a way to make another.
 	 *
@@ -1394,10 +1514,11 @@ class Blogcraft_Connection {
 			delete_transient( 'blogcraft_mcp_new_' . get_current_user_id() );
 
 			printf(
-				'<div class="bc-token-fresh"><p><strong>%1$s</strong></p><input type="text" class="large-text code" readonly="readonly" onfocus="this.select()" value="%2$s" /><p class="description">%3$s</p></div>',
+				'<div class="bc-token-fresh"><p><strong>%1$s</strong></p>%4$s<p class="description">%3$s</p></div>',
 				esc_html__( 'Copy this now. It is not shown again.', 'dicecodes-ai-blog-writer' ),
-				esc_attr( $fresh ),
-				esc_html__( 'Only a fingerprint of it is stored here, so it cannot be looked up later. Lose it and issue another.', 'dicecodes-ai-blog-writer' )
+				'',
+				esc_html__( 'Only a fingerprint of it is stored here, so it cannot be looked up later. Lose it and issue another.', 'dicecodes-ai-blog-writer' ),
+				wp_kses( self::copyable( $fresh, __( 'Copy token', 'dicecodes-ai-blog-writer' ) ), Blogcraft_Markup::allowed() )
 			);
 		}
 
@@ -1539,7 +1660,7 @@ class Blogcraft_Connection {
 		// request.
 		$test = Blogcraft_Mcp::self_test( $secret );
 
-		set_transient( 'blogcraft_mcp_test_' . get_current_user_id(), $test, MINUTE_IN_SECONDS );
+		update_user_meta( get_current_user_id(), self::MCP_TEST_META, $test );
 
 		wp_safe_redirect( self::settings_url( 'bc-card-clients' ) );
 		exit;

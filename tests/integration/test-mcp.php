@@ -430,11 +430,11 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'self_test', $body );
 	}
 
-	public function test_the_card_names_the_options_each_app_needs() {
-		// Claude Desktop offers four ways to authenticate and three OAuth
-		// arrangements. Picking the wrong one fails with a message about
-		// client registration that says nothing about what to do instead,
-		// so the card names the two choices that work.
+	public function test_every_app_it_names_gets_steps_to_follow() {
+		// Named without instructions is worse than not named: it tells
+		// somebody their app is supported and leaves them to guess. The
+		// rule rather than a sample, so an app added later without steps
+		// fails here.
 		Blogcraft_Settings::set( 'setup_path', 'client' );
 		wp_set_current_user( $this->author );
 
@@ -442,10 +442,47 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		Blogcraft_Connection::render();
 		$html = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'Claude Desktop', $html );
-		$this->assertStringContainsString( 'ChatGPT', $html );
-		$this->assertStringContainsString( 'Authorization', $html );
-		$this->assertStringContainsString( 'Always required', $html, 'the card does not warn about the option that fails' );
+		$blocks = array();
+		preg_match_all( '#<div class="bc-mcp-client">(.*?)</div>#s', $html, $blocks, PREG_SET_ORDER );
+
+		$this->assertNotEmpty( $blocks, 'the card names no apps at all' );
+
+		foreach ( $blocks as $block ) {
+			$name = array();
+			preg_match( '#<h4>([^<]*)</h4>#', $block[1], $name );
+
+			$this->assertNotEmpty( $name, 'an app block with no name' );
+			$this->assertStringContainsString(
+				'<ol class="bc-mcp-howto">',
+				$block[1],
+				$name[1] . ' is named but given no steps'
+			);
+		}
+	}
+
+	public function test_everything_worth_copying_has_a_button() {
+		// The address and the command both have to arrive in another
+		// window exactly right. Selecting a long one by hand and losing
+		// the last character produces an error that blames the server.
+		Blogcraft_Settings::set( 'setup_path', 'client' );
+		wp_set_current_user( $this->author );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$copiable = array();
+		preg_match_all( '#data-copy="([^"]*)"#', $html, $copiable );
+
+		$this->assertNotEmpty( $copiable[1], 'nothing on the card can be copied' );
+
+		$joined = implode( ' ', $copiable[1] );
+
+		$this->assertStringContainsString(
+			esc_attr( Blogcraft_Mcp::endpoint() ),
+			$joined,
+			'the address itself has no copy button'
+		);
 	}
 	public function test_the_card_says_what_a_client_cannot_do() {
 		// Somebody who switches this on and then goes looking for

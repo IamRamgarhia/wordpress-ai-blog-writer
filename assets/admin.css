@@ -2334,3 +2334,137 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: var(--bc-t-xs);
 	margin: 0;
 }
+
+/* ------------------------------------------------ values worth copying.
+   An address, a token, a command: each one has to reach another window
+   exactly right, so each one has a button rather than an invitation to
+   select it by hand. */
+
+.bc-copy {
+	align-items: center;
+	display: flex;
+	gap: var(--bc-s2);
+	margin-top: var(--bc-s2);
+	max-width: 100%;
+}
+
+.bc-copy.is-block {
+	flex-wrap: wrap;
+}
+
+.bc-copy input {
+	flex: 1 1 12rem;
+	min-width: 0;
+}
+
+.bc-copy .button {
+	flex: 0 0 auto;
+}
+
+.bc-copy-said {
+	color: var(--bc-ok);
+	flex: 0 0 auto;
+	font-size: var(--bc-t-xs);
+	min-width: 4.5em;
+}
+
+/* ------------------------------------------------ per-app instructions. */
+
+.bc-mcp-howto {
+	font-size: var(--bc-t-sm);
+	margin: 0 0 var(--bc-s2);
+	padding-inline-start: 1.4em;
+}
+
+.bc-mcp-howto li {
+	margin-bottom: var(--bc-s1);
+}
+
+/* ------------------------------------------------------ what a test said.
+   Kept on the screen until it is dismissed. It used to be a notice that
+   went by faster than it could be read, which for the one message that
+   explains a failure is the worst possible behaviour. */
+
+.bc-mcp-test {
+	align-items: flex-start;
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-md);
+	display: flex;
+	gap: var(--bc-s2);
+	margin: 0 0 var(--bc-s3);
+	padding: var(--bc-s3);
+}
+
+.bc-mcp-test.is-good {
+	border-color: var(--bc-ok);
+}
+
+.bc-mcp-test.is-unsure {
+	border-color: var(--bc-warn);
+}
+
+.bc-mcp-test.is-bad {
+	border-color: var(--bc-bad);
+}
+
+.bc-mcp-test p {
+	flex: 1 1 auto;
+	margin: 0;
+}
+
+.bc-mcp-test .bc-mcp-test-dismiss {
+	flex: 0 0 auto;
+}
+
+/* --------------------------------------------------- approving an app. */
+
+.bc-consent {
+	max-width: 44rem;
+}
+
+.bc-consent-lead {
+	font-size: var(--bc-t-md);
+}
+
+.bc-consent-can,
+.bc-consent-cannot {
+	font-size: var(--bc-t-sm);
+	list-style: none;
+	margin: 0 0 var(--bc-s3);
+	padding: 0;
+}
+
+.bc-consent-can li,
+.bc-consent-cannot li {
+	margin-bottom: var(--bc-s1);
+	padding-inline-start: 1.5em;
+	position: relative;
+}
+
+.bc-consent-can li::before {
+	color: var(--bc-ok);
+	content: "\2713";
+	inset-inline-start: 0;
+	position: absolute;
+}
+
+.bc-consent-cannot li {
+	color: var(--bc-muted);
+}
+
+.bc-consent-cannot li::before {
+	color: var(--bc-bad);
+	content: "\00d7";
+	inset-inline-start: 0;
+	position: absolute;
+}
+
+.bc-consent-revoke {
+	color: var(--bc-muted);
+	font-size: var(--bc-t-xs);
+}
+
+.bc-consent-buttons {
+	display: flex;
+	gap: var(--bc-s2);
+}
