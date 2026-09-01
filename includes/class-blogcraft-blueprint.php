@@ -861,14 +861,18 @@ class Blogcraft_Blueprint {
 		// here, so they are matched on the word that decides them.
 		// Anything that matches nothing is left at its default rather
 		// than guessed at.
+		// Keyed by the setting name in full. Composing it as
+		// 'voice_' . $field hides the read from the audit that checks
+		// every setting is read by something — which then calls these
+		// two dead, and is right to.
 		$spoken = array(
-			'point_of_view' => array(
+			'voice_point_of_view' => array(
 				'first person plural' => 'first_plural',
 				'first person'        => 'first_person',
 				'second person'       => 'second',
 				'third person'        => 'third',
 			),
-			'reading_level' => array(
+			'voice_reading_level' => array(
 				'simple'   => 'simple',
 				'general'  => 'general',
 				'informed' => 'informed',
@@ -876,8 +880,9 @@ class Blogcraft_Blueprint {
 			),
 		);
 
-		foreach ( $spoken as $field => $words ) {
-			$said = strtolower( trim( (string) Blogcraft_Settings::get( 'voice_' . $field ) ) );
+		foreach ( $spoken as $setting => $words ) {
+			$field = substr( $setting, strlen( 'voice_' ) );
+			$said  = strtolower( trim( (string) Blogcraft_Settings::get( $setting ) ) );
 
 			if ( '' === $said || $blueprint[ $field ] !== $defaults[ $field ] ) {
 				continue;
