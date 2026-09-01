@@ -3,6 +3,10 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.85.0 =
+* The sentence to say in your app has moved to where it is useful. It was a standing panel at the top of Write a post explaining what to do once you had saved a brief, sitting above the form that saves it — backwards, and unchanging, so after the second visit it was five lines of furniture. It appears once there is a brief to say it about
+* The warning that no app is connected stays at the top, and only when it is true
+
 = 0.84.0 =
 * Housekeeping after the voice fix: one step layout was built from a different element than the two beside it, and the note explaining a list of duplicate style rules described deliberate work as something still to be sorted out. Neither changed how anything behaves
 
