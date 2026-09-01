@@ -167,8 +167,24 @@ class Test_Blogcraft_One_Voice extends WP_UnitTestCase {
 	public function test_learning_from_posts_fills_the_screen_that_owns_the_voice() {
 		// The button moved with the fields. Answering in the old setting
 		// names would fill nothing at all.
+		// Posts to learn from. Without them suggest() answers with an empty
+		// set and the loop below runs zero times, which is a test that
+		// passes by not looking.
+		for ( $i = 0; $i < 4; $i++ ) {
+			self::factory()->post->create(
+				array(
+					'post_status'  => 'publish',
+					'post_title'   => 'Choosing a grinder ' . $i,
+					'post_content' => '<p>You will want a burr grinder. We tested nine of them over four months and the cheap one wandered.</p>'
+					. '<p>Here is what we found. The burrs matter more than the motor, and the stepless ones are worth it.</p>',
+				)
+			);
+		}
+
 		$fields = array_keys( (array) Blogcraft_Learn::suggest()['fields'] );
 		$owned  = array_keys( Blogcraft_Blueprint::fields() );
+
+		$this->assertNotEmpty( $fields, 'nothing was learned, so nothing is being checked' );
 
 		foreach ( $fields as $field ) {
 			$this->assertContains(
