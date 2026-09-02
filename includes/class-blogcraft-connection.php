@@ -1554,6 +1554,7 @@ class Blogcraft_Connection {
 		return array(
 			'claude'  => array(
 				'name'  => __( 'Claude', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'The address only', 'dicecodes-ai-blog-writer' ),
 				'steps' => array(
 					__( 'Settings, then Connectors, then Add custom connector.', 'dicecodes-ai-blog-writer' ),
 					__( 'Paste the address. The name is yours to choose.', 'dicecodes-ai-blog-writer' ),
@@ -1565,6 +1566,7 @@ class Blogcraft_Connection {
 			),
 			'chatgpt' => array(
 				'name'  => __( 'ChatGPT', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'The address only', 'dicecodes-ai-blog-writer' ),
 				'steps' => array(
 					__( 'Settings, Connectors, Advanced, then turn on Developer mode.', 'dicecodes-ai-blog-writer' ),
 					__( 'Press Create and paste the address.', 'dicecodes-ai-blog-writer' ),
@@ -1576,6 +1578,7 @@ class Blogcraft_Connection {
 			),
 			'editor'  => array(
 				'name'  => __( 'Claude Code, Cursor, VS Code', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'One command', 'dicecodes-ai-blog-writer' ),
 				'steps' => array(
 					__( 'Run this in your terminal.', 'dicecodes-ai-blog-writer' ),
 					__( 'Approve the connection in the browser that opens.', 'dicecodes-ai-blog-writer' ),
@@ -1585,6 +1588,7 @@ class Blogcraft_Connection {
 			),
 			'other'   => array(
 				'name'  => __( 'Something else', 'dicecodes-ai-blog-writer' ),
+				'needs' => __( 'A token', 'dicecodes-ai-blog-writer' ),
 				'steps' => array(
 					__( 'Issue a token below and copy it.', 'dicecodes-ai-blog-writer' ),
 					__( 'Set that app\'s authentication to None.', 'dicecodes-ai-blog-writer' ),
