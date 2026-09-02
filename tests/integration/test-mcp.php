@@ -529,7 +529,7 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 
 			$this->assertNotFalse( $at, $method . ' is gone' );
 			$this->assertStringContainsString(
-				'verify_or_die',
+				'check_admin_referer',
 				substr( $source, $at, 600 ),
 				$method . ' changes a credential without verifying anything'
 			);

@@ -47,6 +47,12 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 		// handle_save() itself ends in wp_safe_redirect() + exit, which cannot
 		// be called through safely in a test process — apply_submitted_settings()
 		// is the part that was split out so this could be pinned directly.
+		// apply_submitted_settings() verifies the nonce itself now, rather
+		// than trusting the caller to have done it, so a direct call has to
+		// carry one.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$_REQUEST['_blogcraft_nonce'] = wp_create_nonce( Blogcraft_Connection::SAVE_ACTION );
+
 		$method = new ReflectionMethod( Blogcraft_Connection::class, 'apply_submitted_settings' );
 		$method->setAccessible( true );
 
@@ -62,6 +68,12 @@ class Test_Blogcraft_Quality_Gate extends WP_UnitTestCase {
 	}
 
 	public function test_the_quality_threshold_is_clamped_to_a_real_score_range() {
+		// apply_submitted_settings() verifies the nonce itself now, rather
+		// than trusting the caller to have done it, so a direct call has to
+		// carry one.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$_REQUEST['_blogcraft_nonce'] = wp_create_nonce( Blogcraft_Connection::SAVE_ACTION );
+
 		$method = new ReflectionMethod( Blogcraft_Connection::class, 'apply_submitted_settings' );
 		$method->setAccessible( true );
 
