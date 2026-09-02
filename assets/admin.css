@@ -580,6 +580,30 @@
 
 /* ------------------------------------------------------------ screen nav. */
 
+/* Which way this site is running, at the end of the tabs. Pushed right and
+   quieter than a tab, because it is a label rather than a destination —
+   though it does lead to the switch. */
+.bc-nav-mode {
+	margin-left: auto;
+	align-self: center;
+	padding: 4px 10px;
+	border: 1px solid var(--bc-line);
+	border-radius: var(--bc-r-pill);
+	background: var(--bc-canvas);
+	color: var(--bc-muted);
+	font-size: var(--bc-t-xs);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.bc-nav-mode:hover,
+.bc-nav-mode:focus {
+	border-color: var(--bc-accent);
+	color: var(--bc-accent);
+}
+
 .bc-nav {
 	display: flex;
 	flex-wrap: wrap;
@@ -1999,6 +2023,48 @@ body[class*="page_blogcraft"] #wpcontent {
 	max-width: 60ch;
 }
 
+/* The same question row by row, under the two cards. Scrolls on its own if
+   the screen is narrow rather than widening the page under it. */
+.bc-path-table-wrap {
+	margin-top: var(--bc-s4);
+	overflow-x: auto;
+}
+
+.bc-path-table {
+	width: 100%;
+	min-width: 34rem;
+	border-collapse: collapse;
+	font-size: var(--bc-t-sm);
+}
+
+.bc-path-table th,
+.bc-path-table td {
+	padding: 8px 12px;
+	text-align: left;
+	vertical-align: top;
+	border-bottom: 1px solid var(--bc-line);
+}
+
+.bc-path-table thead th {
+	font-size: var(--bc-t-xs);
+	color: var(--bc-muted);
+	white-space: nowrap;
+}
+
+.bc-path-table tbody th {
+	font-weight: 500;
+	color: var(--bc-ink);
+}
+
+.bc-path-table td { color: var(--bc-muted); }
+
+.bc-path-table tbody tr:last-child th,
+.bc-path-table tbody tr:last-child td { border-bottom: 0; }
+
+.bc-has { font-weight: 600; }
+.bc-has.is-yes { color: var(--bc-ok); }
+.bc-has.is-no  { color: var(--bc-faint); }
+
 .bc-path-options,
 .bc-path-review {
 	display: grid;
@@ -2104,6 +2170,10 @@ body[class*="page_blogcraft"] #wpcontent {
    strip above answers the everyday question and this answers the one asked
    twice a year. */
 .bc-path-compare {
+	/* The strip around this is a flex row, so without a basis of its own
+	   this became an item sized to the width of its summary text — and the
+	   two columns inside it had nowhere to go and stacked. */
+	flex: 1 0 100%;
 	margin-top: 12px;
 	border-top: 1px solid var(--bc-line);
 	padding-top: 10px;

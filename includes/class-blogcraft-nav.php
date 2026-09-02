@@ -122,6 +122,23 @@ class Blogcraft_Nav {
 			echo wp_kses( $item, Blogcraft_Markup::allowed() );
 		}
 
+		// Which of the two ways this site is running, on every screen. The
+		// two behave differently enough — one writes on a schedule, the
+		// other cannot — that "why is there no Calendar" is a question
+		// somebody should never have to go and look up the answer to.
+		if ( Blogcraft_Mode::chosen() ) {
+			printf(
+				'<a class="bc-nav-mode" href="%1$s" title="%2$s">%3$s</a>',
+				esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-path' ) ),
+				esc_attr__( 'How this site writes, and how to change it', 'dicecodes-ai-blog-writer' ),
+				esc_html(
+					Blogcraft_Mode::is_client()
+						? __( 'MCP mode', 'dicecodes-ai-blog-writer' )
+						: __( 'API mode', 'dicecodes-ai-blog-writer' )
+				)
+			);
+		}
+
 		echo '</nav>';
 
 		// Page content on our own screen rather than a dashboard notice.

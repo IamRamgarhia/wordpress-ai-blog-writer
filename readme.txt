@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.1.0 =
+* The comparison of the two ways is a table as well as two cards: thirteen rows in plain words, answering the questions people actually ask. Can it put a picture on the post, do the pictures cost anything, will it write while you are away, what does each post cost, what do you need before it works
+* Fixed: the two cards stacked instead of sitting side by side. The panel around them is a row, so the fold had been sized to the width of its own heading and the columns inside had nowhere to go
+* Every screen says which way this site is running — API mode or MCP mode — at the end of the tabs, and it leads to the switch. The two behave differently enough that "why is there no Calendar" should not need looking up
+* A test holds the table to what the code does, because a wrong Yes in a comparison is worse than no comparison
+
 = 1.0.0 =
 * The two ways of running this can be compared after you have picked one. Both were laid out side by side while the question was open and never again, so anybody wondering whether the other suited them better had a switch button and nothing to weigh it against. It is folded under the switch on Settings, and it is the same list the question uses rather than a second one to keep in step
 * "Change" on the overview lands on the switch and the comparison beside it, instead of the top of a long screen
@@ -188,12 +194,5 @@ everything is here, oldest at the bottom.
 * A site where none of it has been answered is told so once, at the top, with the reason: every post is written to this brief, and it is the difference between a post that sounds like your blog and one that sounds like every other AI post
 * "Before you write" on the Write a post screen now lists the writing rules alongside the voice, and says what setting them up buys — a page that answers a real question in a real voice is what search engines reward, and the brief is where you say which
 * A test checks every field on the blueprint belongs to exactly one section, so a field added later cannot quietly stop being watched
-
-= 0.96.0 =
-* Fixed: pictures could not be switched on at all when an AI client does the writing. The feature worked on that setup — the app asks this site for the pictures and publishing attaches them — but the card that switches them on was shown only to sites using an API key. So the composer offered to describe a picture, the tool answered "the owner turns them on under Settings", and there was no card there to turn them on with
-* Fixed: "Set them up" on the Write a post screen went to Settings for both things it listed, and the voice moved to How it writes some releases ago. Each now links to the screen that actually holds it
-* Fixed: that panel also offered to set up research on the client path, where an application brings its own and the settings screen carries no research card to arrive at. Same for the prompt inside the confirmation
-* The line saying what a post will be no longer claims to know whether it was written from current sources when an app did the writing. That is the app's business and this site cannot see it
-* A new test walks every screen on both setups and checks that each link lands on a screen that exists and an anchor that is actually there. It found three of the faults above
 Older releases are listed in changelog.txt, which ships with the plugin.
 

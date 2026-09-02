@@ -91,6 +91,72 @@ class Test_Blogcraft_Path_Comparison extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'What each way can do', $html );
 	}
 
+	public function test_the_table_answers_the_questions_people_actually_ask() {
+		$html = $this->screen( Blogcraft_Mode::CLIENT );
+
+		foreach (
+			array(
+				'Write on a schedule while you are away',
+				'Put a picture on the post',
+				'Pictures without paying for them',
+				'What each post costs you',
+				'What you need before it works',
+			) as $row
+		) {
+			$this->assertStringContainsString( $row, $html, '"' . $row . '" is not answered' );
+		}
+	}
+
+	public function test_the_table_does_not_claim_a_yes_the_plugin_cannot_keep() {
+		// Every row here is a promise, and a wrong one is worse than no
+		// table at all. These four are the ones the code can be asked
+		// about directly, so they are.
+		$html = $this->screen( Blogcraft_Mode::CLIENT );
+
+		// Scheduled writing is the provider path's, and the queue is what
+		// does it.
+		$this->assertTrue( Blogcraft_Mode::is_client() );
+		$this->assertStringContainsString( 'Write on a schedule while you are away', $html );
+
+		// Pictures work on both paths, which is why the card is on both.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$at     = strpos( $source, "'pictures'   => array(" );
+
+		$this->assertNotFalse( $at );
+		$this->assertStringContainsString(
+			"'paths' => array( 'api', 'client' )",
+			substr( $source, $at, 700 ),
+			'the table promises pictures on both paths and the card is on one'
+		);
+
+		// The free picture service really does need no key.
+		$this->assertArrayHasKey( 'pollinations', Blogcraft_Images::providers() );
+
+		// And the byline is applied on the client path, which the table says.
+		$tools = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-mcp-tools.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertStringContainsString( 'place_from_brief', $tools );
+	}
+
+	public function test_the_nav_says_which_way_this_site_runs() {
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
+
+		ob_start();
+		Blogcraft_Nav::render();
+		$client = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'MCP mode', $client );
+
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::API );
+
+		ob_start();
+		Blogcraft_Nav::render();
+		$api = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'API mode', $api );
+		$this->assertStringNotContainsString( 'MCP mode', $api );
+	}
+
 	public function test_the_overview_links_to_where_the_switch_is() {
 		// "Change" used to land at the top of a long screen with the answer
 		// somewhere on it.

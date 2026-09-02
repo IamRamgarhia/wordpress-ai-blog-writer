@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.1.0 =
+* The comparison of the two ways is a table as well as two cards: thirteen rows in plain words, answering the questions people actually ask. Can it put a picture on the post, do the pictures cost anything, will it write while you are away, what does each post cost, what do you need before it works
+* Fixed: the two cards stacked instead of sitting side by side. The panel around them is a row, so the fold had been sized to the width of its own heading and the columns inside had nowhere to go
+* Every screen says which way this site is running — API mode or MCP mode — at the end of the tabs, and it leads to the switch. The two behave differently enough that "why is there no Calendar" should not need looking up
+* A test holds the table to what the code does, because a wrong Yes in a comparison is worse than no comparison
+
 = 1.0.0 =
 * The two ways of running this can be compared after you have picked one. Both were laid out side by side while the question was open and never again, so anybody wondering whether the other suited them better had a switch button and nothing to weigh it against. It is folded under the switch on Settings, and it is the same list the question uses rather than a second one to keep in step
 * "Change" on the overview lands on the switch and the comparison beside it, instead of the top of a long screen

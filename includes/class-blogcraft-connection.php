@@ -1100,6 +1100,110 @@ class Blogcraft_Connection {
 		);
 
 		echo '</div>';
+
+		self::render_path_table();
+	}
+
+	/**
+	 * The same question again, row by row.
+	 *
+	 * The two cards say what each way is for. This says what each one does,
+	 * in the words somebody uses to ask: can it put a picture on the post,
+	 * does it cost anything, will it write while I am asleep. Rows rather
+	 * than two lists, because "which of these does that" is answered by
+	 * reading across and not by holding both lists in your head.
+	 *
+	 * @return void
+	 */
+	private static function render_path_table() {
+		$yes = '<span class="bc-has is-yes">' . esc_html__( 'Yes', 'dicecodes-ai-blog-writer' ) . '</span>';
+		$no  = '<span class="bc-has is-no">' . esc_html__( 'No', 'dicecodes-ai-blog-writer' ) . '</span>';
+
+		$rows = array(
+			array(
+				__( 'Write a post whenever you ask', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Write on a schedule while you are away', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$no,
+			),
+			array(
+				__( 'Queue a list of topics in one go', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$no,
+			),
+			array(
+				__( 'Put a picture on the post', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Pictures without paying for them', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Yes, the free service needs no key', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Yes, the same free service', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				__( 'Reads current sources before writing', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Yes, from the sources you switch on', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Whatever your app can reach', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				__( 'Writes to your rules and your voice', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Scores the draft and holds a bad one back', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Sets the category, tags and byline', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Points your older posts at the new one', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'Writes the search title and description', 'dicecodes-ai-blog-writer' ),
+				$yes,
+				$yes,
+			),
+			array(
+				__( 'What each post costs you', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Your provider bills you, or nothing on a local model', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Nothing beyond the subscription you have', 'dicecodes-ai-blog-writer' ),
+			),
+			array(
+				__( 'What you need before it works', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'An API key, or a model on your own computer', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'A Claude or ChatGPT subscription, and a site on public HTTPS', 'dicecodes-ai-blog-writer' ),
+			),
+		);
+
+		echo '<div class="bc-path-table-wrap"><table class="bc-path-table">';
+		echo '<thead><tr>';
+		printf( '<th scope="col">%s</th>', esc_html__( 'What you get', 'dicecodes-ai-blog-writer' ) );
+		printf( '<th scope="col">%s</th>', esc_html__( 'Inside WordPress', 'dicecodes-ai-blog-writer' ) );
+		printf( '<th scope="col">%s</th>', esc_html__( 'From Claude or ChatGPT', 'dicecodes-ai-blog-writer' ) );
+		echo '</tr></thead><tbody>';
+
+		foreach ( $rows as $row ) {
+			printf(
+				'<tr><th scope="row">%1$s</th><td>%2$s</td><td>%3$s</td></tr>',
+				esc_html( $row[0] ),
+				wp_kses( $row[1], Blogcraft_Markup::allowed() ),
+				wp_kses( $row[2], Blogcraft_Markup::allowed() )
+			);
+		}
+
+		echo '</tbody></table></div>';
 	}
 
 	/**
