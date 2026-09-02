@@ -237,6 +237,17 @@
 			} );
 	}
 
+	// A job that has already stopped is not being watched, it is being read.
+	// Saying "Working" over a post written days ago, and then asking the
+	// server about it every two seconds, is two kinds of wrong.
+	if ( config.settled ) {
+		if ( note ) {
+			note.textContent = config.done || 'Finished.';
+		}
+
+		return;
+	}
+
 	if ( note ) {
 		note.textContent = config.working || 'Working...';
 	}

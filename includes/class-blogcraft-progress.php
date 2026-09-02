@@ -143,6 +143,12 @@ class Blogcraft_Progress {
 				'elapsedAt' => self::elapsed_for( self::current_job_id() ),
 				'stepsAt'   => self::steps_done_for( self::current_job_id() ),
 				'working'   => __( 'Working...', 'dicecodes-ai-blog-writer' ),
+				// Whether there is anything left to watch. Without this the
+				// page opened on a job finished days ago, wrote "Working"
+				// under it, and only stopped saying so after the first poll
+				// came back — if it came back at all.
+				'settled'   => self::is_settled( self::current_job_id() ),
+				'done'      => __( 'Finished.', 'dicecodes-ai-blog-writer' ),
 				'failed'    => __( 'Something went wrong. The Activity screen has the details.', 'dicecodes-ai-blog-writer' ),
 				'total'     => count( self::steps() ),
 				/* translators: 1: step number reached. 2: steps in total. */
@@ -153,6 +159,22 @@ class Blogcraft_Progress {
 				'remaining' => __( 'about %s left', 'dicecodes-ai-blog-writer' ),
 			)
 		);
+	}
+
+	/**
+	 * Whether this job has stopped moving.
+	 *
+	 * @param int $job_id Job id.
+	 * @return bool
+	 */
+	private static function is_settled( $job_id ) {
+		$job = Blogcraft_Queue::find( (int) $job_id );
+
+		if ( null === $job ) {
+			return true;
+		}
+
+		return in_array( $job->status, array( 'complete', 'failed', 'cancelled', 'ready' ), true );
 	}
 
 	/**
@@ -532,8 +554,24 @@ class Blogcraft_Progress {
 			self::render_review( $job );
 		}
 
+		// A job that finished had nothing rendered for it at all, so opening
+		// one from the Activity screen showed twelve unticked steps and the
+		// word "Working" over a post written days earlier. The score and the
+		// checks are the reason somebody opens this, and they survive on the
+		// post itself.
+		if ( 'complete' === $job->status ) {
+			self::render_finished( $job );
+		}
+
 		if ( 'failed' === $job->status ) {
 			self::render_failure( $job );
+		}
+
+		if ( 'cancelled' === $job->status ) {
+			printf(
+				'<div class="notice notice-info"><p>%s</p></div>',
+				esc_html__( 'This one was stopped before it finished, so there is nothing to show.', 'dicecodes-ai-blog-writer' )
+			);
 		}
 
 		echo '</div>';
@@ -815,6 +853,65 @@ class Blogcraft_Progress {
 		echo '</ol>';
 		echo '</div>';
 		echo '</section>';
+	}
+
+	/**
+	 * What a finished job produced, once it is no longer waiting on anybody.
+	 *
+	 * Read from the post rather than the job, because the post is what
+	 * survives: the checks and the score are written onto it when it is
+	 * created, and they stay right if it is rewritten or rescored later,
+	 * whereas the job's payload is a record of one moment.
+	 *
+	 * @param Blogcraft_Job $job Finished job.
+	 * @return void
+	 */
+	private static function render_finished( $job ) {
+		$post_id = isset( $job->payload['post_id'] ) ? (int) $job->payload['post_id'] : 0;
+		$post    = $post_id ? get_post( $post_id ) : null;
+
+		if ( ! $post instanceof WP_Post ) {
+			printf(
+				'<div class="notice notice-info"><p>%s</p></div>',
+				esc_html__( 'This one finished, but the post it wrote is no longer here.', 'dicecodes-ai-blog-writer' )
+			);
+
+			return;
+		}
+
+		$score  = (int) get_post_meta( $post_id, '_blogcraft_quality', true );
+		$checks = get_post_meta( $post_id, '_blogcraft_checks', true );
+
+		if ( ! is_array( $checks ) ) {
+			$checks = isset( $job->payload['checks'] ) ? (array) $job->payload['checks'] : array();
+		}
+
+		if ( $score > 0 || ! empty( $checks ) ) {
+			self::render_score( $score, $checks, isset( $job->payload['score_before'] ) ? (int) $job->payload['score_before'] : 0 );
+		}
+
+		echo '<section class="blogcraft-card"><header>';
+		echo '<h2>' . esc_html__( 'The post it wrote', 'dicecodes-ai-blog-writer' ) . '</h2>';
+		printf( '<p>%s</p>', esc_html( get_the_title( $post ) ) );
+		echo '</header>';
+
+		echo '<div class="blogcraft-actions">';
+
+		printf(
+			'<a class="button button-primary" href="%1$s">%2$s</a>',
+			esc_url( (string) get_edit_post_link( $post_id, 'raw' ) ),
+			esc_html__( 'Open the post', 'dicecodes-ai-blog-writer' )
+		);
+
+		if ( 'publish' === $post->post_status ) {
+			printf(
+				'<a class="button" href="%1$s">%2$s</a>',
+				esc_url( (string) get_permalink( $post_id ) ),
+				esc_html__( 'View it on the site', 'dicecodes-ai-blog-writer' )
+			);
+		}
+
+		echo '</div></section>';
 	}
 
 	/**
@@ -1133,10 +1230,17 @@ class Blogcraft_Progress {
 		echo '<ul class="bc-checks">';
 
 		foreach ( $checks as $check ) {
+			// What to do about it, where it exists. The scorecard has always
+			// worked this out and the tool that hands it to a model has
+			// always printed it; the screen a person reads showed the number
+			// it got and the number it wanted, and left them to infer the
+			// rest. A check with no note is one a rewrite cannot reach.
+			$repair = isset( $check['repair'] ) ? trim( (string) $check['repair'] ) : '';
+
 			printf(
 				'<li class="%1$s"><span class="bc-check-mark" aria-hidden="true">%2$s</span>'
 				. '<span class="bc-check-name">%3$s</span>'
-				. '<span class="bc-check-values">%4$s</span></li>',
+				. '<span class="bc-check-values">%4$s</span>%5$s</li>',
 				esc_attr( $passed ? 'is-pass' : 'is-fail' ),
 				$passed ? '&#10003;' : '&#10007;',
 				esc_html( isset( $check['label'] ) ? $check['label'] : '' ),
@@ -1147,7 +1251,10 @@ class Blogcraft_Progress {
 						isset( $check['actual'] ) ? (string) $check['actual'] : '',
 						isset( $check['target'] ) ? (string) $check['target'] : ''
 					)
-				)
+				),
+				( $passed || '' === $repair )
+					? ''
+					: '<span class="bc-check-fix">' . esc_html( $repair ) . '</span>'
 			);
 		}
 

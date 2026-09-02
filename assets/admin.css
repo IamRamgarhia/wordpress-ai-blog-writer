@@ -1486,12 +1486,23 @@ body[class*="page_blogcraft"] #wpcontent {
 }
 
 .bc-checks li {
-	display: flex;
+	display: grid;
+	grid-template-columns: 14px minmax(0, 1fr) auto;
 	align-items: baseline;
-	gap: 8px;
+	gap: 4px 8px;
 	padding: 8px 0;
 	border-bottom: 1px solid var(--bc-line);
 	font-size: var(--bc-t-md);
+}
+
+/* What to do about a failure, under the row it belongs to rather than
+   beside it: it is a sentence, and the two columns above are a name and a
+   pair of numbers. */
+.bc-check-fix {
+	grid-column: 2 / -1;
+	color: var(--bc-muted);
+	font-size: var(--bc-t-sm);
+	line-height: 1.5;
 }
 
 .bc-checks li:last-child { border-bottom: 0; }

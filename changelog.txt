@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.99.0 =
+* Every job on the Activity screen opens now, the number and the topic both. Only jobs still moving were clickable, so a finished one — the one worth opening, because it has a score, a list of what failed and a post at the end of it — could be reached from nowhere
+* Opening a finished job shows what it scored, every check it passed and failed, and a way through to the post it wrote. Before this the screen rendered an outcome only for a draft held for review, so a completed job showed twelve unticked steps and the word "Working" over a post written days earlier
+* Each failing check now says what to do about it. The scorecard has always worked that out and the connected apps have always been told; the screen a person reads showed the number it got and the number it wanted, and left them to infer the rest
+* A job that has stopped is no longer polled every two seconds or described as working
+
 = 0.98.0 =
 * Fixed properly: the old Help address still answered "Sorry, you are not allowed to access this page". The fix in 0.93.0 registered the page and then removed it from the menu, which also removes the entry WordPress reads to work out who may open it — so the page stayed refused, and the test written for it checked the source code rather than opening the page. It is registered under a hidden parent now, and the test asks the function that does the refusing
 
