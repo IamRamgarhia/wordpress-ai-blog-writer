@@ -222,7 +222,9 @@ class Blogcraft_Readiness {
 			'' !== $niche && '' !== $audience,
 			3,
 			__( 'A described voice and reader', 'dicecodes-ai-blog-writer' ),
-			__( 'Sent with every request. A button in Settings fills it in from your posts.', 'dicecodes-ai-blog-writer' )
+			// The button moved to How it writes when the voice fields did.
+			// This went on naming the screen it used to be on.
+			__( 'Sent with every request. A button on How it writes fills it in from your posts.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 

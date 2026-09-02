@@ -103,16 +103,30 @@ class Test_Blogcraft_Outcome_Honesty extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'words', $html );
 	}
 
-	public function test_the_confirmation_says_whether_it_has_anything_to_read() {
+	public function test_only_the_provider_path_claims_to_know_what_it_reads() {
+		// On the client path the application does the reading and brings its
+		// own sources. This site has no idea what they were, so saying
+		// "written from memory alone" there would be a guess stated as fact.
 		Blogcraft_Settings::set( 'ask_before_writing', true );
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::CLIENT );
 
 		ob_start();
 		Blogcraft_Generate::render();
-		$html = (string) ob_get_clean();
+		$client = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'memory alone', $html );
+		$this->assertStringNotContainsString( 'memory alone', $client );
+		$this->assertStringNotContainsString( 'current sources', $client );
 
-		// And changes its mind once a source is switched on.
+		// On the provider path it is this site doing the reading, so it can
+		// say, and changes its mind once a source is switched on.
+		Blogcraft_Settings::set( 'setup_path', Blogcraft_Mode::API );
+
+		ob_start();
+		Blogcraft_Generate::render();
+		$api = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'memory alone', $api );
+
 		$sources = array_keys( Blogcraft_Research::free_sources() );
 		Blogcraft_Settings::set( $sources[0], true );
 

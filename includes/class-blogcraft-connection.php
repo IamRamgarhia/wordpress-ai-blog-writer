@@ -911,11 +911,18 @@ class Blogcraft_Connection {
 				'desc'  => __( 'Use the subscription you already pay for. No API key.', 'dicecodes-ai-blog-writer' ),
 				'paths' => array( 'client' ),
 			),
+			// Both paths. A connected app asks this site for the pictures
+			// rather than making them, so add_pictures and publishing both
+			// go through the same service — and with this card on the
+			// provider path only, a client site had the feature working,
+			// the composer offering to describe a picture, and the tool
+			// answering "the owner turns them on under Settings", with no
+			// card there to turn them on with.
 			'pictures'   => array(
 				'title' => __( 'Connect a picture service', 'dicecodes-ai-blog-writer' ),
 				'sub'   => __( 'Who draws them, and what it costs', 'dicecodes-ai-blog-writer' ),
 				'desc'  => __( 'Nothing contacts a picture service until you switch one on. The default is free.', 'dicecodes-ai-blog-writer' ),
-				'paths' => array( 'api' ),
+				'paths' => array( 'api', 'client' ),
 			),
 			'research'   => array(
 				'title' => __( 'Research', 'dicecodes-ai-blog-writer' ),

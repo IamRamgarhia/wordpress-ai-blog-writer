@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.95.0
+Stable tag: 0.96.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,13 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.96.0 =
+* Fixed: pictures could not be switched on at all when an AI client does the writing. The feature worked on that setup — the app asks this site for the pictures and publishing attaches them — but the card that switches them on was shown only to sites using an API key. So the composer offered to describe a picture, the tool answered "the owner turns them on under Settings", and there was no card there to turn them on with
+* Fixed: "Set them up" on the Write a post screen went to Settings for both things it listed, and the voice moved to How it writes some releases ago. Each now links to the screen that actually holds it
+* Fixed: that panel also offered to set up research on the client path, where an application brings its own and the settings screen carries no research card to arrive at. Same for the prompt inside the confirmation
+* The line saying what a post will be no longer claims to know whether it was written from current sources when an app did the writing. That is the app's business and this site cannot see it
+* A new test walks every screen on both setups and checks that each link lands on a screen that exists and an anchor that is actually there. It found three of the faults above
+
 = 0.95.0 =
 * Fixed: "What you will get" listed a featured image on every site, whether or not the picture service was switched on. It was reading the blueprint asking for a picture and never the setting that decides whether one can be fetched — so the one panel whose whole job is to say what the post will be was wrong about the most visible thing on it. It now says "No featured image, pictures are switched off" instead of quietly promising one
 * The confirmation before writing ends with a line saying what the post will actually come out as: roughly how long, whether it has sources to read or is writing from memory, whether there will be pictures, and where it lands. Three of those four are settings on other screens, and nobody should have to remember whether they switched pictures on before agreeing to write a post
@@ -187,12 +194,5 @@ everything is here, oldest at the bottom.
 * The section switcher on How it writes is a real set of tabs: it says which panel each one opens, and the arrow keys, Home and End move between them. It said which section was current before, but nothing said the buttons controlled anything, and most of the form is behind them
 * Activity records what a connected app does. Drafts created, posts published or scheduled, and anything held back for scoring below your threshold — the screen that answers "what has this been doing" could not answer it at all on a site where an app does the writing
 * The list of pipeline jobs is not shown on that path when there are none, rather than an empty table describing a queue that setup does not use
-
-= 0.92.0 =
-* The documentation is one page on the web rather than a copy inside the plugin and another on the website. Every help control opens the section for the control you were looking at, in a new tab, so a half-filled form is not lost to go and read about it
-* The Help screen and the "How this works" panel on every settings card are gone. They were a second copy of every explanation, and it was always the older one: correcting a sentence meant shipping a release
-* Requires a connection, which the shipped copy did not. That is the trade, and it buys corrections that reach you without an update, screenshots and worked examples that never fitted in an admin panel, and one copy to be right
-* Smaller by about 34,000 characters of shipped text: the stylesheet lost the screen it dressed, and translators have 145 fewer strings to carry
-* The four setup steps on the overview no longer fold away behind a control. Four lines and a button each is not something to hide
 Older releases are listed in changelog.txt, which ships with the plugin.
 

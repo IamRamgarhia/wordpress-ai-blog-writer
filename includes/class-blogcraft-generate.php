@@ -578,7 +578,10 @@ class Blogcraft_Generate {
 			}
 		}
 
-		if ( ! $researching && ! Blogcraft_Research::has_search_provider() ) {
+		// Only where this site does the reading. On the client path the
+		// application brings its own sources, these settings are not even on
+		// the screen, and the card this pointed at is not there to arrive at.
+		if ( Blogcraft_Mode::is_api() && ! $researching && ! Blogcraft_Research::has_search_provider() ) {
 			$gaps[] = array(
 				'title' => __( 'It has nothing to read but its own memory', 'dicecodes-ai-blog-writer' ),
 				'why'   => __( 'Without sources it writes from memory, which dates badly. Two free sources need no account.', 'dicecodes-ai-blog-writer' ),
@@ -643,7 +646,18 @@ class Blogcraft_Generate {
 
 		$says = array();
 
-		$says[] = sprintf(
+		// Whether there is anything to read is only this site's answer to
+		// give on the path where this site does the reading. A connected
+		// application brings its own, and the plugin does not know what.
+		if ( Blogcraft_Mode::is_client() ) {
+			$says[] = sprintf(
+				/* translators: %s: target length in words. */
+				__( 'About %s words.', 'dicecodes-ai-blog-writer' ),
+				number_format_i18n( (int) $blueprint['word_target'] )
+			);
+		}
+
+		$says[] = Blogcraft_Mode::is_client() ? '' : sprintf(
 			$researching
 				/* translators: %s: target length in words. */
 				? __( 'About %s words, written from current sources.', 'dicecodes-ai-blog-writer' )
@@ -651,6 +665,8 @@ class Blogcraft_Generate {
 				: __( 'About %s words, written from memory alone.', 'dicecodes-ai-blog-writer' ),
 			number_format_i18n( (int) $blueprint['word_target'] )
 		);
+
+		$says = array_filter( $says );
 
 		// The one people assume. Nothing is fetched until the picture service
 		// is switched on, and that is two screens away from here.
@@ -1082,10 +1098,33 @@ class Blogcraft_Generate {
 		// re-renders on load, and the per-post fields start empty by design.
 		$state = Blogcraft_Readiness::assess( '', '', '' );
 
+		// Where each of these is actually set, and what to call the way
+		// there. One shared button pointing at Settings was wrong for the
+		// voice from the moment the voice moved to its own screen: it landed
+		// on a card whose only content is a link to How it writes.
+		$where = array(
+			'voice'    => array(
+				admin_url( 'admin.php?page=blogcraft-blueprint' ),
+				__( 'Describe your voice', 'dicecodes-ai-blog-writer' ),
+			),
+			'research' => array(
+				admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
+				__( 'Choose a source', 'dicecodes-ai-blog-writer' ),
+			),
+		);
+
+		// Research belongs to the provider path. An application brings its
+		// own, there is no research card on this setup's settings screen to
+		// send anybody to, and telling somebody to go and switch on something
+		// that does not apply to them is worse than saying nothing.
+		if ( Blogcraft_Mode::is_client() ) {
+			unset( $where['research'] );
+		}
+
 		$missing = array();
 
 		foreach ( $state['items'] as $item ) {
-			if ( ! $item['ok'] && in_array( $item['key'], array( 'voice', 'research' ), true ) ) {
+			if ( ! $item['ok'] && isset( $where[ $item['key'] ] ) ) {
 				$missing[] = $item;
 			}
 		}
@@ -1099,20 +1138,19 @@ class Blogcraft_Generate {
 		echo '<p>' . esc_html__( 'Set once, then used by every post.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '<ul>';
 
+		// A link each, to the screen that actually holds it.
 		foreach ( $missing as $item ) {
 			printf(
-				'<li><strong>%1$s</strong><span>%2$s</span></li>',
+				'<li><strong>%1$s</strong><span>%2$s</span>'
+				. '<a class="button button-small" href="%3$s">%4$s</a></li>',
 				esc_html( $item['label'] ),
-				esc_html( $item['why'] )
+				esc_html( $item['why'] ),
+				esc_url( $where[ $item['key'] ][0] ),
+				esc_html( $where[ $item['key'] ][1] )
 			);
 		}
 
 		echo '</ul>';
-		printf(
-			'<p><a class="button button-small" href="%1$s">%2$s</a></p>',
-			esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
-			esc_html__( 'Set them up', 'dicecodes-ai-blog-writer' )
-		);
 		echo '</aside>';
 	}
 

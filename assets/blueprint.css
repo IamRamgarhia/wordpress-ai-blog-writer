@@ -1175,6 +1175,12 @@
 	border-top: 1px solid rgba(178, 107, 0, .18);
 }
 
+/* A link each, so it does not stretch across the panel. */
+.bc-readiness li .button {
+	align-self: start;
+	margin-top: 6px;
+}
+
 .bc-readiness li strong { font-size: var(--bc-t-md); }
 .bc-readiness li span   { font-size: var(--bc-t-sm); color: var(--bc-muted); line-height: 1.5; }
 
