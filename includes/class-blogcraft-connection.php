@@ -27,6 +27,19 @@ class Blogcraft_Connection {
 	const SAVE_ACTION = 'blogcraft_save_settings';
 
 	/**
+	 * The form every setting on this screen belongs to.
+	 *
+	 * Named because the controls say so rather than because of where they sit.
+	 * This screen carries nine forms — the mode switch, issuing a token,
+	 * disconnecting an app, testing a key, saving a provider — and a form
+	 * inside a form is not something HTML has. The browser drops the inner
+	 * opening tag and lets the inner closing tag end the outer one, so the
+	 * settings form used to finish at the first of them and every control
+	 * after that belonged to nothing at all.
+	 */
+	const FORM_ID = 'blogcraft-settings-form';
+
+	/**
 	 * Nonce action for the connection test.
 	 */
 	const TEST_ACTION = 'blogcraft_test_connection';
@@ -463,7 +476,7 @@ class Blogcraft_Connection {
 		// The label belongs beside the checkbox, not also in the header cell —
 		// printing it in both renders the text twice.
 		printf(
-			'<tr class="blogcraft-toggle-row"><th scope="row"></th><td><label for="blogcraft_%1$s"><input type="checkbox" name="%1$s" id="blogcraft_%1$s" value="1"%3$s /> %2$s</label></td></tr>',
+			'<tr class="blogcraft-toggle-row"><th scope="row"></th><td><label for="blogcraft_%1$s"><input form="blogcraft-settings-form" type="checkbox" name="%1$s" id="blogcraft_%1$s" value="1"%3$s /> %2$s</label></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			checked( (bool) Blogcraft_Settings::get( $name ), true, false )
@@ -520,9 +533,18 @@ class Blogcraft_Connection {
 			);
 		}
 
-		echo '<form method="post" id="blogcraft-settings-form" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		// Short, standalone, and closed before any card is drawn. What used to
+		// wrap the whole screen ended at the first card that had a form of its
+		// own, which on every setup was the mode switch — so Save submitted
+		// that instead, and pressing it changed how the site writes.
+		printf(
+			'<form method="post" id="%1$s" action="%2$s">',
+			esc_attr( self::FORM_ID ),
+			esc_url( admin_url( 'admin-post.php' ) )
+		);
 		echo '<input type="hidden" name="action" value="blogcraft_save_settings" />';
 		Blogcraft_Request::nonce_field( self::SAVE_ACTION );
+		echo '</form>';
 
 		// Asked before anything else, because the answer decides what the
 		// rest of this screen is for.
@@ -537,7 +559,7 @@ class Blogcraft_Connection {
 			$groups = Blogcraft_Provider_Registry::groups();
 			$chosen = ( '' !== $type );
 
-			echo '<select name="provider_type" id="blogcraft_provider_type">';
+			echo '<select form="blogcraft-settings-form" name="provider_type" id="blogcraft_provider_type">';
 
 			// A real first option rather than a default. Nineteen providers
 			// and one of them preselected is a decision made on the reader's
@@ -590,7 +612,7 @@ class Blogcraft_Connection {
 
 			echo '<tr><th scope="row"><label for="blogcraft_provider_api_key">' . esc_html__( 'API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
 			printf(
-				'<input type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
+				'<input form="blogcraft-settings-form" type="password" class="regular-text" name="provider_api_key" id="blogcraft_provider_api_key" value="" autocomplete="new-password" placeholder="%s" />',
 				esc_attr( $key_fits ? Blogcraft_Crypto::mask( $key ) : __( 'Not set', 'dicecodes-ai-blog-writer' ) )
 			);
 
@@ -673,7 +695,7 @@ class Blogcraft_Connection {
 
 			echo '<tr class="blogcraft-custom-only"><th scope="row"><label for="blogcraft_provider_request_template">' . esc_html__( 'Request template (JSON)', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
 			printf(
-				'<textarea name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
+				'<textarea form="blogcraft-settings-form" name="provider_request_template" id="blogcraft_provider_request_template" rows="6" class="large-text code">%s</textarea>',
 				esc_textarea( (string) Blogcraft_Settings::get( 'provider_request_template' ) )
 			);
 			echo '<p class="description">' . esc_html__( 'Custom provider only. Use {{prompt}} and {{model}} as placeholders.', 'dicecodes-ai-blog-writer' ) . '</p>';
@@ -697,7 +719,7 @@ class Blogcraft_Connection {
 			}
 
 			echo '<tr><th scope="row"><label for="blogcraft_image_provider">' . esc_html__( 'Who draws them', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-			echo '<select name="image_provider" id="blogcraft_image_provider">';
+			echo '<select form="blogcraft-settings-form" name="image_provider" id="blogcraft_image_provider">';
 			foreach ( Blogcraft_Images::providers() as $id => $label ) {
 				printf(
 					'<option value="%s"%s>%s</option>',
@@ -730,7 +752,7 @@ class Blogcraft_Connection {
 			echo '<table class="form-table" role="presentation"><tbody>';
 
 			echo '<tr><th scope="row"><label for="blogcraft_research_provider">' . esc_html__( 'Search provider', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-			echo '<select name="research_provider" id="blogcraft_research_provider">';
+			echo '<select form="blogcraft-settings-form" name="research_provider" id="blogcraft_research_provider">';
 			foreach ( Blogcraft_Research::providers() as $id => $label ) {
 				printf(
 					'<option value="%s"%s>%s</option>',
@@ -750,7 +772,7 @@ class Blogcraft_Connection {
 			echo '<tr><th scope="row"><label for="blogcraft_research_api_key">' . esc_html__( 'Search API key', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
 			$research_key = (string) Blogcraft_Settings::get( 'research_api_key' );
 			printf(
-				'<input type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
+				'<input form="blogcraft-settings-form" type="password" class="regular-text" name="research_api_key" id="blogcraft_research_api_key" value="" autocomplete="new-password" placeholder="%s" />',
 				esc_attr( '' === $research_key ? __( 'Not set', 'dicecodes-ai-blog-writer' ) : Blogcraft_Crypto::mask( $research_key ) )
 			);
 			echo '<p class="description">' . esc_html__( 'Leave blank to keep the saved key.', 'dicecodes-ai-blog-writer' ) . '</p>';
@@ -824,7 +846,7 @@ class Blogcraft_Connection {
 			self::number_row( 'autopilot_per_day', __( 'Maximum posts per day', 'dicecodes-ai-blog-writer' ), __( 'A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule.', 'dicecodes-ai-blog-writer' ) );
 
 			echo '<tr><th scope="row"><label for="blogcraft_autopilot_status">' . esc_html__( 'Automatic posts should be', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-			echo '<select name="autopilot_status" id="blogcraft_autopilot_status">';
+			echo '<select form="blogcraft-settings-form" name="autopilot_status" id="blogcraft_autopilot_status">';
 			printf(
 				'<option value="draft"%s>%s</option>',
 				selected( 'publish' !== Blogcraft_Settings::get( 'autopilot_status' ), true, false ),
@@ -841,11 +863,18 @@ class Blogcraft_Connection {
 
 			echo '</tbody></table>';
 			echo '<div class="blogcraft-actions">';
-			submit_button( __( 'Save settings', 'dicecodes-ai-blog-writer' ), 'primary', 'submit', false );
+			// Named, like every other control here: this button sits among the
+			// cards rather than inside the short form that saves them.
+			submit_button(
+				__( 'Save settings', 'dicecodes-ai-blog-writer' ),
+				'primary',
+				'submit',
+				false,
+				array( 'form' => self::FORM_ID )
+			);
 			echo '</div>';
 			self::close_card();
 		}
-		echo '</form>';
 
 		if ( self::shows( 'removal' ) ) {
 			self::open_card_for( 'removal' );
@@ -2354,7 +2383,7 @@ class Blogcraft_Connection {
 			$day = ( $start + $offset ) % 7;
 
 			printf(
-				'<label class="blogcraft-day"><input type="checkbox" name="autopilot_days[]" value="%1$d"%2$s /> %3$s</label>',
+				'<label class="blogcraft-day"><input form="blogcraft-settings-form" type="checkbox" name="autopilot_days[]" value="%1$d"%2$s /> %3$s</label>',
 				(int) $day,
 				checked( in_array( $day, $chosen, true ), true, false ),
 				esc_html( isset( $names[ $day ] ) ? $names[ $day ] : (string) $day )
@@ -2384,7 +2413,7 @@ class Blogcraft_Connection {
 		$today  = strtotime( wp_date( 'Y-m-d' ) . ' 00:00:00 ' . wp_timezone_string() );
 
 		echo '<tr><th scope="row"><label for="blogcraft_autopilot_hour">' . esc_html__( 'Starting at', 'dicecodes-ai-blog-writer' ) . '</label></th><td>';
-		echo '<select name="autopilot_hour" id="blogcraft_autopilot_hour">';
+		echo '<select form="blogcraft-settings-form" name="autopilot_hour" id="blogcraft_autopilot_hour">';
 
 		for ( $hour = 0; $hour <= 23; $hour++ ) {
 			printf(
@@ -2416,7 +2445,7 @@ class Blogcraft_Connection {
 	 */
 	private static function text_row( $name, $label, $row_class = '', $description = '', $placeholder = '' ) {
 		printf(
-			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" placeholder="%6$s" autocomplete="off" spellcheck="false" />%5$s</td></tr>',
+			'<tr class="%4$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input form="blogcraft-settings-form" type="text" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" placeholder="%6$s" autocomplete="off" spellcheck="false" />%5$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( (string) Blogcraft_Settings::get( $name ) ),
@@ -2438,7 +2467,7 @@ class Blogcraft_Connection {
 	 */
 	private static function textarea_row( $name, $label, $description = '' ) {
 		printf(
-			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><textarea name="%1$s" id="blogcraft_%1$s" rows="3" class="large-text">%3$s</textarea><p class="description">%4$s</p></td></tr>',
+			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><textarea form="blogcraft-settings-form" name="%1$s" id="blogcraft_%1$s" rows="3" class="large-text">%3$s</textarea><p class="description">%4$s</p></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_textarea( (string) Blogcraft_Settings::get( $name ) ),
@@ -2462,7 +2491,7 @@ class Blogcraft_Connection {
 		$stored = (string) Blogcraft_Settings::get( $name );
 
 		printf(
-			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p>%6$s</td></tr>',
+			'<tr class="%5$s"><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input form="blogcraft-settings-form" type="password" class="regular-text" name="%1$s" id="blogcraft_%1$s" value="" autocomplete="new-password" placeholder="%3$s" /><p class="description">%4$s</p>%6$s</td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( '' === $stored ? __( 'Not set', 'dicecodes-ai-blog-writer' ) : Blogcraft_Crypto::mask( $stored ) ),
@@ -2532,7 +2561,7 @@ class Blogcraft_Connection {
 		}
 
 		return sprintf(
-			'<label class="blogcraft-clear-key"><input type="checkbox" name="clear_%1$s" value="1" /> %2$s</label>',
+			'<label class="blogcraft-clear-key"><input form="blogcraft-settings-form" type="checkbox" name="clear_%1$s" value="1" /> %2$s</label>',
 			esc_attr( $name ),
 			esc_html__( 'Remove this key', 'dicecodes-ai-blog-writer' )
 		);
@@ -2648,7 +2677,7 @@ class Blogcraft_Connection {
 	 */
 	private static function number_row( $name, $label, $description = '' ) {
 		printf(
-			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input type="number" min="0" class="small-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" /><p class="description">%4$s</p></td></tr>',
+			'<tr><th scope="row"><label for="blogcraft_%1$s">%2$s</label></th><td><input form="blogcraft-settings-form" type="number" min="0" class="small-text" name="%1$s" id="blogcraft_%1$s" value="%3$s" /><p class="description">%4$s</p></td></tr>',
 			esc_attr( $name ),
 			esc_html( $label ),
 			esc_attr( (string) Blogcraft_Settings::get( $name ) ),

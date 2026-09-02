@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.2.0 =
+* Fixed, and this is the important one: the Settings screen could not save anything, and pressing "Save settings" switched how the site writes instead. The screen wrapped everything in one form and then drew nine more inside it — the mode switch, issuing a token, disconnecting an app, testing a key, saving a provider. HTML has no nested form, so the browser ended the settings form at the first of those and around seventy controls after it belonged to nothing. The only fields left inside were the mode switch's, which is what Save was submitting
+* This is why pictures could not be switched on, why research stayed off, why the voice never saved and why "Delete all of it instead" never stuck. It was not those settings; it was the form around them
+* The settings form is now a short element of its own and every setting names it, which is what the save button in the corner has always done. The other nine forms are ordinary siblings and work as they read
+* A test renders every screen on every setup and fails if any form opens inside another, or if any setting is left in no form at all
+
 = 1.1.0 =
 * The comparison of the two ways is a table as well as two cards: thirteen rows in plain words, answering the questions people actually ask. Can it put a picture on the post, do the pictures cost anything, will it write while you are away, what does each post cost, what do you need before it works
 * Fixed: the two cards stacked instead of sitting side by side. The panel around them is a row, so the fold had been sized to the width of its own heading and the columns inside had nowhere to go

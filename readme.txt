@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.2.0 =
+* Fixed, and this is the important one: the Settings screen could not save anything, and pressing "Save settings" switched how the site writes instead. The screen wrapped everything in one form and then drew nine more inside it — the mode switch, issuing a token, disconnecting an app, testing a key, saving a provider. HTML has no nested form, so the browser ended the settings form at the first of those and around seventy controls after it belonged to nothing. The only fields left inside were the mode switch's, which is what Save was submitting
+* This is why pictures could not be switched on, why research stayed off, why the voice never saved and why "Delete all of it instead" never stuck. It was not those settings; it was the form around them
+* The settings form is now a short element of its own and every setting names it, which is what the save button in the corner has always done. The other nine forms are ordinary siblings and work as they read
+* A test renders every screen on every setup and fails if any form opens inside another, or if any setting is left in no form at all
+
 = 1.1.0 =
 * The comparison of the two ways is a table as well as two cards: thirteen rows in plain words, answering the questions people actually ask. Can it put a picture on the post, do the pictures cost anything, will it write while you are away, what does each post cost, what do you need before it works
 * Fixed: the two cards stacked instead of sitting side by side. The panel around them is a row, so the fold had been sized to the width of its own heading and the columns inside had nowhere to go
@@ -188,11 +194,5 @@ everything is here, oldest at the bottom.
 
 = 0.98.0 =
 * Fixed properly: the old Help address still answered "Sorry, you are not allowed to access this page". The fix in 0.93.0 registered the page and then removed it from the menu, which also removes the entry WordPress reads to work out who may open it — so the page stayed refused, and the test written for it checked the source code rather than opening the page. It is registered under a hidden parent now, and the test asks the function that does the refusing
-
-= 0.97.0 =
-* How it writes marks every section nobody has been into yet with a quiet "default", so you can see at a glance which parts of the brief have been answered and which are still the ones the plugin shipped with. Keeping a default is a decision too — this only answers "which of these have I not looked at", which otherwise meant opening all seven and remembering what the defaults were
-* A site where none of it has been answered is told so once, at the top, with the reason: every post is written to this brief, and it is the difference between a post that sounds like your blog and one that sounds like every other AI post
-* "Before you write" on the Write a post screen now lists the writing rules alongside the voice, and says what setting them up buys — a page that answers a real question in a real voice is what search engines reward, and the brief is where you say which
-* A test checks every field on the blueprint belongs to exactly one section, so a field added later cannot quietly stop being watched
 Older releases are listed in changelog.txt, which ships with the plugin.
 
