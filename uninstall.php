@@ -98,6 +98,9 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// at the top of this file says every trace goes.
 		delete_transient( 'blogcraft_crawler_access' );
 
+		// And whether the theme was found to be marking posts up as well.
+		delete_transient( 'blogcraft_schema_duplicate' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 

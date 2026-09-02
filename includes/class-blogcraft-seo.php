@@ -551,10 +551,34 @@ class Blogcraft_Seo {
 	 * @return bool
 	 */
 	public static function schema_handled_elsewhere() {
-		return defined( 'WPSEO_VERSION' )
-			|| defined( 'RANK_MATH_VERSION' )
-			|| defined( 'AIOSEO_VERSION' )
-			|| defined( 'SEOPRESS_VERSION' );
+		// Switched off by hand. The reason this exists at all is that the
+		// list below can only name what it knows: a theme emitting its own
+		// Article is invisible to every constant check there is, and there
+		// is no register of which themes do it.
+		if ( ! Blogcraft_Settings::get( 'schema_enabled' ) ) {
+			return true;
+		}
+
+		foreach (
+			array(
+				'WPSEO_VERSION',              // Yoast.
+				'RANK_MATH_VERSION',          // Rank Math.
+				'AIOSEO_VERSION',             // All In One SEO.
+				'SEOPRESS_VERSION',           // SEOPress.
+				'THE_SEO_FRAMEWORK_VERSION',  // The SEO Framework.
+				'SLIM_SEO_VER',               // Slim SEO.
+				'SQ_VERSION',                 // Squirrly.
+				'SSP_VERSION',                // SEO Simple Pack.
+				'WP_SCHEMA_PRO_VER',          // Schema Pro.
+				'SASWP_VERSION',              // Schema & Structured Data for WP.
+			) as $constant
+		) {
+			if ( defined( $constant ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

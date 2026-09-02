@@ -93,6 +93,16 @@ class Blogcraft_Settings_Schema {
 				'type'    => 'bool',
 				'secret'  => false,
 			),
+			// On, because most themes emit no structured data and a post
+			// without it is invisible to the rich result. Off is for the
+			// sites where the theme already emits an Article of its own,
+			// which is the one case where printing ours makes the page
+			// worse rather than better.
+			'schema_enabled'                  => array(
+				'default' => true,
+				'type'    => 'bool',
+				'secret'  => false,
+			),
 			'images_per_section'              => array(
 				'default' => false,
 				'type'    => 'bool',
