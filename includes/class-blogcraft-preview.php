@@ -82,8 +82,26 @@ class Blogcraft_Preview {
 			);
 		}
 
+		// Asking for a picture is not the same as being able to fetch one:
+		// nothing is contacted until the picture service is switched on, and
+		// this panel exists to say what the post will actually be. It listed
+		// a featured image on every site, including the ones where none was
+		// ever coming — the row beside it, for internal links, has always
+		// checked its own switch.
 		if ( (int) $blueprint['images_target'] > 0 ) {
-			$out[] = self::block( 'image', __( 'Featured image', 'dicecodes-ai-blog-writer' ), 0, '' );
+			if ( Blogcraft_Settings::get( 'images_enabled' ) ) {
+				$out[] = self::block( 'image', __( 'Featured image', 'dicecodes-ai-blog-writer' ), 0, '' );
+			} else {
+				// Said rather than dropped: somebody expecting a picture
+				// should find out here, not when the draft arrives without
+				// one.
+				$out[] = self::block(
+					'image-off',
+					__( 'No featured image', 'dicecodes-ai-blog-writer' ),
+					0,
+					__( 'pictures are switched off', 'dicecodes-ai-blog-writer' )
+				);
+			}
 		}
 
 		for ( $i = 1; $i <= $sections; $i++ ) {

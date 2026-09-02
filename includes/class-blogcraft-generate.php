@@ -621,6 +621,55 @@ class Blogcraft_Generate {
 	}
 
 	/**
+	 * What the post will actually come out as, in one line.
+	 *
+	 * The tick boxes above decide which parts a post is built from. These
+	 * decide what it turns out to be, and three of the four are settings
+	 * on other screens — so somebody agreeing to write a post had to
+	 * remember whether the picture service was ever switched on.
+	 *
+	 * @return string
+	 */
+	private static function outcome_line() {
+		$blueprint = Blogcraft_Blueprint::get();
+
+		$researching = Blogcraft_Research::has_search_provider();
+
+		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $source ) {
+			if ( Blogcraft_Settings::get( $source ) ) {
+				$researching = true;
+			}
+		}
+
+		$says = array();
+
+		$says[] = sprintf(
+			$researching
+				/* translators: %s: target length in words. */
+				? __( 'About %s words, written from current sources.', 'dicecodes-ai-blog-writer' )
+				/* translators: %s: target length in words. */
+				: __( 'About %s words, written from memory alone.', 'dicecodes-ai-blog-writer' ),
+			number_format_i18n( (int) $blueprint['word_target'] )
+		);
+
+		// The one people assume. Nothing is fetched until the picture service
+		// is switched on, and that is two screens away from here.
+		if ( (int) $blueprint['images_target'] > 0 ) {
+			$says[] = Blogcraft_Settings::get( 'images_enabled' )
+				? __( 'With pictures.', 'dicecodes-ai-blog-writer' )
+				: __( 'No pictures: the picture service is switched off.', 'dicecodes-ai-blog-writer' );
+		}
+
+		// Where it lands. On the client path nothing here publishes, so the
+		// answer is the same every time and worth saying anyway.
+		$says[] = Blogcraft_Mode::is_client()
+			? __( 'Saved as a draft for you to read.', 'dicecodes-ai-blog-writer' )
+			: __( 'Saved as a draft unless you chose otherwise.', 'dicecodes-ai-blog-writer' );
+
+		return implode( ' ', $says );
+	}
+
+	/**
 	 * The last look before anything is written.
 	 *
 	 * Shown on every write until somebody turns it off, which is the whole
@@ -703,6 +752,16 @@ class Blogcraft_Generate {
 
 		echo '</div>';
 		echo '</div>';
+
+		// What the tick boxes above cannot tell you. They decide which parts
+		// a post is built from; these four decide what it actually comes out
+		// as, and three of them are settings on other screens. Somebody
+		// agreeing to write a post should not have to remember whether the
+		// picture service was ever switched on.
+		printf(
+			'<p class="bc-confirm-summary">%s</p>',
+			esc_html( self::outcome_line() )
+		);
 
 		echo '<div class="bc-confirm-foot">';
 

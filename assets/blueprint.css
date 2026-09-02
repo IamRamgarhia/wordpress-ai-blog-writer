@@ -815,9 +815,17 @@
 
 .bc-shape-toc .bc-shape-label,
 .bc-shape-image .bc-shape-label,
+.bc-shape-image-off .bc-shape-label,
 .bc-shape-related .bc-shape-label {
 	font-weight: 500;
 	color: var(--bp-graphite);
+}
+
+/* A row for something that is not going to happen. Struck through rather
+   than absent, because the reason it is missing is the useful part. */
+.bc-shape-image-off .bc-shape-label {
+	text-decoration: line-through;
+	color: var(--bp-faint);
 }
 
 .bc-shape-note {
@@ -1287,6 +1295,19 @@
 	max-width: 62ch;
 	font-size: var(--bc-t-sm);
 	line-height: 1.55;
+	color: var(--bp-graphite);
+}
+
+/* The four facts the tick boxes cannot carry, on one line above the
+   buttons, because "will this have a picture" is the question somebody
+   actually has at the moment of agreeing. */
+.bc-confirm-summary {
+	margin: 4px 24px 0;
+	padding: 10px 12px;
+	border-radius: var(--bc-r-md);
+	background: var(--bp-wash);
+	font-size: var(--bc-t-sm);
+	line-height: 1.5;
 	color: var(--bp-graphite);
 }
 

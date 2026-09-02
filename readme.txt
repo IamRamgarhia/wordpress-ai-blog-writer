@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.94.0
+Stable tag: 0.95.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,10 @@ They are encrypted before being stored, shown only as a mask, and never written 
 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
+
+= 0.95.0 =
+* Fixed: "What you will get" listed a featured image on every site, whether or not the picture service was switched on. It was reading the blueprint asking for a picture and never the setting that decides whether one can be fetched — so the one panel whose whole job is to say what the post will be was wrong about the most visible thing on it. It now says "No featured image, pictures are switched off" instead of quietly promising one
+* The confirmation before writing ends with a line saying what the post will actually come out as: roughly how long, whether it has sources to read or is writing from memory, whether there will be pictures, and where it lands. Three of those four are settings on other screens, and nobody should have to remember whether they switched pictures on before agreeing to write a post
 
 = 0.94.0 =
 * Fixed: a post published by hand got none of the finishing. The featured image, the pictures under each heading, the links from older posts, the search title and description, and the ping to the search engines all happened inside the call that published it — so following this plugin's own advice, reading the draft and pressing Publish yourself, produced a barer post than asking your app to publish. It now finishes whichever way it goes live, and never twice
