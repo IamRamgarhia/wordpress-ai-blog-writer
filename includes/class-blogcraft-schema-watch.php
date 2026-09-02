@@ -270,8 +270,14 @@ class Blogcraft_Schema_Watch {
 		$response = wp_remote_get(
 			$url,
 			array(
-				'timeout'     => 10,
+				// The same budget the robots.txt check gets, and for the
+				// same reason: this runs while somebody is waiting for an
+				// admin screen to draw, once every twelve hours. A page is
+				// a heavier read than robots.txt, so if anything it should
+				// be given less patience rather than more.
+				'timeout'     => 5,
 				'redirection' => 2,
+				'user-agent'  => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
 				// The site asking itself a question about itself, the same
 				// way core's own loopback check does. Staging and local
 				// installs routinely have a certificate nothing trusts, and
