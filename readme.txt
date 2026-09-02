@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.3.2 =
+* Addresses the plugin did not choose are now fetched the careful way. Two were not: the research list typed into a settings field, and the results a search service hands back, which nobody on this site picked at all. Both went through the call that follows whatever it is handed — including to this server's own network, or to a cloud provider's metadata address. The voice reader had used the careful call for the same kind of input all along
+* A page fetched from outside is now read only up to two megabytes. All that is wanted from one is its headings and an excerpt, both of which arrive early, and without a cap a page answering with a gigabyte is read into memory in full — and the request that dies of it is somebody's post
+* The provider call deliberately keeps the plain fetch, because Ollama, LM Studio, Jan and llama.cpp all answer on localhost and the careful call refuses loopback. A test records that reason alongside the three other exemptions, so the next person to tidy this does not quietly break every local model
+* The translation catalogue still announced itself as "Blogcraft" and declared the old text domain. The rename updated the filename and the scanner but not the header inside it, which is the part a translation tool actually reads. Both now come from the same constant as everything else
+
 = 1.3.1 =
 * Every AI provider now carries its own terms and privacy links. Ten of them — xAI, Moonshot, DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks, Cerebras and Hugging Face — were listed on one shared line saying the policies vary and to check whichever you pick. The directory asks for links per service, and that line had none
 * Each entry also names the address it actually contacts, so what the plugin reaches and what the readme claims can be compared without reading the code
@@ -184,11 +190,5 @@ everything is here, oldest at the bottom.
 * New setting, "Add search-engine structured data to each post", on by default. Off is for the sites whose theme already does it, which is the one case where adding ours makes the page worse
 * The stand-down list knows ten SEO plugins instead of four: The SEO Framework, Slim SEO, Squirrly, SEO Simple Pack, Schema Pro and Schema & Structured Data for WP have joined Yoast, Rank Math, All In One SEO and SEOPress
 * The form test introduced last release checked four screens because those were the four the bug was found on. It now checks all ten that draw a form, with rows on the screens that list things, so the forms drawn once per row are checked too
-
-= 1.2.0 =
-* Fixed, and this is the important one: the Settings screen could not save anything, and pressing "Save settings" switched how the site writes instead. The screen wrapped everything in one form and then drew nine more inside it — the mode switch, issuing a token, disconnecting an app, testing a key, saving a provider. HTML has no nested form, so the browser ended the settings form at the first of those and around seventy controls after it belonged to nothing. The only fields left inside were the mode switch's, which is what Save was submitting
-* This is why pictures could not be switched on, why research stayed off, why the voice never saved and why "Delete all of it instead" never stuck. It was not those settings; it was the form around them
-* The settings form is now a short element of its own and every setting names it, which is what the save button in the corner has always done. The other nine forms are ordinary siblings and work as they read
-* A test renders every screen on every setup and fails if any form opens inside another, or if any setting is left in no form at all
 Older releases are listed in changelog.txt, which ships with the plugin.
 
