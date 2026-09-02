@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.86.0
+Stable tag: 0.87.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.87.0 =
+* Connected apps are listed one row each, saying whether the app signed itself in or is using a token you issued, when it connected, and when it was last heard from
+* Fixed: signing an app in stores two credentials, one to call with and one to renew with, and the old list showed both — so a single app appeared twice, the second row claiming it had never been used. Revoking from that list was worse than useless: take the first and the app renews itself straight back in, take the second and nothing appears to happen
+* Disconnect now ends the connection and everything behind it
+* The list of apps is a list rather than four buttons across the card, each row naming what that app needs from you
+
 = 0.86.0 =
 * Every point raised by the WordPress plugin review, fixed against the current code. The security checks were always being made, but through a helper one call away, so each one carried a note telling the code checker to ignore it — and the review read those notes and called it a fault. Thirty-one places now use WordPress’s own check, with the permission test beside it, and seventy-three of those notes are gone because nothing needs excusing
 * Two of them were not false alarms: a pair of internal functions read submitted data on the strength of a check made by whatever called them, with nothing at those lines saying so. Both check for themselves now
@@ -193,11 +199,5 @@ everything is here, oldest at the bottom.
 * Your connected app collects that brief the moment you ask it to write: the topic, the angle, your own figures, and any choice you changed for this post. It is the same brief the plugin would have written from
 * Only the choices that differ from your standing rules are passed along. A brief that repeats every setting is one nothing reads to the end of
 * The screen says when no app is connected, because without one the form is a wait that never ends
-
-= 0.81.0 =
-* Every screen now knows which of the two ways this site is set up. A site driven by Claude was still offered a Write a post screen that calls a provider it has no key for, and a Calendar for scheduled writing that cannot happen on that path — both failing at the moment somebody tried them, which is the worst place to find out. They are no longer offered, and following an old link to one explains what changed instead of showing a form that cannot be submitted
-* The overview says which way the site writes, and its setup checklist asks for the right things. It used to tell somebody who had chosen an AI client to go and add an API key, which is telling them to undo the choice they just made
-* Fixed: the preview outline on the write screen and the shape buttons on the blueprint screen shared one class name, so every style rule for either landed on both. It only looked right because of which block came last in the stylesheet
-* Fixed: a Windows checkout rewrote every file to Windows line endings, which fails the coding standard on the first line of each. The same code passed and then failed without a line of it changing
 Older releases are listed in changelog.txt, which ships with the plugin.
 
