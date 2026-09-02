@@ -25,13 +25,13 @@ HEADER = '''# Copyright (C) Dicecodes
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: Blogcraft\\n"
+"Project-Id-Version: Dicecodes AI Blog Writer\\n"
 "Report-Msgid-Bugs-To: https://dicecodes.com/\\n"
 "MIME-Version: 1.0\\n"
 "Content-Type: text/plain; charset=UTF-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
-"X-Domain: blogcraft\\n"
+"X-Domain: dicecodes-ai-blog-writer\\n"
 '''
 
 # A single-quoted PHP string, allowing escaped quotes and backslashes.

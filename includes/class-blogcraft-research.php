@@ -61,6 +61,16 @@ class Blogcraft_Research {
 	const MAX_PER_SOURCE = 2;
 
 	/**
+	 * Most bytes worth reading from any one page.
+	 *
+	 * All that is wanted from a fetched page is its headings and an excerpt,
+	 * both of which arrive early. Without a cap, a page that answers with a
+	 * gigabyte — by accident or on purpose — is read into memory in full,
+	 * and the request that dies of it is somebody's post.
+	 */
+	const MAX_FETCH_BYTES = 2097152;
+
+	/**
 	 * Providers a user can pick, keyed by id.
 	 *
 	 * @return array
@@ -286,11 +296,17 @@ class Blogcraft_Research {
 	 * @return array Keys: url, title, excerpt. Empty when unreachable.
 	 */
 	public static function fetch_url( $url ) {
-		$response = wp_remote_get(
+		// Safe rather than plain: this address was typed into a settings
+		// field, and the plain call would follow it to 127.0.0.1, to a
+		// private range, or to a cloud provider's metadata service. The
+		// safe variant is what refuses those, and it is already what the
+		// voice reader uses for exactly the same kind of input.
+		$response = wp_safe_remote_get(
 			$url,
 			array(
-				'timeout'    => 12,
-				'user-agent' => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
+				'timeout'             => 12,
+				'limit_response_size' => self::MAX_FETCH_BYTES,
+				'user-agent'          => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
 			)
 		);
 
@@ -540,11 +556,16 @@ class Blogcraft_Research {
 				continue;
 			}
 
-			$response = wp_remote_get(
+			// These addresses came back from a search service, so nobody
+			// here chose them and nothing here vouches for them. A poisoned
+			// or merely odd result naming an address on this server's own
+			// network would otherwise be fetched and read into the outline.
+			$response = wp_safe_remote_get(
 				(string) $source['url'],
 				array(
-					'timeout'    => 8,
-					'user-agent' => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
+					'timeout'             => 8,
+					'limit_response_size' => self::MAX_FETCH_BYTES,
+					'user-agent'          => 'Dicecodes AI Blog Writer/' . BLOGCRAFT_VERSION . '; ' . home_url(),
 				)
 			);
 
