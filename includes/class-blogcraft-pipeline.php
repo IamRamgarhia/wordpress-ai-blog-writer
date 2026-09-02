@@ -281,6 +281,38 @@ class Blogcraft_Pipeline {
 	 * @throws Blogcraft_Rate_Limited When the provider asks us to come back later.
 	 * @throws RuntimeException When no provider is configured, the cap is hit, or the call fails.
 	 */
+	/**
+	 * The model this job was asked to use, for as long as it runs.
+	 *
+	 * @var string
+	 */
+	private static $chosen_model = '';
+
+	/**
+	 * Use one model for everything in this job.
+	 *
+	 * Set once per job by the worker rather than threaded through every
+	 * call: a post is written across several requests and a dozen
+	 * prompts, and a choice that only some of them honoured would be a
+	 * post written by two models with nothing saying which wrote what.
+	 *
+	 * @param string $model Model name, or empty for the site default.
+	 * @return void
+	 */
+	public static function use_model( $model ) {
+		self::$chosen_model = trim( (string) $model );
+	}
+
+	/**
+	 * Ask the model one question and return the parsed answer.
+	 *
+	 * @param array $messages Chat messages.
+	 * @param array $options  Provider options, including a model override.
+	 * @return array The decoded JSON the model replied with.
+	 * @throws Blogcraft_Rate_Limited When the provider asks us to slow down.
+	 * @throws RuntimeException When no provider is set up, the monthly cap is
+	 *                          reached, or the reply is not usable JSON.
+	 */
 	private static function ask( $messages, $options = array() ) {
 		if ( Blogcraft_Cost::over_cap() ) {
 			throw new RuntimeException( 'Monthly token cap reached; generation paused.' );
@@ -292,7 +324,16 @@ class Blogcraft_Pipeline {
 			throw new RuntimeException( 'No AI provider is set up yet. Add a model and an API key under Dicecodes AI Blog Writer, Settings.' );
 		}
 
-		$provider = Blogcraft_Provider_Registry::from_settings( isset( $options['model'] ) ? (string) $options['model'] : '' );
+		$model = isset( $options['model'] ) ? (string) $options['model'] : '';
+
+		// A model chosen for this post beats the cheaper one the bulk
+		// stages would otherwise reach for: somebody comparing two models
+		// wants the whole post written by the one they picked.
+		if ( '' !== self::$chosen_model ) {
+			$model = self::$chosen_model;
+		}
+
+		$provider = Blogcraft_Provider_Registry::from_settings( $model );
 
 		if ( null === $provider ) {
 			throw new RuntimeException( 'No AI provider is configured.' );

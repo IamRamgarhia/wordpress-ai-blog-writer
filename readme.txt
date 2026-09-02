@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.87.0
+Stable tag: 0.88.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.88.0 =
+* You can pick the model for one post without changing the setting for every other one. It sits with the category and the publishing date, and offers whatever your site already knows about rather than asking you to type a name from memory
+* The strip at the top of Settings says what is actually in use — which provider and model, what it may read, where pictures come from, how often it writes — rather than only that something is set up
+* Removed three controls from Write a post that could not do anything when an AI client does the writing: asking the provider what to write when there is no provider, choosing whether to publish when nothing here publishes, and an estimate of a bill that goes to a subscription instead of to you
+* A test now holds the rule in both directions, so a control cannot go missing from the path it belongs to either
+
 = 0.87.0 =
 * Connected apps are listed one row each, saying whether the app signed itself in or is using a token you issued, when it connected, and when it was last heard from
 * Fixed: signing an app in stores two credentials, one to call with and one to renew with, and the old list showed both — so a single app appeared twice, the second row claiming it had never been used. Revoking from that list was worse than useless: take the first and the app renews itself straight back in, take the second and nothing appears to happen
@@ -193,11 +199,5 @@ everything is here, oldest at the bottom.
 * Fixed: your voice was described in two places and the model was told both. Settings had a Describe your voice card, How it writes had a Voice tab, and they were not two views of one thing — they were two stores, and every request carried two versions of the tone, the reader, the point of view, the reading level, the banned words and the subjects to avoid. Fill in one and the model got two answers to the same question
 * How it writes now owns all of it. What the blog is about, your style rules and your own experience have moved onto its Voice tab, along with the Learn from my posts button. Nothing you had typed is lost — it is carried over the first time you open the screen
 * The Settings card is now a line pointing at where the voice lives
-
-= 0.82.0 =
-* Write a post keeps its whole form when an AI client does the writing. It had been cut down to a single sentence to copy, which threw away the topic field, the angle, the box for what only you know, and every per-post choice — the things that make a post yours rather than generic. Fill it in as before and press Save this brief
-* Your connected app collects that brief the moment you ask it to write: the topic, the angle, your own figures, and any choice you changed for this post. It is the same brief the plugin would have written from
-* Only the choices that differ from your standing rules are passed along. A brief that repeats every setting is one nothing reads to the end of
-* The screen says when no app is connected, because without one the form is a wait that never ends
 Older releases are listed in changelog.txt, which ships with the plugin.
 

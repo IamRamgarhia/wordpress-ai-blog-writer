@@ -2493,3 +2493,14 @@ body[class*="page_blogcraft"] #wpcontent {
 	flex: 1 1 20rem;
 	font-size: var(--bc-t-sm);
 }
+
+/* The strip now names what is in use, so the value needs to read as the
+   answer and the label as the question. */
+
+.bc-status-what {
+	color: var(--bc-muted);
+}
+
+.bc-status-is {
+	font-weight: 600;
+}

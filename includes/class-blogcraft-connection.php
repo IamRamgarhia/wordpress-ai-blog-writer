@@ -2061,41 +2061,148 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function render_status() {
-		// Each state carries both wordings. A grey dot beside "Provider connected"
-		// reads as a claim that it is connected, so the label has to change too:
-		// colour alone is not something every reader can act on.
-		$states = array(
-			array(
-				'done' => Blogcraft_Provider_Registry::is_configured(),
-				'yes'  => __( 'Provider connected', 'dicecodes-ai-blog-writer' ),
-				'no'   => self::missing_label(),
-			),
-			array(
-				'done' => Blogcraft_Voice::is_configured(),
-				'yes'  => __( 'Voice described', 'dicecodes-ai-blog-writer' ),
-				'no'   => __( 'Voice not described', 'dicecodes-ai-blog-writer' ),
-			),
-			array(
-				'done' => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
-					&& array() !== Blogcraft_Autopilot::days(),
-				'yes'  => __( 'Automation on', 'dicecodes-ai-blog-writer' ),
-				'no'   => (bool) Blogcraft_Settings::get( 'autopilot_enabled' )
-					? __( 'Automation has no days', 'dicecodes-ai-blog-writer' )
-					: __( 'Automation off', 'dicecodes-ai-blog-writer' ),
-			),
-		);
-
+		// Each item names the thing in use rather than reporting that one
+		// exists. "Provider connected" answers a question nobody standing
+		// here is asking; "OpenAI, gpt-5" answers the one they are.
+		//
+		// Both wordings are carried because colour alone is not something
+		// every reader can act on: a grey dot beside "Pictures on" reads as
+		// a claim that they are.
 		echo '<ul class="blogcraft-status">';
 
-		foreach ( $states as $state ) {
+		foreach ( self::status_items() as $item ) {
 			printf(
-				'<li class="%1$s">%2$s</li>',
-				$state['done'] ? 'is-done' : '',
-				esc_html( $state['done'] ? $state['yes'] : $state['no'] )
+				'<li class="%1$s"><span class="bc-status-what">%2$s</span> <span class="bc-status-is">%3$s</span></li>',
+				$item['done'] ? 'is-done' : '',
+				esc_html( $item['what'] ),
+				esc_html( $item['is'] )
 			);
 		}
 
 		echo '</ul>';
+	}
+
+	/**
+	 * What is set up on this site, and what it is set to.
+	 *
+	 * @return array
+	 */
+	private static function status_items() {
+		$items = array();
+
+		if ( Blogcraft_Mode::is_client() ) {
+			$connected = Blogcraft_Mcp_Auth::connections();
+
+			$items[] = array(
+				'what' => __( 'Writing', 'dicecodes-ai-blog-writer' ),
+				'is'   => empty( $connected )
+					? __( 'no app connected', 'dicecodes-ai-blog-writer' )
+					: implode( ', ', wp_list_pluck( $connected, 'label' ) ),
+				'done' => ! empty( $connected ),
+			);
+		} else {
+			$type  = (string) Blogcraft_Settings::get( 'provider_type' );
+			$types = Blogcraft_Provider_Registry::types();
+			$model = trim( (string) Blogcraft_Settings::get( 'provider_model' ) );
+			$ready = Blogcraft_Provider_Registry::is_configured();
+
+			$named = isset( $types[ $type ] ) ? $types[ $type ] : $type;
+
+			$items[] = array(
+				'what' => __( 'Writing', 'dicecodes-ai-blog-writer' ),
+				'is'   => $ready
+					? trim( $named . ( '' === $model ? '' : ', ' . $model ) )
+					: self::missing_label(),
+				'done' => $ready,
+			);
+		}
+
+		$blueprint = Blogcraft_Blueprint::get();
+		$described = '' !== trim( (string) $blueprint['niche'] );
+
+		$items[] = array(
+			'what' => __( 'Voice', 'dicecodes-ai-blog-writer' ),
+			'is'   => $described
+				? __( 'described', 'dicecodes-ai-blog-writer' )
+				: __( 'not described', 'dicecodes-ai-blog-writer' ),
+			'done' => $described,
+		);
+
+		// Research is the provider path only: an app brings its own.
+		if ( Blogcraft_Mode::is_api() ) {
+			$sources = array();
+
+			foreach ( Blogcraft_Research::free_sources() as $setting => $label ) {
+				if ( Blogcraft_Settings::get( $setting ) ) {
+					// The setting labels explain themselves at length; the
+					// strip has room for the name and nothing after it.
+					$sources[] = trim( strtok( $label, chr( 226 ) . '-' ) );
+				}
+			}
+
+			$paid = trim( (string) Blogcraft_Settings::get( 'research_provider' ) );
+
+			if ( '' !== $paid ) {
+				$sources[] = $paid;
+			}
+
+			$items[] = array(
+				'what' => __( 'Research', 'dicecodes-ai-blog-writer' ),
+				'is'   => empty( $sources )
+					? __( 'writing from memory', 'dicecodes-ai-blog-writer' )
+					: implode( ', ', $sources ),
+				'done' => ! empty( $sources ),
+			);
+		}
+
+		$pictures = (bool) Blogcraft_Settings::get( 'images_enabled' );
+		$service  = trim( (string) Blogcraft_Settings::get( 'image_provider' ) );
+
+		$items[] = array(
+			'what' => __( 'Pictures', 'dicecodes-ai-blog-writer' ),
+			'is'   => $pictures
+				? ( '' === $service ? __( 'on', 'dicecodes-ai-blog-writer' ) : $service )
+				: __( 'off', 'dicecodes-ai-blog-writer' ),
+			'done' => $pictures,
+		);
+
+		// Scheduled writing cannot happen on the client path at all, so
+		// reporting it off there would imply it could be turned on.
+		if ( Blogcraft_Mode::is_api() ) {
+			$on   = (bool) Blogcraft_Settings::get( 'autopilot_enabled' );
+			$days = Blogcraft_Autopilot::days();
+
+			$items[] = array(
+				'what' => __( 'Automation', 'dicecodes-ai-blog-writer' ),
+				'is'   => self::automation_label( $on, $days ),
+				'done' => $on && array() !== $days,
+			);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * How to describe the state of scheduled writing.
+	 *
+	 * @param bool  $on   Whether it is switched on.
+	 * @param array $days The days it is set to run.
+	 * @return string
+	 */
+	private static function automation_label( $on, $days ) {
+		if ( ! $on ) {
+			return __( 'off', 'dicecodes-ai-blog-writer' );
+		}
+
+		if ( array() === $days ) {
+			return __( 'on, but no days chosen', 'dicecodes-ai-blog-writer' );
+		}
+
+		return sprintf(
+			/* translators: %d: how many days a week posts are written. */
+			_n( 'on, %d day a week', 'on, %d days a week', count( $days ), 'dicecodes-ai-blog-writer' ),
+			count( $days )
+		);
 	}
 
 	/**

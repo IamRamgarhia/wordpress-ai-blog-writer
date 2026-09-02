@@ -120,6 +120,12 @@ class Blogcraft_Worker {
 		// knows which job the calls that follow belong to.
 		Blogcraft_Usage::watch( (int) $job->id );
 
+		// The same reason: one job, one setting, set before any stage of
+		// it runs rather than passed down through every call.
+		Blogcraft_Pipeline::use_model(
+			isset( $job->payload['placement']['model'] ) ? (string) $job->payload['placement']['model'] : ''
+		);
+
 		self::execute( $job );
 
 		return true;

@@ -588,7 +588,7 @@ class Blogcraft_Generate {
 			'<div class="bc-gap is-evidence" id="bc-gap-evidence" hidden>'
 			. '<strong>%1$s</strong><span>%2$s</span>'
 			. '<button type="button" class="button-link" id="bc-gap-evidence-go">%3$s</button>'
-			. '</div>',
+				. '</div>',
 			esc_html__( 'You have not said anything only you know', 'dicecodes-ai-blog-writer' ),
 			esc_html__( 'The heaviest check on the finished post, and the one part a model cannot produce. Your own numbers, prices, results, or what went wrong when you tried it. One or two sentences is enough.', 'dicecodes-ai-blog-writer' ),
 			esc_html__( 'Go and add it', 'dicecodes-ai-blog-writer' )
@@ -1131,30 +1131,41 @@ class Blogcraft_Generate {
 		// cold, and an empty answer is the single commonest reason a finished
 		// post reads like every other AI post. Asked about a specific topic it
 		// becomes easy, so this offers to ask it properly.
-		printf(
-			'<div class="bc-suggest">'
-			. '<button type="button" class="button" id="blogcraft-suggest">%1$s</button>'
-			. '<p class="description">%2$s</p>'
-			. '<div class="bc-suggest-out" id="blogcraft-suggest-out" hidden>'
-			. '<p class="bc-suggest-lead">%3$s</p><ul id="blogcraft-suggest-list"></ul></div>'
-			. '</div>',
-			esc_html__( 'What should I write about this?', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'Asks four questions only you can answer, for the box above.', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'Answer any of these in the box above, in your own words:', 'dicecodes-ai-blog-writer' )
-		);
+		//
+		// Asking costs a call to the provider, so on the client path there is
+		// nothing to ask. The app being written in can answer this better
+		// anyway, since it is the one holding the conversation.
+		if ( Blogcraft_Mode::is_api() ) {
+			printf(
+				'<div class="bc-suggest">'
+				. '<button type="button" class="button" id="blogcraft-suggest">%1$s</button>'
+				. '<p class="description">%2$s</p>'
+				. '<div class="bc-suggest-out" id="blogcraft-suggest-out" hidden>'
+				. '<p class="bc-suggest-lead">%3$s</p><ul id="blogcraft-suggest-list"></ul></div>'
+				. '</div>',
+				esc_html__( 'What should I write about this?', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Asks four questions only you can answer, for the box above.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Answer any of these in the box above, in your own words:', 'dicecodes-ai-blog-writer' )
+			);
+		}
 
-		echo Blogcraft_Controls::row(
-			__( 'When it is finished', 'dicecodes-ai-blog-writer' ),
-			'',
-			Blogcraft_Controls::segmented(
-				'status',
-				array(
-					'draft'   => __( 'Save as a draft', 'dicecodes-ai-blog-writer' ),
-					'publish' => __( 'Publish it', 'dicecodes-ai-blog-writer' ),
-				),
-				'draft'
-			)
-		);
+		// Whether to publish is the provider path deciding what to do when it
+		// finishes writing. A brief is not written by this site, so nothing
+		// here reads this, and the app publishes only above the threshold.
+		if ( Blogcraft_Mode::is_api() ) {
+			echo Blogcraft_Controls::row(
+				__( 'When it is finished', 'dicecodes-ai-blog-writer' ),
+				'',
+				Blogcraft_Controls::segmented(
+					'status',
+					array(
+						'draft'   => __( 'Save as a draft', 'dicecodes-ai-blog-writer' ),
+						'publish' => __( 'Publish it', 'dicecodes-ai-blog-writer' ),
+					),
+					'draft'
+				)
+			);
+		}
 
 		echo '</section>';
 	}
@@ -1628,6 +1639,17 @@ class Blogcraft_Generate {
 			),
 		);
 
+		// Which model writes this one. The other path has no say: the model
+		// is a setting inside whatever application is doing the writing.
+		if ( Blogcraft_Mode::is_api() ) {
+			$rows[] = Blogcraft_Controls::row(
+				__( 'Model for this post', 'dicecodes-ai-blog-writer' ),
+				__( 'Leave it on your usual one unless you are comparing two.', 'dicecodes-ai-blog-writer' ),
+				self::model_choices(),
+				'bc_post_model'
+			);
+		}
+
 		echo implode( '', $rows );
 		echo '</section>';
 	}
@@ -1710,17 +1732,25 @@ class Blogcraft_Generate {
 			esc_html( number_format_i18n( (int) $blueprint['word_target'] ) ),
 			esc_html__( 'Words', 'dicecodes-ai-blog-writer' )
 		);
-		$out .= sprintf(
-			'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
-			esc_html( self::compact( $tokens['total'] ) ),
-			esc_html__( 'Tokens, roughly', 'dicecodes-ai-blog-writer' )
-		);
+		// An estimate of what a provider will bill for. On the client path
+		// the writing is paid for by a subscription somebody already has,
+		// and a number here would be counting somebody else's money.
+		if ( Blogcraft_Mode::is_api() ) {
+			$out .= sprintf(
+				'<div><span class="bc-figure">%1$s</span><span class="bc-figure-label">%2$s</span></div>',
+				esc_html( self::compact( $tokens['total'] ) ),
+				esc_html__( 'Tokens, roughly', 'dicecodes-ai-blog-writer' )
+			);
+		}
+
 		$out .= '</div>';
 
-		$out .= sprintf(
-			'<p class="bc-hint">%s</p>',
-			esc_html__( 'Deliberately generous. Your provider bills you, not us.', 'dicecodes-ai-blog-writer' )
-		);
+		if ( Blogcraft_Mode::is_api() ) {
+			$out .= sprintf(
+				'<p class="bc-hint">%s</p>',
+				esc_html__( 'Deliberately generous. Your provider bills you, not us.', 'dicecodes-ai-blog-writer' )
+			);
+		}
 
 		foreach ( $warnings as $warning ) {
 			$out .= sprintf( '<p class="bc-warn">%s</p>', esc_html( $warning ) );
@@ -1729,6 +1759,63 @@ class Blogcraft_Generate {
 		return $out;
 	}
 
+	/**
+	 * The models this site knows about, as something to pick from.
+	 *
+	 * Whatever is set up now, plus the cheaper one the bulk stages use if
+	 * there is one, plus anything saved on the shelf of providers. Typing a
+	 * model name from memory is how you find out an hour later that it was
+	 * wrong by one character.
+	 *
+	 * @return string
+	 */
+	private static function model_choices() {
+		$usual = trim( (string) Blogcraft_Settings::get( 'provider_model' ) );
+		$known = array();
+
+		foreach ( array( 'provider_model', 'provider_draft_model' ) as $setting ) {
+			$one = trim( (string) Blogcraft_Settings::get( $setting ) );
+
+			if ( '' !== $one ) {
+				$known[ $one ] = $one;
+			}
+		}
+
+		foreach ( Blogcraft_Connections::all() as $saved ) {
+			$one = isset( $saved['values']['provider_model'] ) ? trim( (string) $saved['values']['provider_model'] ) : '';
+
+			if ( '' !== $one ) {
+				$known[ $one ] = $one;
+			}
+		}
+
+		$out = '<select class="bc-select" name="post_model" id="bc_post_model">';
+
+		$out .= sprintf(
+			'<option value="">%s</option>',
+			esc_html(
+				'' === $usual
+					? __( 'Whatever the settings say', 'dicecodes-ai-blog-writer' )
+					: sprintf(
+						/* translators: %s: the model named in the settings. */
+						__( 'The usual one (%s)', 'dicecodes-ai-blog-writer' ),
+						$usual
+					)
+			)
+		);
+
+		foreach ( $known as $one ) {
+			if ( $one === $usual ) {
+				continue;
+			}
+
+			$out .= sprintf( '<option value="%1$s">%2$s</option>', esc_attr( $one ), esc_html( $one ) );
+		}
+
+		$out .= '</select>';
+
+		return $out;
+	}
 	/**
 	 * Shorten a large number for display.
 	 *
@@ -1774,6 +1861,12 @@ class Blogcraft_Generate {
 
 		if ( isset( $source['publish_at'] ) ) {
 			$out['publish_at'] = sanitize_text_field( wp_unslash( $source['publish_at'] ) );
+		}
+
+		// Which model writes this one. Empty means the site default,
+		// which is what every post used before there was a choice.
+		if ( isset( $source['post_model'] ) ) {
+			$out['model'] = sanitize_text_field( wp_unslash( $source['post_model'] ) );
 		}
 
 		return $out;
