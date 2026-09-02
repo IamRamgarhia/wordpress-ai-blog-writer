@@ -492,6 +492,15 @@ class Blogcraft_Overview {
 		// it happened at all.
 		printf( '<p class="blogcraft-hint">%s</p>', esc_html( self::search_line() ) );
 
+		// Whether anything is allowed to come and read any of it. A post can
+		// be right in every way this plugin measures and still be invisible,
+		// and both switches that decide it live outside this plugin.
+		$access = Blogcraft_Crawlers::line();
+
+		if ( '' !== $access ) {
+			printf( '<p class="blogcraft-hint is-warn">%s</p>', esc_html( $access ) );
+		}
+
 		echo '<div class="blogcraft-actions">';
 
 		// A button to a screen this setup does not have is worse than no

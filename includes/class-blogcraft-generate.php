@@ -482,7 +482,12 @@ class Blogcraft_Generate {
 			),
 			'faq'            => array(
 				__( 'Questions and answers', 'dicecodes-ai-blog-writer' ),
-				__( 'Built from what people actually ask about this subject, and marked up so it can appear as its own result.', 'dicecodes-ai-blog-writer' ),
+				// This used to promise its own search result. Google retired
+				// FAQ rich results for every site in May 2026, so that is a
+				// promise the plugin can no longer keep. The section is still
+				// worth writing, for the reason it was worth writing before
+				// anybody marked it up.
+				__( 'Built from what people actually ask about this subject, and answered where they will look for them. No longer its own search result: Google retired those in May 2026.', 'dicecodes-ai-blog-writer' ),
 			),
 			'toc'            => array(
 				__( 'Contents list', 'dicecodes-ai-blog-writer' ),

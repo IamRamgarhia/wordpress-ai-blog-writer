@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.91.0 =
+* The overview says when nothing is allowed to come and read what you publish. A post can be right in every way this plugin measures and still be invisible, and both settings that decide it live outside the plugin: WordPress's own "Discourage search engines", which is on by default on most staging sites and travels to production with the database, and a robots.txt that refuses the AI crawlers
+* It names the assistants rather than the crawlers — "Perplexity", not "PerplexityBot" — because which assistant will not be citing you is the question somebody actually has. Nothing is changed on your behalf: both settings are legitimate choices and the plugin only says what they cost
+* The line stays quiet when there is nothing to say, and reads as confirmation rather than a warning on a staging site, where discouraging search engines is the correct setting
+* Fixed: the Questions and answers section still promised it would appear as its own search result. Google retired FAQ rich results for every site in May 2026. The section is still worth writing and the markup is still emitted, but for what it is worth to a reader rather than a result the plugin can no longer promise
+
 = 0.90.0 =
 * Fixed: a post written by a connected app was never given the score it had just been measured against, so the library, the overview and the activity screen listed everything Claude or ChatGPT wrote as "not scored" however many times it had been checked. The score is now kept when a draft is checked and when it is published, including when publishing is refused — which is the one time you go looking for it
 * Fixed: every brief handed to a connected app claimed the length, the section count, the sentence limit and the link target had been chosen specially for that post. Nothing had been chosen: the form sends text, the standing rules hold numbers, and the two were compared strictly, so 2000 and "2000" counted as a change

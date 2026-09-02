@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.90.0
+Stable tag: 0.91.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.91.0 =
+* The overview says when nothing is allowed to come and read what you publish. A post can be right in every way this plugin measures and still be invisible, and both settings that decide it live outside the plugin: WordPress's own "Discourage search engines", which is on by default on most staging sites and travels to production with the database, and a robots.txt that refuses the AI crawlers
+* It names the assistants rather than the crawlers — "Perplexity", not "PerplexityBot" — because which assistant will not be citing you is the question somebody actually has. Nothing is changed on your behalf: both settings are legitimate choices and the plugin only says what they cost
+* The line stays quiet when there is nothing to say, and reads as confirmation rather than a warning on a staging site, where discouraging search engines is the correct setting
+* Fixed: the Questions and answers section still promised it would appear as its own search result. Google retired FAQ rich results for every site in May 2026. The section is still worth writing and the markup is still emitted, but for what it is worth to a reader rather than a result the plugin can no longer promise
+
 = 0.90.0 =
 * Fixed: a post written by a connected app was never given the score it had just been measured against, so the library, the overview and the activity screen listed everything Claude or ChatGPT wrote as "not scored" however many times it had been checked. The score is now kept when a draft is checked and when it is published, including when publishing is refused — which is the one time you go looking for it
 * Fixed: every brief handed to a connected app claimed the length, the section count, the sentence limit and the link target had been chosen specially for that post. Nothing had been chosen: the form sends text, the standing rules hold numbers, and the two were compared strictly, so 2000 and "2000" counted as a change
@@ -187,17 +193,5 @@ everything is here, oldest at the bottom.
 * The strip at the top of Settings says what is actually in use — which provider and model, what it may read, where pictures come from, how often it writes — rather than only that something is set up
 * Removed three controls from Write a post that could not do anything when an AI client does the writing: asking the provider what to write when there is no provider, choosing whether to publish when nothing here publishes, and an estimate of a bill that goes to a subscription instead of to you
 * A test now holds the rule in both directions, so a control cannot go missing from the path it belongs to either
-
-= 0.87.0 =
-* Connected apps are listed one row each, saying whether the app signed itself in or is using a token you issued, when it connected, and when it was last heard from
-* Fixed: signing an app in stores two credentials, one to call with and one to renew with, and the old list showed both — so a single app appeared twice, the second row claiming it had never been used. Revoking from that list was worse than useless: take the first and the app renews itself straight back in, take the second and nothing appears to happen
-* Disconnect now ends the connection and everything behind it
-* The list of apps is a list rather than four buttons across the card, each row naming what that app needs from you
-
-= 0.86.0 =
-* Every point raised by the WordPress plugin review, fixed against the current code. The security checks were always being made, but through a helper one call away, so each one carried a note telling the code checker to ignore it — and the review read those notes and called it a fault. Thirty-one places now use WordPress’s own check, with the permission test beside it, and seventy-three of those notes are gone because nothing needs excusing
-* Two of them were not false alarms: a pair of internal functions read submitted data on the strength of a check made by whatever called them, with nothing at those lines saying so. Both check for themselves now
-* Submitted data is cleaned where it arrives rather than several steps later, with the right function for each kind — including the one that keeps a draft’s formatting intact
-* Fixed two addresses that did not answer: the plugin’s own page, which is not written yet, and one image service that refuses automated requests on every page it has
 Older releases are listed in changelog.txt, which ships with the plugin.
 

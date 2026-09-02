@@ -94,6 +94,10 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 		// A brief nobody collected.
 		delete_option( 'blogcraft_pending_brief' );
 
+		// What robots.txt last said. A cache, but a stored one, and the note
+		// at the top of this file says every trace goes.
+		delete_transient( 'blogcraft_crawler_access' );
+
 		delete_metadata( 'user', 0, 'blogcraft_dismissed_notices', '', true );
 		delete_metadata( 'user', 0, 'blogcraft_mcp_test', '', true );
 

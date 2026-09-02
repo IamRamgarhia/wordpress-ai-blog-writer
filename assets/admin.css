@@ -338,6 +338,17 @@
 	color: var(--bc-muted);
 }
 
+/* Said rather than warned about: on a staging site this is the correct
+   setting, and a red panel would be nagging somebody who meant it. */
+.blogcraft-hint.is-warn {
+	margin-top: 6px;
+	padding: 8px 10px;
+	border-left: 3px solid var(--bc-warn);
+	border-radius: var(--bc-r-sm);
+	background: var(--bc-warn-soft);
+	color: var(--bc-ink);
+}
+
 .blogcraft-page .notice {
 	margin: 0 0 16px;
 	border-radius: var(--bc-r-md);
