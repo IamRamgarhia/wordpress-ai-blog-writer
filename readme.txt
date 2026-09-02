@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.85.0
+Stable tag: 0.86.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.86.0 =
+* Every point raised by the WordPress plugin review, fixed against the current code. The security checks were always being made, but through a helper one call away, so each one carried a note telling the code checker to ignore it — and the review read those notes and called it a fault. Thirty-one places now use WordPress’s own check, with the permission test beside it, and seventy-three of those notes are gone because nothing needs excusing
+* Two of them were not false alarms: a pair of internal functions read submitted data on the strength of a check made by whatever called them, with nothing at those lines saying so. Both check for themselves now
+* Submitted data is cleaned where it arrives rather than several steps later, with the right function for each kind — including the one that keeps a draft’s formatting intact
+* Fixed two addresses that did not answer: the plugin’s own page, which is not written yet, and one image service that refuses automated requests on every page it has
+
 = 0.85.0 =
 * The sentence to say in your app has moved to where it is useful. It was a standing panel at the top of Write a post explaining what to do once you had saved a brief, sitting above the form that saves it — backwards, and unchanging, so after the second visit it was five lines of furniture. It appears once there is a brief to say it about
 * The warning that no app is connected stays at the top, and only when it is true
@@ -193,9 +199,5 @@ everything is here, oldest at the bottom.
 * The overview says which way the site writes, and its setup checklist asks for the right things. It used to tell somebody who had chosen an AI client to go and add an API key, which is telling them to undo the choice they just made
 * Fixed: the preview outline on the write screen and the shape buttons on the blueprint screen shared one class name, so every style rule for either landed on both. It only looked right because of which block came last in the stylesheet
 * Fixed: a Windows checkout rewrote every file to Windows line endings, which fails the coding standard on the first line of each. The same code passed and then failed without a line of it changing
-
-= 0.80.0 =
-* The shape your writing rules were started from stays marked. Pressing one fills in about twenty fields and marked the card it came from, but nothing wrote that down — so the next visit showed eight identical cards with no sign of which one built the rules in front of you
-* Removed the one direct database query in the uninstaller. The running token totals it existed to sweep up are held as transients now, which expire on their own, so there is nothing left to sweep
 Older releases are listed in changelog.txt, which ships with the plugin.
 

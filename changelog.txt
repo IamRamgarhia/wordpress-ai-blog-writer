@@ -3,6 +3,12 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.86.0 =
+* Every point raised by the WordPress plugin review, fixed against the current code. The security checks were always being made, but through a helper one call away, so each one carried a note telling the code checker to ignore it — and the review read those notes and called it a fault. Thirty-one places now use WordPress’s own check, with the permission test beside it, and seventy-three of those notes are gone because nothing needs excusing
+* Two of them were not false alarms: a pair of internal functions read submitted data on the strength of a check made by whatever called them, with nothing at those lines saying so. Both check for themselves now
+* Submitted data is cleaned where it arrives rather than several steps later, with the right function for each kind — including the one that keeps a draft’s formatting intact
+* Fixed two addresses that did not answer: the plugin’s own page, which is not written yet, and one image service that refuses automated requests on every page it has
+
 = 0.85.0 =
 * The sentence to say in your app has moved to where it is useful. It was a standing panel at the top of Write a post explaining what to do once you had saved a brief, sitting above the form that saves it — backwards, and unchanging, so after the second visit it was five lines of furniture. It appears once there is a brief to say it about
 * The warning that no app is connected stays at the top, and only when it is true
