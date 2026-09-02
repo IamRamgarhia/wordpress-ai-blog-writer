@@ -54,7 +54,7 @@ class Blogcraft_Crypto {
 		$nonce  = random_bytes( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES );
 		$cipher = sodium_crypto_secretbox( $plaintext, $nonce, self::key() );
 
-		return self::PREFIX . base64_encode( $nonce . $cipher ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return self::PREFIX . base64_encode( $nonce . $cipher ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- making raw sodium output storable as text, not hiding anything: the plaintext is the reader's own API key and this is what encrypts it.
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Blogcraft_Crypto {
 			return '';
 		}
 
-		$raw = base64_decode( substr( $ciphertext, strlen( self::PREFIX ) ), true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		$raw = base64_decode( substr( $ciphertext, strlen( self::PREFIX ) ), true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- reading back what encrypt() wrote, with strict mode on so anything else is refused rather than guessed at.
 
 		if ( false === $raw || strlen( $raw ) < SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES ) {
 			return '';

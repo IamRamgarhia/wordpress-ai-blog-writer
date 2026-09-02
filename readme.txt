@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,50 +81,48 @@ Nothing in the plugin is minified, compiled or generated: every file shipped is 
 
 == External Services ==
 
-Dicecodes AI Blog Writer contacts no servers of its own. It collects no analytics and sends nothing to the plugin author.
+Dicecodes AI Blog Writer has no server of its own. It collects no analytics and sends nothing to the plugin author. It contacts only the services you configure, and only while writing a post.
 
-It contacts only the services you configure, and only when generating a post:
+**The WordPress AI Client** — on WordPress 7.0 and later, if a provider plugin is installed, the request can go through WordPress instead. No key here and no signup: the credentials live in WordPress. Offered only when genuinely available.
 
-**The WordPress AI Client** — on WordPress 7.0 and later, if a provider plugin is installed, this plugin can route everything through WordPress instead. No key here and no signup: the credentials live in WordPress and the request goes wherever your site already sends AI requests. It is offered in the provider list only when it is genuinely available.
+**AI providers** — whichever one you set up. The topic, your style settings and any gathered research are sent so the post can be written.
 
-**AI providers** — one of the following, whichever you set up. The topic, your style settings and any gathered research are sent so the post can be written.
+* OpenAI (api.openai.com) — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
+* Anthropic (api.anthropic.com) — https://www.anthropic.com/legal/consumer-terms and https://www.anthropic.com/legal/privacy
+* Google Gemini (generativelanguage.googleapis.com) — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
+* xAI, for Grok (api.x.ai) — https://x.ai/legal/terms-of-service and https://x.ai/legal/privacy-policy
+* Moonshot, for Kimi (api.moonshot.ai) — https://www.moonshot.ai/user-agreement and https://www.moonshot.ai/privacy-policy
+* DeepSeek (api.deepseek.com) — https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html and https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html
+* Groq (api.groq.com) — https://groq.com/terms-of-use/ and https://groq.com/privacy-policy/
+* OpenRouter (openrouter.ai) — https://openrouter.ai/terms and https://openrouter.ai/privacy
+* Mistral (api.mistral.ai) — https://mistral.ai/terms and https://mistral.ai/terms/#privacy-policy
+* Together (api.together.xyz) — https://www.together.ai/terms-of-service and https://www.together.ai/privacy
+* Fireworks (api.fireworks.ai) — https://fireworks.ai/terms-of-service and https://fireworks.ai/privacy-policy
+* Cerebras (api.cerebras.ai) — https://www.cerebras.ai/terms-of-service and https://www.cerebras.ai/privacy-policy
+* Hugging Face (router.huggingface.co) — https://huggingface.co/terms-of-service and https://huggingface.co/privacy
+* Ollama, LM Studio, Jan or llama.cpp on your own machine, or a custom endpoint you define. The address is yours and the request reaches no third party, so there is no policy to link. https://ollama.com/, https://lmstudio.ai/ and https://jan.ai/
 
-* OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
-* Anthropic — https://www.anthropic.com/legal/consumer-terms and https://www.anthropic.com/legal/privacy
-* Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
-* xAI (Grok), Moonshot (Kimi), DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks, Cerebras and Hugging Face. Terms and privacy policy vary; see the one you choose.
-* Ollama, LM Studio, Jan or llama.cpp running on your own machine, which sends nothing anywhere.
-* A custom endpoint you define yourself.
-
-**Research providers** — optional. The post topic is sent so relevant sources can be found.
+**Research providers** — optional, all off until switched on. Only the post topic is sent, and only when you write one. See Settings, Research.
 
 * Tavily (api.tavily.com) — https://tavily.com/terms and https://tavily.com/privacy
 * SerpApi (serpapi.com) — https://serpapi.com/legal#terms-of-service and https://serpapi.com/legal#privacy-policy
-* A SearXNG instance you host yourself.
-* Wikipedia (en.wikipedia.org) — the topic is sent to its public summary API to read the opening of a matching article. No account and no key. https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
-* Hacker News search, via Algolia (hn.algolia.com) — the topic is sent as a search query. No account and no key. https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
+* Wikipedia (en.wikipedia.org) — the topic goes to its public summary API to read the opening of a matching article. No account or key. https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use and https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+* Hacker News search, via Algolia (hn.algolia.com) — the topic is sent as a search query. No account or key. https://www.algolia.com/policies/terms and https://www.algolia.com/policies/privacy
+* A SearXNG instance you host yourself — the address is one you enter, so no third party is reached and there is no policy to link.
 
-Every one of these starts switched off, including the two that need no key. Nothing is contacted until you turn a source on, and only the post topic is ever sent. See Settings, Research.
+**Image providers** — off until you switch pictures on, which is how you choose one. A short description of the wanted picture is sent so one can be found or generated; the post itself never is. fal.ai, OpenAI, Gemini and Grok charge per image and are used only when chosen, so nothing is billed by accident.
 
-**Image providers** — off until you switch pictures on, which is how you choose one. A short description of the wanted picture is then sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
+* Pollinations (image.pollinations.ai) — https://pollinations.ai — publishes no terms or privacy page; offered because it needs no account.
+* fal.ai (fal.run) — refuses automated requests, so its terms and privacy pages cannot be linked here; both are reachable from fal.ai itself.
+* OpenAI, Google Gemini and xAI for Grok — the same three services, hosts and policies listed under AI providers above.
+* Pexels (api.pexels.com) — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/ — served to people, but automated checks are refused with a 403.
+* Pixabay (pixabay.com) — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/ — rate limited, so an automated check may see 403 on one attempt and 200 on the next.
 
-* Pollinations (image.pollinations.ai) — https://pollinations.ai (this service publishes no terms or privacy page; it is offered because it needs no account, and it is off until you choose it)
-* fal.ai (fal.run) — this service refuses automated requests, so its terms and privacy pages cannot be linked here; both are reachable from fal.ai itself, and it is off until you choose it
-* OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
-* Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
-* xAI (Grok) — https://x.ai/legal/terms-of-service and https://x.ai/legal/privacy-policy
-* Pexels (api.pexels.com) — https://www.pexels.com/terms-of-service/ and https://www.pexels.com/privacy-policy/
-* Pixabay (pixabay.com) — https://pixabay.com/service/terms/ and https://pixabay.com/service/privacy/
+**Search engine notification** — off unless switched on under Settings, Automation.
 
-fal.ai, OpenAI, Gemini and Grok charge for each image they generate. The plugin never falls back to them: they are used only when you have chosen one of them, so an image is never billed to you by accident.
+* IndexNow (api.indexnow.org) — the address of the post, and nothing else, is sent once as it goes live, so Bing, Yandex, Seznam and Naver come and look rather than waiting. Google does not take part. https://www.bing.com/indexnow and https://www.microsoft.com/privacy/privacystatement
 
-**Search engine notification** — off unless you switch it on under Settings, Automation.
-
-* IndexNow (api.indexnow.org) — the address of the post, and nothing else, is sent once as it goes live. The endpoint is shared: Bing, Yandex, Seznam and Naver all read from it. https://www.bing.com/indexnow and https://www.microsoft.com/privacy/privacystatement
-
-When it is on, the address of each post is sent as it goes live, so Bing, Yandex, Seznam and Naver come and look rather than waiting to find it. Only the address is sent, never the post. Google has said it does not take part.
-
-The plugin may also fetch any URL you explicitly add to its research list, to read it as source material. When a search provider is configured, it also opens the first few results for a topic to read how they are organised, which is used to plan a post that covers what they leave out.
+The plugin also fetches any URL you add to its research list, to read as source material, and with a search provider configured it opens the first few results for a topic to see how they are organised.
 
 == Frequently Asked Questions ==
 
@@ -170,6 +168,15 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.3.1 =
+* Every AI provider now carries its own terms and privacy links. Ten of them — xAI, Moonshot, DeepSeek, Groq, OpenRouter, Mistral, Together, Fireworks, Cerebras and Hugging Face — were listed on one shared line saying the policies vary and to check whichever you pick. The directory asks for links per service, and that line had none
+* Each entry also names the address it actually contacts, so what the plugin reaches and what the readme claims can be compared without reading the code
+* Two picture services publish policy pages that are served to people but refuse automated readers. Both are now marked as such, the way fal.ai already was, because an automated link check reports a failure for a page that is genuinely there
+* The self-hosted options — SearXNG, Ollama, LM Studio, Jan, llama.cpp and a custom endpoint — say plainly that the address is yours and reaches no third party, rather than being listed with nothing beside them
+* Giving every service its own links pushed the section past the 5,000 characters the readme parser keeps, which would have cut the last services back off. It is written tighter and fits, and a test holds it there
+* A test compares the readme against the code and the provider list: an address the plugin can reach and does not disclose fails, and so does a service named without either a policy link or a stated reason there is none
+* Said why the two base64 calls in the key encryption are there. Both were suppressed warnings with no explanation beside them, which reads worse than the thing it was hiding
+
 = 1.3.0 =
 * Fixed: on a site whose theme adds its own article structured data, every post went out carrying two copies of it that described the same page and disagreed with each other. Two is worth less to a search engine than one, and nothing on any screen said it was happening
 * The plugin already stood down for the SEO plugins it could name, because each announces itself. A theme announces nothing, so no list could ever have caught this. It is now answered by looking: the site reads one of its own published posts and counts what is actually in the page
@@ -183,15 +190,5 @@ everything is here, oldest at the bottom.
 * This is why pictures could not be switched on, why research stayed off, why the voice never saved and why "Delete all of it instead" never stuck. It was not those settings; it was the form around them
 * The settings form is now a short element of its own and every setting names it, which is what the save button in the corner has always done. The other nine forms are ordinary siblings and work as they read
 * A test renders every screen on every setup and fails if any form opens inside another, or if any setting is left in no form at all
-
-= 1.1.0 =
-* The comparison of the two ways is a table as well as two cards: thirteen rows in plain words, answering the questions people actually ask. Can it put a picture on the post, do the pictures cost anything, will it write while you are away, what does each post cost, what do you need before it works
-* Fixed: the two cards stacked instead of sitting side by side. The panel around them is a row, so the fold had been sized to the width of its own heading and the columns inside had nowhere to go
-* Every screen says which way this site is running — API mode or MCP mode — at the end of the tabs, and it leads to the switch. The two behave differently enough that "why is there no Calendar" should not need looking up
-* A test holds the table to what the code does, because a wrong Yes in a comparison is worse than no comparison
-
-= 1.0.0 =
-* The two ways of running this can be compared after you have picked one. Both were laid out side by side while the question was open and never again, so anybody wondering whether the other suited them better had a switch button and nothing to weigh it against. It is folded under the switch on Settings, and it is the same list the question uses rather than a second one to keep in step
-* "Change" on the overview lands on the switch and the comparison beside it, instead of the top of a long screen
 Older releases are listed in changelog.txt, which ships with the plugin.
 
