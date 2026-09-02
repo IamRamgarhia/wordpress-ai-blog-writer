@@ -1103,11 +1103,15 @@ class Blogcraft_Generate {
 		// voice from the moment the voice moved to its own screen: it landed
 		// on a card whose only content is a link to How it writes.
 		$where = array(
-			'voice'    => array(
+			'voice'     => array(
 				admin_url( 'admin.php?page=blogcraft-blueprint' ),
 				__( 'Describe your voice', 'dicecodes-ai-blog-writer' ),
 			),
-			'research' => array(
+			'blueprint' => array(
+				admin_url( 'admin.php?page=blogcraft-blueprint' ),
+				__( 'Set the rules', 'dicecodes-ai-blog-writer' ),
+			),
+			'research'  => array(
 				admin_url( 'admin.php?page=blogcraft-settings#bc-card-research' ),
 				__( 'Choose a source', 'dicecodes-ai-blog-writer' ),
 			),

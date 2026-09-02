@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.96.0
+Stable tag: 0.97.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,12 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.97.0 =
+* How it writes marks every section nobody has been into yet with a quiet "default", so you can see at a glance which parts of the brief have been answered and which are still the ones the plugin shipped with. Keeping a default is a decision too — this only answers "which of these have I not looked at", which otherwise meant opening all seven and remembering what the defaults were
+* A site where none of it has been answered is told so once, at the top, with the reason: every post is written to this brief, and it is the difference between a post that sounds like your blog and one that sounds like every other AI post
+* "Before you write" on the Write a post screen now lists the writing rules alongside the voice, and says what setting them up buys — a page that answers a real question in a real voice is what search engines reward, and the brief is where you say which
+* A test checks every field on the blueprint belongs to exactly one section, so a field added later cannot quietly stop being watched
+
 = 0.96.0 =
 * Fixed: pictures could not be switched on at all when an AI client does the writing. The feature worked on that setup — the app asks this site for the pictures and publishing attaches them — but the card that switches them on was shown only to sites using an API key. So the composer offered to describe a picture, the tool answered "the owner turns them on under Settings", and there was no card there to turn them on with
 * Fixed: "Set them up" on the Write a post screen went to Settings for both things it listed, and the voice moved to How it writes some releases ago. Each now links to the screen that actually holds it
@@ -187,12 +193,5 @@ everything is here, oldest at the bottom.
 * That panel keeps the keyboard inside it now. Tab used to walk out into the form behind, which is still there and still fillable, so it was possible to type into a screen you could not see. Closing it puts you back where you were
 * Fixed: on a phone, the panel's "Back to the brief" button folded into four stacked words. Both buttons take the full width there
 * Note: pictures still need switching on under Settings before anything can add one, whichever way a post is published
-
-= 0.93.0 =
-* Fixed: four links to the documentation opened in the same tab, so following one while setting something up threw away the form you were filling in. Anything that leaves your own admin now opens a new tab, decided from the address rather than remembered link by link
-* Fixed: the old Help address answered with "Sorry, you are not allowed to access this page" — WordPress's message for a permissions problem, on a page that had simply moved. It now says where the documentation went and offers a way there, for anyone who bookmarked it
-* The section switcher on How it writes is a real set of tabs: it says which panel each one opens, and the arrow keys, Home and End move between them. It said which section was current before, but nothing said the buttons controlled anything, and most of the form is behind them
-* Activity records what a connected app does. Drafts created, posts published or scheduled, and anything held back for scoring below your threshold — the screen that answers "what has this been doing" could not answer it at all on a site where an app does the writing
-* The list of pipeline jobs is not shown on that path when there are none, rather than an empty table describing a queue that setup does not use
 Older releases are listed in changelog.txt, which ships with the plugin.
 

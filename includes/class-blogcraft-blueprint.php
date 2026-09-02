@@ -352,8 +352,23 @@ class Blogcraft_Blueprint {
 	 * @return bool
 	 */
 	public static function was_edited() {
+		return ! empty( self::changed_fields() );
+	}
+
+	/**
+	 * Which answers differ from the ones the plugin shipped with.
+	 *
+	 * Per field rather than one verdict for the whole brief, so a screen can
+	 * say which parts of it have been thought about and which are still the
+	 * defaults. "Reasonable defaults, not right ones" is only useful advice
+	 * if somebody can see where they still apply.
+	 *
+	 * @return array Field names.
+	 */
+	public static function changed_fields() {
 		$active   = self::get();
 		$defaults = self::defaults();
+		$changed  = array();
 
 		foreach ( $defaults as $key => $value ) {
 			if ( ! array_key_exists( $key, $active ) ) {
@@ -363,12 +378,20 @@ class Blogcraft_Blueprint {
 			// Loose on purpose: these round-trip through form posts and the
 			// options table, so a 1 comes back as '1' and an int as a string.
 			// A strict comparison would report every install as edited.
-			if ( is_scalar( $value ) && is_scalar( $active[ $key ] ) && (string) $value !== (string) $active[ $key ] ) {
-				return true;
+			if ( is_array( $value ) || is_array( $active[ $key ] ) ) {
+				if ( wp_json_encode( $value ) !== wp_json_encode( $active[ $key ] ) ) {
+					$changed[] = $key;
+				}
+
+				continue;
+			}
+
+			if ( (string) $value !== (string) $active[ $key ] ) {
+				$changed[] = $key;
 			}
 		}
 
-		return false;
+		return $changed;
 	}
 
 	/**

@@ -11,19 +11,19 @@ msgstr ""
 "X-Domain: blogcraft\n"
 
 
-#: includes/class-blogcraft-blueprint-screen.php:950
-#: includes/class-blogcraft-blueprint-screen.php:957
+#: includes/class-blogcraft-blueprint-screen.php:1095
+#: includes/class-blogcraft-blueprint-screen.php:1102
 msgid " characters"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:816
+#: includes/class-blogcraft-blueprint-screen.php:961
 msgid " sentences"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:781
-#: includes/class-blogcraft-blueprint-screen.php:809
-#: includes/class-blogcraft-generate.php:1390
-#: includes/class-blogcraft-generate.php:1480
+#: includes/class-blogcraft-blueprint-screen.php:926
+#: includes/class-blogcraft-blueprint-screen.php:954
+#: includes/class-blogcraft-generate.php:1394
+#: includes/class-blogcraft-generate.php:1484
 msgid " words"
 msgstr ""
 
@@ -43,7 +43,7 @@ msgid "%1$d of %2$d done. Nothing gets written until the first one is."
 msgstr ""
 
 #. translators: 1: number queued, 2: number skipped as duplicates.
-#: includes/class-blogcraft-generate.php:2244
+#: includes/class-blogcraft-generate.php:2248
 msgid "%1$d queued, %2$d skipped as too similar to a post you have or one already waiting."
 msgstr ""
 
@@ -131,7 +131,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of posts moved to the trash.
-#: includes/class-blogcraft-generate.php:2294
+#: includes/class-blogcraft-generate.php:2298
 msgid "%d post moved to the trash."
 msgid_plural "%d posts moved to the trash."
 msgstr[0] ""
@@ -145,7 +145,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of pipeline steps that ran.
-#: includes/class-blogcraft-generate.php:2175
+#: includes/class-blogcraft-generate.php:2179
 msgid "%d step ran."
 msgid_plural "%d steps ran."
 msgstr[0] ""
@@ -169,7 +169,7 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:712
+#: includes/class-blogcraft-blueprint-screen.php:857
 msgid "1 is a message to a friend. 5 is a white paper."
 msgstr ""
 
@@ -197,7 +197,7 @@ msgstr ""
 msgid "A close detail"
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:224
+#: includes/class-blogcraft-readiness.php:245
 msgid "A described voice and reader"
 msgstr ""
 
@@ -213,11 +213,11 @@ msgstr ""
 msgid "A low number is safer. Volume without review is what search engines penalise. Zero writes nothing, which is a way to pause automatic posts without losing the schedule."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1574
+#: includes/class-blogcraft-generate.php:1578
 msgid "A named source for claims"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:995
+#: includes/class-blogcraft-blueprint-screen.php:1140
 msgid "A named source for factual claims"
 msgstr ""
 
@@ -238,7 +238,7 @@ msgid "A position held from the first line and defended. First person, longer se
 msgstr ""
 
 #. translators: %s: a clock time, such as "3:45 pm".
-#: includes/class-blogcraft-generate.php:1222
+#: includes/class-blogcraft-generate.php:1226
 msgid "A post already being written resumes at about %s. Starting another now will most likely stop part-way too, and the stages it runs first still cost you."
 msgstr ""
 
@@ -246,11 +246,11 @@ msgstr ""
 msgid "A provider is already set up. Nothing to do here."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1244
+#: includes/class-blogcraft-generate.php:1248
 msgid "A sentence beats a keyword. Say what the post should answer."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:321
+#: includes/class-blogcraft-blueprint-screen.php:466
 msgid "A shape"
 msgstr ""
 
@@ -262,7 +262,7 @@ msgstr ""
 msgid "A table of the figures the post rests on, so they can be checked rather than taken."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:847
+#: includes/class-blogcraft-blueprint-screen.php:992
 msgid "A table of the figures, with sources"
 msgstr ""
 
@@ -270,7 +270,7 @@ msgstr ""
 msgid "A token"
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:171
+#: includes/class-blogcraft-readiness.php:172
 msgid "A topic that says what to answer"
 msgstr ""
 
@@ -343,12 +343,12 @@ msgstr ""
 msgid "Add what you measured, paid, tried or got wrong. One paragraph of it is worth more than a thousand words that are not yours."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:942
+#: includes/class-blogcraft-blueprint-screen.php:1087
 msgid "Added after writing, then counted."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1079
-#: includes/class-blogcraft-generate.php:1657
+#: includes/class-blogcraft-blueprint-screen.php:1224
+#: includes/class-blogcraft-generate.php:1661
 msgid "Added to every image prompt as written."
 msgstr ""
 
@@ -356,7 +356,7 @@ msgstr ""
 msgid "Adding the extra sections"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:353
+#: includes/class-blogcraft-blueprint-screen.php:498
 msgid "Address"
 msgstr ""
 
@@ -372,22 +372,22 @@ msgstr ""
 msgid "All In One SEO"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:858
+#: includes/class-blogcraft-blueprint-screen.php:1003
 msgid "Allow"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:987
-#: includes/class-blogcraft-generate.php:1567
+#: includes/class-blogcraft-blueprint-screen.php:1132
+#: includes/class-blogcraft-generate.php:1571
 msgid "Allow contractions"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:988
-#: includes/class-blogcraft-generate.php:1568
+#: includes/class-blogcraft-blueprint-screen.php:1133
+#: includes/class-blogcraft-generate.php:1572
 msgid "Allow em dashes"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1094
-#: includes/class-blogcraft-generate.php:1670
+#: includes/class-blogcraft-blueprint-screen.php:1239
+#: includes/class-blogcraft-generate.php:1674
 msgid "Allow text in generated images"
 msgstr ""
 
@@ -403,8 +403,8 @@ msgstr ""
 msgid "Already have posts published?"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:914
-#: includes/class-blogcraft-generate.php:1521
+#: includes/class-blogcraft-blueprint-screen.php:1059
+#: includes/class-blogcraft-generate.php:1525
 msgid "Also cover"
 msgstr ""
 
@@ -416,7 +416,7 @@ msgstr ""
 msgid "Always read these URLs"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:730
+#: includes/class-blogcraft-blueprint-screen.php:875
 msgid "American"
 msgstr ""
 
@@ -424,7 +424,7 @@ msgstr ""
 msgid "An abstract representation"
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:205
+#: includes/class-blogcraft-readiness.php:206
 msgid "An angle for this one post"
 msgstr ""
 
@@ -456,7 +456,7 @@ msgstr ""
 msgid "Anecdotes, opinions or data only you have. This is what AI writing structurally lacks."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1250
+#: includes/class-blogcraft-generate.php:1254
 msgid "Angle for this post"
 msgstr ""
 
@@ -464,11 +464,11 @@ msgstr ""
 msgid "Announcing a post sends its address to IndexNow, which is Microsoft's open service — Bing, Yandex, Seznam and Naver read it. Nothing is sent until you tick that box, and only the address is sent, never the post. Google has said it does not take part, so this does nothing for Google either way."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1286
+#: includes/class-blogcraft-generate.php:1290
 msgid "Answer any of these in the box above, in your own words:"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1141
+#: includes/class-blogcraft-blueprint-screen.php:1286
 msgid "Answer in two sentences at most."
 msgstr ""
 
@@ -496,12 +496,12 @@ msgstr ""
 msgid "Anthropic — Claude, paid"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:354
+#: includes/class-blogcraft-blueprint-screen.php:499
 msgid "Any published article, including one of your own. Dicecodes AI Blog Writer reads it and works out how long it runs, how it is sectioned, how long its sentences are, whether it uses tables, how heavily it links out, how many figures it states, and whether it says \"I\" or \"you\". Structure only: none of the wording is copied, kept, or shown to a model."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1078
-#: includes/class-blogcraft-generate.php:1656
+#: includes/class-blogcraft-blueprint-screen.php:1223
+#: includes/class-blogcraft-generate.php:1660
 msgid "Anything else"
 msgstr ""
 
@@ -509,7 +509,7 @@ msgstr ""
 msgid "Anything else — enter the address yourself"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1251
+#: includes/class-blogcraft-generate.php:1255
 msgid "Anything true of this post only. Stops them all reading the same."
 msgstr ""
 
@@ -537,7 +537,7 @@ msgstr ""
 msgid "Ask it to write, and tell it what only you know"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1039
+#: includes/class-blogcraft-blueprint-screen.php:1184
 msgid "Ask the writing model to describe a scene for this specific post, instead of handing the headline to an image model and hoping. This is the single biggest difference between a useful image and clip art of the title."
 msgstr ""
 
@@ -553,7 +553,7 @@ msgstr ""
 msgid "Asking your provider..."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1285
+#: includes/class-blogcraft-generate.php:1289
 msgid "Asks four questions only you can answer, for the box above."
 msgstr ""
 
@@ -630,7 +630,7 @@ msgstr ""
 msgid "Before it writes"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1137
+#: includes/class-blogcraft-generate.php:1141
 msgid "Before you write"
 msgstr ""
 
@@ -647,15 +647,15 @@ msgstr ""
 msgid "Being written"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:230
+#: includes/class-blogcraft-blueprint-screen.php:366
 msgid "Blueprint sections"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:863
+#: includes/class-blogcraft-blueprint-screen.php:1008
 msgid "Bold key phrases"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:319
+#: includes/class-blogcraft-blueprint-screen.php:464
 msgid "Both of these fill in the controls on the other tabs. Nothing is saved until you press Save changes, and every field stays yours to change."
 msgstr ""
 
@@ -671,7 +671,7 @@ msgstr ""
 msgid "Bright and open"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:731
+#: includes/class-blogcraft-blueprint-screen.php:876
 msgid "British"
 msgstr ""
 
@@ -687,8 +687,8 @@ msgstr ""
 msgid "Built from what people actually ask about this subject, and answered where they will look for them. No longer its own search result: Google retired those in May 2026."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:860
-#: includes/class-blogcraft-generate.php:1424
+#: includes/class-blogcraft-blueprint-screen.php:1005
+#: includes/class-blogcraft-generate.php:1428
 #: includes/class-blogcraft-generate.php:501
 msgid "Bulleted lists"
 msgstr ""
@@ -704,7 +704,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1755
+#: includes/class-blogcraft-generate.php:1759
 msgid "Category"
 msgstr ""
 
@@ -724,11 +724,11 @@ msgstr ""
 msgid "Change it"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1713
+#: includes/class-blogcraft-generate.php:1717
 msgid "Change the service"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1324
+#: includes/class-blogcraft-generate.php:1328
 msgid "Changes this post only."
 msgstr ""
 
@@ -785,7 +785,7 @@ msgstr ""
 msgid "Choose a shape"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1112
+#: includes/class-blogcraft-generate.php:1116
 msgid "Choose a source"
 msgstr ""
 
@@ -828,16 +828,16 @@ msgstr ""
 msgid "Clear the log"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1071
-#: includes/class-blogcraft-generate.php:1650
+#: includes/class-blogcraft-blueprint-screen.php:1216
+#: includes/class-blogcraft-generate.php:1654
 msgid "Colours"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1762
+#: includes/class-blogcraft-generate.php:1766
 msgid "Comma separated. Left blank, no tags are added."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1252
+#: includes/class-blogcraft-generate.php:1256
 msgid "Compare three price brackets and say which is worth it."
 msgstr ""
 
@@ -850,11 +850,11 @@ msgid "Concrete examples"
 msgstr ""
 
 #: includes/class-blogcraft-editorial.php:868
-#: includes/class-blogcraft-generate.php:1575
+#: includes/class-blogcraft-generate.php:1579
 msgid "Concrete figures"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:996
+#: includes/class-blogcraft-blueprint-screen.php:1141
 msgid "Concrete figures where they exist"
 msgstr ""
 
@@ -1019,7 +1019,7 @@ msgstr ""
 msgid "Creating the post"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1767
+#: includes/class-blogcraft-generate.php:1771
 msgid "Credited to"
 msgstr ""
 
@@ -1075,12 +1075,12 @@ msgstr ""
 msgid "Deleting the plugin leaves your settings, your writing rules and its record of every post it wrote exactly where they are. Install it again and everything is as you left it. This is the safe default because deleting a plugin to reinstall it, to move hosts, or to clear a half-finished upload is an ordinary thing to do, and none of those mean you wanted the work thrown away."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1889
+#: includes/class-blogcraft-generate.php:1893
 msgid "Deliberately generous. Your provider bills you, not us."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:992
-#: includes/class-blogcraft-generate.php:1571
+#: includes/class-blogcraft-blueprint-screen.php:1137
+#: includes/class-blogcraft-generate.php:1575
 msgid "Demand"
 msgstr ""
 
@@ -1088,7 +1088,7 @@ msgstr ""
 msgid "Depends on how you set it up"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:923
+#: includes/class-blogcraft-blueprint-screen.php:1068
 msgid "Derive the terms from existing coverage"
 msgstr ""
 
@@ -1097,21 +1097,21 @@ msgstr ""
 msgid "Describe it"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1038
+#: includes/class-blogcraft-blueprint-screen.php:1183
 msgid "Describe the picture first"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:704
-#: includes/class-blogcraft-generate.php:1466
+#: includes/class-blogcraft-blueprint-screen.php:849
+#: includes/class-blogcraft-generate.php:1470
 msgid "Describe the reader"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:684
-#: includes/class-blogcraft-generate.php:1449
+#: includes/class-blogcraft-blueprint-screen.php:829
+#: includes/class-blogcraft-generate.php:1453
 msgid "Describe the tone"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1072
+#: includes/class-blogcraft-blueprint-screen.php:1217
 msgid "Describe them in words. Leave blank to let each picture suit its own subject."
 msgstr ""
 
@@ -1121,7 +1121,7 @@ msgstr ""
 msgid "Describe your voice"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:955
+#: includes/class-blogcraft-blueprint-screen.php:1100
 msgid "Description length"
 msgstr ""
 
@@ -1129,8 +1129,8 @@ msgstr ""
 msgid "Developers"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:974
-#: includes/class-blogcraft-generate.php:1555
+#: includes/class-blogcraft-blueprint-screen.php:1119
+#: includes/class-blogcraft-generate.php:1559
 msgid "Devices to use"
 msgstr ""
 
@@ -1207,19 +1207,19 @@ msgstr ""
 msgid "Drafts are safer. Nothing goes live until you have read it."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:671
+#: includes/class-blogcraft-blueprint-screen.php:816
 msgid "Drawn on where it fits. Never invented beyond."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1451
+#: includes/class-blogcraft-generate.php:1455
 msgid "Dry, a little sceptical"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:686
+#: includes/class-blogcraft-blueprint-screen.php:831
 msgid "Dry, a little sceptical, never breathless"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:844
+#: includes/class-blogcraft-blueprint-screen.php:989
 msgid "Each one is written after the article is finished, from the article, in a single extra request. Off by default because a post that has all of them bolted on reads like a form."
 msgstr ""
 
@@ -1287,15 +1287,19 @@ msgstr ""
 msgid "Every fact in this post can be found on the pages it was written from. A page that restates what is already ranking has no argument for being ranked above it, and nothing in it another writer would cite."
 msgstr ""
 
+#: includes/class-blogcraft-blueprint-screen.php:301
+msgid "Every post is written to this brief, so it is the single biggest difference between a post that sounds like your blog and one that sounds like every other AI post."
+msgstr ""
+
 #: includes/class-blogcraft-library.php:133
 msgid "Every post this plugin has written, and every draft still waiting on you."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1125
+#: includes/class-blogcraft-blueprint-screen.php:1270
 msgid "Every section"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1323
+#: includes/class-blogcraft-generate.php:1327
 msgid "Everything else about this post"
 msgstr ""
 
@@ -1311,7 +1315,7 @@ msgstr ""
 msgid "Everything the plugin can do"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:261
+#: includes/class-blogcraft-blueprint-screen.php:406
 msgid "Exactly what the model is told. Updates as you change anything above."
 msgstr ""
 
@@ -1327,7 +1331,7 @@ msgstr ""
 msgid "Extra banned words"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:843
+#: includes/class-blogcraft-blueprint-screen.php:988
 msgid "Extra sections"
 msgstr ""
 
@@ -1335,7 +1339,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1616
+#: includes/class-blogcraft-generate.php:1620
 #: includes/class-blogcraft-preview.php:93
 msgid "Featured image"
 msgstr ""
@@ -1344,8 +1348,8 @@ msgstr ""
 msgid "Fewer than three sections."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:793
-#: includes/class-blogcraft-generate.php:1394
+#: includes/class-blogcraft-blueprint-screen.php:938
+#: includes/class-blogcraft-generate.php:1398
 msgid "Fewest sections"
 msgstr ""
 
@@ -1369,7 +1373,7 @@ msgstr ""
 msgid "Filled in on the other tabs. Nothing is saved until you press Save changes."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:652
+#: includes/class-blogcraft-blueprint-screen.php:797
 msgid "Fills these in from what you have already published. Nothing is saved until you press save."
 msgstr ""
 
@@ -1413,8 +1417,8 @@ msgstr ""
 msgid "First-hand experience"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:994
-#: includes/class-blogcraft-generate.php:1573
+#: includes/class-blogcraft-blueprint-screen.php:1139
+#: includes/class-blogcraft-generate.php:1577
 msgid "First-hand, specific detail"
 msgstr ""
 
@@ -1438,7 +1442,7 @@ msgstr ""
 msgid "Forget"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:711
+#: includes/class-blogcraft-blueprint-screen.php:856
 msgid "Formality"
 msgstr ""
 
@@ -1512,7 +1516,7 @@ msgstr ""
 msgid "Give it a topic. It researches, drafts, checks its own work and rewrites before anything reaches your site."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:416
+#: includes/class-blogcraft-blueprint-screen.php:561
 msgid "Give it a web address to read."
 msgstr ""
 
@@ -1548,8 +1552,8 @@ msgstr ""
 msgid "HTTP %1$d: %2$s"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:984
-#: includes/class-blogcraft-generate.php:1564
+#: includes/class-blogcraft-blueprint-screen.php:1129
+#: includes/class-blogcraft-generate.php:1568
 msgid "Habits"
 msgstr ""
 
@@ -1600,17 +1604,17 @@ msgstr ""
 msgid "How do you want to write?"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:787
+#: includes/class-blogcraft-blueprint-screen.php:932
 msgid "How far either side of the target is acceptable."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:828
-#: includes/class-blogcraft-generate.php:1412
+#: includes/class-blogcraft-blueprint-screen.php:973
+#: includes/class-blogcraft-generate.php:1416
 msgid "How it ends"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:821
-#: includes/class-blogcraft-generate.php:1406
+#: includes/class-blogcraft-blueprint-screen.php:966
+#: includes/class-blogcraft-generate.php:1410
 msgid "How it opens"
 msgstr ""
 
@@ -1620,7 +1624,7 @@ msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:115
 #: includes/class-blogcraft-blueprint-screen.php:116
-#: includes/class-blogcraft-blueprint-screen.php:204
+#: includes/class-blogcraft-blueprint-screen.php:340
 #: includes/class-blogcraft-generate.php:345
 #: includes/class-blogcraft-nav.php:33
 #: includes/class-blogcraft-overview.php:255
@@ -1632,11 +1636,11 @@ msgstr ""
 msgid "How it writes, and what every field here does"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:874
+#: includes/class-blogcraft-blueprint-screen.php:1019
 msgid "How many questions"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:867
+#: includes/class-blogcraft-blueprint-screen.php:1012
 msgid "How many takeaways"
 msgstr ""
 
@@ -1645,7 +1649,7 @@ msgstr ""
 msgid "How this works"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1245
+#: includes/class-blogcraft-generate.php:1249
 msgid "How to choose a standing desk for a small home office"
 msgstr ""
 
@@ -1689,11 +1693,11 @@ msgstr ""
 msgid "Image model"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1669
+#: includes/class-blogcraft-generate.php:1673
 msgid "Image models render lettering as convincing gibberish, so text is excluded by default."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1093
+#: includes/class-blogcraft-blueprint-screen.php:1238
 msgid "Image models render lettering as convincing gibberish, so text is excluded by default. Turn this on only with a model that handles typography."
 msgstr ""
 
@@ -1701,7 +1705,7 @@ msgstr ""
 msgid "In use"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1651
+#: includes/class-blogcraft-generate.php:1655
 msgid "In words. Leave blank to let each picture suit its own subject."
 msgstr ""
 
@@ -1709,8 +1713,8 @@ msgstr ""
 msgid "In your site timezone. Posting every single day, weekends included, is one of the clearer signs of an unattended blog."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:835
-#: includes/class-blogcraft-generate.php:1418
+#: includes/class-blogcraft-blueprint-screen.php:980
+#: includes/class-blogcraft-generate.php:1422
 msgid "Include"
 msgstr ""
 
@@ -1722,7 +1726,7 @@ msgstr ""
 msgid "Inside WordPress"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1115
+#: includes/class-blogcraft-blueprint-screen.php:1260
 msgid "Instructions for one part of the article only. These are appended to the rules the model already has, so use them for the things that keep coming out wrong."
 msgstr ""
 
@@ -1796,8 +1800,8 @@ msgid "Keep sentences short. Most of ours run under sixteen words."
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:38
-#: includes/class-blogcraft-blueprint-screen.php:837
-#: includes/class-blogcraft-generate.php:1420
+#: includes/class-blogcraft-blueprint-screen.php:982
+#: includes/class-blogcraft-generate.php:1424
 #: includes/class-blogcraft-generate.php:480
 #: includes/class-blogcraft-preview.php:75
 msgid "Key takeaways"
@@ -1815,7 +1819,7 @@ msgstr ""
 msgid "LM Studio — on this machine, free, no key"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:738
+#: includes/class-blogcraft-blueprint-screen.php:883
 msgid "Language"
 msgstr ""
 
@@ -1827,12 +1831,12 @@ msgstr ""
 msgid "Last used"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:651
+#: includes/class-blogcraft-blueprint-screen.php:796
 #: includes/class-blogcraft-connection.php:222
 msgid "Learn from my posts"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:900
+#: includes/class-blogcraft-blueprint-screen.php:1045
 msgid "Least often"
 msgstr ""
 
@@ -1846,11 +1850,11 @@ msgstr ""
 msgid "Leave blank to keep the saved key."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:894
+#: includes/class-blogcraft-blueprint-screen.php:1039
 msgid "Leave blank to let each topic speak for itself. Overridden per post."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1774
+#: includes/class-blogcraft-generate.php:1778
 msgid "Leave blank to publish as soon as it is written. Only applies if you chose to publish rather than save a draft."
 msgstr ""
 
@@ -1860,7 +1864,7 @@ msgstr ""
 msgid "Leave blank to use %s."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:739
+#: includes/class-blogcraft-blueprint-screen.php:884
 msgid "Leave blank to write in English."
 msgstr ""
 
@@ -1868,12 +1872,12 @@ msgstr ""
 msgid "Leave it for now"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1785
+#: includes/class-blogcraft-generate.php:1789
 msgid "Leave it on your usual one unless you are comparing two."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:779
-#: includes/class-blogcraft-generate.php:1388
+#: includes/class-blogcraft-blueprint-screen.php:924
+#: includes/class-blogcraft-generate.php:1392
 #: includes/class-blogcraft-scorecard.php:124
 msgid "Length"
 msgstr ""
@@ -1882,11 +1886,15 @@ msgstr ""
 msgid "Length is not a ranking factor on its own, and padding does not help. But a page well under what it takes to answer the question tends to be the one that leaves the reader still looking."
 msgstr ""
 
+#: includes/class-blogcraft-readiness.php:227
+msgid "Length, shape, reading level and what a finished post must contain. A page that answers a real question in a real voice is what search engines reward, and this is where you say which."
+msgstr ""
+
 #: includes/class-blogcraft-connection.php:451
 msgid "Let an AI client connect to this site"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1618
+#: includes/class-blogcraft-generate.php:1622
 msgid "Let the model describe the picture for this post"
 msgstr ""
 
@@ -1910,7 +1918,7 @@ msgstr ""
 msgid "Links to your other posts"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:941
+#: includes/class-blogcraft-blueprint-screen.php:1086
 msgid "Links to your own posts"
 msgstr ""
 
@@ -1934,12 +1942,12 @@ msgstr ""
 msgid "Long, thoroughly sectioned, with a contents list and the obvious questions answered at the end. The shape that ranks for a broad subject."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:814
+#: includes/class-blogcraft-blueprint-screen.php:959
 msgid "Longest paragraph"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:807
-#: includes/class-blogcraft-generate.php:1478
+#: includes/class-blogcraft-blueprint-screen.php:952
+#: includes/class-blogcraft-generate.php:1482
 msgid "Longest sentence"
 msgstr ""
 
@@ -1947,50 +1955,50 @@ msgstr ""
 msgid "Maximum posts per day"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1746
+#: includes/class-blogcraft-generate.php:1750
 msgid "Me"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1473
+#: includes/class-blogcraft-generate.php:1477
 msgid "Measured as a Flesch Reading Ease band."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:901
+#: includes/class-blogcraft-blueprint-screen.php:1046
 msgid "Measured as a share of all words."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:719
+#: includes/class-blogcraft-blueprint-screen.php:864
 msgid "Measured on the finished draft as a Flesch Reading Ease band."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:801
-#: includes/class-blogcraft-generate.php:1389
+#: includes/class-blogcraft-blueprint-screen.php:946
+#: includes/class-blogcraft-generate.php:1393
 msgid "Measured on the finished draft."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:815
-#: includes/class-blogcraft-generate.php:1479
-#: includes/class-blogcraft-generate.php:1534
+#: includes/class-blogcraft-blueprint-screen.php:960
+#: includes/class-blogcraft-generate.php:1483
+#: includes/class-blogcraft-generate.php:1538
 msgid "Measured."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:780
+#: includes/class-blogcraft-blueprint-screen.php:925
 msgid "Measured. A draft outside the tolerance below is sent back to be rewritten."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:908
+#: includes/class-blogcraft-blueprint-screen.php:1053
 msgid "Measured. Above this reads as keyword stuffing."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:808
+#: includes/class-blogcraft-blueprint-screen.php:953
 msgid "Measured. Every sentence over this is reported back for splitting."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1516
+#: includes/class-blogcraft-generate.php:1520
 msgid "Measured. Leave blank to let the topic speak for itself."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:935
+#: includes/class-blogcraft-blueprint-screen.php:1080
 msgid "Measured. Outbound links to reputable sources."
 msgstr ""
 
@@ -2003,7 +2011,7 @@ msgid "Minimal, lots of space"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:84
-#: includes/class-blogcraft-blueprint-screen.php:848
+#: includes/class-blogcraft-blueprint-screen.php:993
 #: includes/class-blogcraft-generate.php:521
 msgid "Mistakes worth avoiding"
 msgstr ""
@@ -2016,7 +2024,7 @@ msgstr ""
 msgid "Model"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1784
+#: includes/class-blogcraft-generate.php:1788
 msgid "Model for this post"
 msgstr ""
 
@@ -2037,8 +2045,8 @@ msgstr ""
 msgid "Monthly token cap of %d tokens has been reached; no request was sent."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1051
-#: includes/class-blogcraft-generate.php:1633
+#: includes/class-blogcraft-blueprint-screen.php:1196
+#: includes/class-blogcraft-generate.php:1637
 msgid "Mood"
 msgstr ""
 
@@ -2054,7 +2062,7 @@ msgstr ""
 msgid "More than one at a time"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:907
+#: includes/class-blogcraft-blueprint-screen.php:1052
 msgid "Most often"
 msgstr ""
 
@@ -2062,8 +2070,8 @@ msgstr ""
 msgid "Most paid images per month"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:800
-#: includes/class-blogcraft-generate.php:1400
+#: includes/class-blogcraft-blueprint-screen.php:945
+#: includes/class-blogcraft-generate.php:1404
 msgid "Most sections"
 msgstr ""
 
@@ -2091,8 +2099,8 @@ msgstr ""
 msgid "Moved."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:927
-#: includes/class-blogcraft-generate.php:1527
+#: includes/class-blogcraft-blueprint-screen.php:1072
+#: includes/class-blogcraft-generate.php:1531
 msgid "Must appear"
 msgstr ""
 
@@ -2131,17 +2139,17 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1007
-#: includes/class-blogcraft-generate.php:1584
+#: includes/class-blogcraft-blueprint-screen.php:1152
+#: includes/class-blogcraft-generate.php:1588
 msgid "Never mention"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1120
+#: includes/class-blogcraft-blueprint-screen.php:1265
 msgid "Never open with a rhetorical question."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1085
-#: includes/class-blogcraft-generate.php:1662
+#: includes/class-blogcraft-blueprint-screen.php:1230
+#: includes/class-blogcraft-generate.php:1666
 msgid "Never show"
 msgstr ""
 
@@ -2149,8 +2157,8 @@ msgstr ""
 msgid "Never used"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1000
-#: includes/class-blogcraft-generate.php:1578
+#: includes/class-blogcraft-blueprint-screen.php:1145
+#: includes/class-blogcraft-generate.php:1582
 msgid "Never write"
 msgstr ""
 
@@ -2247,7 +2255,7 @@ msgstr ""
 msgid "No scheduled or unattended writing"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1134
+#: includes/class-blogcraft-blueprint-screen.php:1279
 msgid "No summary of what was just said. End on what to do next."
 msgstr ""
 
@@ -2271,16 +2279,16 @@ msgstr ""
 msgid "None — use my own site and any URLs I supply"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1222
-#: includes/class-blogcraft-blueprint-screen.php:1226
-#: includes/class-blogcraft-blueprint-screen.php:372
-#: includes/class-blogcraft-blueprint-screen.php:376
+#: includes/class-blogcraft-blueprint-screen.php:1367
+#: includes/class-blogcraft-blueprint-screen.php:1371
+#: includes/class-blogcraft-blueprint-screen.php:517
+#: includes/class-blogcraft-blueprint-screen.php:521
 #: includes/class-blogcraft-connection.php:251
 #: includes/class-blogcraft-connection.php:255
 #: includes/class-blogcraft-connection.php:95
 #: includes/class-blogcraft-connection.php:99
-#: includes/class-blogcraft-generate.php:1164
 #: includes/class-blogcraft-generate.php:1168
+#: includes/class-blogcraft-generate.php:1172
 #: includes/class-blogcraft-generate.php:177
 #: includes/class-blogcraft-generate.php:181
 #: includes/class-blogcraft-progress.php:237
@@ -2318,6 +2326,10 @@ msgstr ""
 
 #: includes/class-blogcraft-learn.php:340
 msgid "Nothing has been saved. Correct anything that is wrong, then save."
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:300
+msgid "Nothing here has been answered yet."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1640
@@ -2396,7 +2408,7 @@ msgstr ""
 msgid "On your site"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1623
+#: includes/class-blogcraft-generate.php:1627
 msgid "One beneath each section heading, up to this many."
 msgstr ""
 
@@ -2415,12 +2427,12 @@ msgid_plural "One more writing pass, aimed at the %d faults below that a rewrite
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-blogcraft-blueprint-screen.php:657
+#: includes/class-blogcraft-blueprint-screen.php:802
 #: includes/class-blogcraft-connection.php:412
 msgid "One or two sentences on the subject and the angle."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1522
+#: includes/class-blogcraft-generate.php:1526
 msgid "One per line."
 msgstr ""
 
@@ -2428,7 +2440,7 @@ msgstr ""
 msgid "One per line. A list of common AI tells is already blocked by default."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1585
+#: includes/class-blogcraft-generate.php:1589
 msgid "One per line. Competitors, brands, claims that must not appear at all. Measured, weighted heavily."
 msgstr ""
 
@@ -2436,7 +2448,7 @@ msgstr ""
 msgid "One per line. Competitors, off-limits claims, anything legally sensitive."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:664
+#: includes/class-blogcraft-blueprint-screen.php:809
 msgid "One per line. Followed on every post."
 msgstr ""
 
@@ -2444,27 +2456,27 @@ msgstr ""
 msgid "One per line. For example: no em dashes. Short paragraphs. Never open with a question."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1528
+#: includes/class-blogcraft-generate.php:1532
 msgid "One per line. Measured — a missing term is reported back and rewritten."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1001
+#: includes/class-blogcraft-blueprint-screen.php:1146
 msgid "One per line. Measured — any of these found in a draft sends it back."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:928
+#: includes/class-blogcraft-blueprint-screen.php:1073
 msgid "One per line. Measured — every one of these is checked for, and a missing term is reported back."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1008
+#: includes/class-blogcraft-blueprint-screen.php:1153
 msgid "One per line. Measured, and weighted heavily. For competitors, brands and claims that must never appear at all."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1579
+#: includes/class-blogcraft-generate.php:1583
 msgid "One per line. Measured."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:746
+#: includes/class-blogcraft-blueprint-screen.php:891
 msgid "One per line. Product names, your brand, anything that gets mangled."
 msgstr ""
 
@@ -2472,15 +2484,15 @@ msgstr ""
 msgid "One per line. Read for every post, whether or not a search provider is set."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:915
+#: includes/class-blogcraft-blueprint-screen.php:1060
 msgid "One per line. Related phrases worth a mention."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1591
+#: includes/class-blogcraft-generate.php:1595
 msgid "One per line. Subjects to avoid even in passing."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1015
+#: includes/class-blogcraft-blueprint-screen.php:1160
 msgid "One per line. Subjects to avoid even in passing. Sent to the model rather than measured, because a subject is not a single word."
 msgstr ""
 
@@ -2516,7 +2528,7 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1127
+#: includes/class-blogcraft-blueprint-screen.php:1272
 msgid "Open each section with the answer, then explain it."
 msgstr ""
 
@@ -2584,7 +2596,7 @@ msgstr ""
 msgid "Optional. Turn these on once the writing looks right to you."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:350
+#: includes/class-blogcraft-blueprint-screen.php:495
 msgid "Or match an article you like"
 msgstr ""
 
@@ -2679,18 +2691,18 @@ msgstr ""
 msgid "People deciding what to buy"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1468
+#: includes/class-blogcraft-generate.php:1472
 msgid "People setting up a first home office"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:706
+#: includes/class-blogcraft-blueprint-screen.php:851
 msgid "People setting up a first home office on a budget"
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:323
 #: includes/class-blogcraft-activity.php:437
 #: includes/class-blogcraft-activity.php:458
-#: includes/class-blogcraft-blueprint-screen.php:1198
+#: includes/class-blogcraft-blueprint-screen.php:1343
 #: includes/class-blogcraft-calendar.php:322
 #: includes/class-blogcraft-connection.php:1172
 #: includes/class-blogcraft-connection.php:1285
@@ -2699,11 +2711,11 @@ msgstr ""
 #: includes/class-blogcraft-connection.php:1851
 #: includes/class-blogcraft-connection.php:2534
 #: includes/class-blogcraft-connection.php:2770
-#: includes/class-blogcraft-generate.php:2031
-#: includes/class-blogcraft-generate.php:2074
-#: includes/class-blogcraft-generate.php:2151
-#: includes/class-blogcraft-generate.php:2200
-#: includes/class-blogcraft-generate.php:2260
+#: includes/class-blogcraft-generate.php:2035
+#: includes/class-blogcraft-generate.php:2078
+#: includes/class-blogcraft-generate.php:2155
+#: includes/class-blogcraft-generate.php:2204
+#: includes/class-blogcraft-generate.php:2264
 #: includes/class-blogcraft-library.php:97
 #: includes/class-blogcraft-mcp-oauth.php:479
 #: includes/class-blogcraft-notices.php:86
@@ -2740,21 +2752,21 @@ msgstr ""
 msgid "Pick a model…"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:678
+#: includes/class-blogcraft-blueprint-screen.php:823
 msgid "Pick the closest, or describe your own."
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:138
 #: includes/class-blogcraft-connection.php:2128
-#: includes/class-blogcraft-generate.php:1334
+#: includes/class-blogcraft-generate.php:1338
 msgid "Pictures"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1693
+#: includes/class-blogcraft-generate.php:1697
 msgid "Pictures are switched off, so nothing here will run."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1622
+#: includes/class-blogcraft-generate.php:1626
 msgid "Pictures in the body"
 msgstr ""
 
@@ -2778,8 +2790,8 @@ msgstr ""
 msgid "Planning the shape of the post"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2046
-#: includes/class-blogcraft-generate.php:2086
+#: includes/class-blogcraft-generate.php:2050
+#: includes/class-blogcraft-generate.php:2090
 msgid "Please enter a topic."
 msgstr ""
 
@@ -2881,11 +2893,11 @@ msgstr ""
 msgid "Publish above your threshold, with pictures, tags and links added"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1773
+#: includes/class-blogcraft-generate.php:1777
 msgid "Publish at"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1301
+#: includes/class-blogcraft-generate.php:1305
 msgid "Publish it"
 msgstr ""
 
@@ -2901,7 +2913,7 @@ msgstr ""
 msgid "Published."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1335
+#: includes/class-blogcraft-generate.php:1339
 msgid "Publishing"
 msgstr ""
 
@@ -2913,8 +2925,8 @@ msgstr ""
 msgid "Put the earlier version back"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:838
-#: includes/class-blogcraft-generate.php:1421
+#: includes/class-blogcraft-blueprint-screen.php:983
+#: includes/class-blogcraft-generate.php:1425
 #: includes/class-blogcraft-generate.php:484
 #: includes/class-blogcraft-preview.php:135
 msgid "Questions and answers"
@@ -2936,7 +2948,7 @@ msgstr ""
 msgid "Queued again. It will run on the next step."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2213
+#: includes/class-blogcraft-generate.php:2217
 msgid "Queueing a list of topics needs an API key. On this setup, ask your app to write."
 msgstr ""
 
@@ -2953,7 +2965,7 @@ msgid "Rank Math"
 msgstr ""
 
 #. translators: %s: the title of the article that was read.
-#: includes/class-blogcraft-blueprint-screen.php:434
+#: includes/class-blogcraft-blueprint-screen.php:579
 msgid "Read \"%s\"."
 msgstr ""
 
@@ -2975,7 +2987,7 @@ msgstr ""
 msgid "Read it"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:356
+#: includes/class-blogcraft-blueprint-screen.php:501
 msgid "Read it and match"
 msgstr ""
 
@@ -3003,7 +3015,7 @@ msgstr ""
 msgid "Read or change your settings, keys, users or plugins"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:431
+#: includes/class-blogcraft-blueprint-screen.php:576
 msgid "Read that page."
 msgstr ""
 
@@ -3035,9 +3047,9 @@ msgstr ""
 msgid "Reading its own draft back critically"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:718
+#: includes/class-blogcraft-blueprint-screen.php:863
 #: includes/class-blogcraft-connection.php:401
-#: includes/class-blogcraft-generate.php:1472
+#: includes/class-blogcraft-generate.php:1476
 msgid "Reading level"
 msgstr ""
 
@@ -3054,7 +3066,7 @@ msgstr ""
 msgid "Reading your posts..."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:853
+#: includes/class-blogcraft-blueprint-screen.php:998
 msgid "Real links to what the article was actually researched from, listed at the end. On by default, unlike the extras above: nothing lets the model invent a citation link, so this is the only honest way the \"Sources cited\" check below can pass. Turn it off only if you also lower that target to 0."
 msgstr ""
 
@@ -3181,11 +3193,11 @@ msgstr ""
 msgid "Save and continue"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1300
+#: includes/class-blogcraft-generate.php:1304
 msgid "Save as a draft"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:209
+#: includes/class-blogcraft-blueprint-screen.php:345
 msgid "Save changes"
 msgstr ""
 
@@ -3219,11 +3231,11 @@ msgstr ""
 msgid "Saved as drafts for review"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2061
+#: includes/class-blogcraft-generate.php:2065
 msgid "Saved. Ask your app to write it — it will collect this brief."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1212
+#: includes/class-blogcraft-blueprint-screen.php:1357
 msgid "Saved. Every post from now on is written to this brief."
 msgstr ""
 
@@ -3297,7 +3309,7 @@ msgid "SearXNG URL"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:136
-#: includes/class-blogcraft-generate.php:1332
+#: includes/class-blogcraft-generate.php:1336
 msgid "Search"
 msgstr ""
 
@@ -3371,7 +3383,7 @@ msgstr ""
 msgid "Sent with every request, so posts sound like your site."
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:227
+#: includes/class-blogcraft-readiness.php:248
 msgid "Sent with every request. A button on How it writes fills it in from your posts."
 msgstr ""
 
@@ -3391,12 +3403,16 @@ msgstr ""
 msgid "Set it up once. Everything here shapes every post it writes."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1138
+#: includes/class-blogcraft-generate.php:1142
 msgid "Set once, then used by every post."
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1601
 msgid "Set that app's authentication to None."
+msgstr ""
+
+#: includes/class-blogcraft-generate.php:1112
+msgid "Set the rules"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:1121
@@ -3434,9 +3450,9 @@ msgstr ""
 msgid "Settings, then Connectors, then Add custom connector."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1065
-#: includes/class-blogcraft-generate.php:1330
-#: includes/class-blogcraft-generate.php:1645
+#: includes/class-blogcraft-blueprint-screen.php:1210
+#: includes/class-blogcraft-generate.php:1334
+#: includes/class-blogcraft-generate.php:1649
 msgid "Shape"
 msgstr ""
 
@@ -3478,7 +3494,7 @@ msgid "Skip this and go to the Write screen"
 msgstr ""
 
 #. translators: %s: the existing topic this one duplicates.
-#: includes/class-blogcraft-generate.php:2115
+#: includes/class-blogcraft-generate.php:2119
 msgid "Skipped: too similar to a post you already have about \"%s\"."
 msgstr ""
 
@@ -3502,11 +3518,11 @@ msgstr ""
 msgid "Something else — I will describe it"
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:189
+#: includes/class-blogcraft-readiness.php:190
 msgid "Something only you know"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2184
+#: includes/class-blogcraft-generate.php:2188
 msgid "Something went wrong. Dicecodes AI Blog Writer → Activity has the reason."
 msgstr ""
 
@@ -3514,17 +3530,17 @@ msgstr ""
 msgid "Something went wrong. The Activity screen has the details."
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:254
+#: includes/class-blogcraft-readiness.php:275
 msgid "Somewhere to research from"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:137
-#: includes/class-blogcraft-generate.php:1333
+#: includes/class-blogcraft-generate.php:1337
 msgid "Sounding human"
 msgstr ""
 
 #: includes/class-blogcraft-blocks.php:221
-#: includes/class-blogcraft-blueprint-screen.php:852
+#: includes/class-blogcraft-blueprint-screen.php:997
 msgid "Sources"
 msgstr ""
 
@@ -3532,20 +3548,20 @@ msgstr ""
 msgid "Sources cited"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:934
-#: includes/class-blogcraft-generate.php:1533
+#: includes/class-blogcraft-blueprint-screen.php:1079
+#: includes/class-blogcraft-generate.php:1537
 msgid "Sources to cite"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:740
+#: includes/class-blogcraft-blueprint-screen.php:885
 msgid "Spanish"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:745
+#: includes/class-blogcraft-blueprint-screen.php:890
 msgid "Spell these exactly"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:725
+#: includes/class-blogcraft-blueprint-screen.php:870
 msgid "Spelling"
 msgstr ""
 
@@ -3561,12 +3577,16 @@ msgstr ""
 msgid "Standard, 4:3"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:658
+#: includes/class-blogcraft-blueprint-screen.php:803
 msgid "Standing desks and home office kit, tested rather than summarised"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:133
 msgid "Start from"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:302
+msgid "Start from a shape below, or work through the sections marked \"default\". Search engines reward a page that answers a real question in a real voice, and this is where you say which."
 msgstr ""
 
 #: includes/class-blogcraft-overview.php:253
@@ -3592,8 +3612,8 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1014
-#: includes/class-blogcraft-generate.php:1590
+#: includes/class-blogcraft-blueprint-screen.php:1159
+#: includes/class-blogcraft-generate.php:1594
 msgid "Steer clear of"
 msgstr ""
 
@@ -3645,12 +3665,12 @@ msgstr ""
 msgid "Students"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:663
+#: includes/class-blogcraft-blueprint-screen.php:808
 #: includes/class-blogcraft-connection.php:414
 msgid "Style rules"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:862
+#: includes/class-blogcraft-blueprint-screen.php:1007
 msgid "Sub-subheadings"
 msgstr ""
 
@@ -3702,24 +3722,24 @@ msgstr ""
 msgid "Switching only changes what is shown here. Nothing is deleted."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:839
-#: includes/class-blogcraft-generate.php:1422
+#: includes/class-blogcraft-blueprint-screen.php:984
+#: includes/class-blogcraft-generate.php:1426
 #: includes/class-blogcraft-preview.php:59
 msgid "Table of contents"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:861
-#: includes/class-blogcraft-generate.php:1423
+#: includes/class-blogcraft-blueprint-screen.php:1006
+#: includes/class-blogcraft-generate.php:1427
 #: includes/class-blogcraft-generate.php:497
 msgid "Tables"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1761
+#: includes/class-blogcraft-generate.php:1765
 msgid "Tags"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:893
-#: includes/class-blogcraft-generate.php:1515
+#: includes/class-blogcraft-blueprint-screen.php:1038
+#: includes/class-blogcraft-generate.php:1519
 msgid "Target phrase"
 msgstr ""
 
@@ -3758,11 +3778,11 @@ msgstr ""
 msgid "That does not look like a web address."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1230
-#: includes/class-blogcraft-blueprint-screen.php:380
+#: includes/class-blogcraft-blueprint-screen.php:1375
+#: includes/class-blogcraft-blueprint-screen.php:525
 #: includes/class-blogcraft-connection.php:103
 #: includes/class-blogcraft-connection.php:259
-#: includes/class-blogcraft-generate.php:1172
+#: includes/class-blogcraft-generate.php:1176
 #: includes/class-blogcraft-generate.php:185
 msgid "That form has expired. Reload the page."
 msgstr ""
@@ -3796,7 +3816,7 @@ msgstr ""
 msgid "That request cannot be approved"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:402
+#: includes/class-blogcraft-blueprint-screen.php:547
 msgid "That shape is not one of the ones offered."
 msgstr ""
 
@@ -3838,8 +3858,8 @@ msgstr ""
 msgid "The address only"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1059
-#: includes/class-blogcraft-generate.php:1640
+#: includes/class-blogcraft-blueprint-screen.php:1204
+#: includes/class-blogcraft-generate.php:1644
 msgid "The angle every picture takes on its subject."
 msgstr ""
 
@@ -3855,16 +3875,16 @@ msgstr ""
 msgid "The app did not protect the sign-in properly, so it was refused."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1035
+#: includes/class-blogcraft-blueprint-screen.php:1180
 msgid "The article decides what the picture shows. These decide how it looks. Which service makes them is chosen under Settings."
 msgstr ""
 
 #. translators: %s: the picture service currently chosen.
-#: includes/class-blogcraft-generate.php:1708
+#: includes/class-blogcraft-generate.php:1712
 msgid "The article decides what the picture shows; these decide how it looks. Drawn right now by: %s."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:260
+#: includes/class-blogcraft-blueprint-screen.php:405
 msgid "The brief"
 msgstr ""
 
@@ -3872,7 +3892,7 @@ msgstr ""
 msgid "The brief could not be refreshed. Save to see it applied."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:205
+#: includes/class-blogcraft-blueprint-screen.php:341
 msgid "The brief every post is written to. Anything shown in monospace is measured on the finished draft, not merely requested."
 msgstr ""
 
@@ -3888,7 +3908,7 @@ msgstr ""
 msgid "The earliest a post is started. WordPress only runs scheduled work when someone visits the site, so a quiet morning can push it later."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1132
+#: includes/class-blogcraft-blueprint-screen.php:1277
 msgid "The ending"
 msgstr ""
 
@@ -3931,7 +3951,7 @@ msgstr ""
 msgid "The numbers"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1245
+#: includes/class-blogcraft-generate.php:1249
 msgid "The only field you have to fill in."
 msgstr ""
 
@@ -3939,7 +3959,7 @@ msgstr ""
 msgid "The only real outbound links a post gets — they are the addresses research actually fetched, never ones the model wrote. Off means no citations, and the citation check is skipped rather than failed."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1118
+#: includes/class-blogcraft-blueprint-screen.php:1263
 msgid "The opening"
 msgstr ""
 
@@ -3959,7 +3979,7 @@ msgstr ""
 msgid "The plugin writes, using an API key from your account."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1139
+#: includes/class-blogcraft-blueprint-screen.php:1284
 msgid "The questions"
 msgstr ""
 
@@ -3988,11 +4008,11 @@ msgstr ""
 msgid "The setting it belongs in"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1813
+#: includes/class-blogcraft-generate.php:1817
 msgid "The shape of it, not the words."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:854
+#: includes/class-blogcraft-blueprint-screen.php:999
 #: includes/class-blogcraft-generate.php:505
 msgid "The sources it was written from"
 msgstr ""
@@ -4013,7 +4033,7 @@ msgstr ""
 msgid "The token could not be created."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2121
+#: includes/class-blogcraft-generate.php:2125
 msgid "The topic could not be queued."
 msgstr ""
 
@@ -4022,7 +4042,7 @@ msgid "The topic is the only field you have to fill in. The one worth filling in
 msgstr ""
 
 #. translators: %s: the model named in the settings.
-#: includes/class-blogcraft-generate.php:1939
+#: includes/class-blogcraft-generate.php:1943
 msgid "The usual one (%s)"
 msgstr ""
 
@@ -4032,6 +4052,10 @@ msgstr ""
 
 #: includes/class-blogcraft-generate.php:564
 msgid "The writing rules have never been adjusted"
+msgstr ""
+
+#: includes/class-blogcraft-readiness.php:226
+msgid "The writing rules, answered once"
 msgstr ""
 
 #: includes/class-blogcraft-learn.php:337
@@ -4054,7 +4078,7 @@ msgstr ""
 msgid "There is no post here. Start one from Write a post."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2163
+#: includes/class-blogcraft-generate.php:2167
 msgid "There is no queue on this setup. Your app writes when you ask it to."
 msgstr ""
 
@@ -4082,8 +4106,8 @@ msgstr ""
 msgid "They are in Settings, and entirely optional."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1086
-#: includes/class-blogcraft-generate.php:1663
+#: includes/class-blogcraft-blueprint-screen.php:1231
+#: includes/class-blogcraft-generate.php:1667
 msgid "Things that keep appearing and should not."
 msgstr ""
 
@@ -4119,7 +4143,7 @@ msgstr ""
 msgid "This is sent with every request and it is the single biggest reason two blogs using the same model do not read the same. Without it the model writes for nobody in particular, which is what generic sounds like."
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:190
+#: includes/class-blogcraft-readiness.php:191
 msgid "This is the heaviest check on the finished post, and the only part of a page a model genuinely cannot produce. A number you measured, a price you paid, what went wrong when you tried it. Without it the post can only restate what is already published, which is exactly the kind of page search engines discount."
 msgstr ""
 
@@ -4169,7 +4193,7 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:948
+#: includes/class-blogcraft-blueprint-screen.php:1093
 #: includes/class-blogcraft-editorial.php:625
 msgid "Title length"
 msgstr ""
@@ -4195,7 +4219,7 @@ msgstr ""
 msgid "Tokens are billed by your provider, not by us."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1880
+#: includes/class-blogcraft-generate.php:1884
 msgid "Tokens, roughly"
 msgstr ""
 
@@ -4203,19 +4227,19 @@ msgstr ""
 msgid "Tokens:"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:786
+#: includes/class-blogcraft-blueprint-screen.php:931
 msgid "Tolerance"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:677
+#: includes/class-blogcraft-blueprint-screen.php:822
 #: includes/class-blogcraft-connection.php:399
-#: includes/class-blogcraft-generate.php:1443
+#: includes/class-blogcraft-generate.php:1447
 msgid "Tone"
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:161
 #: includes/class-blogcraft-calendar.php:232
-#: includes/class-blogcraft-generate.php:1243
+#: includes/class-blogcraft-generate.php:1247
 #: includes/class-blogcraft-library.php:171
 #: includes/class-blogcraft-library.php:259
 msgid "Topic"
@@ -4242,8 +4266,8 @@ msgstr ""
 msgid "Trashes posts Dicecodes AI Blog Writer created in the last 24 hours. Anything you wrote yourself is left alone."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1044
-#: includes/class-blogcraft-generate.php:1627
+#: includes/class-blogcraft-blueprint-screen.php:1189
+#: includes/class-blogcraft-generate.php:1631
 msgid "Treatment"
 msgstr ""
 
@@ -4264,11 +4288,11 @@ msgstr ""
 msgid "Turn refreshing on"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1695
+#: includes/class-blogcraft-generate.php:1699
 msgid "Turn them on"
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:172
+#: includes/class-blogcraft-readiness.php:173
 msgid "Two or three words is a category, not a question. A sentence gives the outline something to aim at, and outlines built from a bare keyword drift into whatever the model already knows about the subject."
 msgstr ""
 
@@ -4341,8 +4365,8 @@ msgstr ""
 msgid "Use your research sources — it uses its own"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:685
-#: includes/class-blogcraft-generate.php:1450
+#: includes/class-blogcraft-blueprint-screen.php:830
+#: includes/class-blogcraft-generate.php:1454
 msgid "Used only when the tone above is set to something else."
 msgstr ""
 
@@ -4354,17 +4378,17 @@ msgstr ""
 msgid "Uses what you supplied"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1566
+#: includes/class-blogcraft-generate.php:1570
 msgid "Vary sentence length"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:986
+#: includes/class-blogcraft-blueprint-screen.php:1131
 msgid "Vary sentence length deliberately"
 msgstr ""
 
 #: includes/class-blogcraft-blueprint-screen.php:134
 #: includes/class-blogcraft-connection.php:2090
-#: includes/class-blogcraft-generate.php:1331
+#: includes/class-blogcraft-generate.php:1335
 msgid "Voice"
 msgstr ""
 
@@ -4388,11 +4412,11 @@ msgstr ""
 msgid "Watercolour"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:672
+#: includes/class-blogcraft-blueprint-screen.php:817
 msgid "We have tested 40 desks since 2019 and run a workshop"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1262
+#: includes/class-blogcraft-generate.php:1266
 msgid "We tested 9 desks over 4 months. The £220 bracket wobbled above 110cm; the £400 bracket did not. Our own returns rate on the cheapest was 3 in 9."
 msgstr ""
 
@@ -4453,8 +4477,8 @@ msgstr ""
 msgid "What it means"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1058
-#: includes/class-blogcraft-generate.php:1639
+#: includes/class-blogcraft-blueprint-screen.php:1203
+#: includes/class-blogcraft-generate.php:1643
 msgid "What it shows"
 msgstr ""
 
@@ -4462,7 +4486,7 @@ msgstr ""
 msgid "What now"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1284
+#: includes/class-blogcraft-generate.php:1288
 #: includes/class-blogcraft-generate.php:134
 msgid "What should I write about this?"
 msgstr ""
@@ -4471,7 +4495,7 @@ msgstr ""
 msgid "What shows under the title in search results."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1097
+#: includes/class-blogcraft-blueprint-screen.php:1242
 msgid "What the image model is told"
 msgstr ""
 
@@ -4479,11 +4503,11 @@ msgstr ""
 msgid "What the plugin has been doing, and why anything stopped."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:705
+#: includes/class-blogcraft-blueprint-screen.php:850
 msgid "What they already know, and what they are trying to do."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:656
+#: includes/class-blogcraft-blueprint-screen.php:801
 #: includes/class-blogcraft-connection.php:412
 #: includes/class-blogcraft-welcome.php:367
 msgid "What this blog is about"
@@ -4497,7 +4521,7 @@ msgstr ""
 msgid "What works"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:846
+#: includes/class-blogcraft-blueprint-screen.php:991
 #: includes/class-blogcraft-generate.php:513
 msgid "What works and what does not"
 msgstr ""
@@ -4506,23 +4530,23 @@ msgstr ""
 msgid "What would hold this back"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:670
+#: includes/class-blogcraft-blueprint-screen.php:815
 msgid "What you have done yourself"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1257
+#: includes/class-blogcraft-generate.php:1261
 msgid "What you know that nobody else does"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1812
+#: includes/class-blogcraft-generate.php:1816
 msgid "What you will get"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1936
+#: includes/class-blogcraft-generate.php:1940
 msgid "Whatever the settings say"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1733
+#: includes/class-blogcraft-generate.php:1737
 msgid "Whatever the site default is"
 msgstr ""
 
@@ -4530,11 +4554,11 @@ msgstr ""
 msgid "When"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1295
+#: includes/class-blogcraft-generate.php:1299
 msgid "When it is finished"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:922
+#: includes/class-blogcraft-blueprint-screen.php:1067
 msgid "When you name no terms of your own, take them from the pages already covering the subject. Costs nothing extra: it reads the research this post already gathered."
 msgstr ""
 
@@ -4546,7 +4570,7 @@ msgstr ""
 msgid "Where it came from"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:975
+#: includes/class-blogcraft-blueprint-screen.php:1120
 msgid "Where they genuinely help. Nothing here is forced into every section."
 msgstr ""
 
@@ -4580,8 +4604,8 @@ msgstr ""
 msgid "Who draws them, and what it costs"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:697
-#: includes/class-blogcraft-generate.php:1460
+#: includes/class-blogcraft-blueprint-screen.php:842
+#: includes/class-blogcraft-generate.php:1464
 msgid "Who is reading"
 msgstr ""
 
@@ -4593,8 +4617,8 @@ msgstr ""
 msgid "Who is reading, and what they already know."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:691
-#: includes/class-blogcraft-generate.php:1455
+#: includes/class-blogcraft-blueprint-screen.php:836
+#: includes/class-blogcraft-generate.php:1459
 msgid "Who is speaking"
 msgstr ""
 
@@ -4610,7 +4634,7 @@ msgstr ""
 msgid "Who this is for"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:845
+#: includes/class-blogcraft-blueprint-screen.php:990
 msgid "Who this is for, and who it is not"
 msgstr ""
 
@@ -4618,7 +4642,7 @@ msgstr ""
 msgid "Who you write for"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1768
+#: includes/class-blogcraft-generate.php:1772
 msgid "Whose byline appears on the post. A named author with stated credentials is a real trust signal, and it is published as structured data."
 msgstr ""
 
@@ -4638,7 +4662,7 @@ msgstr ""
 msgid "With research on, the model is handed current sources and writes from them, and the finished draft is checked against those same sources for whether it says anything they do not. With everything off it writes from memory, which dates badly and can cite nothing."
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:255
+#: includes/class-blogcraft-readiness.php:276
 msgid "With research on, the model is handed current sources and writes from them. With everything off it writes from memory alone, which dates badly and cannot cite anything. Wikipedia and Hacker News need no key."
 msgstr ""
 
@@ -4646,7 +4670,7 @@ msgstr ""
 msgid "With that ticked, deleting the plugin drops its database tables and removes every setting. There is no undo and no confirmation beyond this box — WordPress asks whether you meant to delete the plugin, and has no way to ask whether you also meant to delete the rest. Your posts themselves are never touched either way: they are WordPress posts and they stay."
 msgstr ""
 
-#: includes/class-blogcraft-readiness.php:206
+#: includes/class-blogcraft-readiness.php:207
 msgid "Without it every post on a subject arrives at the same shape, because the same rules produced it. An angle is what makes this one yours rather than the default treatment."
 msgstr ""
 
@@ -4674,16 +4698,16 @@ msgstr ""
 msgid "Wording of that line"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1871
+#: includes/class-blogcraft-generate.php:1875
 msgid "Words"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1092
-#: includes/class-blogcraft-generate.php:1668
+#: includes/class-blogcraft-blueprint-screen.php:1237
+#: includes/class-blogcraft-generate.php:1672
 msgid "Words in the picture"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:921
+#: includes/class-blogcraft-blueprint-screen.php:1066
 msgid "Work these out for me"
 msgstr ""
 
@@ -4718,7 +4742,7 @@ msgstr ""
 msgid "Write a post"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1040
+#: includes/class-blogcraft-blueprint-screen.php:1185
 msgid "Write a proper description for each image"
 msgstr ""
 
@@ -4726,7 +4750,7 @@ msgstr ""
 msgid "Write a topic first, then ask again."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1183
+#: includes/class-blogcraft-generate.php:1187
 msgid "Write a topic first."
 msgstr ""
 
@@ -4860,7 +4884,7 @@ msgid "You are already writing with this provider, so leave the key blank and th
 msgstr ""
 
 #: includes/class-blogcraft-activity.php:82
-#: includes/class-blogcraft-blueprint-screen.php:150
+#: includes/class-blogcraft-blueprint-screen.php:273
 #: includes/class-blogcraft-calendar.php:100
 #: includes/class-blogcraft-connection.php:480
 #: includes/class-blogcraft-docs.php:85
@@ -4886,7 +4910,7 @@ msgstr ""
 #: includes/class-blogcraft-activity.php:322
 #: includes/class-blogcraft-activity.php:436
 #: includes/class-blogcraft-activity.php:457
-#: includes/class-blogcraft-blueprint-screen.php:1197
+#: includes/class-blogcraft-blueprint-screen.php:1342
 #: includes/class-blogcraft-calendar.php:321
 #: includes/class-blogcraft-connection.php:1171
 #: includes/class-blogcraft-connection.php:1284
@@ -4895,11 +4919,11 @@ msgstr ""
 #: includes/class-blogcraft-connection.php:1850
 #: includes/class-blogcraft-connection.php:2533
 #: includes/class-blogcraft-connection.php:2769
-#: includes/class-blogcraft-generate.php:2030
-#: includes/class-blogcraft-generate.php:2073
-#: includes/class-blogcraft-generate.php:2150
-#: includes/class-blogcraft-generate.php:2199
-#: includes/class-blogcraft-generate.php:2259
+#: includes/class-blogcraft-generate.php:2034
+#: includes/class-blogcraft-generate.php:2077
+#: includes/class-blogcraft-generate.php:2154
+#: includes/class-blogcraft-generate.php:2203
+#: includes/class-blogcraft-generate.php:2263
 #: includes/class-blogcraft-library.php:96
 #: includes/class-blogcraft-mcp-oauth.php:478
 #: includes/class-blogcraft-notices.php:85
@@ -4912,7 +4936,7 @@ msgstr ""
 msgid "You are not allowed to perform this action."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:2039
+#: includes/class-blogcraft-generate.php:2043
 msgid "You are not allowed to write posts here."
 msgstr ""
 
@@ -4960,7 +4984,7 @@ msgstr ""
 msgid "Your own experience"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1258
+#: includes/class-blogcraft-generate.php:1262
 msgid "Your own numbers, prices, or what happened when you tried it. Used as fact, never invented beyond."
 msgstr ""
 
@@ -4973,7 +4997,7 @@ msgstr ""
 msgid "Your provider is rate limiting, so this is waiting rather than failing. It carries on by itself at about %s, and everything written so far is kept."
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1218
+#: includes/class-blogcraft-generate.php:1222
 msgid "Your provider is rate limiting."
 msgstr ""
 
@@ -5002,7 +5026,7 @@ msgstr ""
 msgid "Your writing provider is not OpenAI, so a separate OpenAI key is needed above. A key from one company will not work at another."
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:297
+#: includes/class-blogcraft-blueprint-screen.php:442
 msgid "[what this post is about, described by the model]"
 msgstr ""
 
@@ -5022,13 +5046,17 @@ msgstr ""
 msgid "allowed"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1763
+#: includes/class-blogcraft-generate.php:1767
 msgid "cold brew, coffee gear"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1087
-#: includes/class-blogcraft-generate.php:1664
+#: includes/class-blogcraft-blueprint-screen.php:1232
+#: includes/class-blogcraft-generate.php:1668
 msgid "crowds, brand names, hands holding phones"
+msgstr ""
+
+#: includes/class-blogcraft-blueprint-screen.php:388
+msgid "default"
 msgstr ""
 
 #: includes/class-blogcraft-connection.php:2092
@@ -5063,7 +5091,7 @@ msgstr ""
 msgid "may use subheadings"
 msgstr ""
 
-#: includes/class-blogcraft-generate.php:1592
+#: includes/class-blogcraft-generate.php:1596
 msgid "medical advice"
 msgstr ""
 
@@ -5074,8 +5102,8 @@ msgstr ""
 msgid "missing"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1073
-#: includes/class-blogcraft-generate.php:1652
+#: includes/class-blogcraft-blueprint-screen.php:1218
+#: includes/class-blogcraft-generate.php:1656
 msgid "muted greens, warm oak, off-white"
 msgstr ""
 
@@ -5149,13 +5177,13 @@ msgstr ""
 msgid "present"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:1080
-#: includes/class-blogcraft-generate.php:1658
+#: includes/class-blogcraft-blueprint-screen.php:1225
+#: includes/class-blogcraft-generate.php:1662
 msgid "shot from slightly above, shallow depth of field"
 msgstr ""
 
-#: includes/class-blogcraft-blueprint-screen.php:895
-#: includes/class-blogcraft-generate.php:1517
+#: includes/class-blogcraft-blueprint-screen.php:1040
+#: includes/class-blogcraft-generate.php:1521
 msgid "standing desk"
 msgstr ""
 
@@ -5193,6 +5221,6 @@ msgid "xAI — Grok, paid"
 msgstr ""
 
 #. translators: %d: approximate word count.
-#: includes/class-blogcraft-generate.php:1845
+#: includes/class-blogcraft-generate.php:1849
 msgid "~%d words"
 msgstr ""

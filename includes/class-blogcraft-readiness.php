@@ -40,6 +40,7 @@ class Blogcraft_Readiness {
 		$items[] = self::evidence_check( $evidence );
 		$items[] = self::angle_check( $angle );
 		$items[] = self::voice_check();
+		$items[] = self::blueprint_check();
 		$items[] = self::research_check();
 
 		$earned = 0;
@@ -204,6 +205,26 @@ class Blogcraft_Readiness {
 			2,
 			__( 'An angle for this one post', 'dicecodes-ai-blog-writer' ),
 			__( 'Without it every post on a subject arrives at the same shape, because the same rules produced it. An angle is what makes this one yours rather than the default treatment.', 'dicecodes-ai-blog-writer' )
+		);
+	}
+
+	/**
+	 * Whether the brief every post is written to has ever been answered.
+	 *
+	 * Separate from the voice: one is who you are writing for, this is the
+	 * shape, the length, the reading level and what counts as finished. Both
+	 * are sent with every request and both are still the shipped defaults on
+	 * a site nobody has been through.
+	 *
+	 * @return array
+	 */
+	private static function blueprint_check() {
+		return self::item(
+			'blueprint',
+			Blogcraft_Blueprint::was_edited(),
+			2,
+			__( 'The writing rules, answered once', 'dicecodes-ai-blog-writer' ),
+			__( 'Length, shape, reading level and what a finished post must contain. A page that answers a real question in a real voice is what search engines reward, and this is where you say which.', 'dicecodes-ai-blog-writer' )
 		);
 	}
 

@@ -146,6 +146,30 @@
 	transition: background 120ms ease, color 120ms ease;
 }
 
+/* A section nobody has been into yet. Quiet: keeping a default is a
+   decision too, and this only answers "which have I not looked at". */
+.bc-rail-default {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 1px 6px;
+	border-radius: var(--bc-r-pill);
+	background: var(--bp-wash);
+	border: 1px solid var(--bp-line);
+	font-size: var(--bc-t-xs);
+	font-weight: 500;
+	color: var(--bp-faint);
+	vertical-align: 1px;
+}
+
+.bc-rail-item.is-active .bc-rail-default {
+	border-color: var(--bp-accent);
+	color: var(--bp-accent);
+}
+
+.bc-untouched p:last-child {
+	margin-bottom: 8px;
+}
+
 .bc-rail-item:hover {
 	background: var(--bp-hair);
 	color: var(--bp-ink);

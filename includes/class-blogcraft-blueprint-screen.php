@@ -141,6 +141,129 @@ class Blogcraft_Blueprint_Screen {
 	}
 
 	/**
+	 * Which fields each section holds.
+	 *
+	 * Kept as a list rather than worked out from the markup, because the
+	 * markup is built by a dozen helpers and reading it back would be a
+	 * guess. A test checks every name here is a real field and that no
+	 * field has been added to a pane without being added here, which is the
+	 * way this would otherwise rot.
+	 *
+	 * "Start from" holds none of its own: the shapes on it write into the
+	 * others.
+	 *
+	 * @return array Group slug => field names.
+	 */
+	public static function group_fields() {
+		return array(
+			'start'     => array(),
+			'voice'     => array(
+				'niche',
+				'audience',
+				'audience_custom',
+				'tone',
+				'tone_custom',
+				'formality',
+				'reading_level',
+				'point_of_view',
+				'locale_spelling',
+				'language',
+				'style_rules',
+				'experience',
+				'brand_terms',
+			),
+			'structure' => array(
+				'word_target',
+				'word_tolerance',
+				'sections_min',
+				'sections_max',
+				'allow_h3',
+				'para_max_sentences',
+				'sentence_max_words',
+				'intro_style',
+				'conclusion_style',
+				'takeaways',
+				'takeaways_count',
+				'faq',
+				'faq_count',
+				'tables',
+				'lists',
+				'bold_key_phrases',
+				'toc',
+				'block_audience',
+				'block_proscons',
+				'block_figures',
+				'block_mistakes',
+				'block_sources',
+			),
+			'seo'       => array(
+				'primary_keyword',
+				'secondary_keywords',
+				'density_min',
+				'density_max',
+				'required_terms',
+				'auto_terms',
+				'meta_title_max',
+				'meta_desc_max',
+				'internal_links_target',
+				'external_links_target',
+			),
+			'human'     => array(
+				'literary_devices',
+				'sentence_variety',
+				'allow_contractions',
+				'allow_em_dash',
+				'require_experience',
+				'require_citations',
+				'require_statistics',
+				'banned_phrases',
+				'negative_keywords',
+				'avoid_subjects',
+			),
+			'pictures'  => array(
+				'images_target',
+				'image_describe',
+				'image_style',
+				'image_mood',
+				'image_subject',
+				'image_shape',
+				'image_palette',
+				'image_extra',
+				'image_avoid',
+				'image_allow_text',
+			),
+			'sections'  => array(
+				'prompt_intro',
+				'prompt_section',
+				'prompt_conclusion',
+				'prompt_faq',
+			),
+		);
+	}
+
+	/**
+	 * The sections nobody has changed anything in.
+	 *
+	 * @return array Group slugs.
+	 */
+	public static function untouched_groups() {
+		$changed = Blogcraft_Blueprint::changed_fields();
+		$out     = array();
+
+		foreach ( self::group_fields() as $slug => $fields ) {
+			if ( empty( $fields ) ) {
+				continue;
+			}
+
+			if ( ! array_intersect( $fields, $changed ) ) {
+				$out[] = $slug;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
 	 * Render the screen.
 	 *
 	 * @return void
@@ -164,6 +287,19 @@ class Blogcraft_Blueprint_Screen {
 				'<div class="notice %s"><p>%s</p></div>',
 				esc_attr( empty( $notice['ok'] ) ? 'notice-error' : 'notice-success' ),
 				esc_html( (string) $notice['message'] )
+			);
+		}
+
+		// Said once, at the top, on a site where nothing here has been
+		// answered yet. Not a warning: the defaults produce a perfectly
+		// ordinary post. It is the difference between an ordinary one and
+		// one that reads like this blog that is worth thirty seconds.
+		if ( ! Blogcraft_Blueprint::was_edited() ) {
+			printf(
+				'<div class="notice notice-info bc-untouched"><p><strong>%1$s</strong> %2$s</p><p>%3$s</p></div>',
+				esc_html__( 'Nothing here has been answered yet.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Every post is written to this brief, so it is the single biggest difference between a post that sounds like your blog and one that sounds like every other AI post.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Start from a shape below, or work through the sections marked "default". Search engines reward a page that answers a real question in a real voice, and this is where you say which.', 'dicecodes-ai-blog-writer' )
 			);
 		}
 
@@ -230,17 +366,26 @@ class Blogcraft_Blueprint_Screen {
 			esc_attr__( 'Blueprint sections', 'dicecodes-ai-blog-writer' )
 		);
 
-		$first = true;
+		$first     = true;
+		$untouched = self::untouched_groups();
 
 		foreach ( self::groups() as $slug => $label ) {
+			// Marked rather than nagged about. Somebody who has read a
+			// section and kept the defaults has still decided; what this
+			// answers is "which of these have I not looked at yet", which is
+			// otherwise only knowable by opening all seven.
+			$still = in_array( $slug, $untouched, true );
+
 			printf(
 				'<button type="button" class="bc-rail-item%1$s" data-pane="%2$s" role="tab"'
-				. ' id="bc-tab-%2$s" aria-controls="bc-pane-%2$s" aria-selected="%3$s" tabindex="%4$s">%5$s</button>',
+				. ' id="bc-tab-%2$s" aria-controls="bc-pane-%2$s" aria-selected="%3$s" tabindex="%4$s">'
+				. '<span>%5$s</span>%6$s</button>',
 				$first ? ' is-active' : '',
 				esc_attr( $slug ),
 				$first ? 'true' : 'false',
 				$first ? '0' : '-1',
-				esc_html( $label )
+				esc_html( $label ),
+				$still ? '<span class="bc-rail-default">' . esc_html__( 'default', 'dicecodes-ai-blog-writer' ) . '</span>' : ''
 			);
 			$first = false;
 		}
