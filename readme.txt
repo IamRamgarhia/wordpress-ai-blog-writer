@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.91.0
+Stable tag: 0.92.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,7 +130,7 @@ The plugin may also fetch any URL you explicitly add to its research list, to re
 
 = Where is the documentation? =
 
-Two places. The plugin ships its own under Help, which is always accurate to the version you have installed. The longer guides and walkthroughs are at https://dicecodes.com/
+At https://dicecodes.com/ai-blog-writer/ — every help link in the plugin opens the section for the control you were looking at. It is one page rather than a copy inside the plugin and another on the web, so there is only ever one to be right.
 = Do I need to pay for anything? =
 
 The plugin is free and complete, and takes no cut of anything. The provider list is grouped by what it costs, free first, so the question is answered before you pick rather than after.
@@ -170,6 +170,13 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.92.0 =
+* The documentation is one page on the web rather than a copy inside the plugin and another on the website. Every help control opens the section for the control you were looking at, in a new tab, so a half-filled form is not lost to go and read about it
+* The Help screen and the "How this works" panel on every settings card are gone. They were a second copy of every explanation, and it was always the older one: correcting a sentence meant shipping a release
+* Requires a connection, which the shipped copy did not. That is the trade, and it buys corrections that reach you without an update, screenshots and worked examples that never fitted in an admin panel, and one copy to be right
+* Smaller by about 34,000 characters of shipped text: the stylesheet lost the screen it dressed, and translators have 145 fewer strings to carry
+* The four setup steps on the overview no longer fold away behind a control. Four lines and a button each is not something to hide
+
 = 0.91.0 =
 * The overview says when nothing is allowed to come and read what you publish. A post can be right in every way this plugin measures and still be invisible, and both settings that decide it live outside the plugin: WordPress's own "Discourage search engines", which is on by default on most staging sites and travels to production with the database, and a robots.txt that refuses the AI crawlers
 * It names the assistants rather than the crawlers — "Perplexity", not "PerplexityBot" — because which assistant will not be citing you is the question somebody actually has. Nothing is changed on your behalf: both settings are legitimate choices and the plugin only says what they cost
@@ -187,11 +194,5 @@ everything is here, oldest at the bottom.
 
 = 0.89.0 =
 * The connected apps list says whether each one is Active, Idle or Never used, with a dot beside the word. A date told you when something last called and left you to work out whether that meant it was still working
-
-= 0.88.0 =
-* You can pick the model for one post without changing the setting for every other one. It sits with the category and the publishing date, and offers whatever your site already knows about rather than asking you to type a name from memory
-* The strip at the top of Settings says what is actually in use — which provider and model, what it may read, where pictures come from, how often it writes — rather than only that something is set up
-* Removed three controls from Write a post that could not do anything when an AI client does the writing: asking the provider what to write when there is no provider, choosing whether to publish when nothing here publishes, and an estimate of a bill that goes to a subscription instead of to you
-* A test now holds the rule in both directions, so a control cannot go missing from the path it belongs to either
 Older releases are listed in changelog.txt, which ships with the plugin.
 

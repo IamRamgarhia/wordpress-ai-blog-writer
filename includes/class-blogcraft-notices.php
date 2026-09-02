@@ -160,7 +160,7 @@ class Blogcraft_Notices {
 		printf(
 			'<div class="notice notice-warning"><p>%1$s</p><p><a href="%2$s">%3$s</a> <span aria-hidden="true">&middot;</span> <a href="%4$s">%5$s</a></p></div>',
 			esc_html__( 'The queue has not been processed recently. WordPress only runs scheduled tasks when somebody visits your site, so a quiet site may need a real system cron job running wp dicecodes run.', 'dicecodes-ai-blog-writer' ),
-			esc_url( Blogcraft_Docs::url( 'automation' ) ),
+			esc_url( Blogcraft_Docs::site_url( 'automation' ) ),
 			esc_html__( 'How to fix this', 'dicecodes-ai-blog-writer' ),
 			esc_url( self::dismiss_url( 'cron_health' ) ),
 			esc_html__( 'Dismiss', 'dicecodes-ai-blog-writer' )

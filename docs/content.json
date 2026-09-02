@@ -1,0 +1,417 @@
+{
+  "sections": [
+    {
+      "id": "quickstart",
+      "title": "Start here",
+      "lead": "Five steps, about ten minutes. Nothing is contacted until you finish the first one.",
+      "prose": [],
+      "steps": [
+        {
+          "title": "Choose a provider",
+          "text": "Settings, Connect a provider. The free ones are at the top. Nothing is chosen for you."
+        },
+        {
+          "title": "Paste the key",
+          "text": "Each provider has a link to the page on its own site where the key is issued. A model on your own machine needs no key. Save."
+        },
+        {
+          "title": "Pick a model",
+          "text": "Press \"Show the models on my account\". Never type an id from memory."
+        },
+        {
+          "title": "Describe your voice",
+          "text": "Two sentences on your subject and your reader. Or press \"Learn from my posts\"."
+        },
+        {
+          "title": "Write one post",
+          "text": "Give it a topic and read the score before you publish anything."
+        }
+      ],
+      "points": [],
+      "table": null
+    },
+    {
+      "id": "providers",
+      "title": "Connecting a provider",
+      "lead": "Dicecodes AI Blog Writer has no AI of its own. It uses your account, and your provider bills you directly.",
+      "prose": [
+        "Every request goes from your site straight to the provider you chose, and is billed to you by them. Nothing passes through a server of ours, because there is not one.",
+        "Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.",
+        "Three fields matter: the provider, the key, and the model id. Take the model id from your provider's own model list rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own."
+      ],
+      "steps": [
+        {
+          "title": "Provider",
+          "text": "Grouped by what it costs, free first. Nothing is preselected."
+        },
+        {
+          "title": "Key",
+          "text": "Follow the link to the provider's own site, where the key is issued. A local model needs none."
+        },
+        {
+          "title": "Model id",
+          "text": "Take it from your own account, not from an example. Retired ids fail with an error that does not say so."
+        }
+      ],
+      "points": [
+        "Free, no key, no account: Ollama, LM Studio, Jan, llama.cpp. They run on this machine and contact nobody.",
+        "Free tier, a key but no card: Google, Groq, Mistral, Hugging Face. On OpenRouter the free ids end in :free.",
+        "Nothing is held back on a free provider. There is no paid tier here to unlock.",
+        "On WordPress 7.0 and later, \"WordPress AI Client\" appears when a provider plugin is installed. No key here at all.",
+        "Leave the base URL blank unless you are pointing at a proxy of your own."
+      ],
+      "table": null
+    },
+    {
+      "id": "clients",
+      "title": "Writing from Claude or ChatGPT",
+      "lead": "Use the subscription you already pay for. No API key, and usually no token either.",
+      "prose": [
+        "There are two ways to run this plugin. The other has your site call a provider using your key. This one is the reverse: an application you already pay for connects to your site and does the writing, while the writing rules, the checks and the publishing all stay on your site. If you already have a Claude or ChatGPT subscription, this costs nothing extra.",
+        "It works with anything that speaks the Model Context Protocol — Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others. Switch it on, issue a token, and paste the address and the token into that app. Your site has to be reachable over HTTPS from the internet for the app to find it.",
+        "A connected client can read your rules, score and revise drafts, and publish above your threshold — adding the pictures, tags and links as it goes. It cannot write on a schedule, touch a post it did not create, or use your research sources. Scheduled writing needs an API key, because something has to be running when nobody is watching.",
+        "A token is a key to this site. It is shown once, stored only as a fingerprint, and stops working the moment the person it was issued to loses permission to write here. Revoke any you are not using."
+      ],
+      "steps": [
+        {
+          "title": "Choose the AI client way",
+          "text": "Settings. The first question on the screen is which way you want to write. Pick the second one."
+        },
+        {
+          "title": "Copy the address",
+          "text": "The Settings screen shows the address at the top, with a button that copies it."
+        },
+        {
+          "title": "Paste it into your app",
+          "text": "Claude: Settings, Connectors, Add custom connector. ChatGPT: Settings, Connectors, Advanced, Developer mode, Create."
+        },
+        {
+          "title": "Approve the connection",
+          "text": "The app sends you back here. Sign in if you are asked, read what it will be allowed to do, then press Approve."
+        },
+        {
+          "title": "Ask it to write",
+          "text": "\"Read my writing rules and write a post about X for my site.\""
+        }
+      ],
+      "points": [
+        "Claude Code, Cursor and VS Code take one command instead. The Settings screen shows the exact command, ready to copy.",
+        "Your permalinks must not be set to Plain. On that setting the address an app looks up to find the sign-in never reaches WordPress.",
+        "The app then reports that your site is not an MCP server, which is not what is wrong with it.",
+        "Your site must be reachable over HTTPS from the internet. A laptop install will not work.",
+        "If an app cannot sign in, issue a token on the Settings screen instead, and set that app to no authentication.",
+        "Then add a request header named Authorization, with the value Bearer followed by a space and the token.",
+        "If a token is refused, your server is stripping the Authorization header. Add CGIPassAuth On to your .htaccess, or ask your host to pass it through.",
+        "A connected app can read your rules, score and revise drafts, and publish above your threshold.",
+        "Publishing adds the pictures, the search title, the tags and the links from older posts, same as the other way.",
+        "It still cannot write on a schedule, or touch a post it did not create.",
+        "Scheduled writing needs a provider key on the other path, because something has to be running when nobody is watching.",
+        "Disconnect an app at any time from the same card. Revoking its token cuts it off immediately."
+      ],
+      "table": null
+    },
+    {
+      "id": "voice",
+      "title": "Describing your voice",
+      "lead": "Sent with every request. The reason two blogs on the same model do not read alike.",
+      "prose": [
+        "If you already have posts published, use \"Learn from my posts\". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say \"I\" or \"you\" — and drafts the descriptions from your own titles. Nothing is saved until you press save.",
+        "The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist."
+      ],
+      "steps": [],
+      "points": [
+        "Two sentences on your subject and your reader is enough to start.",
+        "\"Learn from my posts\" measures how you actually write and fills the fields in. Nothing saves until you press Save.",
+        "Posts Dicecodes AI Blog Writer wrote are left out of that. Learning from its own output ends with every post sounding like the first.",
+        "The experience field is the one worth time. It is the only part of a post a model cannot produce."
+      ],
+      "table": null
+    },
+    {
+      "id": "how-it-writes",
+      "title": "How it writes",
+      "lead": "The standing brief every post is written to.",
+      "prose": [],
+      "steps": [],
+      "points": [
+        "Start from a shape — guide, listicle, tutorial — and about twenty fields are set at once. All stay editable.",
+        "Or paste the address of an article you admire. Its structure is measured and becomes your rules.",
+        "Structure only. No wording is copied, kept, or shown to a model.",
+        "Anything shown in monospace is measured on the finished draft, not merely asked for."
+      ],
+      "table": null
+    },
+    {
+      "id": "writing-a-post",
+      "title": "Writing a post",
+      "lead": "One required field. Everything else already has an answer.",
+      "prose": [],
+      "steps": [
+        {
+          "title": "Topic",
+          "text": "A sentence beats a keyword: \"how to choose a standing desk for a small office\"."
+        },
+        {
+          "title": "What only you know",
+          "text": "Your figures, prices and results. Used as fact, and checked for on the finished draft."
+        },
+        {
+          "title": "The tabs beneath",
+          "text": "Pictures holds the art direction. Publishing sets the category, tags, author and time."
+        }
+      ],
+      "points": [
+        "Stuck on the second one? A button asks you four specific questions instead. It never answers them for you."
+      ],
+      "table": null
+    },
+    {
+      "id": "research",
+      "title": "Research",
+      "lead": "The biggest single lever on whether a post is worth reading.",
+      "prose": [
+        "Without sources it writes from memory, which dates badly and which search engines discount.",
+        "Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.",
+        "Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it."
+      ],
+      "steps": [],
+      "points": [
+        "Off, the model writes from memory. On, it writes from current sources.",
+        "Everything starts switched off. Turning a source on is how you consent to it.",
+        "Wikipedia and Hacker News need no key. Tavily and SerpApi are paid and more current.",
+        "A SearXNG instance you host is free. You can also list URLs to be read for every post.",
+        "What is found also checks the draft: merely restating your sources costs points."
+      ],
+      "table": null
+    },
+    {
+      "id": "pictures",
+      "title": "Pictures",
+      "lead": "The article decides what a picture shows. These controls decide how it looks.",
+      "prose": [
+        "Pictures come from a different kind of service than the writing does, so they are set up separately. Nothing here is required, and nothing runs until you switch pictures on — that switch is how you tell the plugin it may contact a picture service. Pollinations needs no key and is the one it starts on.",
+        "The model that wrote the post describes the scene it should show, and the Pictures controls on the How it writes screen decide how that scene looks.",
+        "fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.",
+        "Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free."
+      ],
+      "steps": [],
+      "points": [
+        "The model that wrote the piece describes the scene — the difference between a useful image and clip art of the headline.",
+        "Pollinations needs no key. fal.ai, OpenAI, Gemini and Grok charge per picture and run only when you pick them.",
+        "Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both.",
+        "Text is kept out of generated images by default. Image models render lettering as convincing gibberish."
+      ],
+      "table": null
+    },
+    {
+      "id": "what-is-checked",
+      "title": "What is checked",
+      "lead": "Every draft is measured before it becomes a post, and each failure is written back into the rewrite as an instruction.",
+      "prose": [],
+      "steps": [],
+      "points": [
+        "Does the opening answer the question in its first two sentences?",
+        "Does every section stating a figure carry a link beside it?",
+        "Does the draft say anything its sources do not already say?",
+        "Is the subject in the title, a heading, the address and the first hundred words?",
+        "Did the figures you supplied actually reach the page?",
+        "A check that cannot be assessed is skipped, not failed. The score is what was earned out of what was offered.",
+        "Two limits: the figure check does not open the link to confirm the number, and the originality check only sees the sources it was given. It is not a plagiarism service.",
+        "Anything below your threshold is held for review instead of published."
+      ],
+      "table": null
+    },
+    {
+      "id": "where-posts-go",
+      "title": "Where posts go",
+      "lead": "A finished post is a normal WordPress post.",
+      "prose": [],
+      "steps": [],
+      "points": [
+        "Written as real blocks, so every paragraph and heading is editable in the editor.",
+        "Saved as a draft by default. You will find it under Posts.",
+        "Anything below your threshold is set to pending and listed under \"Needs review\".",
+        "Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates."
+      ],
+      "table": null
+    },
+    {
+      "id": "automation",
+      "title": "Automation",
+      "lead": "Not needed to write a post by hand. Switch it on once the writing already looks right to you.",
+      "prose": [
+        "Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.",
+        "Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback."
+      ],
+      "steps": [],
+      "points": [
+        "Automatic posts are saved as drafts unless you say otherwise.",
+        "A daily cap and a monthly token cap are both there to make a mistake cheap.",
+        "WordPress runs scheduled work only when somebody visits, so a quiet morning can push a post past the hour you chose."
+      ],
+      "table": null
+    },
+    {
+      "id": "checking-it-works",
+      "title": "Checking it works",
+      "lead": "The test on the settings screen sends one short request and reports exactly what came back.",
+      "prose": [
+        "It costs a fraction of a penny, and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.",
+        "Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching."
+      ],
+      "steps": [],
+      "points": [
+        "It costs a fraction of a penny, and it separates a wrong key from a wrong model id from a provider that is down.",
+        "Saving a key runs it automatically, so a mistake is caught when you make it.",
+        "If a post fails, Activity says why.",
+        "Rate limits are waited out rather than counted as failures."
+      ],
+      "table": null
+    },
+    {
+      "id": "privacy",
+      "title": "What leaves your site",
+      "lead": "Dicecodes AI Blog Writer contacts no servers of its own and sends nothing to the plugin author.",
+      "prose": [],
+      "steps": [],
+      "points": [
+        "No analytics, no telemetry, nothing phoning home.",
+        "Only the services you configure, and only while a post is being written.",
+        "Your topic, your style settings and any gathered research go to the provider you chose.",
+        "Keys are stored encrypted, never rendered back into the page, and stripped from every log line.",
+        "The full list of services, with their terms and privacy policies, is in the readme under External Services."
+      ],
+      "table": null
+    },
+    {
+      "id": "alternatives",
+      "title": "Looking for an alternative?",
+      "lead": "Most AI writing plugins work one of two ways: you buy credits, or you pay a monthly subscription.",
+      "prose": [
+        "Dicecodes AI Blog Writer is the third way: you bring your own API key. The plugin is free and open source, the AI account is yours, and the bill comes from the provider at their own rates with nothing added.",
+        "If you arrived here looking for a free AI writer for WordPress, an AI content generator with no monthly subscription, a plugin that uses your own OpenAI or Gemini key, an open source alternative to credit-based writing tools, an autoblogging plugin that is genuinely free, or a way to run AI blog writing on a local model with no key at all — that is what this is."
+      ],
+      "steps": [],
+      "points": [],
+      "table": {
+        "caption": "How the three models compare",
+        "head": [
+          "",
+          "Bring your own key (Dicecodes AI Blog Writer)",
+          "Credit packs",
+          "Monthly subscription"
+        ],
+        "rows": [
+          [
+            "Cost of the plugin",
+            "Free, GPLv2",
+            "Usually free to install",
+            "Recurring"
+          ],
+          [
+            "Who bills you for the AI",
+            "Your provider, directly",
+            "The vendor",
+            "The vendor"
+          ],
+          [
+            "Price of a word",
+            "The model's own rate",
+            "The model's rate plus a margin",
+            "Bundled, so unclear"
+          ],
+          [
+            "Where your drafts go",
+            "Your provider only",
+            "Through the vendor",
+            "Through the vendor"
+          ],
+          [
+            "If you stop paying",
+            "Nothing changes. There is nothing to stop paying",
+            "Writing stops",
+            "Writing stops"
+          ],
+          [
+            "Runs on a local model",
+            "Yes — Ollama, LM Studio, Jan or llama.cpp, no key",
+            "No",
+            "No"
+          ],
+          [
+            "Source you can read",
+            "All of it",
+            "Usually not",
+            "Usually not"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "removal",
+      "title": "If you delete this plugin",
+      "lead": "Deleting Dicecodes AI Blog Writer leaves your settings, your writing rules and your posts exactly where they are.",
+      "prose": [
+        "The setting on the Settings screen changes nothing about how posts are written. It decides one thing: whether deleting the plugin also deletes what it has stored.",
+        "Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.",
+        "Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin."
+      ],
+      "steps": [],
+      "points": [
+        "Install it again and everything is as you left it.",
+        "Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.",
+        "There is a box in Settings if you do want it all gone. Ticking it is the only confirmation there will be.",
+        "Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created."
+      ],
+      "table": null
+    }
+  ],
+  "faq": [
+    {
+      "q": "Where is the documentation?",
+      "a": [
+        "This page. The plugin links here from every screen, and each help link opens the section for the control you were looking at. Nothing is duplicated inside the plugin, so there is only ever one copy to be right."
+      ]
+    },
+    {
+      "q": "Do I need to pay for anything?",
+      "a": [
+        "The plugin is free and complete, and takes no cut of anything. The provider list is grouped by what it costs, free first, so the question is answered before you pick rather than after.",
+        "The first group runs a model on your own computer: Ollama, LM Studio, Jan and llama.cpp. No account, no key, no bill, and nothing leaves the machine. The second needs a key but not a card: Google Gemini, Groq, Mistral and Hugging Face give away usage at no cost, and OpenRouter lists a number of models that are free to call. Everything the plugin does works the same on either — there is no paid tier here to unlock.",
+        "Pictures work the same way: Pollinations needs no key, Pexels and Pixabay are free with a free key, and fal.ai, OpenAI, Gemini and Grok charge per image and are only ever used if you pick one of them.",
+        "Free allowances move on each provider's schedule, so the settings screen links to every provider's own pricing page rather than repeating a number here that would go stale."
+      ]
+    },
+    {
+      "q": "Do I need an SEO plugin?",
+      "a": [
+        "No. If Yoast, Rank Math or SEOPress is active, this plugin writes the title and description into that plugin's own fields and leaves the rest to it. If none is active, it prints the description and the Facebook and X sharing tags for its own posts, so the description it wrote is actually used rather than sitting unread in the database.",
+        "It stops there deliberately. Filling in head tags for pages it did not write is what an SEO plugin is for, and doing it anyway would mean two plugins fighting over the same tags on any site that later installs one."
+      ]
+    },
+    {
+      "q": "Will posts publish without my review?",
+      "a": [
+        "Only if you turn that on. Drafts are the default, and any post scoring below your quality threshold is held for review even when you asked for immediate publication."
+      ]
+    },
+    {
+      "q": "Scheduled posts are not appearing. Why?",
+      "a": [
+        "WordPress only runs scheduled tasks when someone visits your site, so a quiet site may need a real system cron job. The plugin shows a notice when it detects this. You can also run `wp dicecodes run` from the command line."
+      ]
+    },
+    {
+      "q": "Can I use a local model?",
+      "a": [
+        "Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and llama.cpp each have an entry with the right address already filled in — pick one and leave the API key blank. Anything else that speaks the OpenAI protocol, vLLM included, works through the custom endpoint."
+      ]
+    },
+    {
+      "q": "What happens to my API keys?",
+      "a": [
+        "They are encrypted before being stored, shown only as a mask, and never written to logs or error messages."
+      ]
+    }
+  ]
+}

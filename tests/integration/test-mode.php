@@ -55,7 +55,7 @@ class Test_Blogcraft_Mode extends WP_UnitTestCase {
 		// And everything else still is. Naming only the exceptions means a
 		// screen added later is available until somebody decides otherwise,
 		// which is the right way round.
-		foreach ( array( 'blogcraft-blueprint', 'blogcraft-library', 'blogcraft-settings', 'blogcraft-help' ) as $slug ) {
+		foreach ( array( 'blogcraft-blueprint', 'blogcraft-library', 'blogcraft-settings', 'blogcraft-activity' ) as $slug ) {
 			$this->assertTrue( Blogcraft_Mode::allows( $slug ), $slug . ' disappeared for no reason' );
 		}
 	}

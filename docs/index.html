@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dicecodes AI Blog Writer - Documentation</title>
+<meta name="description" content="Everything the plugin does, why each control is there, and what it costs you. Free, bring your own key, nothing held back.">
+<style>
+:root {
+  color-scheme: light dark;
+  --ink: #16181d;
+  --ink-soft: #4a5058;
+  --muted: #6b7280;
+  --bg: #ffffff;
+  --bg-soft: #f7f8fa;
+  --line: #e3e6ea;
+  --accent: #3a5bd9;
+  --accent-soft: #eef2fe;
+  --measure: 68ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8eaed;
+    --ink-soft: #b8bec7;
+    --muted: #8b929c;
+    --bg: #14161a;
+    --bg-soft: #1b1e24;
+    --line: #2b2f37;
+    --accent: #8fa6ff;
+    --accent-soft: #1e2436;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+header.top {
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-soft);
+  padding: 56px 0 40px;
+}
+
+header.top h1 {
+  margin: 0 0 12px;
+  font-size: 2.1rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+header.top p {
+  margin: 0;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 48px;
+  padding: 40px 0 80px;
+}
+
+nav.toc {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+nav.toc h2 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+nav.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav.toc li { margin: 0; }
+
+nav.toc a {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+nav.toc a:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+main { min-width: 0; }
+
+section {
+  margin: 0 0 56px;
+  scroll-margin-top: 20px;
+}
+
+section > h2 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  letter-spacing: -0.015em;
+}
+
+.lead {
+  margin: 0 0 20px;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+main p {
+  max-width: var(--measure);
+}
+
+ol.steps {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+ol.steps li {
+  position: relative;
+  margin: 0 0 12px;
+  padding: 0 0 0 42px;
+  max-width: var(--measure);
+  counter-increment: step;
+}
+
+ol.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 26px;
+}
+
+ol.steps strong { display: block; }
+
+ol.steps span { color: var(--ink-soft); }
+
+ul.points {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+ul.points li {
+  position: relative;
+  margin: 0 0 9px;
+  padding: 0 0 0 20px;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+ul.points li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.table-wrap {
+  margin: 0 0 20px;
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 0.92rem;
+}
+
+caption {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+th, td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  border-bottom: 2px solid var(--line);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+thead th:nth-child(2) { color: var(--accent); }
+
+tbody th {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+tbody td { color: var(--ink-soft); }
+
+tbody td:first-of-type { color: var(--ink); }
+
+.faq h3 {
+  margin: 26px 0 6px;
+  font-size: 1.05rem;
+  scroll-margin-top: 20px;
+}
+
+.faq p {
+  margin: 0 0 10px;
+  color: var(--ink-soft);
+}
+
+footer.foot {
+  border-top: 1px solid var(--line);
+  padding: 28px 0 60px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+footer.foot p { margin: 0 0 6px; }
+
+code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  font-size: 0.9em;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  nav.toc {
+    position: static;
+    max-height: none;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  nav.toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  header.top { padding: 40px 0 32px; }
+  header.top h1 { font-size: 1.7rem; }
+}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Dicecodes AI Blog Writer - Documentation", "description": "Everything the plugin does, why each control is there, and what it costs you. Free, bring your own key, nothing held back.", "about": {"@type": "SoftwareApplication", "name": "Dicecodes AI Blog Writer", "applicationCategory": "BrowserApplication", "operatingSystem": "WordPress"}}</script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<h1>Dicecodes AI Blog Writer - Documentation</h1>
+<p>Everything the plugin does, why each control is there, and what it costs you. Free, bring your own key, nothing held back.</p>
+</div></header>
+<div class="wrap"><div class="layout">
+<nav class="toc" aria-label="Contents">
+<h2>On this page</h2><ol>
+<li><a href="#quickstart">Start here</a></li>
+<li><a href="#providers">Connecting a provider</a></li>
+<li><a href="#clients">Writing from Claude or ChatGPT</a></li>
+<li><a href="#voice">Describing your voice</a></li>
+<li><a href="#how-it-writes">How it writes</a></li>
+<li><a href="#writing-a-post">Writing a post</a></li>
+<li><a href="#research">Research</a></li>
+<li><a href="#pictures">Pictures</a></li>
+<li><a href="#what-is-checked">What is checked</a></li>
+<li><a href="#where-posts-go">Where posts go</a></li>
+<li><a href="#automation">Automation</a></li>
+<li><a href="#checking-it-works">Checking it works</a></li>
+<li><a href="#privacy">What leaves your site</a></li>
+<li><a href="#alternatives">Looking for an alternative?</a></li>
+<li><a href="#removal">If you delete this plugin</a></li>
+<li><a href="#faq">Common questions</a></li>
+</ol></nav>
+<main>
+<section id="quickstart">
+<h2>Start here</h2>
+<p class="lead">Five steps, about ten minutes. Nothing is contacted until you finish the first one.</p>
+<ol class="steps">
+<li><strong>Choose a provider</strong><span>Settings, Connect a provider. The free ones are at the top. Nothing is chosen for you.</span></li>
+<li><strong>Paste the key</strong><span>Each provider has a link to the page on its own site where the key is issued. A model on your own machine needs no key. Save.</span></li>
+<li><strong>Pick a model</strong><span>Press &quot;Show the models on my account&quot;. Never type an id from memory.</span></li>
+<li><strong>Describe your voice</strong><span>Two sentences on your subject and your reader. Or press &quot;Learn from my posts&quot;.</span></li>
+<li><strong>Write one post</strong><span>Give it a topic and read the score before you publish anything.</span></li>
+</ol>
+</section>
+<section id="providers">
+<h2>Connecting a provider</h2>
+<p class="lead">Dicecodes AI Blog Writer has no AI of its own. It uses your account, and your provider bills you directly.</p>
+<p>Every request goes from your site straight to the provider you chose, and is billed to you by them. Nothing passes through a server of ours, because there is not one.</p>
+<p>Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.</p>
+<p>Three fields matter: the provider, the key, and the model id. Take the model id from your provider&#x27;s own model list rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.</p>
+<ol class="steps">
+<li><strong>Provider</strong><span>Grouped by what it costs, free first. Nothing is preselected.</span></li>
+<li><strong>Key</strong><span>Follow the link to the provider&#x27;s own site, where the key is issued. A local model needs none.</span></li>
+<li><strong>Model id</strong><span>Take it from your own account, not from an example. Retired ids fail with an error that does not say so.</span></li>
+</ol>
+<ul class="points">
+<li>Free, no key, no account: Ollama, LM Studio, Jan, llama.cpp. They run on this machine and contact nobody.</li>
+<li>Free tier, a key but no card: Google, Groq, Mistral, Hugging Face. On OpenRouter the free ids end in :free.</li>
+<li>Nothing is held back on a free provider. There is no paid tier here to unlock.</li>
+<li>On WordPress 7.0 and later, &quot;WordPress AI Client&quot; appears when a provider plugin is installed. No key here at all.</li>
+<li>Leave the base URL blank unless you are pointing at a proxy of your own.</li>
+</ul>
+</section>
+<section id="clients">
+<h2>Writing from Claude or ChatGPT</h2>
+<p class="lead">Use the subscription you already pay for. No API key, and usually no token either.</p>
+<p>There are two ways to run this plugin. The other has your site call a provider using your key. This one is the reverse: an application you already pay for connects to your site and does the writing, while the writing rules, the checks and the publishing all stay on your site. If you already have a Claude or ChatGPT subscription, this costs nothing extra.</p>
+<p>It works with anything that speaks the Model Context Protocol — Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others. Switch it on, issue a token, and paste the address and the token into that app. Your site has to be reachable over HTTPS from the internet for the app to find it.</p>
+<p>A connected client can read your rules, score and revise drafts, and publish above your threshold — adding the pictures, tags and links as it goes. It cannot write on a schedule, touch a post it did not create, or use your research sources. Scheduled writing needs an API key, because something has to be running when nobody is watching.</p>
+<p>A token is a key to this site. It is shown once, stored only as a fingerprint, and stops working the moment the person it was issued to loses permission to write here. Revoke any you are not using.</p>
+<ol class="steps">
+<li><strong>Choose the AI client way</strong><span>Settings. The first question on the screen is which way you want to write. Pick the second one.</span></li>
+<li><strong>Copy the address</strong><span>The Settings screen shows the address at the top, with a button that copies it.</span></li>
+<li><strong>Paste it into your app</strong><span>Claude: Settings, Connectors, Add custom connector. ChatGPT: Settings, Connectors, Advanced, Developer mode, Create.</span></li>
+<li><strong>Approve the connection</strong><span>The app sends you back here. Sign in if you are asked, read what it will be allowed to do, then press Approve.</span></li>
+<li><strong>Ask it to write</strong><span>&quot;Read my writing rules and write a post about X for my site.&quot;</span></li>
+</ol>
+<ul class="points">
+<li>Claude Code, Cursor and VS Code take one command instead. The Settings screen shows the exact command, ready to copy.</li>
+<li>Your permalinks must not be set to Plain. On that setting the address an app looks up to find the sign-in never reaches WordPress.</li>
+<li>The app then reports that your site is not an MCP server, which is not what is wrong with it.</li>
+<li>Your site must be reachable over HTTPS from the internet. A laptop install will not work.</li>
+<li>If an app cannot sign in, issue a token on the Settings screen instead, and set that app to no authentication.</li>
+<li>Then add a request header named Authorization, with the value Bearer followed by a space and the token.</li>
+<li>If a token is refused, your server is stripping the Authorization header. Add CGIPassAuth On to your .htaccess, or ask your host to pass it through.</li>
+<li>A connected app can read your rules, score and revise drafts, and publish above your threshold.</li>
+<li>Publishing adds the pictures, the search title, the tags and the links from older posts, same as the other way.</li>
+<li>It still cannot write on a schedule, or touch a post it did not create.</li>
+<li>Scheduled writing needs a provider key on the other path, because something has to be running when nobody is watching.</li>
+<li>Disconnect an app at any time from the same card. Revoking its token cuts it off immediately.</li>
+</ul>
+</section>
+<section id="voice">
+<h2>Describing your voice</h2>
+<p class="lead">Sent with every request. The reason two blogs on the same model do not read alike.</p>
+<p>If you already have posts published, use &quot;Learn from my posts&quot;. It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say &quot;I&quot; or &quot;you&quot; — and drafts the descriptions from your own titles. Nothing is saved until you press save.</p>
+<p>The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.</p>
+<ul class="points">
+<li>Two sentences on your subject and your reader is enough to start.</li>
+<li>&quot;Learn from my posts&quot; measures how you actually write and fills the fields in. Nothing saves until you press Save.</li>
+<li>Posts Dicecodes AI Blog Writer wrote are left out of that. Learning from its own output ends with every post sounding like the first.</li>
+<li>The experience field is the one worth time. It is the only part of a post a model cannot produce.</li>
+</ul>
+</section>
+<section id="how-it-writes">
+<h2>How it writes</h2>
+<p class="lead">The standing brief every post is written to.</p>
+<ul class="points">
+<li>Start from a shape — guide, listicle, tutorial — and about twenty fields are set at once. All stay editable.</li>
+<li>Or paste the address of an article you admire. Its structure is measured and becomes your rules.</li>
+<li>Structure only. No wording is copied, kept, or shown to a model.</li>
+<li>Anything shown in monospace is measured on the finished draft, not merely asked for.</li>
+</ul>
+</section>
+<section id="writing-a-post">
+<h2>Writing a post</h2>
+<p class="lead">One required field. Everything else already has an answer.</p>
+<ol class="steps">
+<li><strong>Topic</strong><span>A sentence beats a keyword: &quot;how to choose a standing desk for a small office&quot;.</span></li>
+<li><strong>What only you know</strong><span>Your figures, prices and results. Used as fact, and checked for on the finished draft.</span></li>
+<li><strong>The tabs beneath</strong><span>Pictures holds the art direction. Publishing sets the category, tags, author and time.</span></li>
+</ol>
+<ul class="points">
+<li>Stuck on the second one? A button asks you four specific questions instead. It never answers them for you.</li>
+</ul>
+</section>
+<section id="research">
+<h2>Research</h2>
+<p class="lead">The biggest single lever on whether a post is worth reading.</p>
+<p>Without sources it writes from memory, which dates badly and which search engines discount.</p>
+<p>Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.</p>
+<p>Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.</p>
+<ul class="points">
+<li>Off, the model writes from memory. On, it writes from current sources.</li>
+<li>Everything starts switched off. Turning a source on is how you consent to it.</li>
+<li>Wikipedia and Hacker News need no key. Tavily and SerpApi are paid and more current.</li>
+<li>A SearXNG instance you host is free. You can also list URLs to be read for every post.</li>
+<li>What is found also checks the draft: merely restating your sources costs points.</li>
+</ul>
+</section>
+<section id="pictures">
+<h2>Pictures</h2>
+<p class="lead">The article decides what a picture shows. These controls decide how it looks.</p>
+<p>Pictures come from a different kind of service than the writing does, so they are set up separately. Nothing here is required, and nothing runs until you switch pictures on — that switch is how you tell the plugin it may contact a picture service. Pollinations needs no key and is the one it starts on.</p>
+<p>The model that wrote the post describes the scene it should show, and the Pictures controls on the How it writes screen decide how that scene looks.</p>
+<p>fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.</p>
+<p>Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.</p>
+<ul class="points">
+<li>The model that wrote the piece describes the scene — the difference between a useful image and clip art of the headline.</li>
+<li>Pollinations needs no key. fal.ai, OpenAI, Gemini and Grok charge per picture and run only when you pick them.</li>
+<li>Writing on OpenAI and pictures on OpenAI? Leave the image key blank and one key does both.</li>
+<li>Text is kept out of generated images by default. Image models render lettering as convincing gibberish.</li>
+</ul>
+</section>
+<section id="what-is-checked">
+<h2>What is checked</h2>
+<p class="lead">Every draft is measured before it becomes a post, and each failure is written back into the rewrite as an instruction.</p>
+<ul class="points">
+<li>Does the opening answer the question in its first two sentences?</li>
+<li>Does every section stating a figure carry a link beside it?</li>
+<li>Does the draft say anything its sources do not already say?</li>
+<li>Is the subject in the title, a heading, the address and the first hundred words?</li>
+<li>Did the figures you supplied actually reach the page?</li>
+<li>A check that cannot be assessed is skipped, not failed. The score is what was earned out of what was offered.</li>
+<li>Two limits: the figure check does not open the link to confirm the number, and the originality check only sees the sources it was given. It is not a plagiarism service.</li>
+<li>Anything below your threshold is held for review instead of published.</li>
+</ul>
+</section>
+<section id="where-posts-go">
+<h2>Where posts go</h2>
+<p class="lead">A finished post is a normal WordPress post.</p>
+<ul class="points">
+<li>Written as real blocks, so every paragraph and heading is editable in the editor.</li>
+<li>Saved as a draft by default. You will find it under Posts.</li>
+<li>Anything below your threshold is set to pending and listed under &quot;Needs review&quot;.</li>
+<li>Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates.</li>
+</ul>
+</section>
+<section id="automation">
+<h2>Automation</h2>
+<p class="lead">Not needed to write a post by hand. Switch it on once the writing already looks right to you.</p>
+<p>Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.</p>
+<p>Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback.</p>
+<ul class="points">
+<li>Automatic posts are saved as drafts unless you say otherwise.</li>
+<li>A daily cap and a monthly token cap are both there to make a mistake cheap.</li>
+<li>WordPress runs scheduled work only when somebody visits, so a quiet morning can push a post past the hour you chose.</li>
+</ul>
+</section>
+<section id="checking-it-works">
+<h2>Checking it works</h2>
+<p class="lead">The test on the settings screen sends one short request and reports exactly what came back.</p>
+<p>It costs a fraction of a penny, and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.</p>
+<p>Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching.</p>
+<ul class="points">
+<li>It costs a fraction of a penny, and it separates a wrong key from a wrong model id from a provider that is down.</li>
+<li>Saving a key runs it automatically, so a mistake is caught when you make it.</li>
+<li>If a post fails, Activity says why.</li>
+<li>Rate limits are waited out rather than counted as failures.</li>
+</ul>
+</section>
+<section id="privacy">
+<h2>What leaves your site</h2>
+<p class="lead">Dicecodes AI Blog Writer contacts no servers of its own and sends nothing to the plugin author.</p>
+<ul class="points">
+<li>No analytics, no telemetry, nothing phoning home.</li>
+<li>Only the services you configure, and only while a post is being written.</li>
+<li>Your topic, your style settings and any gathered research go to the provider you chose.</li>
+<li>Keys are stored encrypted, never rendered back into the page, and stripped from every log line.</li>
+<li>The full list of services, with their terms and privacy policies, is in the readme under External Services.</li>
+</ul>
+</section>
+<section id="alternatives">
+<h2>Looking for an alternative?</h2>
+<p class="lead">Most AI writing plugins work one of two ways: you buy credits, or you pay a monthly subscription.</p>
+<p>Dicecodes AI Blog Writer is the third way: you bring your own API key. The plugin is free and open source, the AI account is yours, and the bill comes from the provider at their own rates with nothing added.</p>
+<p>If you arrived here looking for a free AI writer for WordPress, an AI content generator with no monthly subscription, a plugin that uses your own OpenAI or Gemini key, an open source alternative to credit-based writing tools, an autoblogging plugin that is genuinely free, or a way to run AI blog writing on a local model with no key at all — that is what this is.</p>
+<div class="table-wrap"><table>
+<caption>How the three models compare</caption>
+<thead><tr>
+<th scope="col"></th>
+<th scope="col">Bring your own key (Dicecodes AI Blog Writer)</th>
+<th scope="col">Credit packs</th>
+<th scope="col">Monthly subscription</th>
+</tr></thead><tbody>
+<tr><th scope="row">Cost of the plugin</th>
+<td>Free, GPLv2</td>
+<td>Usually free to install</td>
+<td>Recurring</td>
+</tr>
+<tr><th scope="row">Who bills you for the AI</th>
+<td>Your provider, directly</td>
+<td>The vendor</td>
+<td>The vendor</td>
+</tr>
+<tr><th scope="row">Price of a word</th>
+<td>The model&#x27;s own rate</td>
+<td>The model&#x27;s rate plus a margin</td>
+<td>Bundled, so unclear</td>
+</tr>
+<tr><th scope="row">Where your drafts go</th>
+<td>Your provider only</td>
+<td>Through the vendor</td>
+<td>Through the vendor</td>
+</tr>
+<tr><th scope="row">If you stop paying</th>
+<td>Nothing changes. There is nothing to stop paying</td>
+<td>Writing stops</td>
+<td>Writing stops</td>
+</tr>
+<tr><th scope="row">Runs on a local model</th>
+<td>Yes — Ollama, LM Studio, Jan or llama.cpp, no key</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr><th scope="row">Source you can read</th>
+<td>All of it</td>
+<td>Usually not</td>
+<td>Usually not</td>
+</tr>
+</tbody></table></div>
+</section>
+<section id="removal">
+<h2>If you delete this plugin</h2>
+<p class="lead">Deleting Dicecodes AI Blog Writer leaves your settings, your writing rules and your posts exactly where they are.</p>
+<p>The setting on the Settings screen changes nothing about how posts are written. It decides one thing: whether deleting the plugin also deletes what it has stored.</p>
+<p>Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.</p>
+<p>Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.</p>
+<ul class="points">
+<li>Install it again and everything is as you left it.</li>
+<li>Deliberate: WordPress asks whether you meant to delete the plugin, not whether you meant to delete the rest.</li>
+<li>There is a box in Settings if you do want it all gone. Ticking it is the only confirmation there will be.</li>
+<li>Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created.</li>
+</ul>
+</section>
+<section id="faq" class="faq">
+<h2>Common questions</h2>
+<h3 id="q-where-is-the-documentation">Where is the documentation?</h3>
+<p>This page. The plugin links here from every screen, and each help link opens the section for the control you were looking at. Nothing is duplicated inside the plugin, so there is only ever one copy to be right.</p>
+<h3 id="q-do-i-need-to-pay-for-anything">Do I need to pay for anything?</h3>
+<p>The plugin is free and complete, and takes no cut of anything. The provider list is grouped by what it costs, free first, so the question is answered before you pick rather than after.</p>
+<p>The first group runs a model on your own computer: Ollama, LM Studio, Jan and llama.cpp. No account, no key, no bill, and nothing leaves the machine. The second needs a key but not a card: Google Gemini, Groq, Mistral and Hugging Face give away usage at no cost, and OpenRouter lists a number of models that are free to call. Everything the plugin does works the same on either — there is no paid tier here to unlock.</p>
+<p>Pictures work the same way: Pollinations needs no key, Pexels and Pixabay are free with a free key, and fal.ai, OpenAI, Gemini and Grok charge per image and are only ever used if you pick one of them.</p>
+<p>Free allowances move on each provider&#x27;s schedule, so the settings screen links to every provider&#x27;s own pricing page rather than repeating a number here that would go stale.</p>
+<h3 id="q-do-i-need-an-seo-plugin">Do I need an SEO plugin?</h3>
+<p>No. If Yoast, Rank Math or SEOPress is active, this plugin writes the title and description into that plugin&#x27;s own fields and leaves the rest to it. If none is active, it prints the description and the Facebook and X sharing tags for its own posts, so the description it wrote is actually used rather than sitting unread in the database.</p>
+<p>It stops there deliberately. Filling in head tags for pages it did not write is what an SEO plugin is for, and doing it anyway would mean two plugins fighting over the same tags on any site that later installs one.</p>
+<h3 id="q-will-posts-publish-without-my-review">Will posts publish without my review?</h3>
+<p>Only if you turn that on. Drafts are the default, and any post scoring below your quality threshold is held for review even when you asked for immediate publication.</p>
+<h3 id="q-scheduled-posts-are-not-appearing-why">Scheduled posts are not appearing. Why?</h3>
+<p>WordPress only runs scheduled tasks when someone visits your site, so a quiet site may need a real system cron job. The plugin shows a notice when it detects this. You can also run wp dicecodes run from the command line.</p>
+<h3 id="q-can-i-use-a-local-model">Can I use a local model?</h3>
+<p>Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and llama.cpp each have an entry with the right address already filled in — pick one and leave the API key blank. Anything else that speaks the OpenAI protocol, vLLM included, works through the custom endpoint.</p>
+<h3 id="q-what-happens-to-my-api-keys">What happens to my API keys?</h3>
+<p>They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.</p>
+</section>
+</main>
+</div></div>
+<footer class="foot"><div class="wrap">
+<p>Dicecodes AI Blog Writer is free software, released under the GPL.</p>
+<p>This page is the documentation the plugin links to. Section addresses are used by the plugin itself, so they do not change.</p>
+</div></footer>
+</body></html>

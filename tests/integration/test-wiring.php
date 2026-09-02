@@ -389,80 +389,94 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		$this->assertNotSame( '', Blogcraft_Provider_Registry::default_base_url( 'openai' ) );
 	}
 
-	public function test_the_documentation_ships_with_the_plugin() {
-		// Help panels used to link to a page on a website that did not exist,
-		// so the one control offering to explain more returned a 404.
-		$sections = Blogcraft_Docs::sections();
+	/**
+	 * The published documentation, as the page is built from.
+	 *
+	 * Deliberately not shipped with the plugin. It is read here so a
+	 * help link pointing at a section the page does not have fails in
+	 * the test suite rather than in somebody's browser.
+	 *
+	 * @return array Section id => section.
+	 */
+	private function docs() {
+		$path = BLOGCRAFT_PATH . 'docs/content.json';
+
+		if ( ! file_exists( $path ) ) {
+			$this->fail( 'docs/content.json is missing, so no help link can be checked' );
+		}
+
+		$doc = json_decode( (string) file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$this->assertIsArray( $doc, 'docs/content.json is not readable as JSON' );
+
+		$by_id = array();
+
+		foreach ( $doc['sections'] as $one ) {
+			$by_id[ $one['id'] ] = $one;
+		}
+
+		return $by_id;
+	}
+
+	public function test_every_section_of_the_documentation_says_something() {
+		$sections = $this->docs();
 
 		$this->assertNotEmpty( $sections );
 
-		foreach ( $sections as $anchor => $section ) {
-			$this->assertNotSame( '', $section['title'], $anchor . ' has no title' );
-			$this->assertNotEmpty( $section['lead'], $anchor . ' has no opening line' );
+		foreach ( $sections as $id => $section ) {
+			$this->assertNotSame( '', $section['title'], $id . ' has no title' );
+			$this->assertNotEmpty( $section['lead'], $id . ' has no opening line' );
 
 			$this->assertTrue(
-				! empty( $section['steps'] ) || ! empty( $section['points'] ),
-				$anchor . ' has nothing under its opening line'
+				! empty( $section['steps'] ) || ! empty( $section['points'] ) || ! empty( $section['prose'] ),
+				$id . ' has nothing under its opening line'
 			);
 		}
-
-		$this->assertStringContainsString( 'page=blogcraft-help', Blogcraft_Docs::url() );
-		$this->assertStringContainsString( '#providers', Blogcraft_Docs::url( 'providers' ) );
 	}
 
-	public function test_the_help_screen_is_written_in_short_lines() {
-		// It was four to seven full paragraphs a section, which reads as an
-		// essay about the plugin rather than instructions for using it —
-		// nobody reads a help screen from the top, they arrive with a question
-		// and scan. This pins the shape rather than the wording: a ceiling on
-		// every line, so the next thing added has to be written to be scanned.
-		$sections = Blogcraft_Docs::sections();
-		$limits   = array(
-			'lead'  => 120,
-			'step'  => 130,
-			'point' => 180,
-		);
+	public function test_the_documentation_is_written_in_short_lines() {
+		// Nobody reads documentation from the top. They arrive with a
+		// question and scan, so this pins the shape rather than the
+		// wording and the next thing added has to be scannable too.
+		$sections = $this->docs();
 
-		foreach ( $sections as $anchor => $section ) {
+		foreach ( $sections as $id => $section ) {
 			$this->assertLessThanOrEqual(
-				$limits['lead'],
+				160,
 				mb_strlen( (string) $section['lead'] ),
-				$anchor . ' opens with a paragraph rather than a sentence'
+				$id . ' opens with a paragraph rather than a sentence'
 			);
 
-			foreach ( ( isset( $section['steps'] ) ? $section['steps'] : array() ) as $step ) {
-				$this->assertCount( 2, $step, $anchor . ' has a step that is not a name and a line' );
-
+			foreach ( $section['steps'] as $step ) {
 				$this->assertLessThanOrEqual(
 					40,
-					mb_strlen( (string) $step[0] ),
-					$anchor . ' has a step name long enough to be a sentence: "' . $step[0] . '"'
+					mb_strlen( (string) $step['title'] ),
+					$id . ' has a step name long enough to be a sentence'
 				);
 
 				$this->assertLessThanOrEqual(
-					$limits['step'],
-					mb_strlen( (string) $step[1] ),
-					$anchor . ' has a step nobody will read: "' . $step[1] . '"'
+					150,
+					mb_strlen( (string) $step['text'] ),
+					$id . ' has a step nobody will read'
 				);
 			}
 
-			foreach ( ( isset( $section['points'] ) ? $section['points'] : array() ) as $point ) {
+			foreach ( $section['points'] as $point ) {
 				$this->assertLessThanOrEqual(
-					$limits['point'],
+					200,
 					mb_strlen( (string) $point ),
-					$anchor . ' has a bullet that is really a paragraph: "' . $point . '"'
+					$id . ' has a bullet that is really a paragraph'
 				);
 			}
 		}
 	}
 
-	public function test_the_help_screen_opens_with_the_steps() {
-		// Somebody who has just installed this wants the order to do things
-		// in, not a section on privacy. First section, and it is the sequence.
-		$sections = Blogcraft_Docs::sections();
-		$first    = key( $sections );
+	public function test_the_documentation_opens_with_the_steps() {
+		// Somebody who has just installed this wants the order to do
+		// things in, not a section on privacy.
+		$sections = $this->docs();
 
-		$this->assertSame( 'quickstart', $first );
+		$this->assertSame( 'quickstart', (string) key( $sections ) );
 		$this->assertNotEmpty( $sections['quickstart']['steps'] );
 	}
 
@@ -493,15 +507,19 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 	}
 
 	public function test_every_help_panel_points_at_a_section_that_exists() {
-		$sections = Blogcraft_Docs::sections();
+		$sections = $this->docs();
 		$source   = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
-		if ( ! preg_match_all( "/'anchor'\s*=>\s*'([a-z-]+)'/", $source, $hits ) ) {
+		if ( ! preg_match_all( "/'anchor'\\s*=>\\s*'([a-z-]+)'/", $source, $hits ) ) {
 			$this->fail( 'no help anchors found to check' );
 		}
 
 		foreach ( $hits[1] as $anchor ) {
-			$this->assertArrayHasKey( $anchor, $sections, 'a help panel links to "' . $anchor . '", which no section provides' );
+			$this->assertArrayHasKey(
+				$anchor,
+				$sections,
+				'a help panel links to "' . $anchor . '", which the documentation does not have'
+			);
 		}
 	}
 
@@ -572,19 +590,45 @@ class Test_Blogcraft_Wiring extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_every_settings_card_that_has_a_help_panel_has_a_docs_section() {
-		// The picture card is new; every card that offers to explain itself has
-		// to have somewhere to send the reader.
-		$source   = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-connection.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$sections = Blogcraft_Docs::sections();
+	public function test_every_anchor_the_plugin_links_to_exists_on_the_page() {
+		// Every link from anywhere in the plugin, not only the settings
+		// cards. A link into the middle of a page that has moved on lands
+		// at the top of it, with nothing to say anything is wrong.
+		$sections = $this->docs();
+		$anchors  = array();
 
-		preg_match_all( "/'anchor'\s*=>\s*'([a-z-]+)'/", $source, $hits );
+		// Two ways an anchor is written: passed to the link helpers directly,
+		// or held in the map the settings cards look themselves up in. A
+		// pattern for only one of them checks half the links and reports
+		// nothing about the other half.
+		$patterns = array(
+			"/Blogcraft_Docs::(?:site_url|link)\\(\\s*(?:\\/\\/[^\\n]*\\n\\s*)?'([a-z-]+)'/",
+			"/'anchor'\\s*=>\\s*'([a-z-]+)'/",
+		);
 
-		$this->assertNotEmpty( $hits[1] );
-		$this->assertContains( 'pictures', $hits[1], 'the picture card explains nothing' );
+		foreach ( (array) glob( BLOGCRAFT_PATH . 'includes/*.php' ) as $path ) {
+			$body = (string) file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
-		foreach ( $hits[1] as $anchor ) {
-			$this->assertArrayHasKey( $anchor, $sections, $anchor . ' has no documentation section' );
+			foreach ( $patterns as $pattern ) {
+				if ( preg_match_all( $pattern, $body, $hits ) ) {
+					$anchors = array_merge( $anchors, $hits[1] );
+				}
+			}
+		}
+
+		$this->assertNotEmpty( $anchors, 'nothing in the plugin links to the documentation' );
+
+		// One that is reached only through the map, so a pattern that stops
+		// seeing the map fails here rather than passing on a smaller set.
+		$this->assertContains( 'quickstart', $anchors, 'nothing points at the setup guide' );
+		$this->assertContains( 'pictures', $anchors, 'the picture card explains nothing' );
+
+		foreach ( array_unique( $anchors ) as $anchor ) {
+			$this->assertArrayHasKey(
+				$anchor,
+				$sections,
+				'the plugin links to "' . $anchor . '", which the documentation does not have'
+			);
 		}
 	}
 

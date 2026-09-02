@@ -36,7 +36,6 @@ class Blogcraft_Nav {
 			'blogcraft-review'            => __( 'Needs review', 'dicecodes-ai-blog-writer' ),
 			'blogcraft-activity'          => __( 'Activity', 'dicecodes-ai-blog-writer' ),
 			'blogcraft-settings'          => __( 'Settings', 'dicecodes-ai-blog-writer' ),
-			'blogcraft-help'              => __( 'Help', 'dicecodes-ai-blog-writer' ),
 		);
 
 		// A tab for an empty queue is a tab that is never worth clicking. It

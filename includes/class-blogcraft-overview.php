@@ -185,7 +185,7 @@ class Blogcraft_Overview {
 						: __( 'Read it before you turn anything on a schedule.', 'dicecodes-ai-blog-writer' ),
 					'done'   => $written,
 					'url'    => Blogcraft_Mode::is_client()
-						? admin_url( 'admin.php?page=blogcraft-help' )
+						? Blogcraft_Docs::site_url( 'clients' )
 						: admin_url( 'admin.php?page=blogcraft-write' ),
 					'action' => Blogcraft_Mode::is_client()
 						? __( 'How', 'dicecodes-ai-blog-writer' )
@@ -260,7 +260,7 @@ class Blogcraft_Overview {
 					? __( 'Say: read my writing rules and write a post about X. Give it your own figures and results too — they are used as fact and checked against the finished draft.', 'dicecodes-ai-blog-writer' )
 					: __( 'The topic is the only field you have to fill in. The one worth filling in anyway is what you know that nobody else does: your own figures and results are used as fact and checked against the finished draft.', 'dicecodes-ai-blog-writer' ),
 				$client
-					? admin_url( 'admin.php?page=blogcraft-help' )
+					? Blogcraft_Docs::site_url( 'clients' )
 					: admin_url( 'admin.php?page=blogcraft-write' ),
 				$client
 					? __( 'How', 'dicecodes-ai-blog-writer' )
@@ -274,22 +274,25 @@ class Blogcraft_Overview {
 			),
 		);
 
-		// Open while there is still setup to do, shut afterwards.
-		$open = ! self::setup_done();
-
 		echo '<section class="blogcraft-card"><header>';
 		echo '<h2>' . esc_html__( 'How this works', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Four steps, once. After that it is a topic and a look at the draft.', 'dicecodes-ai-blog-writer' ) . '</p>';
 
-		printf(
-			'<button type="button" class="bc-help-toggle" aria-expanded="%1$s" aria-controls="bc-how"><span aria-hidden="true">?</span>%2$s</button>',
-			$open ? 'true' : 'false',
-			esc_html__( 'Show the steps', 'dicecodes-ai-blog-writer' )
+		// The four steps stay on the screen; what used to fold open under
+		// them was a longer retelling of the same four, which is what the
+		// documentation is for.
+		Blogcraft_Docs::link(
+			'quickstart',
+			__( 'Read the setup guide', 'dicecodes-ai-blog-writer' ),
+			'bc-help-toggle'
 		);
 
 		echo '</header>';
 
-		printf( '<ol class="blogcraft-steps bc-how" id="bc-how"%s>', $open ? '' : ' hidden' );
+		// Always shown. They were folded away because a longer explanation
+		// sat under them; four lines and a button each is not something to
+		// hide behind a control.
+		echo '<ol class="blogcraft-steps bc-how" id="bc-how">';
 
 		foreach ( $steps as $step ) {
 			printf(
@@ -302,13 +305,11 @@ class Blogcraft_Overview {
 		}
 
 		echo '</ol>';
-		printf(
-			'<p class="blogcraft-hint"><a href="%1$s">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
-			esc_url( Blogcraft_Docs::url() ),
-			esc_html__( 'Everything else, in detail', 'dicecodes-ai-blog-writer' ),
-			esc_url( Blogcraft_Docs::site_url() ),
-			esc_html__( 'Guides and walkthroughs', 'dicecodes-ai-blog-writer' )
-		);
+		// One link where there were two. They pointed at the shipped help
+		// screen and at the website, which are now the same page.
+		echo '<p class="blogcraft-hint">';
+		Blogcraft_Docs::link( '', __( 'Everything else, in detail', 'dicecodes-ai-blog-writer' ) );
+		echo '</p>';
 		echo '</section>';
 	}
 

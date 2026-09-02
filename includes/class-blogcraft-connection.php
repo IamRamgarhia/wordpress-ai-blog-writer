@@ -1908,84 +1908,25 @@ class Blogcraft_Connection {
 	}
 
 	/**
-	 * What each card is for, in more words than its subtitle allows.
+	 * Which section of the documentation explains each card.
 	 *
-	 * Folded away by default. A settings screen that explains everything up
-	 * front is unreadable, and one that explains nothing sends people to a
-	 * search engine; a control that opens the explanation in place is the only
-	 * arrangement that serves both the person who knows and the person who
-	 * does not.
+	 * The paragraphs that used to sit here, folded away behind a control
+	 * on every card, are on the documentation page now. Two copies of an
+	 * explanation means one of them is the older, and it was this one:
+	 * shipping a correction meant shipping a release.
 	 *
-	 * @return array Slug => array( paragraphs, docs anchor ).
+	 * @return array Card slug => documentation anchor.
 	 */
 	private static function help_text() {
 		return array(
-			'provider'   => array(
-				'anchor' => 'providers',
-				'lines'  => array(
-					__( 'Dicecodes AI Blog Writer has no AI of its own. It talks to a provider you choose, using a key from your account, and every request is billed to you by them and never passes through us.', 'dicecodes-ai-blog-writer' ),
-					__( 'Pick the provider you already have an account with. If you have none, Groq and Google both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.', 'dicecodes-ai-blog-writer' ),
-					__( 'Three fields matter: the provider, the key, and the model id. Take the model id from the provider list linked here rather than copying an example, because these get retired without notice. Leave the base URL blank unless you are pointing at something of your own.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'clients'    => array(
-				'anchor'    => 'clients',
-				'link_only' => true,
-				'lines'     => array(
-					__( 'The card above has this site call a provider with your key. This one is the other way round: an app you already pay for connects to this site and does the writing, while the writing rules, the checks and the publishing stay here. If you have a Claude or ChatGPT subscription, this costs nothing extra.', 'dicecodes-ai-blog-writer' ),
-					__( 'It works with anything that speaks the Model Context Protocol — Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and others. Switch it on, issue a token, and paste the address and the token into that app. Your site has to be reachable over HTTPS from the internet for the app to find it.', 'dicecodes-ai-blog-writer' ),
-					__( 'A connected client can read your rules, score and revise drafts, and publish above your threshold — adding the pictures, tags and links as it goes. It cannot write on a schedule, touch a post it did not create, or use your research sources. Scheduled writing needs an API key, because something has to be running when nobody is watching.', 'dicecodes-ai-blog-writer' ),
-					__( 'A token is a key to this site. It is shown once, stored only as a fingerprint, and stops working the moment the person it was issued to loses permission to write here. Revoke any you are not using.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'pictures'   => array(
-				'anchor' => 'pictures',
-				'lines'  => array(
-					__( 'Pictures come from a different kind of service than the writing does, which is why they get their own card. Nothing here is required, and nothing here runs until you switch pictures on — that switch is how you tell Dicecodes AI Blog Writer it may contact a picture service. Pollinations needs no key and is the one it starts on.', 'dicecodes-ai-blog-writer' ),
-					__( 'The article decides what a picture shows — the model that wrote the post describes the scene — and the Pictures controls under "How it writes" decide how it looks.', 'dicecodes-ai-blog-writer' ),
-					__( 'fal.ai, OpenAI, Gemini and Grok charge per picture. They are only ever used when you pick one of them, never as a fallback, so an image is never billed to you by accident. If you already write with OpenAI, Google or xAI, choosing the same one here uses the key you have already entered.', 'dicecodes-ai-blog-writer' ),
-					__( 'Pexels and Pixabay search real photographs rather than drawing anything. Their keys are free.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'research'   => array(
-				'anchor' => 'research',
-				'lines'  => array(
-					__( 'The biggest lever on quality. Without sources it writes from memory, which search engines discount.', 'dicecodes-ai-blog-writer' ),
-					__( 'Every source starts off. Wikipedia and Hacker News need no key, so switching one on is all they need. Tavily and SerpApi are paid but return more current results. A SearXNG instance is free if you host one.', 'dicecodes-ai-blog-writer' ),
-					__( 'Anything found here is also used to check the finished draft: if the article merely restates its sources, the score says so and the rewrite is told to fix it.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'voice'      => array(
-				'anchor' => 'voice',
-				'lines'  => array(
-					__( 'Everything here is sent with every request. It is the difference between posts that sound like your site and posts that sound like every other AI blog.', 'dicecodes-ai-blog-writer' ),
-					__( 'If you already have posts published, use "Learn from my posts". It measures how you actually write — sentence length, paragraph length, whether you use em dashes or contractions, whether you say "I" or "you" — and drafts the descriptions from your own titles. Nothing is saved until you press save.', 'dicecodes-ai-blog-writer' ),
-					__( 'The experience field is the one worth spending time on. It is the only part of a post a model cannot produce, and it is what stops the writing being a summary of pages that already exist.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'removal'    => array(
-				'anchor' => 'removal',
-				'lines'  => array(
-					__( 'Nothing here changes how anything is written. It decides one thing: whether deleting the plugin also deletes what it has stored.', 'dicecodes-ai-blog-writer' ),
-					__( 'Left alone, everything survives. That is deliberate — a plugin that quietly erases years of settings because somebody deleted it to reinstall it is a plugin nobody trusts twice, and dropping database tables cannot be undone.', 'dicecodes-ai-blog-writer' ),
-					__( 'Your posts are never affected either way. They are ordinary WordPress posts from the moment they are created, and they stay whatever happens to this plugin.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'automation' => array(
-				'anchor' => 'automation',
-				'lines'  => array(
-					__( 'None of this is needed to write a post by hand. Turn it on once the writing already looks right to you, not before.', 'dicecodes-ai-blog-writer' ),
-					__( 'Automatic posts are saved as drafts unless you say otherwise, and anything scoring below your threshold is held for review whatever you chose. The daily cap and the monthly token cap are both there to make a mistake cheap.', 'dicecodes-ai-blog-writer' ),
-					__( 'Pictures are optional. Pollinations needs no key. fal.ai and OpenAI charge per image and are only ever used when you pick one of them, never as a fallback.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
-			'test'       => array(
-				'anchor' => 'checking-it-works',
-				'lines'  => array(
-					__( 'Sends one very short request and reports exactly what came back. It costs a fraction of a penny and it is the fastest way to tell a wrong key from a wrong model id from a provider that is simply down.', 'dicecodes-ai-blog-writer' ),
-					__( 'Saving a key runs this automatically, so a mistake is caught at the moment you make it rather than on a cron tick nobody is watching.', 'dicecodes-ai-blog-writer' ),
-				),
-			),
+			'provider'   => array( 'anchor' => 'providers' ),
+			'clients'    => array( 'anchor' => 'clients' ),
+			'pictures'   => array( 'anchor' => 'pictures' ),
+			'research'   => array( 'anchor' => 'research' ),
+			'voice'      => array( 'anchor' => 'voice' ),
+			'removal'    => array( 'anchor' => 'removal' ),
+			'automation' => array( 'anchor' => 'automation' ),
+			'test'       => array( 'anchor' => 'checking-it-works' ),
 		);
 	}
 
@@ -2003,48 +1944,14 @@ class Blogcraft_Connection {
 			return;
 		}
 
-		// A card whose explanation is a set of instructions sends people to
-		// the instructions. Repeating them inside a fold here would mean two
-		// copies to keep in step, and the reader following along in another
-		// window wants the page with the screenshots, not a paragraph.
-		if ( ! empty( $all[ $slug ]['link_only'] ) ) {
-			printf(
-				'<a class="bc-help-toggle" href="%1$s"><span aria-hidden="true">?</span>%2$s</a>',
-				esc_url( Blogcraft_Docs::url( $all[ $slug ]['anchor'] ) ),
-				esc_html__( 'How this works', 'dicecodes-ai-blog-writer' )
-			);
-
-			return;
-		}
-
-		$id = 'bc-help-' . $slug;
-
-		// A bare question mark in a corner is a control nobody finds. It says
-		// what it does.
-		printf(
-			'<button type="button" class="bc-help-toggle" aria-expanded="false" aria-controls="%1$s"><span aria-hidden="true">?</span>%2$s</button>',
-			esc_attr( $id ),
-			esc_html__( 'How this works', 'dicecodes-ai-blog-writer' )
+		// A bare question mark in a corner is a control nobody finds, so it
+		// says what it does. It opens the section for this card, away from
+		// the form being filled in.
+		Blogcraft_Docs::link(
+			$all[ $slug ]['anchor'],
+			__( 'How this works', 'dicecodes-ai-blog-writer' ),
+			'bc-help-toggle'
 		);
-
-		printf( '<div class="bc-help" id="%s" hidden>', esc_attr( $id ) );
-
-		foreach ( $all[ $slug ]['lines'] as $line ) {
-			printf( '<p>%s</p>', esc_html( $line ) );
-		}
-
-		// The documentation ships with the plugin. It used to link to a page on
-		// a website that did not exist, so the one control offering to explain
-		// more returned a 404.
-		printf(
-			'<p class="bc-help-more"><a href="%1$s">%2$s</a> <span aria-hidden="true">&middot;</span> <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></p>',
-			esc_url( Blogcraft_Docs::url( $all[ $slug ]['anchor'] ) ),
-			esc_html__( 'Read the full documentation', 'dicecodes-ai-blog-writer' ),
-			esc_url( Blogcraft_Docs::site_url( $all[ $slug ]['anchor'] ) ),
-			esc_html__( 'Guides online', 'dicecodes-ai-blog-writer' )
-		);
-
-		echo '</div>';
 	}
 
 	/**

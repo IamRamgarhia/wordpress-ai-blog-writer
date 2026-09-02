@@ -782,41 +782,6 @@ a.bc-nav-item:hover {
 	}
 }
 
-/* The help rail carries no save button and twelve entries rather than
-   six, so it gets a little more width and is allowed to scroll on its
-   own once it runs past the window. */
-.bc-doc-shell {
-	grid-template-columns: minmax(0, 1fr) 248px;
-}
-
-.bc-doc-shell .bc-jump {
-	max-height: calc(100vh - 96px);
-	overflow-y: auto;
-}
-
-.bc-doc-shell .bc-jump-item {
-	line-height: 1.35;
-}
-
-@media screen and (max-width: 1100px) {
-	.bc-doc-shell {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
-	/* Stacked, the rail is the second grid item and lands under every
-	   section it is meant to help you skip. On the settings screen that
-	   is survivable because the rail carries the save button; here it
-	   would be a table of contents printed after the book. */
-	.bc-doc-shell .bc-jump-col {
-		order: -1;
-	}
-
-	.bc-doc-shell .bc-jump {
-		max-height: none;
-		overflow-y: visible;
-	}
-}
-
 /* ------------------------------------------------ connecting an app. */
 
 /* The result of the check that runs when a token is issued. Three states,
@@ -864,91 +829,6 @@ a.bc-nav-item:hover {
 .bc-client-heading {
 	margin: 24px 0 10px;
 	font-size: var(--bc-t-lg);
-}
-
-/* ------------------------------------------------------- the help copy. */
-
-/* One sentence, set slightly larger, so a section can be judged from its
-   first line and skipped without reading the rest. */
-.bc-doc-lead {
-	margin: 0 0 16px;
-	max-width: 68ch;
-	font-size: var(--bc-t-lg);
-	line-height: 1.5;
-	color: var(--bc-ink);
-}
-
-.bc-doc-steps {
-	counter-reset: bc-step;
-	margin: 0 0 16px;
-	padding: 0;
-	list-style: none;
-}
-
-.bc-doc-steps li {
-	counter-increment: bc-step;
-	position: relative;
-	margin: 0 0 12px;
-	padding-left: 40px;
-	max-width: 68ch;
-	line-height: 1.55;
-}
-
-.bc-doc-steps li::before {
-	content: counter(bc-step);
-	position: absolute;
-	left: 0;
-	top: 0;
-	display: grid;
-	place-items: center;
-	width: 26px;
-	height: 26px;
-	border-radius: 50%;
-	background: var(--bc-accent-soft);
-	color: var(--bc-accent);
-	font-size: var(--bc-t-sm);
-	font-weight: 700;
-}
-
-.bc-doc-step-name {
-	font-weight: 600;
-	color: var(--bc-ink);
-}
-
-.bc-doc-step-line {
-	color: var(--bc-ink-soft);
-}
-
-/* Short lines, one idea each. The rule they replace was four to seven
-   full paragraphs a section, which nobody reads on a help screen. */
-.bc-doc-points {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.bc-doc-points li {
-	position: relative;
-	margin: 0 0 8px;
-	padding-left: 20px;
-	max-width: 68ch;
-	line-height: 1.55;
-}
-
-.bc-doc-points li::before {
-	content: "";
-	position: absolute;
-	left: 4px;
-	top: 0.62em;
-	width: 5px;
-	height: 5px;
-	border-radius: 50%;
-	background: var(--bc-accent);
-}
-
-.bc-doc-points li:last-child,
-.bc-doc-steps li:last-child {
-	margin-bottom: 0;
 }
 
 /* ------------------------------------------------------------- overview. */
@@ -2090,20 +1970,6 @@ body[class*="page_blogcraft"] #wpcontent {
 	font-size: var(--bc-t-md);
 	line-height: 1.6;
 	color: var(--bc-ink);
-}
-
-/* The two links that cannot ship with the plugin: guides that get longer
-   over time, and somewhere to say something is broken. */
-.bc-docs-links {
-	margin: var(--bc-s3) 0 0;
-	font-size: var(--bc-t-md);
-	font-weight: 600;
-}
-
-.bc-docs-links span {
-	margin: 0 var(--bc-s1);
-	color: var(--bc-faint);
-	font-weight: 400;
 }
 
 /* ---------------------------------------------------- the path chooser.
