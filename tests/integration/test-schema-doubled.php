@@ -19,15 +19,22 @@ class Test_Blogcraft_Schema_Doubled extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
+		Blogcraft_Capabilities::add();
 		Blogcraft_Migrator::migrate();
 
 		delete_option( 'blogcraft_settings' );
 		delete_transient( Blogcraft_Schema_Watch::CACHE );
+
+		// One of these renders the settings screen, which refuses anybody
+		// who cannot manage the plugin.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 	}
 
 	public function tear_down() {
 		delete_option( 'blogcraft_settings' );
 		delete_transient( Blogcraft_Schema_Watch::CACHE );
+		Blogcraft_Capabilities::remove();
+		wp_set_current_user( 0 );
 
 		parent::tear_down();
 	}
