@@ -508,6 +508,16 @@ class Blogcraft_Overview {
 			printf( '<p class="blogcraft-hint is-warn">%s</p>', esc_html( $access ) );
 		}
 
+		// And whether the markup this plugin adds is the only copy on the
+		// page. Themes that print their own Article are common, announce
+		// themselves nowhere, and turn a correct post into one carrying two
+		// descriptions of itself that disagree.
+		$doubled = Blogcraft_Schema_Watch::line();
+
+		if ( '' !== $doubled ) {
+			printf( '<p class="blogcraft-hint is-warn">%s</p>', esc_html( $doubled ) );
+		}
+
 		echo '<div class="blogcraft-actions">';
 
 		// A button to a screen this setup does not have is worse than no

@@ -3,6 +3,14 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.3.0 =
+* Fixed: on a site whose theme adds its own article structured data, every post went out carrying two copies of it that described the same page and disagreed with each other. Two is worth less to a search engine than one, and nothing on any screen said it was happening
+* The plugin already stood down for the SEO plugins it could name, because each announces itself. A theme announces nothing, so no list could ever have caught this. It is now answered by looking: the site reads one of its own published posts and counts what is actually in the page
+* The overview says so when it finds a second copy, and names the switch that stops it. If both copies come from elsewhere it says that too, rather than pointing at a switch that would not help
+* New setting, "Add search-engine structured data to each post", on by default. Off is for the sites whose theme already does it, which is the one case where adding ours makes the page worse
+* The stand-down list knows ten SEO plugins instead of four: The SEO Framework, Slim SEO, Squirrly, SEO Simple Pack, Schema Pro and Schema & Structured Data for WP have joined Yoast, Rank Math, All In One SEO and SEOPress
+* The form test introduced last release checked four screens because those were the four the bug was found on. It now checks all ten that draw a form, with rows on the screens that list things, so the forms drawn once per row are checked too
+
 = 1.2.0 =
 * Fixed, and this is the important one: the Settings screen could not save anything, and pressing "Save settings" switched how the site writes instead. The screen wrapped everything in one form and then drew nine more inside it — the mode switch, issuing a token, disconnecting an app, testing a key, saving a provider. HTML has no nested form, so the browser ended the settings form at the first of those and around seventy controls after it belonged to nothing. The only fields left inside were the mode switch's, which is what Save was submitting
 * This is why pictures could not be switched on, why research stayed off, why the voice never saved and why "Delete all of it instead" never stuck. It was not those settings; it was the form around them

@@ -41,6 +41,35 @@ class Test_Blogcraft_Forms_Work extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Give the listing screens something to list.
+	 *
+	 * An empty Library draws no rows, and the form this is looking for is
+	 * drawn once per row — so checking the screens without seeding them
+	 * checks the sentence that says there is nothing here yet.
+	 *
+	 * @return void
+	 */
+	private function seed_rows() {
+		foreach ( array( 'publish', 'draft', 'pending' ) as $status ) {
+			$post_id = self::factory()->post->create(
+				array(
+					'post_status' => $status,
+					'post_title'  => 'Seeded ' . $status,
+				)
+			);
+
+			update_post_meta( $post_id, Blogcraft_Seo::GENERATED_META, 1 );
+			update_post_meta( $post_id, '_blogcraft_generated', 1 );
+			update_post_meta( $post_id, '_blogcraft_quality', 62 );
+		}
+
+		Blogcraft_Queue::enqueue( 'generate', 'writing', array( 'topic' => 'seeded' ) );
+
+		// pending_posts() caches, and the cache was filled while empty.
+		wp_cache_flush();
+	}
+
+	/**
 	 * Render one screen on one path.
 	 *
 	 * @param string $mode   Which path, or '' for not yet chosen.
@@ -70,37 +99,56 @@ class Test_Blogcraft_Forms_Work extends WP_UnitTestCase {
 		$depth = 0;
 		$worst = 0;
 
-		preg_match_all( '/<form\b|<\/form>/i', $html, $tags, PREG_OFFSET_CAPTURE );
+		preg_match_all( '#</?form\b#i', $html, $tags );
 
 		foreach ( $tags[0] as $tag ) {
-			if ( '<' === $tag[0][1] || 0 === strpos( strtolower( $tag[0] ), '<form' ) ) {
-				// Opening tag.
-				if ( 0 !== strpos( strtolower( $tag[0] ), '</' ) ) {
-					++$depth;
+			if ( '/' === $tag[1] ) {
+				$depth = max( 0, $depth - 1 );
 
-					if ( $depth > 1 ) {
-						++$worst;
-					}
-
-					continue;
-				}
+				continue;
 			}
 
-			$depth = max( 0, $depth - 1 );
+			++$depth;
+
+			if ( $depth > 1 ) {
+				++$worst;
+			}
 		}
 
 		return $worst;
 	}
 
-	public function test_no_screen_puts_a_form_inside_another_form() {
-		$screens = array(
-			'Blogcraft_Connection' => array( '', Blogcraft_Mode::API, Blogcraft_Mode::CLIENT ),
-			'Blogcraft_Generate'   => array( Blogcraft_Mode::API, Blogcraft_Mode::CLIENT ),
-			'Blogcraft_Overview'   => array( Blogcraft_Mode::API, Blogcraft_Mode::CLIENT ),
-			'Blogcraft_Activity'   => array( Blogcraft_Mode::API, Blogcraft_Mode::CLIENT ),
-		);
+	/**
+	 * Every screen that draws a form, and the paths it draws one on.
+	 *
+	 * The first four were the ones checked when this was written, because
+	 * they were the ones the bug was found on. That is the wrong reason to
+	 * stop: the fault was a screen calling a helper that opens a form of its
+	 * own, and any screen here can do that.
+	 *
+	 * @return array
+	 */
+	private function screens_with_forms() {
+		$both = array( Blogcraft_Mode::API, Blogcraft_Mode::CLIENT );
 
-		foreach ( $screens as $screen => $modes ) {
+		return array(
+			'Blogcraft_Connection'       => array( '', Blogcraft_Mode::API, Blogcraft_Mode::CLIENT ),
+			'Blogcraft_Generate'         => $both,
+			'Blogcraft_Overview'         => $both,
+			'Blogcraft_Activity'         => $both,
+			'Blogcraft_Blueprint_Screen' => $both,
+			'Blogcraft_Library'          => $both,
+			'Blogcraft_Calendar'         => $both,
+			'Blogcraft_Progress'         => $both,
+			'Blogcraft_Review'           => $both,
+			'Blogcraft_Welcome'          => $both,
+		);
+	}
+
+	public function test_no_screen_puts_a_form_inside_another_form() {
+		$this->seed_rows();
+
+		foreach ( $this->screens_with_forms() as $screen => $modes ) {
 			foreach ( $modes as $mode ) {
 				$this->assertSame(
 					0,
@@ -119,7 +167,7 @@ class Test_Blogcraft_Forms_Work extends WP_UnitTestCase {
 			// the screen's other forms, has to name the settings form.
 			$outside = self::strip_forms( $html );
 
-			preg_match_all( '/<(?:input|select|textarea)\b[^>]*\bname="([a-z_]+)"[^>]*>/i', $outside, $hits, PREG_SET_ORDER );
+			preg_match_all( '/<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"[^>]*>/i', $outside, $hits, PREG_SET_ORDER );
 
 			$this->assertNotEmpty( $hits, 'no settings controls found on "' . $mode . '"' );
 
@@ -145,6 +193,35 @@ class Test_Blogcraft_Forms_Work extends WP_UnitTestCase {
 				$outside,
 				'the mode switch field is loose on "' . $mode . '", so Save would switch the mode'
 			);
+		}
+	}
+
+	public function test_no_screen_leaves_a_control_belonging_to_nothing() {
+		$this->seed_rows();
+
+		// The settings screen is checked field by field above, against the
+		// one form that saves it. This asks the weaker question of every
+		// other screen: a control that is inside no form and names no form
+		// is not submitted by anything, whatever it looks like.
+		foreach ( $this->screens_with_forms() as $screen => $modes ) {
+			foreach ( $modes as $mode ) {
+				$outside = self::strip_forms( $this->screen( $mode, $screen ) );
+
+				preg_match_all(
+					'/<(?:input|select|textarea|button)\b[^>]*\bname="([^"]+)"[^>]*>/i',
+					$outside,
+					$hits,
+					PREG_SET_ORDER
+				);
+
+				foreach ( $hits as $hit ) {
+					$this->assertMatchesRegularExpression(
+						'/\bform="[^"]+"/',
+						$hit[0],
+						'"' . $hit[1] . '" on ' . $screen . ' "' . $mode . '" is in no form and names none, so nothing submits it'
+					);
+				}
+			}
 		}
 	}
 

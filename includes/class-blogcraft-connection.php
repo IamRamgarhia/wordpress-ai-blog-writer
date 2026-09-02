@@ -456,6 +456,7 @@ class Blogcraft_Connection {
 			'duplicate_check_enabled' => __( 'Refuse topics too similar to existing posts', 'dicecodes-ai-blog-writer' ),
 			'ask_before_writing'      => __( 'Ask what each post will include before writing it', 'dicecodes-ai-blog-writer' ),
 			'ai_disclosure'           => __( 'Say on each post that AI helped write it', 'dicecodes-ai-blog-writer' ),
+			'schema_enabled'          => __( 'Add search-engine structured data to each post', 'dicecodes-ai-blog-writer' ),
 
 			'autopilot_enabled'       => __( 'Write posts automatically on a schedule', 'dicecodes-ai-blog-writer' ),
 			'refresh_enabled'         => __( 'Rewrite older posts when nothing new is queued', 'dicecodes-ai-blog-writer' ),
@@ -2810,6 +2811,12 @@ class Blogcraft_Connection {
 		foreach ( array_keys( self::toggle_fields() ) as $toggle ) {
 			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) );
 		}
+
+		// One of those toggles decides whether this plugin prints structured
+		// data at all, and the answer to "is there a second copy" is cached
+		// for half a day. Without this, switching it off leaves the warning
+		// about it on screen until the cache expires.
+		Blogcraft_Schema_Watch::forget();
 
 		// An empty key field means "leave unchanged": the form renders a mask
 		// rather than the real value, so treating blank as "clear" would wipe
