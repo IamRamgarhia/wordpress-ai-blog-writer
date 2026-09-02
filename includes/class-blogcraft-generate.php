@@ -382,7 +382,7 @@ class Blogcraft_Generate {
 		// screen you read. The explanations live in the documentation now,
 		// which this page had no link to at all.
 		printf(
-			'<p class="bc-page-docs"><a href="%1$s">%2$s</a></p>',
+			'<p class="bc-page-docs"><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a></p>',
 			esc_url( Blogcraft_Docs::site_url( 'how-it-writes' ) ),
 			esc_html__( 'How it writes, and what every field here does', 'dicecodes-ai-blog-writer' )
 		);

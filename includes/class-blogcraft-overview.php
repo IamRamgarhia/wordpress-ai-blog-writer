@@ -95,7 +95,9 @@ class Blogcraft_Overview {
 				esc_html( $step['title'] ),
 				esc_html( $step['detail'] ),
 				$step['done'] ? '' : sprintf(
-					'<a class="button button-small" href="%1$s">%2$s</a>',
+					Blogcraft_Docs::leaves( $step['url'] )
+						? '<a class="button button-small" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>'
+						: '<a class="button button-small" href="%1$s">%2$s</a>',
 					esc_url( $step['url'] ),
 					esc_html( $step['action'] )
 				),
@@ -296,7 +298,9 @@ class Blogcraft_Overview {
 
 		foreach ( $steps as $step ) {
 			printf(
-				'<li><span class="blogcraft-step-text"><strong>%1$s</strong><span>%2$s</span></span><a class="button" href="%3$s">%4$s</a></li>',
+				Blogcraft_Docs::leaves( $step[2] )
+					? '<li><span class="blogcraft-step-text"><strong>%1$s</strong><span>%2$s</span></span><a class="button" href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a></li>'
+					: '<li><span class="blogcraft-step-text"><strong>%1$s</strong><span>%2$s</span></span><a class="button" href="%3$s">%4$s</a></li>',
 				esc_html( $step[0] ),
 				esc_html( $step[1] ),
 				esc_url( $step[2] ),

@@ -39,13 +39,45 @@
 		for ( i = 0; i < rail.length; i++ ) {
 			var current = rail[ i ].getAttribute( 'data-pane' ) === name;
 			rail[ i ].classList.toggle( 'is-active', current );
-			rail[ i ].setAttribute( 'aria-current', current ? 'true' : 'false' );
+			rail[ i ].setAttribute( 'aria-selected', current ? 'true' : 'false' );
+
+			// Only the selected tab is in the tab order; the arrow keys move
+			// between them from there, which is how a tablist is expected to
+			// behave once it calls itself one.
+			rail[ i ].setAttribute( 'tabindex', current ? '0' : '-1' );
 		}
 	}
 
 	for ( var r = 0; r < rail.length; r++ ) {
 		rail[ r ].addEventListener( 'click', function ( event ) {
 			show( event.currentTarget.getAttribute( 'data-pane' ) );
+		} );
+
+		rail[ r ].addEventListener( 'keydown', function ( event ) {
+			var step = 0;
+
+			if ( 'ArrowDown' === event.key || 'ArrowRight' === event.key ) {
+				step = 1;
+			} else if ( 'ArrowUp' === event.key || 'ArrowLeft' === event.key ) {
+				step = -1;
+			} else if ( 'Home' !== event.key && 'End' !== event.key ) {
+				return;
+			}
+
+			var at = Array.prototype.indexOf.call( rail, event.currentTarget );
+			var to;
+
+			if ( 'Home' === event.key ) {
+				to = 0;
+			} else if ( 'End' === event.key ) {
+				to = rail.length - 1;
+			} else {
+				to = ( at + step + rail.length ) % rail.length;
+			}
+
+			event.preventDefault();
+			show( rail[ to ].getAttribute( 'data-pane' ) );
+			rail[ to ].focus();
 		} );
 	}
 

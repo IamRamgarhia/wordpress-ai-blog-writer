@@ -136,6 +136,14 @@ class Blogcraft_Activity {
 	private static function render_jobs() {
 		$jobs = Blogcraft_Queue::recent_jobs( 25 );
 
+		// Jobs are the provider path writing unattended. On the client path
+		// nothing queues, so the table is either empty or a record of what
+		// this site used to do — and either way it is not what somebody came
+		// here to find out. The event log below covers both paths.
+		if ( Blogcraft_Mode::is_client() && empty( $jobs ) ) {
+			return;
+		}
+
 		echo '<section class="blogcraft-card"><header>';
 		echo '<h2>' . esc_html__( 'Recent jobs', 'dicecodes-ai-blog-writer' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Each post moves through the pipeline one step per run. A job that fails waits, then tries again.', 'dicecodes-ai-blog-writer' ) . '</p>';

@@ -631,6 +631,17 @@ class Blogcraft_Mcp_Tools {
 
 		self::remember( (int) $post_id, $args );
 
+		// The activity log knew about the pipeline and nothing else, so on a
+		// site where an app does the writing the screen that answers "what
+		// has this been doing" could not answer it at all.
+		Blogcraft_Logger::info(
+			'A connected app created a draft.',
+			array(
+				'post_id' => (int) $post_id,
+				'title'   => $title,
+			)
+		);
+
 		return self::ok(
 			sprintf(
 				"Saved as draft %1\$d.\n%2\$s\n\nIt is not published. Score it with check_draft, revise with update_draft, then publish_draft when it clears the threshold.",
@@ -713,6 +724,17 @@ class Blogcraft_Mcp_Tools {
 		// when the plugin wrote it is held when a client writes it, or the
 		// threshold means nothing.
 		if ( $score < $bar ) {
+			// The one somebody goes looking for: a draft they were told was
+			// finished, still sitting there.
+			Blogcraft_Logger::info(
+				'A post was held back: it scored below the threshold.',
+				array(
+					'post_id' => $post_id,
+					'score'   => $score,
+					'wanted'  => $bar,
+				)
+			);
+
 			return self::fail(
 				sprintf(
 					'Not published. It scores %1$d and this site publishes at %2$d. Call check_draft on it to see what is failing.',
@@ -764,6 +786,16 @@ class Blogcraft_Mcp_Tools {
 		}
 
 		$finished = self::finish( $post_id );
+
+		Blogcraft_Logger::info(
+			( 'future' === $update['post_status'] )
+				? 'A connected app scheduled a post.'
+				: 'A connected app published a post.',
+			array(
+				'post_id' => $post_id,
+				'score'   => $score,
+			)
+		);
 
 		if ( 'future' === $update['post_status'] ) {
 			return self::ok(

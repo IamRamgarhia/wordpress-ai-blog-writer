@@ -35,6 +35,84 @@ class Blogcraft_Docs {
 	const HOME = 'https://dicecodes.com/ai-blog-writer/';
 
 	/**
+	 * The screen this used to be, kept only to say where it went.
+	 */
+	const OLD_SLUG = 'blogcraft-help';
+
+	/**
+	 * Wire hooks.
+	 *
+	 * @return void
+	 */
+	public static function init() {
+		add_action( 'admin_menu', array( __CLASS__, 'register_moved' ), 24 );
+	}
+
+	/**
+	 * Keep the old Help address answering, without a menu entry.
+	 *
+	 * The screen is gone, but the address is in people's bookmarks and in
+	 * their browser history. Unregistered, WordPress answers it with "Sorry,
+	 * you are not allowed to access this page" — which is its message for a
+	 * capability failure, so it reads as an account problem rather than as a
+	 * page that moved, and offers nowhere to go.
+	 *
+	 * Registered and then removed from the menu: reachable by address,
+	 * absent from the navigation.
+	 *
+	 * @return void
+	 */
+	public static function register_moved() {
+		add_submenu_page(
+			Blogcraft_Admin::MENU_SLUG,
+			__( 'Documentation', 'dicecodes-ai-blog-writer' ),
+			__( 'Documentation', 'dicecodes-ai-blog-writer' ),
+			Blogcraft_Capabilities::MANAGE,
+			self::OLD_SLUG,
+			array( __CLASS__, 'render_moved' )
+		);
+
+		remove_submenu_page( Blogcraft_Admin::MENU_SLUG, self::OLD_SLUG );
+	}
+
+	/**
+	 * Say where the documentation went.
+	 *
+	 * @return void
+	 */
+	public static function render_moved() {
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die( esc_html__( 'You are not allowed to access this page.', 'dicecodes-ai-blog-writer' ) );
+		}
+
+		echo '<div class="wrap blogcraft-page">';
+
+		Blogcraft_Nav::render();
+
+		echo '<div class="blogcraft-head">';
+		echo '<h1>' . esc_html__( 'The documentation moved', 'dicecodes-ai-blog-writer' ) . '</h1>';
+		echo '<p>' . esc_html__( 'It is one page on the web now, rather than a copy inside the plugin that was always the older of the two. Corrections reach you there without waiting for an update.', 'dicecodes-ai-blog-writer' ) . '</p>';
+		echo '</div>';
+
+		echo '<section class="blogcraft-card"><div class="blogcraft-actions">';
+
+		printf(
+			'<a class="button button-primary" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+			esc_url( self::site_url() ),
+			esc_html__( 'Read the documentation', 'dicecodes-ai-blog-writer' )
+		);
+
+		printf(
+			'<a class="button" href="%1$s">%2$s</a>',
+			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Admin::MENU_SLUG ) ),
+			esc_html__( 'Back to the overview', 'dicecodes-ai-blog-writer' )
+		);
+
+		echo '</div></section>';
+		echo '</div>';
+	}
+
+	/**
 	 * The address of one section of the documentation.
 	 *
 	 * @param string $anchor Section anchor, or '' for the top of the page.
@@ -44,6 +122,32 @@ class Blogcraft_Docs {
 		$anchor = sanitize_title( (string) $anchor );
 
 		return ( '' === $anchor ) ? self::HOME : self::HOME . '#' . $anchor;
+	}
+
+	/**
+	 * The attributes a link needs when it leaves WordPress.
+	 *
+	 * The rule, rather than four separate remembers: anything that takes
+	 * somebody off their own admin opens a new tab, because they are reading
+	 * it while setting something up and the half-filled form behind them is
+	 * the thing they came back to.
+	 *
+	 * Answers with a fact rather than with markup, so a caller picks between
+	 * two whole format strings instead of printing attributes built
+	 * elsewhere. Nothing then reaches the page that has not been escaped
+	 * where it is written.
+	 *
+	 * @param string $url Where the link goes.
+	 * @return bool Whether it leaves this WordPress.
+	 */
+	public static function leaves( $url ) {
+		$host = wp_parse_url( (string) $url, PHP_URL_HOST );
+
+		if ( ! $host ) {
+			return false;
+		}
+
+		return wp_parse_url( admin_url(), PHP_URL_HOST ) !== $host;
 	}
 
 	/**

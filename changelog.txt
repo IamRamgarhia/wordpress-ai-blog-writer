@@ -3,6 +3,13 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.93.0 =
+* Fixed: four links to the documentation opened in the same tab, so following one while setting something up threw away the form you were filling in. Anything that leaves your own admin now opens a new tab, decided from the address rather than remembered link by link
+* Fixed: the old Help address answered with "Sorry, you are not allowed to access this page" — WordPress's message for a permissions problem, on a page that had simply moved. It now says where the documentation went and offers a way there, for anyone who bookmarked it
+* The section switcher on How it writes is a real set of tabs: it says which panel each one opens, and the arrow keys, Home and End move between them. It said which section was current before, but nothing said the buttons controlled anything, and most of the form is behind them
+* Activity records what a connected app does. Drafts created, posts published or scheduled, and anything held back for scoring below your threshold — the screen that answers "what has this been doing" could not answer it at all on a site where an app does the writing
+* The list of pipeline jobs is not shown on that path when there are none, rather than an empty table describing a queue that setup does not use
+
 = 0.92.0 =
 * The documentation is one page on the web rather than a copy inside the plugin and another on the website. Every help control opens the section for the control you were looking at, in a new tab, so a half-filled form is not lost to go and read about it
 * The Help screen and the "How this works" panel on every settings card are gone. They were a second copy of every explanation, and it was always the older one: correcting a sentence meant shipping a release

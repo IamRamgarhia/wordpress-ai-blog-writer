@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.92.0
+Stable tag: 0.93.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,13 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.93.0 =
+* Fixed: four links to the documentation opened in the same tab, so following one while setting something up threw away the form you were filling in. Anything that leaves your own admin now opens a new tab, decided from the address rather than remembered link by link
+* Fixed: the old Help address answered with "Sorry, you are not allowed to access this page" — WordPress's message for a permissions problem, on a page that had simply moved. It now says where the documentation went and offers a way there, for anyone who bookmarked it
+* The section switcher on How it writes is a real set of tabs: it says which panel each one opens, and the arrow keys, Home and End move between them. It said which section was current before, but nothing said the buttons controlled anything, and most of the form is behind them
+* Activity records what a connected app does. Drafts created, posts published or scheduled, and anything held back for scoring below your threshold — the screen that answers "what has this been doing" could not answer it at all on a site where an app does the writing
+* The list of pipeline jobs is not shown on that path when there are none, rather than an empty table describing a queue that setup does not use
+
 = 0.92.0 =
 * The documentation is one page on the web rather than a copy inside the plugin and another on the website. Every help control opens the section for the control you were looking at, in a new tab, so a half-filled form is not lost to go and read about it
 * The Help screen and the "How this works" panel on every settings card are gone. They were a second copy of every explanation, and it was always the older one: correcting a sentence meant shipping a release
@@ -182,17 +189,5 @@ everything is here, oldest at the bottom.
 * It names the assistants rather than the crawlers — "Perplexity", not "PerplexityBot" — because which assistant will not be citing you is the question somebody actually has. Nothing is changed on your behalf: both settings are legitimate choices and the plugin only says what they cost
 * The line stays quiet when there is nothing to say, and reads as confirmation rather than a warning on a staging site, where discouraging search engines is the correct setting
 * Fixed: the Questions and answers section still promised it would appear as its own search result. Google retired FAQ rich results for every site in May 2026. The section is still worth writing and the markup is still emitted, but for what it is worth to a reader rather than a result the plugin can no longer promise
-
-= 0.90.0 =
-* Fixed: a post written by a connected app was never given the score it had just been measured against, so the library, the overview and the activity screen listed everything Claude or ChatGPT wrote as "not scored" however many times it had been checked. The score is now kept when a draft is checked and when it is published, including when publishing is refused — which is the one time you go looking for it
-* Fixed: every brief handed to a connected app claimed the length, the section count, the sentence limit and the link target had been chosen specially for that post. Nothing had been chosen: the form sends text, the standing rules hold numbers, and the two were compared strictly, so 2000 and "2000" counted as a change
-* The byline and the publishing time on Write a post are applied instead of ignored. Both were saved with the brief and then read by nothing at all — an app has no parameter for either, so this site sets them itself
-* Queueing a list of topics and pushing the queue along are no longer offered when an AI client does the writing. There is no provider on that setup, so a queued list waited for something that was never coming while the screen reported it as queued. Both endpoints refuse it too, rather than only being hidden
-* Undoing a batch stays on both paths, because it works off the mark this plugin puts on posts it wrote and an app's posts carry it too
-* The confirmation step says "Save this brief" where that is what pressing it does, rather than "Write it now" on the one setup where it writes nothing
-* Fixed: the Settings strip read "Writing , Claude" when a token issued by hand sat beside a signed-in app, because the token had no name and the empty name was still joined into the list
-
-= 0.89.0 =
-* The connected apps list says whether each one is Active, Idle or Never used, with a dot beside the word. A date told you when something last called and left you to work out whether that meant it was still working
 Older releases are listed in changelog.txt, which ships with the plugin.
 

@@ -217,22 +217,35 @@ class Blogcraft_Blueprint_Screen {
 	 * @return void
 	 */
 	private static function render_rail() {
-		echo '<nav class="bc-rail" aria-label="' . esc_attr__( 'Blueprint sections', 'dicecodes-ai-blog-writer' ) . '">';
+		// A tablist rather than a row of buttons carrying aria-current. The
+		// buttons did say which one was current, but nothing said they
+		// controlled anything, so there was no way to know from the rail that
+		// most of the form was behind them — and switching pane changes which
+		// fields exist, from four on the first to seventeen on the next.
+		// The rail itself carries the role. A wrapper inside it would become
+		// the only flex child and the buttons would lose both the spacing and
+		// the wrap they fall back to on a narrow screen.
+		printf(
+			'<div class="bc-rail" role="tablist" aria-orientation="vertical" aria-label="%s">',
+			esc_attr__( 'Blueprint sections', 'dicecodes-ai-blog-writer' )
+		);
 
 		$first = true;
 
 		foreach ( self::groups() as $slug => $label ) {
 			printf(
-				'<button type="button" class="bc-rail-item%1$s" data-pane="%2$s" aria-current="%3$s">%4$s</button>',
+				'<button type="button" class="bc-rail-item%1$s" data-pane="%2$s" role="tab"'
+				. ' id="bc-tab-%2$s" aria-controls="bc-pane-%2$s" aria-selected="%3$s" tabindex="%4$s">%5$s</button>',
 				$first ? ' is-active' : '',
 				esc_attr( $slug ),
 				$first ? 'true' : 'false',
+				$first ? '0' : '-1',
 				esc_html( $label )
 			);
 			$first = false;
 		}
 
-		echo '</nav>';
+		echo '</div>';
 	}
 
 	/**
@@ -437,7 +450,8 @@ class Blogcraft_Blueprint_Screen {
 	 */
 	private static function pane_open( $slug, $active = false ) {
 		printf(
-			'<section class="bc-pane%1$s" data-pane="%2$s"%3$s>',
+			'<section class="bc-pane%1$s" data-pane="%2$s" role="tabpanel" id="bc-pane-%2$s"'
+			. ' aria-labelledby="bc-tab-%2$s" tabindex="0"%3$s>',
 			$active ? ' is-active' : '',
 			esc_attr( $slug ),
 			$active ? '' : ' hidden'
