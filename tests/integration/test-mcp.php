@@ -771,6 +771,51 @@ class Test_Blogcraft_Mcp extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_a_score_is_kept_where_this_site_looks_for_it() {
+		// The number was worked out, printed for the model and thrown away.
+		// Every screen that reports a score reads it from the post, so a post
+		// a connected app wrote and checked read "not scored" for ever, and
+		// the score column existed only for mode A.
+		$post_id = $this->draft();
+
+		$this->assertSame( '', get_post_meta( $post_id, '_blogcraft_quality', true ) );
+
+		$this->rpc(
+			'tools/call',
+			array( 'name' => 'check_draft', 'arguments' => array( 'post_id' => $post_id ) )
+		);
+
+		$this->assertNotSame(
+			'',
+			get_post_meta( $post_id, '_blogcraft_quality', true ),
+			'the draft was scored and the score was not kept'
+		);
+
+		// The scorecard too, so the review screen describes the post as it
+		// now stands rather than showing nothing at all.
+		$this->assertNotEmpty( get_post_meta( $post_id, '_blogcraft_checks', true ) );
+	}
+
+	public function test_a_refused_publish_still_says_what_it_scored() {
+		// The one time somebody goes looking for the score is when a draft
+		// is sitting there unpublished, so it is recorded before the gate.
+		$post_id = $this->draft();
+
+		Blogcraft_Settings::set( 'quality_threshold', 100 );
+
+		$this->rpc(
+			'tools/call',
+			array( 'name' => 'publish_draft', 'arguments' => array( 'post_id' => $post_id ) )
+		);
+
+		$this->assertSame( 'draft', get_post_status( $post_id ), 'it published under a threshold of 100' );
+		$this->assertNotSame(
+			'',
+			get_post_meta( $post_id, '_blogcraft_quality', true ),
+			'refused, and nothing on this site says what it scored'
+		);
+	}
+
 	public function test_nothing_reaches_a_draft_that_is_not_ours() {
 		// The rule, over every tool that takes a post_id: a connected app
 		// may only touch what it wrote. A tool added later that forgets

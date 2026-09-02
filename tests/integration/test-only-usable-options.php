@@ -94,6 +94,66 @@ class Test_Blogcraft_Only_Usable_Options extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_the_confirmation_button_says_what_pressing_it_does() {
+		// It is the same submit as the button under the form, and that one
+		// already says the right thing. "Write it now" on a path where
+		// pressing it writes nothing is a promise the screen cannot keep.
+		$client = $this->screen( Blogcraft_Mode::CLIENT, 'Blogcraft_Generate' );
+
+		$this->assertStringNotContainsString( 'Write it now', $client );
+		$this->assertStringContainsString( 'Save this brief', $client );
+
+		$this->assertStringContainsString(
+			'Write it now',
+			$this->screen( Blogcraft_Mode::API, 'Blogcraft_Generate' ),
+			'the wording is gone from the path it was right on'
+		);
+	}
+
+	public function test_nothing_offers_to_queue_work_that_cannot_run() {
+		// Queueing a list and pushing the queue along are this site calling a
+		// provider, unattended. Queued on the client path, the jobs wait for
+		// a provider the site has deliberately not got — and the screen says
+		// they are queued, which is true and useless.
+		$client = $this->screen( Blogcraft_Mode::CLIENT, 'Blogcraft_Generate' );
+
+		foreach ( array( 'blogcraft_bulk_topics', 'blogcraft_run_queue_now' ) as $action ) {
+			$this->assertStringNotContainsString(
+				$action,
+				$client,
+				$action . ' is offered where nothing can run it'
+			);
+		}
+
+		// Undoing a batch is neither of those: it works off the mark this
+		// plugin puts on posts it wrote, which a post written over MCP
+		// carries too. It stays.
+		$this->assertStringContainsString( 'blogcraft_rollback', $client );
+
+		$api = $this->screen( Blogcraft_Mode::API, 'Blogcraft_Generate' );
+
+		foreach ( array( 'blogcraft_bulk_topics', 'blogcraft_run_queue_now', 'blogcraft_rollback' ) as $action ) {
+			$this->assertStringContainsString( $action, $api, $action . ' is missing from the path it works on' );
+		}
+	}
+
+	public function test_the_queue_endpoints_refuse_the_path_they_cannot_serve() {
+		// Not rendering a form is not the same as shutting the endpoint, and
+		// these two start unattended writing.
+		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-generate.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		foreach ( array( 'handle_bulk', 'handle_run_now' ) as $method ) {
+			$at = strpos( $source, 'function ' . $method . '(' );
+
+			$this->assertNotFalse( $at, $method . ' is gone' );
+			$this->assertStringContainsString(
+				'Blogcraft_Mode::is_client()',
+				substr( $source, $at, 900 ),
+				$method . ' queues unattended writing without checking it can happen'
+			);
+		}
+	}
+
 	public function test_the_settings_screen_shows_each_path_its_own_cards() {
 		$client = $this->screen( Blogcraft_Mode::CLIENT, 'Blogcraft_Connection' );
 		$api    = $this->screen( Blogcraft_Mode::API, 'Blogcraft_Connection' );

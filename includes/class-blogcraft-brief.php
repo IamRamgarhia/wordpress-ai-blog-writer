@@ -119,7 +119,7 @@ class Blogcraft_Brief {
 				continue;
 			}
 
-			if ( wp_json_encode( $standing[ $field ] ) === wp_json_encode( $value ) ) {
+			if ( self::same( $standing[ $field ], $value ) ) {
 				continue;
 			}
 
@@ -150,5 +150,37 @@ class Blogcraft_Brief {
 		}
 
 		return implode( "\n", $lines );
+	}
+
+	/**
+	 * Whether a per-post answer is the standing answer said differently.
+	 *
+	 * The form posts everything as text and the blueprint keeps its numbers
+	 * as numbers, so a strict comparison called 2000 and "2000" different.
+	 * Every untouched field was then reported as chosen for this post: the
+	 * length, the section count, the sentence limit and the link target were
+	 * announced as deliberate overrides on every brief ever handed over,
+	 * when nothing had been touched at all.
+	 *
+	 * @param mixed $standing What the standing rules say.
+	 * @param mixed $given    What this post's form sent.
+	 * @return bool
+	 */
+	private static function same( $standing, $given ) {
+		if ( is_array( $standing ) || is_array( $given ) ) {
+			return wp_json_encode( $standing ) === wp_json_encode( $given );
+		}
+
+		// Before the numeric test, because a boolean is not numeric and
+		// casting one to a string gives "1" or "".
+		if ( is_bool( $standing ) || is_bool( $given ) ) {
+			return (bool) $standing === (bool) $given;
+		}
+
+		if ( is_numeric( $standing ) && is_numeric( $given ) ) {
+			return (float) $standing === (float) $given;
+		}
+
+		return (string) $standing === (string) $given;
 	}
 }

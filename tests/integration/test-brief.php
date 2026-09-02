@@ -105,6 +105,136 @@ class Test_Blogcraft_Brief extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'point_of_view', $text );
 	}
 
+	public function test_a_number_left_alone_is_not_an_override_of_itself() {
+		// The form posts text and the blueprint keeps numbers, so a strict
+		// comparison called 2000 and "2000" different. Every brief ever
+		// handed over announced the length, the sections and the sentence
+		// limit as chosen for that post, on posts where nothing was touched.
+		$standing = Blogcraft_Blueprint::get();
+		$as_typed = array();
+
+		// Exactly what the form sends: every value as a string.
+		foreach ( $standing as $field => $value ) {
+			$as_typed[ $field ] = is_array( $value ) ? $value : (string) $value;
+		}
+
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => 'A topic',
+				'angle'     => '',
+				'evidence'  => '',
+				'overrides' => $as_typed,
+				'placement' => array(),
+			)
+		);
+
+		$this->assertStringNotContainsString(
+			'differ from the standing rules',
+			Blogcraft_Brief::as_text(),
+			'nothing was changed and the brief claims otherwise'
+		);
+	}
+
+	public function test_a_number_actually_changed_is_still_carried() {
+		// The other half. A comparison loose enough to stop crying wolf must
+		// not go quiet about a real answer.
+		$standing = Blogcraft_Blueprint::get();
+		$as_typed = array();
+
+		foreach ( $standing as $field => $value ) {
+			$as_typed[ $field ] = is_array( $value ) ? $value : (string) $value;
+		}
+
+		$as_typed['word_target'] = '2400';
+
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => 'A topic',
+				'angle'     => '',
+				'evidence'  => '',
+				'overrides' => $as_typed,
+				'placement' => array(),
+			)
+		);
+
+		$this->assertStringContainsString( 'word_target: 2400', Blogcraft_Brief::as_text() );
+	}
+
+	public function test_the_byline_chosen_on_the_brief_is_the_byline_on_the_post() {
+		// The field took an answer, saved it, and was then read by nothing:
+		// the text handed to the app never mentioned it and the app has no
+		// parameter for it. This site applies it, the way the pipeline does.
+		$writer = self::factory()->user->create( array( 'role' => 'author' ) );
+
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => 'Sharpening a chisel',
+				'angle'     => '',
+				'evidence'  => '',
+				'overrides' => array(),
+				'placement' => array( 'author' => $writer ),
+			)
+		);
+
+		$out = Blogcraft_Mcp_Tools::call(
+			'create_draft',
+			array(
+				'title' => 'Sharpening a chisel',
+				'html'  => '<h2>How</h2><p>Words enough to be a paragraph about chisels.</p>',
+			)
+		);
+
+		$hit = array();
+		preg_match( '/draft (\d+)/', (string) $out['text'], $hit );
+		$this->assertNotEmpty( $hit, (string) $out['text'] );
+
+		$this->assertSame(
+			$writer,
+			(int) get_post_field( 'post_author', (int) $hit[1] ),
+			'the byline chosen on the brief was not the one used'
+		);
+	}
+
+	public function test_a_publishing_time_on_the_brief_reaches_the_call_that_publishes() {
+		// Publishing happens in a later call than the one that knew about
+		// it, and the brief is cleared in between, so the draft has to carry
+		// it. Without this the field was a date nobody ever read.
+		Blogcraft_Brief::save(
+			array(
+				'topic'     => 'Sharpening a chisel',
+				'angle'     => '',
+				'evidence'  => '',
+				'overrides' => array(),
+				'placement' => array( 'publish_at' => gmdate( 'Y-m-d H:i:s', time() + WEEK_IN_SECONDS ) ),
+			)
+		);
+
+		$out = Blogcraft_Mcp_Tools::call(
+			'create_draft',
+			array(
+				'title' => 'Sharpening a chisel',
+				'html'  => '<h2>How</h2><p>Words enough to be a paragraph about chisels.</p>',
+			)
+		);
+
+		$hit = array();
+		preg_match( '/draft (\d+)/', (string) $out['text'], $hit );
+		$this->assertNotEmpty( $hit, (string) $out['text'] );
+
+		$post_id = (int) $hit[1];
+
+		// Past the gate, because the date is what is under test.
+		Blogcraft_Settings::set( 'quality_threshold', 0 );
+
+		Blogcraft_Mcp_Tools::call( 'publish_draft', array( 'post_id' => $post_id ) );
+
+		$this->assertSame(
+			'future',
+			get_post_status( $post_id ),
+			'the time asked for on the brief was not honoured, so it published at once'
+		);
+	}
+
 	public function test_nothing_is_waiting_until_something_is_asked_for() {
 		$this->assertFalse( Blogcraft_Brief::waiting() );
 		$this->assertSame( '', Blogcraft_Brief::as_text() );

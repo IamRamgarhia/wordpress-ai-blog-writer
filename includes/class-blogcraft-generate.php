@@ -700,9 +700,16 @@ class Blogcraft_Generate {
 			'<button type="button" class="button" id="bc-confirm-back">%s</button>',
 			esc_html__( 'Back to the brief', 'dicecodes-ai-blog-writer' )
 		);
+		// This is the same submit as the button under the form, so it has to
+		// say the same thing. On the client path pressing it writes nothing;
+		// it hands the brief over for an app to collect.
 		printf(
 			'<button type="submit" class="bc-save">%s</button>',
-			esc_html__( 'Write it now', 'dicecodes-ai-blog-writer' )
+			esc_html(
+				Blogcraft_Mode::is_client()
+					? __( 'Save this brief', 'dicecodes-ai-blog-writer' )
+					: __( 'Write it now', 'dicecodes-ai-blog-writer' )
+			)
 		);
 		echo '</div>';
 
@@ -725,49 +732,67 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	private static function render_more() {
-		$waiting = Blogcraft_Queue::count_by_status( 'pending' ) + Blogcraft_Queue::count_by_status( 'running' );
+		// Queueing a list and pushing the queue along are this site calling a
+		// provider, over and over, unattended. There is no provider on the
+		// client path, so a list queued there is a list that sits for ever
+		// while the screen reports it as queued. Undoing a batch is neither:
+		// it works off the generated-by-us mark, which a post written over
+		// MCP carries too, so it stays on both paths.
+		$client = Blogcraft_Mode::is_client();
 
 		echo '<details class="bc-more">';
 		printf(
 			'<summary><span>%1$s</span><span class="bc-more-hint">%2$s</span></summary>',
-			esc_html__( 'More than one at a time', 'dicecodes-ai-blog-writer' ),
-			esc_html__( 'Queue a list, run a stuck job, undo a batch', 'dicecodes-ai-blog-writer' )
+			esc_html(
+				$client
+					? __( 'Undo a batch', 'dicecodes-ai-blog-writer' )
+					: __( 'More than one at a time', 'dicecodes-ai-blog-writer' )
+			),
+			esc_html(
+				$client
+					? __( 'Trash what was written in the last day', 'dicecodes-ai-blog-writer' )
+					: __( 'Queue a list, run a stuck job, undo a batch', 'dicecodes-ai-blog-writer' )
+			)
 		);
 
 		echo '<div class="bc-more-body">';
 
-		printf(
-			'<p class="bc-more-count">%1$s <a href="%2$s">%3$s</a></p>',
-			esc_html(
-				sprintf(
-					/* translators: %d: how many posts are queued or being written. */
-					_n( '%d post is queued or being written.', '%d posts are queued or being written.', $waiting, 'dicecodes-ai-blog-writer' ),
-					$waiting
-				)
-			),
-			esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
-			esc_html__( 'See everything written by AI', 'dicecodes-ai-blog-writer' )
-		);
+		if ( ! $client ) {
+			$waiting = Blogcraft_Queue::count_by_status( 'pending' ) + Blogcraft_Queue::count_by_status( 'running' );
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
-		echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
-		Blogcraft_Request::nonce_field( self::BULK_ACTION );
-		printf(
-			'<label for="blogcraft_topics"><strong>%1$s</strong></label>',
-			esc_html__( 'Queue a list of topics', 'dicecodes-ai-blog-writer' )
-		);
-		echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="5" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'dicecodes-ai-blog-writer' ) . '"></textarea>';
-		echo '<p class="description">' . esc_html__( 'These use your standing rules, not the brief above, and are written unattended. Repeats are skipped, whether the post already exists or is only queued.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		submit_button( __( 'Queue all of these', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
-		echo '</form>';
+			printf(
+				'<p class="bc-more-count">%1$s <a href="%2$s">%3$s</a></p>',
+				esc_html(
+					sprintf(
+						/* translators: %d: how many posts are queued or being written. */
+						_n( '%d post is queued or being written.', '%d posts are queued or being written.', $waiting, 'dicecodes-ai-blog-writer' ),
+						$waiting
+					)
+				),
+				esc_url( admin_url( 'admin.php?page=' . Blogcraft_Library::PAGE_SLUG ) ),
+				esc_html__( 'See everything written by AI', 'dicecodes-ai-blog-writer' )
+			);
 
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
-		echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
-		Blogcraft_Request::nonce_field( self::RUN_ACTION );
-		printf( '<p><strong>%s</strong></p>', esc_html__( 'Push the queue along', 'dicecodes-ai-blog-writer' ) );
-		echo '<p class="description">' . esc_html__( 'Posts written here run in your browser and need none of this. It is for a queued job that has stopped moving on a site where scheduled tasks do not fire.', 'dicecodes-ai-blog-writer' ) . '</p>';
-		submit_button( __( 'Run the queue now', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
-		echo '</form>';
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
+			echo '<input type="hidden" name="action" value="blogcraft_bulk_topics" />';
+			Blogcraft_Request::nonce_field( self::BULK_ACTION );
+			printf(
+				'<label for="blogcraft_topics"><strong>%1$s</strong></label>',
+				esc_html__( 'Queue a list of topics', 'dicecodes-ai-blog-writer' )
+			);
+			echo '<textarea class="large-text code" name="topics" id="blogcraft_topics" rows="5" placeholder="' . esc_attr__( 'One topic per line, or paste a CSV column', 'dicecodes-ai-blog-writer' ) . '"></textarea>';
+			echo '<p class="description">' . esc_html__( 'These use your standing rules, not the brief above, and are written unattended. Repeats are skipped, whether the post already exists or is only queued.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			submit_button( __( 'Queue all of these', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
+			echo '</form>';
+
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block">';
+			echo '<input type="hidden" name="action" value="blogcraft_run_queue_now" />';
+			Blogcraft_Request::nonce_field( self::RUN_ACTION );
+			printf( '<p><strong>%s</strong></p>', esc_html__( 'Push the queue along', 'dicecodes-ai-blog-writer' ) );
+			echo '<p class="description">' . esc_html__( 'Posts written here run in your browser and need none of this. It is for a queued job that has stopped moving on a site where scheduled tasks do not fire.', 'dicecodes-ai-blog-writer' ) . '</p>';
+			submit_button( __( 'Run the queue now', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
+			echo '</form>';
+		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-more-block is-danger" onsubmit="return confirm(' . esc_attr( "'" . esc_js( __( 'Move recently generated posts to the trash?', 'dicecodes-ai-blog-writer' ) ) . "'" ) . ');">';
 		echo '<input type="hidden" name="action" value="blogcraft_rollback" />';
@@ -2017,6 +2042,15 @@ class Blogcraft_Generate {
 
 		check_admin_referer( self::RUN_ACTION, '_blogcraft_nonce' );
 
+		// Nothing queues work on the client path, so there is no queue to
+		// push along and running the worker would only look like it failed.
+		if ( Blogcraft_Mode::is_client() ) {
+			self::back(
+				false,
+				__( 'There is no queue on this setup. Your app writes when you ask it to.', 'dicecodes-ai-blog-writer' )
+			);
+		}
+
 		Blogcraft_Queue::reclaim_stale();
 
 		$before   = Blogcraft_Queue::count_with_errors();
@@ -2056,6 +2090,16 @@ class Blogcraft_Generate {
 		}
 
 		check_admin_referer( self::BULK_ACTION, '_blogcraft_nonce' );
+
+		// The form is not rendered on the client path, which is not the same
+		// as the endpoint being shut. A job queued here would wait for a
+		// provider that this site has deliberately not got.
+		if ( Blogcraft_Mode::is_client() ) {
+			self::back(
+				false,
+				__( 'Queueing a list of topics needs an API key. On this setup, ask your app to write.', 'dicecodes-ai-blog-writer' )
+			);
+		}
 
 		$raw     = isset( $_POST['topics'] ) ? sanitize_textarea_field( wp_unslash( $_POST['topics'] ) ) : '';
 		$queued  = 0;

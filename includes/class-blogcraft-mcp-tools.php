@@ -23,6 +23,14 @@ defined( 'ABSPATH' ) || exit;
 class Blogcraft_Mcp_Tools {
 
 	/**
+	 * Where a publishing time asked for on the brief is kept.
+	 *
+	 * Publishing happens in a later call than the one that knew about it,
+	 * so the draft carries it until publish_draft comes asking.
+	 */
+	const WHEN_META = '_blogcraft_publish_at';
+
+	/**
 	 * Every tool, in the shape tools/list returns.
 	 *
 	 * @return array
@@ -428,6 +436,14 @@ class Blogcraft_Mcp_Tools {
 		$bar    = (int) Blogcraft_Settings::get( 'quality_threshold' );
 		$score  = (int) $result['score'];
 
+		// Scoring something saved here is worth keeping. Without this the
+		// library lists every post a connected app wrote as "not scored",
+		// however many times it was measured, because the only code that
+		// ever wrote the score down was the pipeline this path replaces.
+		if ( $post_id > 0 ) {
+			self::record_score( $post_id, $result );
+		}
+
 		$lines = array(
 			sprintf( 'Score: %1$d out of 100. This site publishes at %2$d or above.', $score, $bar ),
 			'',
@@ -688,6 +704,11 @@ class Blogcraft_Mcp_Tools {
 		$score = (int) $result['score'];
 		$bar   = (int) Blogcraft_Settings::get( 'quality_threshold' );
 
+		// Before the gate, so a draft that is refused still carries the score
+		// it was refused for. Somebody looking at the library then sees why
+		// it is still sitting there.
+		self::record_score( $post_id, $result );
+
 		// The same gate mode A uses. A post that would be held for review
 		// when the plugin wrote it is held when a client writes it, or the
 		// threshold means nothing.
@@ -710,7 +731,14 @@ class Blogcraft_Mcp_Tools {
 		// is WordPress's own behaviour for a future post_date. A date
 		// in the past is not an error worth refusing over; it just
 		// publishes now, which is what was asked for.
-		$when  = isset( $args['publish_at'] ) ? (string) $args['publish_at'] : '';
+		$when = isset( $args['publish_at'] ) ? trim( (string) $args['publish_at'] ) : '';
+
+		// Nothing in the call, so the time the brief asked for, which the
+		// draft has been carrying since it was created.
+		if ( '' === $when ) {
+			$when = trim( (string) get_post_meta( $post_id, self::WHEN_META, true ) );
+		}
+
 		$stamp = ( '' === $when ) ? 0 : strtotime( $when );
 
 		if ( $stamp && $stamp > time() ) {
@@ -810,6 +838,74 @@ class Blogcraft_Mcp_Tools {
 
 		if ( ! empty( $tags ) ) {
 			wp_set_post_terms( $post_id, $tags, 'post_tag' );
+		}
+	}
+
+	/**
+	 * Apply the placement choices only this site can make.
+	 *
+	 * The byline and the publishing time sit on the brief form and were
+	 * being saved with the brief, but the text handed to the app never
+	 * mentioned either and the app has no parameter for either. So both were
+	 * controls that took an answer and threw it away.
+	 *
+	 * The time is kept rather than used, because the draft is not published
+	 * in the call that creates it.
+	 *
+	 * @param int $post_id The draft just created.
+	 * @return void
+	 */
+	private static function place_from_brief( $post_id ) {
+		$brief = Blogcraft_Brief::get();
+
+		if ( empty( $brief['placement'] ) || ! is_array( $brief['placement'] ) ) {
+			return;
+		}
+
+		$placement = $brief['placement'];
+		$author    = isset( $placement['author'] ) ? (int) $placement['author'] : 0;
+
+		// Checked against what exists now, the way the pipeline checks it: a
+		// user can be deleted between a brief being written and acted on.
+		if ( $author > 0 && get_userdata( $author ) ) {
+			wp_update_post(
+				array(
+					'ID'          => $post_id,
+					'post_author' => $author,
+				)
+			);
+		}
+
+		$when = isset( $placement['publish_at'] ) ? trim( (string) $placement['publish_at'] ) : '';
+
+		if ( '' !== $when ) {
+			update_post_meta( $post_id, self::WHEN_META, $when );
+		}
+	}
+
+	/**
+	 * Keep a score where this site's own screens look for it.
+	 *
+	 * Mode A writes these when the pipeline finishes a post, and the
+	 * library, the overview and the activity screen all read them back.
+	 * Nothing on this path wrote them, so a post a connected app wrote,
+	 * checked and published read "not scored" for ever.
+	 *
+	 * @param int   $post_id The draft.
+	 * @param array $result  What the scorecard returned.
+	 * @return void
+	 */
+	private static function record_score( $post_id, $result ) {
+		update_post_meta( $post_id, '_blogcraft_quality', (int) $result['score'] );
+
+		// Written so the review screen describes the post as it now stands,
+		// rather than as it was when somebody last happened to check it.
+		if ( ! empty( $result['checks'] ) ) {
+			update_post_meta( $post_id, '_blogcraft_checks', (array) $result['checks'] );
+		}
+
+		if ( ! empty( $result['metrics'] ) ) {
+			update_post_meta( $post_id, '_blogcraft_metrics', (array) $result['metrics'] );
 		}
 	}
 
@@ -1094,6 +1190,12 @@ class Blogcraft_Mcp_Tools {
 		}
 
 		self::place( $post_id, $args );
+
+		// The two placement choices the app has no parameter for and no
+		// business making: whose byline goes on the post, and when it should
+		// go out. Both are on the brief form, both were being saved with it,
+		// and until now both were read by nothing at all.
+		self::place_from_brief( $post_id );
 
 		// The brief has been acted on. Leaving it would hand the next
 		// conversation a topic this site has just covered, which is the

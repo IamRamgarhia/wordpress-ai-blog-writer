@@ -1643,7 +1643,7 @@ class Blogcraft_Connection {
 			echo '</tr></thead><tbody>';
 
 			foreach ( $connections as $id => $one ) {
-				$label = ( '' === $one['label'] ) ? __( 'Unnamed', 'dicecodes-ai-blog-writer' ) : $one['label'];
+				$label = self::connection_name( $one );
 
 				echo '<tr>';
 				printf( '<td><strong>%s</strong></td>', esc_html( $label ) );
@@ -1725,6 +1725,22 @@ class Blogcraft_Connection {
 		}
 
 		return __( 'Never used', 'dicecodes-ai-blog-writer' );
+	}
+
+	/**
+	 * What to call one connection.
+	 *
+	 * A token issued by hand carries whatever name it was given, which may
+	 * be nothing. Two screens describing the same connection two different
+	 * ways is how one of them ends up printing an empty string.
+	 *
+	 * @param array $one One connection.
+	 * @return string
+	 */
+	private static function connection_name( $one ) {
+		$label = isset( $one['label'] ) ? trim( (string) $one['label'] ) : '';
+
+		return ( '' === $label ) ? __( 'Unnamed', 'dicecodes-ai-blog-writer' ) : $label;
 	}
 
 	/**
@@ -2120,12 +2136,21 @@ class Blogcraft_Connection {
 		if ( Blogcraft_Mode::is_client() ) {
 			$connected = Blogcraft_Mcp_Auth::connections();
 
+			// Named the same way the table below names them. Plucking the raw
+			// labels put an empty one in the list, and a token issued by hand
+			// has no label, so the strip read "Writing , Claude".
+			$named = array();
+
+			foreach ( $connected as $one ) {
+				$named[] = self::connection_name( $one );
+			}
+
 			$items[] = array(
 				'what' => __( 'Writing', 'dicecodes-ai-blog-writer' ),
-				'is'   => empty( $connected )
+				'is'   => empty( $named )
 					? __( 'no app connected', 'dicecodes-ai-blog-writer' )
-					: implode( ', ', wp_list_pluck( $connected, 'label' ) ),
-				'done' => ! empty( $connected ),
+					: implode( ', ', $named ),
+				'done' => ! empty( $named ),
 			);
 		} else {
 			$type  = (string) Blogcraft_Settings::get( 'provider_type' );

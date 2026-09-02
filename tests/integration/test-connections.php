@@ -173,6 +173,21 @@ class Test_Blogcraft_Connections extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'name="connection"', $html );
 	}
 
+	public function test_a_connection_with_no_name_is_named_everywhere() {
+		// A token issued without a label is listed as "Unnamed" in the table
+		// and was an empty string in the strip above it, which joined the
+		// names with commas and so read "Writing , Claude".
+		Blogcraft_Mcp_Auth::issue( $this->author, '' );
+		$this->sign_in( 'bc_claude', 'Claude' );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringNotContainsString( '<span class="bc-status-is">, ', $html, 'the strip is naming nothing' );
+		$this->assertStringContainsString( 'Unnamed, Claude', $html );
+	}
+
 	public function test_a_connection_says_whether_it_is_live() {
 		// "Last used: September 1" is a fact somebody then has to do
 		// arithmetic on. Whether it is working today is the question.

@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.89.0
+Stable tag: 0.90.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,15 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.90.0 =
+* Fixed: a post written by a connected app was never given the score it had just been measured against, so the library, the overview and the activity screen listed everything Claude or ChatGPT wrote as "not scored" however many times it had been checked. The score is now kept when a draft is checked and when it is published, including when publishing is refused — which is the one time you go looking for it
+* Fixed: every brief handed to a connected app claimed the length, the section count, the sentence limit and the link target had been chosen specially for that post. Nothing had been chosen: the form sends text, the standing rules hold numbers, and the two were compared strictly, so 2000 and "2000" counted as a change
+* The byline and the publishing time on Write a post are applied instead of ignored. Both were saved with the brief and then read by nothing at all — an app has no parameter for either, so this site sets them itself
+* Queueing a list of topics and pushing the queue along are no longer offered when an AI client does the writing. There is no provider on that setup, so a queued list waited for something that was never coming while the screen reported it as queued. Both endpoints refuse it too, rather than only being hidden
+* Undoing a batch stays on both paths, because it works off the mark this plugin puts on posts it wrote and an app's posts carry it too
+* The confirmation step says "Save this brief" where that is what pressing it does, rather than "Write it now" on the one setup where it writes nothing
+* Fixed: the Settings strip read "Writing , Claude" when a token issued by hand sat beside a signed-in app, because the token had no name and the empty name was still joined into the list
+
 = 0.89.0 =
 * The connected apps list says whether each one is Active, Idle or Never used, with a dot beside the word. A date told you when something last called and left you to work out whether that meant it was still working
 
@@ -190,17 +199,5 @@ everything is here, oldest at the bottom.
 * Two of them were not false alarms: a pair of internal functions read submitted data on the strength of a check made by whatever called them, with nothing at those lines saying so. Both check for themselves now
 * Submitted data is cleaned where it arrives rather than several steps later, with the right function for each kind — including the one that keeps a draft’s formatting intact
 * Fixed two addresses that did not answer: the plugin’s own page, which is not written yet, and one image service that refuses automated requests on every page it has
-
-= 0.85.0 =
-* The sentence to say in your app has moved to where it is useful. It was a standing panel at the top of Write a post explaining what to do once you had saved a brief, sitting above the form that saves it — backwards, and unchanging, so after the second visit it was five lines of furniture. It appears once there is a brief to say it about
-* The warning that no app is connected stays at the top, and only when it is true
-
-= 0.84.0 =
-* Housekeeping after the voice fix: one step layout was built from a different element than the two beside it, and the note explaining a list of duplicate style rules described deliberate work as something still to be sorted out. Neither changed how anything behaves
-
-= 0.83.0 =
-* Fixed: your voice was described in two places and the model was told both. Settings had a Describe your voice card, How it writes had a Voice tab, and they were not two views of one thing — they were two stores, and every request carried two versions of the tone, the reader, the point of view, the reading level, the banned words and the subjects to avoid. Fill in one and the model got two answers to the same question
-* How it writes now owns all of it. What the blog is about, your style rules and your own experience have moved onto its Voice tab, along with the Learn from my posts button. Nothing you had typed is lost — it is carried over the first time you open the screen
-* The Settings card is now a line pointing at where the voice lives
 Older releases are listed in changelog.txt, which ships with the plugin.
 
