@@ -52,6 +52,26 @@ class Test_Blogcraft_Only_Usable_Options extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The status strip alone, which is what this rule is about.
+	 *
+	 * @param string $mode Which path.
+	 * @return string
+	 */
+	private function strip( $mode ) {
+		$html = $this->screen( $mode, 'Blogcraft_Connection' );
+
+		$at = strpos( $html, '<ul class="blogcraft-status">' );
+
+		if ( false === $at ) {
+			return '';
+		}
+
+		$end = strpos( $html, '</ul>', $at );
+
+		return substr( $html, $at, $end - $at );
+	}
+
+	/**
 	 * Controls that only work when this site calls a provider itself.
 	 *
 	 * Each is a marker in the markup and the reason it cannot work on the
@@ -170,15 +190,21 @@ class Test_Blogcraft_Only_Usable_Options extends WP_UnitTestCase {
 		// Research is the provider's; scheduled writing cannot happen on the
 		// client path at all, and reporting it "off" implies it could be
 		// turned on.
+		// Read from the strip itself rather than the whole screen. The
+		// screen also carries a folded comparison of the two ways of running
+		// this, which names what the other one does on purpose — describing
+		// the alternative is not the same fault as offering a control for it.
+		$this->assertStringNotContainsString( 'Research', $this->strip( Blogcraft_Mode::CLIENT ) );
+		$this->assertStringNotContainsString( 'Automation', $this->strip( Blogcraft_Mode::CLIENT ) );
+
+		$this->assertStringContainsString( 'Research', $this->strip( Blogcraft_Mode::API ) );
+		$this->assertStringContainsString( 'Automation', $this->strip( Blogcraft_Mode::API ) );
+
+		// And no control for the other path is offered either way.
 		$client = $this->screen( Blogcraft_Mode::CLIENT, 'Blogcraft_Connection' );
 
-		$this->assertStringNotContainsString( 'Research', $client );
-		$this->assertStringNotContainsString( 'Automation', $client );
-
-		$api = $this->screen( Blogcraft_Mode::API, 'Blogcraft_Connection' );
-
-		$this->assertStringContainsString( 'Research', $api );
-		$this->assertStringContainsString( 'Automation', $api );
+		$this->assertStringNotContainsString( 'bc-card-research', $client );
+		$this->assertStringNotContainsString( 'bc-card-automation', $client );
 	}
 
 	public function test_the_status_strip_names_what_is_in_use() {

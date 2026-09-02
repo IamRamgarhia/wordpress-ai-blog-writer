@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.99.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,10 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.0.0 =
+* The two ways of running this can be compared after you have picked one. Both were laid out side by side while the question was open and never again, so anybody wondering whether the other suited them better had a switch button and nothing to weigh it against. It is folded under the switch on Settings, and it is the same list the question uses rather than a second one to keep in step
+* "Change" on the overview lands on the switch and the comparison beside it, instead of the top of a long screen
+
 = 0.99.0 =
 * Every job on the Activity screen opens now, the number and the topic both. Only jobs still moving were clickable, so a finished one — the one worth opening, because it has a score, a list of what failed and a post at the end of it — could be reached from nowhere
 * Opening a finished job shows what it scored, every check it passed and failed, and a way through to the post it wrote. Before this the screen rendered an outcome only for a draft held for review, so a completed job showed twelve unticked steps and the word "Working" over a post written days earlier
@@ -191,9 +195,5 @@ everything is here, oldest at the bottom.
 * Fixed: that panel also offered to set up research on the client path, where an application brings its own and the settings screen carries no research card to arrive at. Same for the prompt inside the confirmation
 * The line saying what a post will be no longer claims to know whether it was written from current sources when an app did the writing. That is the app's business and this site cannot see it
 * A new test walks every screen on both setups and checks that each link lands on a screen that exists and an anchor that is actually there. It found three of the faults above
-
-= 0.95.0 =
-* Fixed: "What you will get" listed a featured image on every site, whether or not the picture service was switched on. It was reading the blueprint asking for a picture and never the setting that decides whether one can be fetched — so the one panel whose whole job is to say what the post will be was wrong about the most visible thing on it. It now says "No featured image, pictures are switched off" instead of quietly promising one
-* The confirmation before writing ends with a line saying what the post will actually come out as: roughly how long, whether it has sources to read or is writing from memory, whether there will be pictures, and where it lands. Three of those four are settings on other screens, and nobody should have to remember whether they switched pictures on before agreeing to write a post
 Older releases are listed in changelog.txt, which ships with the plugin.
 

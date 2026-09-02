@@ -1999,7 +1999,8 @@ body[class*="page_blogcraft"] #wpcontent {
 	max-width: 60ch;
 }
 
-.bc-path-options {
+.bc-path-options,
+.bc-path-review {
 	display: grid;
 	gap: var(--bc-s4);
 	grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
@@ -2098,6 +2099,26 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-path-now form {
 	margin: 0;
 }
+
+/* The comparison, after the choice has been made. Shut by default: the
+   strip above answers the everyday question and this answers the one asked
+   twice a year. */
+.bc-path-compare {
+	margin-top: 12px;
+	border-top: 1px solid var(--bc-line);
+	padding-top: 10px;
+}
+
+.bc-path-compare > summary {
+	cursor: pointer;
+	font-size: var(--bc-t-sm);
+	font-weight: 600;
+	color: var(--bc-accent);
+}
+
+.bc-path-compare > summary::marker { color: var(--bc-faint); }
+
+.bc-path-compare .bc-path-review { margin-top: 12px; }
 
 .bc-path-keep {
 	color: var(--bc-muted);

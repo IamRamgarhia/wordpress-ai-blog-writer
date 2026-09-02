@@ -1048,7 +1048,23 @@ class Blogcraft_Connection {
 			esc_html__( 'Two ways to do this. You can switch whenever you like.', 'dicecodes-ai-blog-writer' )
 		);
 
-		echo '<div class="bc-path-options">';
+		self::render_path_comparison();
+		echo '</section>';
+	}
+
+	/**
+	 * The two ways of running this, beside each other.
+	 *
+	 * One list, used both when the question is first asked and when
+	 * somebody comes back to ask it again. Written twice it would be two
+	 * answers to one question within a release or two.
+	 *
+	 * @param string $wrapper Class for the row, so the open question keeps a
+	 *                        marker of its own.
+	 * @return void
+	 */
+	private static function render_path_comparison( $wrapper = 'bc-path-options' ) {
+		printf( '<div class="%s">', esc_attr( $wrapper ) );
 
 		self::render_path_option(
 			'api',
@@ -1084,7 +1100,6 @@ class Blogcraft_Connection {
 		);
 
 		echo '</div>';
-		echo '</section>';
 	}
 
 	/**
@@ -1130,7 +1145,7 @@ class Blogcraft_Connection {
 	private static function render_path_switch() {
 		$is_api = ( 'api' === self::path() );
 
-		echo '<div class="bc-path-now">';
+		echo '<div class="bc-path-now" id="bc-card-path">';
 
 		printf(
 			'<p class="bc-path-current"><strong>%1$s</strong> %2$s</p>',
@@ -1156,6 +1171,21 @@ class Blogcraft_Connection {
 			'<p class="bc-path-keep">%s</p>',
 			esc_html__( 'Switching only changes what is shown here. Nothing is deleted.', 'dicecodes-ai-blog-writer' )
 		);
+
+		// The comparison of the two ways was shown while the question was
+		// open and then never again, so anybody wondering whether the other
+		// one suited them better had a switch button and nothing to base the
+		// decision on. Folded away rather than gone: it is read once or
+		// twice, and the strip above answers the everyday question.
+		echo '<details class="bc-path-compare">';
+		printf(
+			'<summary>%s</summary>',
+			esc_html__( 'What each way can do', 'dicecodes-ai-blog-writer' )
+		);
+
+		self::render_path_comparison( 'bc-path-review' );
+
+		echo '</details>';
 
 		echo '</div>';
 	}

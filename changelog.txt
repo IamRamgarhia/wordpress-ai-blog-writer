@@ -3,6 +3,10 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.0.0 =
+* The two ways of running this can be compared after you have picked one. Both were laid out side by side while the question was open and never again, so anybody wondering whether the other suited them better had a switch button and nothing to weigh it against. It is folded under the switch on Settings, and it is the same list the question uses rather than a second one to keep in step
+* "Change" on the overview lands on the switch and the comparison beside it, instead of the top of a long screen
+
 = 0.99.0 =
 * Every job on the Activity screen opens now, the number and the topic both. Only jobs still moving were clickable, so a finished one — the one worth opening, because it has a score, a list of what failed and a post at the end of it — could be reached from nowhere
 * Opening a finished job shows what it scored, every check it passed and failed, and a way through to the post it wrote. Before this the screen rendered an outcome only for a draft held for review, so a completed job showed twelve unticked steps and the word "Working" over a post written days earlier

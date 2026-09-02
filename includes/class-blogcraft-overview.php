@@ -215,7 +215,9 @@ class Blogcraft_Overview {
 			'<div class="bc-mode-now"><span class="bc-mode-tag">%1$s</span><span class="bc-mode-what">%2$s</span><a href="%3$s">%4$s</a></div>',
 			esc_html( Blogcraft_Mode::label() ),
 			esc_html( Blogcraft_Mode::summary() ),
-			esc_url( admin_url( 'admin.php?page=blogcraft-settings' ) ),
+			// Straight to the switch and the comparison beside it, rather
+			// than the top of a long screen with the answer somewhere on it.
+			esc_url( admin_url( 'admin.php?page=blogcraft-settings#bc-card-path' ) ),
 			esc_html__( 'Change', 'dicecodes-ai-blog-writer' )
 		);
 	}
