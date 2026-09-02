@@ -3,6 +3,13 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.94.0 =
+* Fixed: a post published by hand got none of the finishing. The featured image, the pictures under each heading, the links from older posts, the search title and description, and the ping to the search engines all happened inside the call that published it — so following this plugin's own advice, reading the draft and pressing Publish yourself, produced a barer post than asking your app to publish. It now finishes whichever way it goes live, and never twice
+* The confirmation before writing is quicker to read: one line instead of a paragraph arguing for itself, two headings said rather than shouted, and the ten things a post can include laid out in two columns so the buttons are no longer below the fold
+* That panel keeps the keyboard inside it now. Tab used to walk out into the form behind, which is still there and still fillable, so it was possible to type into a screen you could not see. Closing it puts you back where you were
+* Fixed: on a phone, the panel's "Back to the brief" button folded into four stacked words. Both buttons take the full width there
+* Note: pictures still need switching on under Settings before anything can add one, whichever way a post is published
+
 = 0.93.0 =
 * Fixed: four links to the documentation opened in the same tab, so following one while setting something up threw away the form you were filling in. Anything that leaves your own admin now opens a new tab, decided from the address rather than remembered link by link
 * Fixed: the old Help address answered with "Sorry, you are not allowed to access this page" — WordPress's message for a permissions problem, on a page that had simply moved. It now says where the documentation went and offers a way there, for anyone who bookmarked it

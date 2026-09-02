@@ -643,11 +643,19 @@ class Blogcraft_Generate {
 		$bp = Blogcraft_Blueprint::get();
 
 		echo '<div class="bc-confirm" id="bc-confirm" hidden>';
-		echo '<div class="bc-confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="bc-confirm-title">';
+		// tabindex so focus can be put on the panel itself when it opens,
+		// which is what makes a screen reader read the heading before the
+		// first control rather than starting halfway down.
+		echo '<div class="bc-confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="bc-confirm-title" tabindex="-1">';
 
 		echo '<div class="bc-confirm-head">';
 		echo '<h2 id="bc-confirm-title">' . esc_html__( 'Before it writes', 'dicecodes-ai-blog-writer' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Everything here is what the model is told before a word is written. It is the whole difference between a post that answers a question properly and one that reads like every other AI post — which is why it is worth thirty seconds rather than being buried in a settings tab.', 'dicecodes-ai-blog-writer' ) . '</p>';
+
+		// It used to open with a paragraph arguing for its own existence.
+		// Somebody who has just pressed the button is not reading an essay
+		// about why they are being asked; they want to see what they are
+		// agreeing to and get on.
+		echo '<p>' . esc_html__( 'A last look at what this post will be, and what it is missing.', 'dicecodes-ai-blog-writer' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="bc-confirm-body">';
@@ -670,6 +678,8 @@ class Blogcraft_Generate {
 		// through data-for, and the form keeps exactly one input per field.
 		$on_tab = array( 'takeaways', 'faq', 'toc', 'tables', 'lists' );
 
+		echo '<div class="bc-confirm-parts">';
+
 		foreach ( self::parts() as $field => $part ) {
 			$proxy = in_array( $field, $on_tab, true );
 
@@ -691,6 +701,7 @@ class Blogcraft_Generate {
 			);
 		}
 
+		echo '</div>';
 		echo '</div>';
 
 		echo '<div class="bc-confirm-foot">';

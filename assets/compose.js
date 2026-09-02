@@ -339,21 +339,70 @@
 		} );
 	}
 
+	// Where focus was before the panel opened, so closing it puts somebody
+	// back where they were rather than at the top of a long form.
+	var cameFrom = null;
+
+	function focusable() {
+		var all = confirm.querySelectorAll(
+			'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+		);
+
+		return Array.prototype.filter.call( all, function ( el ) {
+			return null !== el.offsetParent;
+		} );
+	}
+
 	function open() {
 		sync();
 		checkEvidence();
+
+		cameFrom = document.activeElement;
 		confirm.hidden = false;
 
-		var first = confirm.querySelector( 'input' );
-
-		if ( first ) {
-			first.focus();
+		// The panel itself, not its first tick box. Focus landing on a
+		// checkbox halfway down reads to a screen reader as an answer being
+		// demanded, and skips the heading that says what is being asked.
+		if ( sheet ) {
+			sheet.focus();
 		}
 	}
 
 	function close() {
 		confirm.hidden = true;
+
+		if ( cameFrom && cameFrom.focus ) {
+			cameFrom.focus();
+		}
+
+		cameFrom = null;
 	}
+
+	// Tab used to walk straight out of the panel and into the form behind
+	// it, which is still there and still fillable, so somebody could be
+	// typing into a screen they cannot see.
+	confirm.addEventListener( 'keydown', function ( event ) {
+		if ( 'Tab' !== event.key ) {
+			return;
+		}
+
+		var stops = focusable();
+
+		if ( ! stops.length ) {
+			return;
+		}
+
+		var first = stops[ 0 ];
+		var last = stops[ stops.length - 1 ];
+
+		if ( event.shiftKey && document.activeElement === first ) {
+			event.preventDefault();
+			last.focus();
+		} else if ( ! event.shiftKey && document.activeElement === last ) {
+			event.preventDefault();
+			first.focus();
+		}
+	} );
 
 	form.addEventListener( 'submit', function ( event ) {
 		// Armed once the panel's own button has been pressed. Without this

@@ -31,6 +31,16 @@ class Blogcraft_Mcp_Tools {
 	const WHEN_META = '_blogcraft_publish_at';
 
 	/**
+	 * What was done to a post when it went live, so it is not done twice.
+	 *
+	 * Publishing fires the status transition, which finishes the post, and
+	 * the call that asked for the publish then wants to report what happened.
+	 * Holding the answer here lets the second ask be told without the work
+	 * running again.
+	 */
+	const DONE_META = '_blogcraft_finished';
+
+	/**
 	 * Every tool, in the shape tools/list returns.
 	 *
 	 * @return array
@@ -956,11 +966,18 @@ class Blogcraft_Mcp_Tools {
 	 * @param int $post_id The post, now published.
 	 * @return string What was done, for the client to report.
 	 */
-	private static function finish( $post_id ) {
+	public static function finish( $post_id ) {
 		$post = get_post( $post_id );
 
 		if ( ! $post instanceof WP_Post ) {
 			return '';
+		}
+
+		// Done already, by whichever route got here first.
+		$already = (string) get_post_meta( $post_id, self::DONE_META, true );
+
+		if ( '' !== $already ) {
+			return ( '-' === $already ) ? '' : $already;
 		}
 
 		$topic = (string) get_post_meta( $post_id, '_blogcraft_topic', true );
@@ -1015,11 +1032,48 @@ class Blogcraft_Mcp_Tools {
 			Blogcraft_Logger::error( 'The search engines could not be told.', array( 'reason' => $e->getMessage() ) );
 		}
 
-		if ( empty( $did ) ) {
-			return '';
+		$summary = empty( $did ) ? '' : ' Added: ' . implode( ', ', $did ) . '.';
+
+		// A dash for "nothing to add", because an empty string would read as
+		// never having run and the work would be attempted again on the next
+		// save of the same post.
+		update_post_meta( $post_id, self::DONE_META, ( '' === $summary ) ? '-' : $summary );
+
+		return $summary;
+	}
+
+	/**
+	 * Finish a post that went live without the tool being asked to publish it.
+	 *
+	 * The plugin tells people to read the draft before anything goes out, and
+	 * the obvious way to act on that is to open it in WordPress and press
+	 * Publish. Nothing was hooked to that, so following the advice meant a
+	 * post published with no featured image, no section pictures, nothing
+	 * linking to it, no search title or description written, and no search
+	 * engine told — while asking the app to publish did all five.
+	 *
+	 * Only posts this connection wrote. Mode A finishes its own inside the
+	 * pipeline, and a post somebody wrote by hand is not ours to touch.
+	 *
+	 * @param string  $status Status being moved to.
+	 * @param string  $was    Status being moved from.
+	 * @param WP_Post $post   The post.
+	 * @return void
+	 */
+	public static function on_publish( $status, $was, $post ) {
+		if ( 'publish' !== $status || 'publish' === $was ) {
+			return;
 		}
 
-		return ' Added: ' . implode( ', ', $did ) . '.';
+		if ( ! $post instanceof WP_Post || 'post' !== $post->post_type ) {
+			return;
+		}
+
+		if ( ! get_post_meta( $post->ID, '_blogcraft_mcp', true ) ) {
+			return;
+		}
+
+		self::finish( $post->ID );
 	}
 
 	/**

@@ -81,6 +81,11 @@ class Blogcraft_Mcp {
 	 */
 	public static function init() {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_route' ) );
+
+		// Not part of the endpoint, and registered here because it has to be
+		// listening on the ordinary admin request where somebody presses
+		// Publish on a draft an app wrote.
+		add_action( 'transition_post_status', array( 'Blogcraft_Mcp_Tools', 'on_publish' ), 10, 3 );
 	}
 
 	/**

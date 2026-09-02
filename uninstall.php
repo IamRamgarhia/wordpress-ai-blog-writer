@@ -123,6 +123,7 @@ if ( ! function_exists( 'blogcraft_uninstall_cleanup' ) ) {
 			'_blogcraft_seo_title',
 			'_blogcraft_seo_description',
 			'_blogcraft_publish_at',
+			'_blogcraft_finished',
 		);
 
 		foreach ( $post_meta as $key ) {

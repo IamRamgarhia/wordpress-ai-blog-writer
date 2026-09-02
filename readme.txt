@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.93.0
+Stable tag: 0.94.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,13 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.94.0 =
+* Fixed: a post published by hand got none of the finishing. The featured image, the pictures under each heading, the links from older posts, the search title and description, and the ping to the search engines all happened inside the call that published it — so following this plugin's own advice, reading the draft and pressing Publish yourself, produced a barer post than asking your app to publish. It now finishes whichever way it goes live, and never twice
+* The confirmation before writing is quicker to read: one line instead of a paragraph arguing for itself, two headings said rather than shouted, and the ten things a post can include laid out in two columns so the buttons are no longer below the fold
+* That panel keeps the keyboard inside it now. Tab used to walk out into the form behind, which is still there and still fillable, so it was possible to type into a screen you could not see. Closing it puts you back where you were
+* Fixed: on a phone, the panel's "Back to the brief" button folded into four stacked words. Both buttons take the full width there
+* Note: pictures still need switching on under Settings before anything can add one, whichever way a post is published
+
 = 0.93.0 =
 * Fixed: four links to the documentation opened in the same tab, so following one while setting something up threw away the form you were filling in. Anything that leaves your own admin now opens a new tab, decided from the address rather than remembered link by link
 * Fixed: the old Help address answered with "Sorry, you are not allowed to access this page" — WordPress's message for a permissions problem, on a page that had simply moved. It now says where the documentation went and offers a way there, for anyone who bookmarked it
@@ -183,11 +190,5 @@ everything is here, oldest at the bottom.
 * Requires a connection, which the shipped copy did not. That is the trade, and it buys corrections that reach you without an update, screenshots and worked examples that never fitted in an admin panel, and one copy to be right
 * Smaller by about 34,000 characters of shipped text: the stylesheet lost the screen it dressed, and translators have 145 fewer strings to carry
 * The four setup steps on the overview no longer fold away behind a control. Four lines and a button each is not something to hide
-
-= 0.91.0 =
-* The overview says when nothing is allowed to come and read what you publish. A post can be right in every way this plugin measures and still be invisible, and both settings that decide it live outside the plugin: WordPress's own "Discourage search engines", which is on by default on most staging sites and travels to production with the database, and a robots.txt that refuses the AI crawlers
-* It names the assistants rather than the crawlers — "Perplexity", not "PerplexityBot" — because which assistant will not be citing you is the question somebody actually has. Nothing is changed on your behalf: both settings are legitimate choices and the plugin only says what they cost
-* The line stays quiet when there is nothing to say, and reads as confirmation rather than a warning on a staging site, where discouraging search engines is the correct setting
-* Fixed: the Questions and answers section still promised it would appear as its own search result. Google retired FAQ rich results for every site in May 2026. The section is still worth writing and the markup is still emitted, but for what it is worth to a reader rather than a result the plugin can no longer promise
 Older releases are listed in changelog.txt, which ships with the plugin.
 
