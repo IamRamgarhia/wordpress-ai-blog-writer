@@ -2,5 +2,19 @@
   "phpVersion": "8.2",
   "mappings": {
     "wp-content/plugins/blogcraft": "."
+  },
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_DISPLAY": false,
+    "SCRIPT_DEBUG": true
+  },
+  "env": {
+    "tests": {
+      "config": {
+        "WP_DEBUG": true,
+        "WP_DEBUG_DISPLAY": false,
+        "SCRIPT_DEBUG": true
+      }
+    }
   }
 }
