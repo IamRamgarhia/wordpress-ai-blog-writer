@@ -210,7 +210,7 @@ class Blogcraft_Progress {
 	private static function current_job_id() {
 		// Read-only screen selection, not a state change: the nonce that
 		// matters guards the AJAX advance and the approve handler.
-		$asked = isset( $_GET['job'] ) ? (int) $_GET['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$asked = isset( $_GET['job'] ) ? (int) $_GET['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: which job to display; ownership is checked before anything is shown.
 
 		if ( $asked > 0 ) {
 			return $asked;
@@ -237,13 +237,15 @@ class Blogcraft_Progress {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That page has expired. Reload it.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0;
 
 		if ( $job_id <= 0 ) {
 			wp_send_json_error( array( 'message' => __( 'No post to write.', 'dicecodes-ai-blog-writer' ) ), 400 );
@@ -377,10 +379,17 @@ class Blogcraft_Progress {
 	 * @return void
 	 */
 	public static function handle_approve() {
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::ACTION, '_blogcraft_nonce' );
+
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0;
 
 		if ( $job_id > 0 ) {
 			self::apply_edits( $job_id );
@@ -427,6 +436,12 @@ class Blogcraft_Progress {
 	 * @return void
 	 */
 	private static function apply_edits( $job_id ) {
+		// Checked here as well as in the caller. A private helper that
+		// reads $_POST on the strength of a check made somewhere else is
+		// one refactor away from reading it on no check at all, and
+		// nothing at this line says which.
+		check_admin_referer( self::ACTION, '_blogcraft_nonce' );
+
 		$job = Blogcraft_Queue::find( $job_id );
 
 		if ( null === $job || 'ready' !== $job->status ) {
@@ -435,8 +450,10 @@ class Blogcraft_Progress {
 
 		$payload = $job->payload;
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- nonce verified by the caller; the markup is narrowed by wp_kses_post() below, which is the sanitiser for post content and the only one that can keep the writer's formatting.
-		$body = isset( $_POST['draft_body'] ) ? (string) wp_unslash( $_POST['draft_body'] ) : '';
+				// wp_kses_post is the sanitiser for post markup, and the only one
+		// that keeps the writer's formatting. Applied here rather than a few
+		// lines down, so the value is never raw at any point.
+		$body = isset( $_POST['draft_body'] ) ? wp_kses_post( wp_unslash( $_POST['draft_body'] ) ) : '';
 
 		if ( '' !== trim( wp_strip_all_tags( $body ) ) ) {
 			// wp_kses_post first: this is writer-supplied markup arriving over
@@ -445,14 +462,12 @@ class Blogcraft_Progress {
 			$payload['content'] = Blogcraft_Blocks::from_html( wp_kses_post( $body ) );
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by the caller.
 		$title = isset( $_POST['draft_title'] ) ? sanitize_text_field( wp_unslash( $_POST['draft_title'] ) ) : '';
 
 		if ( '' !== $title ) {
 			$payload['outline']['title'] = $title;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by the caller.
 		$meta = isset( $_POST['draft_meta'] ) ? sanitize_textarea_field( wp_unslash( $_POST['draft_meta'] ) ) : '';
 
 		if ( '' !== $meta ) {
@@ -492,7 +507,7 @@ class Blogcraft_Progress {
 		}
 
 		// Read-only; the nonce that matters guarded the handler that set it.
-		$outcome = isset( $_GET['improve'] ) ? sanitize_key( wp_unslash( $_GET['improve'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$outcome = isset( $_GET['improve'] ) ? sanitize_key( wp_unslash( $_GET['improve'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: what the last attempt did, so the right sentence is shown after a redirect.
 
 		if ( 'nothing' === $outcome ) {
 			printf(
@@ -544,14 +559,21 @@ class Blogcraft_Progress {
 	public static function handle_improve() {
 		// Read then verify; Blogcraft_Request performs the check PHPCS cannot
 		// follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::IMPROVE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::IMPROVE_ACTION, '_blogcraft_nonce' );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dicecodes-ai-blog-writer' ) );
 		}
 
-		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0;
 		$job    = $job_id > 0 ? Blogcraft_Queue::find( $job_id ) : null;
 
 		if ( null === $job || 'ready' !== $job->status ) {
@@ -639,14 +661,21 @@ class Blogcraft_Progress {
 	public static function handle_undo_improve() {
 		// Read then verify; Blogcraft_Request performs the check PHPCS cannot
 		// follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::UNDO_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::UNDO_ACTION, '_blogcraft_nonce' );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'dicecodes-ai-blog-writer' ) );
 		}
 
-		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0;
 		$job    = $job_id > 0 ? Blogcraft_Queue::find( $job_id ) : null;
 
 		if ( null === $job || 'ready' !== $job->status || empty( $job->payload['before'] ) ) {

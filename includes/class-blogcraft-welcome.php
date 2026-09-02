@@ -135,7 +135,7 @@ class Blogcraft_Welcome {
 		// Only from a Blogcraft screen. Hijacking an unrelated admin page
 		// because a plugin was activated is the behaviour that makes people
 		// distrust plugins, and it is what Guideline 11 is about.
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: which screen is open, so the introduction knows whether to appear.
 
 		if ( 0 !== strpos( $page, 'blogcraft' ) || self::PAGE_SLUG === $page ) {
 			return;
@@ -153,16 +153,22 @@ class Blogcraft_Welcome {
 	 * @return void
 	 */
 	public static function handle_step() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::ACTION, '_blogcraft_nonce' );
+
+		$step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
 
 		if ( 'voice' === $step ) {
 			foreach ( array( 'voice_niche', 'voice_audience' ) as $field ) {
-				if ( isset( $_POST[ $field ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-					Blogcraft_Settings::set( $field, sanitize_textarea_field( wp_unslash( $_POST[ $field ] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				if ( isset( $_POST[ $field ] ) ) {
+					Blogcraft_Settings::set( $field, sanitize_textarea_field( wp_unslash( $_POST[ $field ] ) ) );
 				}
 			}
 		}
@@ -171,7 +177,7 @@ class Blogcraft_Welcome {
 			// Absence means no, which is the whole point of asking: a source
 			// switched on here is switched on because somebody chose to.
 			foreach ( array_keys( Blogcraft_Research::free_sources() ) as $source ) {
-				Blogcraft_Settings::set( $source, isset( $_POST[ $source ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				Blogcraft_Settings::set( $source, isset( $_POST[ $source ] ) );
 			}
 		}
 
@@ -183,7 +189,7 @@ class Blogcraft_Welcome {
 			exit;
 		}
 
-		$next = isset( $_POST['next'] ) ? sanitize_key( wp_unslash( $_POST['next'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$next = isset( $_POST['next'] ) ? sanitize_key( wp_unslash( $_POST['next'] ) ) : '';
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -208,7 +214,7 @@ class Blogcraft_Welcome {
 		}
 
 		// Read-only step selection; the nonce guards the handler that writes.
-		$step = isset( $_GET['step'] ) ? sanitize_key( wp_unslash( $_GET['step'] ) ) : 'provider'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$step = isset( $_GET['step'] ) ? sanitize_key( wp_unslash( $_GET['step'] ) ) : 'provider'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: which step of the introduction to draw.
 
 		echo '<div class="wrap blogcraft-wrap bc-welcome">';
 		echo '<h1>' . esc_html__( 'Three things worth two minutes', 'dicecodes-ai-blog-writer' ) . '</h1>';

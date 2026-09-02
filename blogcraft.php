@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Dicecodes AI Blog Writer
- * Plugin URI:        https://dicecodes.com/ai-blog-writer/
+ * Plugin URI:        https://dicecodes.com/
  * Description:       AI blog writer that researches first, writes in your voice, and checks its own work.
  * Version:           0.85.0
  * Requires at least: 6.0

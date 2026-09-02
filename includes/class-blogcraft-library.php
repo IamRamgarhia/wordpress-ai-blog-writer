@@ -91,11 +91,17 @@ class Blogcraft_Library {
 	 * @return void
 	 */
 	public static function handle_discard() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::ACTION, '_blogcraft_nonce' );
+
+		$job_id = isset( $_POST['job'] ) ? (int) $_POST['job'] : 0;
 
 		if ( $job_id > 0 ) {
 			// Cancelled rather than deleted: the row is the only record that

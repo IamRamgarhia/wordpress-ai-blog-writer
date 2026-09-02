@@ -309,11 +309,17 @@ class Blogcraft_Activity {
 	 * @return void
 	 */
 	public static function handle_cancel() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::CANCEL_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$job_id = isset( $_POST['job_id'] ) ? (int) $_POST['job_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::CANCEL_ACTION, '_blogcraft_nonce' );
+
+		$job_id = isset( $_POST['job_id'] ) ? (int) $_POST['job_id'] : 0;
 
 		if ( $job_id > 0 && Blogcraft_Queue::cancel( $job_id ) ) {
 			Blogcraft_Logger::info( 'A queued post was stopped.', array(), $job_id );
@@ -417,9 +423,15 @@ class Blogcraft_Activity {
 	 * @return void
 	 */
 	public static function handle_clear() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::CLEAR_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::CLEAR_ACTION, '_blogcraft_nonce' );
 
 		Blogcraft_Logger::clear();
 
@@ -432,11 +444,17 @@ class Blogcraft_Activity {
 	 * @return void
 	 */
 	public static function handle_retry() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::RETRY_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::RETRY_ACTION, '_blogcraft_nonce' );
+
+		$job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 
 		if ( $job_id > 0 && Blogcraft_Queue::requeue( $job_id ) ) {
 			self::back( true, __( 'Queued again. It will run on the next step.', 'dicecodes-ai-blog-writer' ) );

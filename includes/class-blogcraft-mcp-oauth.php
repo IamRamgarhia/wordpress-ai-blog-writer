@@ -473,9 +473,15 @@ class Blogcraft_Mcp_Oauth {
 	 * @return void
 	 */
 	public static function handle_approval() {
-		// Read here, verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( 'blogcraft_oauth_approve', $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( 'blogcraft_oauth_approve', '_blogcraft_nonce' );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to connect apps to this site.', 'dicecodes-ai-blog-writer' ) );

@@ -74,7 +74,7 @@ class Blogcraft_Nav {
 	private static function current() {
 		// Reading which tab to highlight is not a state change, so it needs no
 		// nonce; the value is only ever compared against a known list.
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: which screen is open, so the tab for it can be marked current.
 
 		return $page;
 	}

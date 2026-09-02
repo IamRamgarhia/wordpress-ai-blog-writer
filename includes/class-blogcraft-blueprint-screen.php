@@ -359,9 +359,11 @@ class Blogcraft_Blueprint_Screen {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::SAVE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
@@ -373,11 +375,11 @@ class Blogcraft_Blueprint_Screen {
 		// Reading the site's own posts and describing them. It answers
 		// in blueprint field names, and the script puts them into the
 		// form the same way a shape does.
-		if ( isset( $_POST['learn'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['learn'] ) ) {
 			wp_send_json_success( Blogcraft_Learn::suggest() );
 		}
 
-		$shape = isset( $_POST['shape'] ) ? sanitize_key( wp_unslash( $_POST['shape'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$shape = isset( $_POST['shape'] ) ? sanitize_key( wp_unslash( $_POST['shape'] ) ) : '';
 
 		if ( '' !== $shape ) {
 			$all    = Blogcraft_Archetypes::all();
@@ -395,7 +397,7 @@ class Blogcraft_Blueprint_Screen {
 			);
 		}
 
-		$url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : '';
 
 		if ( '' === $url ) {
 			wp_send_json_error( array( 'message' => __( 'Give it a web address to read.', 'dicecodes-ai-blog-writer' ) ), 400 );
@@ -1176,11 +1178,17 @@ class Blogcraft_Blueprint_Screen {
 	 * @return void
 	 */
 	public static function handle_save() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::SAVE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$raw = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is sanitised by type in from_request() and Blogcraft_Blueprint::normalise().
+		check_admin_referer( self::SAVE_ACTION, '_blogcraft_nonce' );
+
+		$raw = map_deep( wp_unslash( $_POST ), 'sanitize_textarea_field' );
 
 		$current = Blogcraft_Blueprint::get();
 		$saved   = array_merge( $current, self::from_request( $raw ) );
@@ -1200,13 +1208,15 @@ class Blogcraft_Blueprint_Screen {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::SAVE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$raw = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is sanitised by type in from_request() and Blogcraft_Blueprint::normalise().
+		$raw = map_deep( wp_unslash( $_POST ), 'sanitize_textarea_field' );
 
 		$blueprint = Blogcraft_Blueprint::normalise(
 			array_merge( Blogcraft_Blueprint::get(), self::from_request( $raw ) )

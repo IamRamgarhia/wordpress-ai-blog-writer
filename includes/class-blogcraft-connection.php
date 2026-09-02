@@ -95,9 +95,11 @@ class Blogcraft_Connection {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::SAVE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
@@ -109,9 +111,9 @@ class Blogcraft_Connection {
 		// Read from the form rather than from storage: the reader may be
 		// typing a key right now and have saved nothing yet, which is exactly
 		// the moment they want to see the list.
-		$type = isset( $_POST['provider_type'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$key  = isset( $_POST['api_key'] ) ? trim( (string) wp_unslash( $_POST['api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		$base = isset( $_POST['base_url'] ) ? esc_url_raw( trim( (string) wp_unslash( $_POST['base_url'] ) ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- esc_url_raw is the sanitiser for a URL.
+		$type = isset( $_POST['provider_type'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_type'] ) ) : '';
+		$key  = isset( $_POST['api_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : '';
+		$base = isset( $_POST['base_url'] ) ? esc_url_raw( trim( (string) wp_unslash( $_POST['base_url'] ) ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw is the sanitiser for a URL.
 
 		if ( '' === $key ) {
 			$owner = (string) Blogcraft_Settings::get( 'provider_key_owner' );
@@ -249,9 +251,11 @@ class Blogcraft_Connection {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::SAVE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::SAVE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
@@ -490,7 +494,7 @@ class Blogcraft_Connection {
 		// wizard is a one-way door: it asks somebody to set up a provider and
 		// then leaves them to find their own way back to a page they had been
 		// looking at for ten seconds.
-		$from = isset( $_GET['from'] ) ? sanitize_key( wp_unslash( $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$from = isset( $_GET['from'] ) ? sanitize_key( wp_unslash( $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read only: decides whether to offer a way back to the introduction, and nothing else.
 
 		if ( 'welcome' === $from ) {
 			printf(
@@ -1155,11 +1159,17 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_choose_path() {
-		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::PATH_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$path = isset( $_POST['path'] ) ? sanitize_key( wp_unslash( $_POST['path'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		check_admin_referer( self::PATH_ACTION, '_blogcraft_nonce' );
+
+		$path = isset( $_POST['path'] ) ? sanitize_key( wp_unslash( $_POST['path'] ) ) : '';
 
 		if ( in_array( $path, array( 'api', 'client' ), true ) ) {
 			Blogcraft_Settings::set( 'setup_path', $path );
@@ -1262,9 +1272,15 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_saved_provider() {
-		// Read here, verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::SAVED_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::SAVED_ACTION, '_blogcraft_nonce' );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to change providers on this site.', 'dicecodes-ai-blog-writer' ) );
@@ -1383,9 +1399,15 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_mcp_test_seen() {
-		// Read here, verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::MCP_TEST_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::MCP_TEST_ACTION, '_blogcraft_nonce' );
 
 		delete_user_meta( get_current_user_id(), self::MCP_TEST_META );
 
@@ -1705,11 +1727,17 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_mcp_issue() {
-		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::MCP_ISSUE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		check_admin_referer( self::MCP_ISSUE_ACTION, '_blogcraft_nonce' );
+
+		$label = isset( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
 
 		// Pressing this button is not an ambiguous statement of intent, so it
 		// is also the switch. Requiring a tick, a save, and then a second
@@ -1745,11 +1773,17 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_mcp_revoke() {
-		// Read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::MCP_REVOKE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$fingerprint = isset( $_POST['fingerprint'] ) ? sanitize_text_field( wp_unslash( $_POST['fingerprint'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified above.
+		check_admin_referer( self::MCP_REVOKE_ACTION, '_blogcraft_nonce' );
+
+		$fingerprint = isset( $_POST['fingerprint'] ) ? sanitize_text_field( wp_unslash( $_POST['fingerprint'] ) ) : '';
 
 		if ( '' !== $fingerprint ) {
 			Blogcraft_Mcp_Auth::revoke( $fingerprint );
@@ -2396,9 +2430,15 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_save() {
-		// The nonce is read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::SAVE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::SAVE_ACTION, '_blogcraft_nonce' );
 
 		list( $was_usable, $submitted_key, $failed ) = self::apply_submitted_settings();
 
@@ -2427,6 +2467,12 @@ class Blogcraft_Connection {
 	 *               alone), both needed for the save notice.
 	 */
 	private static function apply_submitted_settings() {
+		// Checked here as well as in the caller. A private helper that
+		// reads $_POST on the strength of a check made somewhere else is
+		// one refactor away from reading it on no check at all, and
+		// nothing at this line says which.
+		check_admin_referer( self::SAVE_ACTION, '_blogcraft_nonce' );
+
 		$was_usable = Blogcraft_Provider_Registry::is_configured();
 
 		$plain = array_merge(
@@ -2438,22 +2484,22 @@ class Blogcraft_Connection {
 		);
 
 		foreach ( $plain as $key ) {
-			if ( isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( isset( $_POST[ $key ] ) ) {
 				// Blogcraft_Settings::set() sanitises per the schema type for this key.
-				Blogcraft_Settings::set( $key, wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+				Blogcraft_Settings::set( $key, sanitize_textarea_field( wp_unslash( $_POST[ $key ] ) ) );
 			}
 		}
 
-		if ( isset( $_POST['monthly_token_cap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'monthly_token_cap', (int) $_POST['monthly_token_cap'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['monthly_token_cap'] ) ) {
+			Blogcraft_Settings::set( 'monthly_token_cap', (int) $_POST['monthly_token_cap'] );
 		}
 
-		if ( isset( $_POST['monthly_image_cap'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'monthly_image_cap', max( 0, (int) $_POST['monthly_image_cap'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['monthly_image_cap'] ) ) {
+			Blogcraft_Settings::set( 'monthly_image_cap', max( 0, (int) $_POST['monthly_image_cap'] ) );
 		}
 
-		if ( isset( $_POST['autopilot_per_day'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'autopilot_per_day', (int) $_POST['autopilot_per_day'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['autopilot_per_day'] ) ) {
+			Blogcraft_Settings::set( 'autopilot_per_day', (int) $_POST['autopilot_per_day'] );
 		}
 
 		// Both are plain number inputs rendered by number_row() alongside the
@@ -2461,16 +2507,16 @@ class Blogcraft_Connection {
 		// the value the user typed was shown back to them as "Settings saved."
 		// and then thrown away. The threshold in particular is load-bearing:
 		// it is what "held for review instead of published" means.
-		if ( isset( $_POST['quality_threshold'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'quality_threshold', max( 0, min( 100, (int) $_POST['quality_threshold'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['quality_threshold'] ) ) {
+			Blogcraft_Settings::set( 'quality_threshold', max( 0, min( 100, (int) $_POST['quality_threshold'] ) ) );
 		}
 
-		if ( isset( $_POST['refresh_after_days'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'refresh_after_days', max( 1, (int) $_POST['refresh_after_days'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['refresh_after_days'] ) ) {
+			Blogcraft_Settings::set( 'refresh_after_days', max( 1, (int) $_POST['refresh_after_days'] ) );
 		}
 
-		if ( isset( $_POST['autopilot_hour'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			Blogcraft_Settings::set( 'autopilot_hour', max( 0, min( 23, (int) $_POST['autopilot_hour'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['autopilot_hour'] ) ) {
+			Blogcraft_Settings::set( 'autopilot_hour', max( 0, min( 23, (int) $_POST['autopilot_hour'] ) ) );
 		}
 
 		// Checkboxes post an array, and post nothing at all when none are ticked.
@@ -2478,8 +2524,8 @@ class Blogcraft_Connection {
 		// writing, which is exactly what unticking every box asks for.
 		$days = array();
 
-		if ( isset( $_POST['autopilot_days'] ) && is_array( $_POST['autopilot_days'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			foreach ( wp_unslash( $_POST['autopilot_days'] ) as $day ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['autopilot_days'] ) && is_array( $_POST['autopilot_days'] ) ) {
+			foreach ( map_deep( wp_unslash( $_POST['autopilot_days'] ), 'sanitize_key' ) as $day ) {
 				$day = (int) $day;
 
 				if ( $day >= 0 && $day <= 6 ) {
@@ -2493,15 +2539,15 @@ class Blogcraft_Connection {
 
 		// An unchecked checkbox posts nothing, so absence means false.
 		foreach ( array_keys( Blogcraft_Research::free_sources() ) as $toggle ) {
-			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) );
 		}
 
 		foreach ( array_keys( self::picture_toggles() ) as $toggle ) {
-			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) );
 		}
 
 		foreach ( array_keys( self::toggle_fields() ) as $toggle ) {
-			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			Blogcraft_Settings::set( $toggle, isset( $_POST[ $toggle ] ) );
 		}
 
 		// An empty key field means "leave unchanged": the form renders a mask
@@ -2513,13 +2559,13 @@ class Blogcraft_Connection {
 		$failed = array();
 
 		foreach ( self::secret_fields() as $secret ) {
-			if ( isset( $_POST[ 'clear_' . $secret ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( isset( $_POST[ 'clear_' . $secret ] ) ) {
 				Blogcraft_Settings::delete( $secret );
 
 				continue;
 			}
 
-			$value = isset( $_POST[ $secret ] ) ? trim( (string) wp_unslash( $_POST[ $secret ] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+			$value = isset( $_POST[ $secret ] ) ? trim( sanitize_text_field( wp_unslash( $_POST[ $secret ] ) ) ) : '';
 
 			if ( '' === $value ) {
 				continue;
@@ -2541,7 +2587,7 @@ class Blogcraft_Connection {
 			}
 		}
 
-		$submitted_key = isset( $_POST['provider_api_key'] ) ? trim( (string) wp_unslash( $_POST['provider_api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		$submitted_key = isset( $_POST['provider_api_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['provider_api_key'] ) ) ) : '';
 
 		return array( $was_usable, $submitted_key, $failed );
 	}
@@ -2620,9 +2666,15 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	public static function handle_test() {
-		// The nonce is read here and verified on the next line by Blogcraft_Request, which PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::TEST_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::TEST_ACTION, '_blogcraft_nonce' );
 
 		// Testing with nothing filled in spends a round trip to be told what we
 		// already know, and returns the provider's own wording for it, which

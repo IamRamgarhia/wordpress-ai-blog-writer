@@ -16,7 +16,7 @@ Dicecodes AI Blog Writer writes blog posts for your WordPress site using an AI p
 
 Every feature is included. Nothing is locked, nothing expires, and there are no credits or quotas. Your only cost is whatever your chosen provider charges, and several offer free tiers.
 
-Full documentation, including a setup walkthrough and an explanation of every check it scores: https://dicecodes.com/ai-blog-writer/
+Full documentation, including a setup walkthrough and an explanation of every check it scores: https://dicecodes.com/
 
 **How a post is written**
 
@@ -109,7 +109,7 @@ Every one of these starts switched off, including the two that need no key. Noth
 **Image providers** — off until you switch pictures on, which is how you choose one. A short description of the wanted picture is then sent so an image can be found or generated. When "Describe the picture first" is on, that description is written by the AI provider above from the post's title and subject, and no post content is sent to the image service itself.
 
 * Pollinations (image.pollinations.ai) — https://pollinations.ai (this service publishes no terms or privacy page; it is offered because it needs no account, and it is off until you choose it)
-* fal.ai — https://fal.ai/terms and https://fal.ai/privacy
+* fal.ai (fal.run) — this service refuses automated requests, so its terms and privacy pages cannot be linked here; both are reachable from fal.ai itself, and it is off until you choose it
 * OpenAI — https://openai.com/policies/terms-of-use and https://openai.com/policies/privacy-policy
 * Google Gemini — https://ai.google.dev/gemini-api/terms and https://policies.google.com/privacy
 * xAI (Grok) — https://x.ai/legal/terms-of-service and https://x.ai/legal/privacy-policy
@@ -130,7 +130,7 @@ The plugin may also fetch any URL you explicitly add to its research list, to re
 
 = Where is the documentation? =
 
-Two places. The plugin ships its own under Help, which is always accurate to the version you have installed. The longer guides and walkthroughs are at https://dicecodes.com/ai-blog-writer/
+Two places. The plugin ships its own under Help, which is always accurate to the version you have installed. The longer guides and walkthroughs are at https://dicecodes.com/
 = Do I need to pay for anything? =
 
 The plugin is free and complete, and takes no cut of anything. The provider list is grouped by what it costs, free first, so the question is answered before you pick rather than after.

@@ -80,13 +80,17 @@ class Blogcraft_Notices {
 	 * @return void
 	 */
 	public static function handle_dismiss() {
-		// The nonce value itself must be read before it can be verified below;
-		// verification is centralised in Blogcraft_Request rather than inline,
-		// so PHPCS cannot statically see that it happens.
-		$nonce  = isset( $_REQUEST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$notice = isset( $_REQUEST['notice'] ) ? sanitize_key( wp_unslash( $_REQUEST['notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		Blogcraft_Request::verify_or_die( self::DISMISS_ACTION, $nonce );
+		check_admin_referer( self::DISMISS_ACTION, '_blogcraft_nonce' );
+
+		$notice = isset( $_REQUEST['notice'] ) ? sanitize_key( wp_unslash( $_REQUEST['notice'] ) ) : '';
 
 		if ( '' !== $notice ) {
 			self::dismiss( $notice, get_current_user_id() );

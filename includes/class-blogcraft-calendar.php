@@ -316,12 +316,18 @@ class Blogcraft_Calendar {
 	 * @return void
 	 */
 	public static function handle_move() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::MOVE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$index = isset( $_POST['index'] ) ? absint( $_POST['index'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$verb  = isset( $_POST['verb'] ) ? sanitize_key( wp_unslash( $_POST['verb'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::MOVE_ACTION, '_blogcraft_nonce' );
+
+		$index = isset( $_POST['index'] ) ? absint( $_POST['index'] ) : 0;
+		$verb  = isset( $_POST['verb'] ) ? sanitize_key( wp_unslash( $_POST['verb'] ) ) : '';
 
 		$topics = Blogcraft_Autopilot::topics();
 

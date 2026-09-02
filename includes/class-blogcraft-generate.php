@@ -177,13 +177,15 @@ class Blogcraft_Generate {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::QUEUE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$raw = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is sanitised by type in Blogcraft_Blueprint::normalise().
+		$raw = map_deep( wp_unslash( $_POST ), 'sanitize_textarea_field' );
 
 		$blueprint = Blogcraft_Blueprint::with_overrides(
 			Blogcraft_Blueprint::get(),
@@ -1024,9 +1026,11 @@ class Blogcraft_Generate {
 			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_send_json_error( array( 'message' => __( 'Not allowed.', 'dicecodes-ai-blog-writer' ) ), 403 );
+		}
 
-		if ( ! Blogcraft_Request::verify( self::QUEUE_ACTION, $nonce ) ) {
+		if ( ! check_ajax_referer( self::QUEUE_ACTION, '_blogcraft_nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'That form has expired. Reload the page.', 'dicecodes-ai-blog-writer' ) ), 403 );
 		}
 
@@ -1035,7 +1039,7 @@ class Blogcraft_Generate {
 		// tells nobody what to do about it.
 		Blogcraft_Request::require_provider();
 
-		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : '';
 
 		if ( '' === trim( $topic ) ) {
 			wp_send_json_error( array( 'message' => __( 'Write a topic first.', 'dicecodes-ai-blog-writer' ) ), 400 );
@@ -1790,16 +1794,22 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function handle_brief() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::QUEUE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::QUEUE_ACTION, '_blogcraft_nonce' );
 
 		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
 			wp_die( esc_html__( 'You are not allowed to write posts here.', 'dicecodes-ai-blog-writer' ) );
 		}
 
-		// Verified above by Blogcraft_Request::verify_or_die().
-		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// Verified above by check_admin_referer().
+		$topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : '';
 
 		if ( '' === $topic ) {
 			self::back( false, __( 'Please enter a topic.', 'dicecodes-ai-blog-writer' ) );
@@ -1808,10 +1818,10 @@ class Blogcraft_Generate {
 		Blogcraft_Brief::save(
 			array(
 				'topic'     => $topic,
-				'angle'     => isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
-				'evidence'  => isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
-				'overrides' => self::overrides_from( wp_unslash( $_POST ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
-				'placement' => self::placement_from( $_POST ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is cast or sanitised inside placement_from().
+				'angle'     => isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : '',
+				'evidence'  => isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : '',
+				'overrides' => self::overrides_from( map_deep( wp_unslash( $_POST ), 'sanitize_textarea_field' ) ),
+				'placement' => self::placement_from( map_deep( wp_unslash( $_POST ), 'sanitize_text_field' ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- every field is cast or sanitised inside placement_from().
 			)
 		);
 
@@ -1827,13 +1837,19 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function handle_queue() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow statically.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::QUEUE_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		// Verified above by Blogcraft_Request::verify_or_die(), which PHPCS cannot follow statically.
-		$topic  = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : 'draft'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::QUEUE_ACTION, '_blogcraft_nonce' );
+
+		// Verified above by check_admin_referer().
+		$topic  = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : '';
+		$status = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : 'draft';
 
 		if ( '' === $topic ) {
 			self::back( false, __( 'Please enter a topic.', 'dicecodes-ai-blog-writer' ) );
@@ -1842,14 +1858,14 @@ class Blogcraft_Generate {
 		// Ticked inside the panel that asks what a post will include, so this
 		// is the one place it can be switched off from. Settings can turn it
 		// back on.
-		if ( isset( $_POST['stop_asking'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['stop_asking'] ) ) {
 			Blogcraft_Settings::set( 'ask_before_writing', false );
 		}
 
-		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$evidence     = isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$overrides    = self::overrides_from( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- each field is sanitised by type in Blogcraft_Blueprint::normalise().
-		$placement    = self::placement_from( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- every field is cast or sanitised inside placement_from().
+		$instructions = isset( $_POST['instructions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['instructions'] ) ) : '';
+		$evidence     = isset( $_POST['evidence'] ) ? sanitize_textarea_field( wp_unslash( $_POST['evidence'] ) ) : '';
+		$overrides    = self::overrides_from( map_deep( wp_unslash( $_POST ), 'sanitize_textarea_field' ) );
+		$placement    = self::placement_from( map_deep( wp_unslash( $_POST ), 'sanitize_text_field' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- every field is cast or sanitised inside placement_from().
 		// Written by hand means somebody is sitting there waiting, so the draft
 		// is shown to them before it becomes a post. Autopilot passes false —
 		// unattended writing has the quality gate and the review queue instead.
@@ -1898,8 +1914,15 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function handle_run_now() {
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::RUN_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::RUN_ACTION, '_blogcraft_nonce' );
 
 		Blogcraft_Queue::reclaim_stale();
 
@@ -1931,10 +1954,17 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function handle_bulk() {
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::BULK_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$raw     = isset( $_POST['topics'] ) ? sanitize_textarea_field( wp_unslash( $_POST['topics'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::BULK_ACTION, '_blogcraft_nonce' );
+
+		$raw     = isset( $_POST['topics'] ) ? sanitize_textarea_field( wp_unslash( $_POST['topics'] ) ) : '';
 		$queued  = 0;
 		$skipped = 0;
 
@@ -1974,8 +2004,15 @@ class Blogcraft_Generate {
 	 * @return void
 	 */
 	public static function handle_rollback() {
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::ROLLBACK_ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		check_admin_referer( self::ROLLBACK_ACTION, '_blogcraft_nonce' );
 
 		// The generated-by-Blogcraft meta is the guard that keeps this away from
 		// anything a human wrote.

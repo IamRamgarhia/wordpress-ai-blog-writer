@@ -86,7 +86,7 @@ class Blogcraft_Docs {
 	 * @return string
 	 */
 	public static function site_url( $anchor = '' ) {
-		$base = 'https://dicecodes.com/ai-blog-writer/';
+		$base = 'https://dicecodes.com/';
 
 		return ( '' === $anchor ) ? $base : $base . '#' . sanitize_title( $anchor );
 	}

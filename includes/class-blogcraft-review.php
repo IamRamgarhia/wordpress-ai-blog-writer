@@ -304,12 +304,18 @@ class Blogcraft_Review {
 	 * @return void
 	 */
 	public static function handle_action() {
-		// Read then verify; Blogcraft_Request performs the check PHPCS cannot follow.
-		$nonce = isset( $_POST['_blogcraft_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_blogcraft_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Blogcraft_Request::verify_or_die( self::ACTION, $nonce );
+		if ( ! current_user_can( Blogcraft_Capabilities::MANAGE ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to perform this action.', 'dicecodes-ai-blog-writer' ),
+				esc_html__( 'Permission denied', 'dicecodes-ai-blog-writer' ),
+				array( 'response' => 403 )
+			);
+		}
 
-		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$verb    = isset( $_POST['verb'] ) ? sanitize_key( wp_unslash( $_POST['verb'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( self::ACTION, '_blogcraft_nonce' );
+
+		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		$verb    = isset( $_POST['verb'] ) ? sanitize_key( wp_unslash( $_POST['verb'] ) ) : '';
 		$post    = $post_id ? get_post( $post_id ) : null;
 
 		// Only ever act on a post this plugin generated and is holding.
