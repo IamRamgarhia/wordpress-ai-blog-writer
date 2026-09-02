@@ -78,6 +78,73 @@ class Blogcraft_Mcp_Auth {
 	}
 
 	/**
+	 * The connections this site has, one row each.
+	 *
+	 * An app that signed itself in holds two tokens — one to call with
+	 * and one to renew with — and they are one connection, not two. A
+	 * token typed in by hand is its own connection, because nothing
+	 * else knows about it.
+	 *
+	 * @return array Id => label, how, created, used, fingerprints.
+	 */
+	public static function connections() {
+		$out = array();
+
+		foreach ( self::all() as $fingerprint => $record ) {
+			$client = isset( $record['client'] ) ? (string) $record['client'] : '';
+			$id     = ( '' === $client ) ? 'token:' . $fingerprint : 'app:' . $client;
+
+			if ( ! isset( $out[ $id ] ) ) {
+				$out[ $id ] = array(
+					'label'        => trim( (string) $record['label'] ),
+					'signed_in'    => ( '' !== $client ),
+					'created'      => (int) $record['created'],
+					'used'         => 0,
+					'fingerprints' => array(),
+				);
+			}
+
+			$out[ $id ]['fingerprints'][] = $fingerprint;
+
+			// The earliest of the pair is when the connection began, and
+			// the latest use of either is when it was last heard from.
+			$out[ $id ]['created'] = min( $out[ $id ]['created'], (int) $record['created'] );
+			$out[ $id ]['used']    = max( $out[ $id ]['used'], (int) $record['used'] );
+		}
+
+		return $out;
+	}
+
+	/**
+	 * End one connection, and every credential behind it.
+	 *
+	 * Revoking one of an app's two tokens and leaving the other is how a
+	 * disconnection appears to work and then does not: the app renews
+	 * itself and carries on.
+	 *
+	 * @param string $id A connection id from connections().
+	 * @return bool Whether anything was ended.
+	 */
+	public static function disconnect( $id ) {
+		$connections = self::connections();
+		$id          = (string) $id;
+
+		if ( ! isset( $connections[ $id ] ) ) {
+			return false;
+		}
+
+		$tokens = self::all();
+
+		foreach ( $connections[ $id ]['fingerprints'] as $fingerprint ) {
+			unset( $tokens[ $fingerprint ] );
+		}
+
+		update_option( self::OPTION, $tokens, false );
+
+		return true;
+	}
+
+	/**
 	 * Every issued token, without the secrets.
 	 *
 	 * @return array Fingerprint => record.

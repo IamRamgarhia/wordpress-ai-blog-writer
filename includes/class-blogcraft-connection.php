@@ -1503,13 +1503,17 @@ class Blogcraft_Connection {
 			esc_html__( 'Which app are you using?', 'dicecodes-ai-blog-writer' )
 		);
 
+		// A list rather than a row of buttons: four of them ran the width
+		// of the card and read as four things to do rather than one
+		// question with four answers.
 		echo '<div class="bc-app-pick" role="tablist" aria-labelledby="bc-app-ask">';
 
 		foreach ( $guides as $slug => $guide ) {
 			printf(
-				'<button type="button" class="button bc-app-tab" role="tab" id="bc-app-tab-%1$s" aria-controls="bc-app-panel-%1$s" aria-selected="false">%2$s</button>',
+				'<button type="button" class="bc-app-tab" role="tab" id="bc-app-tab-%1$s" aria-controls="bc-app-panel-%1$s" aria-selected="false"><span class="bc-app-name">%2$s</span><span class="bc-app-needs">%3$s</span></button>',
 				esc_attr( $slug ),
-				esc_html( $guide['name'] )
+				esc_html( $guide['name'] ),
+				esc_html( $guide['needs'] )
 			);
 		}
 
@@ -1597,7 +1601,7 @@ class Blogcraft_Connection {
 	 * @return void
 	 */
 	private static function render_mcp_tokens() {
-		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Connection tokens', 'dicecodes-ai-blog-writer' ) );
+		printf( '<h3 class="bc-client-heading">%s</h3>', esc_html__( 'Connected apps', 'dicecodes-ai-blog-writer' ) );
 
 		// Shown exactly once, and never from the address bar: a secret in a
 		// URL is written into every server log and the browser's history,
@@ -1617,47 +1621,62 @@ class Blogcraft_Connection {
 			);
 		}
 
-		$tokens = Blogcraft_Mcp_Auth::all();
+		$connections = Blogcraft_Mcp_Auth::connections();
 
-		if ( empty( $tokens ) ) {
+		if ( empty( $connections ) ) {
 			printf(
 				'<p class="bc-hint">%s</p>',
-				esc_html__( 'No tokens yet. Issue one and paste it into your client alongside the address above.', 'dicecodes-ai-blog-writer' )
+				esc_html__( 'Nothing is connected yet. Paste the address above into your app, or issue a token for one that cannot sign in.', 'dicecodes-ai-blog-writer' )
 			);
 		} else {
 			echo '<table class="widefat striped bc-token-table"><thead><tr>';
-			printf( '<th>%s</th>', esc_html__( 'Name', 'dicecodes-ai-blog-writer' ) );
-			printf( '<th>%s</th>', esc_html__( 'Created', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'App', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'How', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Connected', 'dicecodes-ai-blog-writer' ) );
 			printf( '<th>%s</th>', esc_html__( 'Last used', 'dicecodes-ai-blog-writer' ) );
-			printf( '<th>%s</th>', esc_html__( 'Revoke', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Disconnect', 'dicecodes-ai-blog-writer' ) );
 			echo '</tr></thead><tbody>';
 
-			foreach ( $tokens as $fingerprint => $record ) {
-				$label = trim( (string) $record['label'] );
+			foreach ( $connections as $id => $one ) {
+				$label = ( '' === $one['label'] ) ? __( 'Unnamed', 'dicecodes-ai-blog-writer' ) : $one['label'];
 
 				echo '<tr>';
-				printf( '<td>%s</td>', esc_html( '' === $label ? __( 'Unnamed', 'dicecodes-ai-blog-writer' ) : $label ) );
-				printf(
-					'<td>%s</td>',
-					esc_html( wp_date( get_option( 'date_format' ), (int) $record['created'] ) )
-				);
+				printf( '<td><strong>%s</strong></td>', esc_html( $label ) );
+
+				// Which way it got in. Somebody deciding whether to end a
+				// connection wants to know whether ending it means the app has
+				// to sign in again or somebody has to be handed a new token.
 				printf(
 					'<td>%s</td>',
 					esc_html(
-						empty( $record['used'] )
+						$one['signed_in']
+							? __( 'Signed in', 'dicecodes-ai-blog-writer' )
+							: __( 'Token', 'dicecodes-ai-blog-writer' )
+					)
+				);
+
+				printf(
+					'<td>%s</td>',
+					esc_html( wp_date( get_option( 'date_format' ), (int) $one['created'] ) )
+				);
+
+				printf(
+					'<td>%s</td>',
+					esc_html(
+						empty( $one['used'] )
 							? __( 'Never', 'dicecodes-ai-blog-writer' )
-							: wp_date( get_option( 'date_format' ), (int) $record['used'] )
+							: wp_date( get_option( 'date_format' ), (int) $one['used'] )
 					)
 				);
 
 				echo '<td>';
 				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 				echo '<input type="hidden" name="action" value="blogcraft_mcp_revoke" />';
-				printf( '<input type="hidden" name="fingerprint" value="%s" />', esc_attr( $fingerprint ) );
+				printf( '<input type="hidden" name="connection" value="%s" />', esc_attr( $id ) );
 				Blogcraft_Request::nonce_field( self::MCP_REVOKE_ACTION );
 				printf(
 					'<button type="submit" class="button-link delete">%s</button>',
-					esc_html__( 'Revoke', 'dicecodes-ai-blog-writer' )
+					esc_html__( 'Disconnect', 'dicecodes-ai-blog-writer' )
 				);
 				echo '</form>';
 				echo '</td></tr>';
@@ -1665,7 +1684,6 @@ class Blogcraft_Connection {
 
 			echo '</tbody></table>';
 		}
-
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bc-token-issue">';
 		echo '<input type="hidden" name="action" value="blogcraft_mcp_issue" />';
 		Blogcraft_Request::nonce_field( self::MCP_ISSUE_ACTION );
@@ -1783,10 +1801,13 @@ class Blogcraft_Connection {
 
 		check_admin_referer( self::MCP_REVOKE_ACTION, '_blogcraft_nonce' );
 
-		$fingerprint = isset( $_POST['fingerprint'] ) ? sanitize_text_field( wp_unslash( $_POST['fingerprint'] ) ) : '';
+		// A connection, not a credential. An app that signed itself in holds
+		// two tokens, and taking away one of them is a disconnection that
+		// appears to work and then does not: it renews itself and carries on.
+		$connection = isset( $_POST['connection'] ) ? sanitize_text_field( wp_unslash( $_POST['connection'] ) ) : '';
 
-		if ( '' !== $fingerprint ) {
-			Blogcraft_Mcp_Auth::revoke( $fingerprint );
+		if ( '' !== $connection ) {
+			Blogcraft_Mcp_Auth::disconnect( $connection );
 		}
 
 		wp_safe_redirect( self::settings_url( 'bc-card-clients' ) );

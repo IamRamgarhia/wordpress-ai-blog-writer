@@ -2337,17 +2337,57 @@ body[class*="page_blogcraft"] #wpcontent {
    the other three only make you wonder which list you are meant to be
    following. */
 
+/* A list, not a row. Four buttons across ran the width of the card and
+   read as four things to do rather than one question with four answers. */
 .bc-app-pick {
 	display: flex;
-	flex-wrap: wrap;
-	gap: var(--bc-s2);
+	flex-direction: column;
+	gap: 1px;
 	margin-bottom: var(--bc-s3);
+	max-width: 34rem;
+}
+
+.bc-app-tab {
+	align-items: baseline;
+	background: var(--bc-surface);
+	border: 1px solid var(--bc-line);
+	cursor: pointer;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--bc-s1) var(--bc-s2);
+	padding: var(--bc-s2) var(--bc-s3);
+	text-align: left;
+	width: 100%;
+}
+
+.bc-app-tab:first-child {
+	border-radius: var(--bc-r-md) var(--bc-r-md) 0 0;
+}
+
+.bc-app-tab:last-child {
+	border-radius: 0 0 var(--bc-r-md) var(--bc-r-md);
+}
+
+.bc-app-tab:hover {
+	border-color: var(--bc-accent);
+}
+
+.bc-app-name {
+	font-weight: 600;
+}
+
+.bc-app-needs {
+	color: var(--bc-muted);
+	font-size: var(--bc-t-sm);
 }
 
 .bc-app-tab.is-chosen {
-	background: var(--bc-accent);
+	background: var(--bc-accent-soft);
 	border-color: var(--bc-accent);
-	color: #fff;
+}
+
+.bc-app-tab.is-chosen .bc-app-name {
+	color: var(--bc-accent);
 }
 
 .bc-app-steps {
