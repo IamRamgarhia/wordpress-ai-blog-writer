@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.97.0
+Stable tag: 0.98.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,9 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.98.0 =
+* Fixed properly: the old Help address still answered "Sorry, you are not allowed to access this page". The fix in 0.93.0 registered the page and then removed it from the menu, which also removes the entry WordPress reads to work out who may open it — so the page stayed refused, and the test written for it checked the source code rather than opening the page. It is registered under a hidden parent now, and the test asks the function that does the refusing
+
 = 0.97.0 =
 * How it writes marks every section nobody has been into yet with a quiet "default", so you can see at a glance which parts of the brief have been answered and which are still the ones the plugin shipped with. Keeping a default is a decision too — this only answers "which of these have I not looked at", which otherwise meant opening all seven and remembering what the defaults were
 * A site where none of it has been answered is told so once, at the top, with the reason: every post is written to this brief, and it is the difference between a post that sounds like your blog and one that sounds like every other AI post
@@ -186,12 +189,5 @@ everything is here, oldest at the bottom.
 = 0.95.0 =
 * Fixed: "What you will get" listed a featured image on every site, whether or not the picture service was switched on. It was reading the blueprint asking for a picture and never the setting that decides whether one can be fetched — so the one panel whose whole job is to say what the post will be was wrong about the most visible thing on it. It now says "No featured image, pictures are switched off" instead of quietly promising one
 * The confirmation before writing ends with a line saying what the post will actually come out as: roughly how long, whether it has sources to read or is writing from memory, whether there will be pictures, and where it lands. Three of those four are settings on other screens, and nobody should have to remember whether they switched pictures on before agreeing to write a post
-
-= 0.94.0 =
-* Fixed: a post published by hand got none of the finishing. The featured image, the pictures under each heading, the links from older posts, the search title and description, and the ping to the search engines all happened inside the call that published it — so following this plugin's own advice, reading the draft and pressing Publish yourself, produced a barer post than asking your app to publish. It now finishes whichever way it goes live, and never twice
-* The confirmation before writing is quicker to read: one line instead of a paragraph arguing for itself, two headings said rather than shouted, and the ten things a post can include laid out in two columns so the buttons are no longer below the fold
-* That panel keeps the keyboard inside it now. Tab used to walk out into the form behind, which is still there and still fillable, so it was possible to type into a screen you could not see. Closing it puts you back where you were
-* Fixed: on a phone, the panel's "Back to the brief" button folded into four stacked words. Both buttons take the full width there
-* Note: pictures still need switching on under Settings before anything can add one, whichever way a post is published
 Older releases are listed in changelog.txt, which ships with the plugin.
 

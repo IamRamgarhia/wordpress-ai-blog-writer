@@ -3,6 +3,9 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.98.0 =
+* Fixed properly: the old Help address still answered "Sorry, you are not allowed to access this page". The fix in 0.93.0 registered the page and then removed it from the menu, which also removes the entry WordPress reads to work out who may open it — so the page stayed refused, and the test written for it checked the source code rather than opening the page. It is registered under a hidden parent now, and the test asks the function that does the refusing
+
 = 0.97.0 =
 * How it writes marks every section nobody has been into yet with a quiet "default", so you can see at a glance which parts of the brief have been answered and which are still the ones the plugin shipped with. Keeping a default is a decision too — this only answers "which of these have I not looked at", which otherwise meant opening all seven and remembering what the defaults were
 * A site where none of it has been answered is told so once, at the top, with the reason: every post is written to this brief, and it is the difference between a post that sounds like your blog and one that sounds like every other AI post

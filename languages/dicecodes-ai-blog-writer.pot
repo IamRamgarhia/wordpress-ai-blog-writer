@@ -614,7 +614,7 @@ msgstr ""
 msgid "Back to the brief"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:108
+#: includes/class-blogcraft-docs.php:114
 msgid "Back to the overview"
 msgstr ""
 
@@ -1184,8 +1184,8 @@ msgstr ""
 msgid "Docs"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:68
-#: includes/class-blogcraft-docs.php:69
+#: includes/class-blogcraft-docs.php:76
+#: includes/class-blogcraft-docs.php:77
 msgid "Documentation"
 msgstr ""
 
@@ -1758,7 +1758,7 @@ msgstr ""
 msgid "It has nothing to read but its own memory"
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:94
+#: includes/class-blogcraft-docs.php:100
 msgid "It is one page on the web now, rather than a copy inside the plugin that was always the older of the two. Corrections reach you there without waiting for an update."
 msgstr ""
 
@@ -3019,7 +3019,7 @@ msgstr ""
 msgid "Read that page."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:102
+#: includes/class-blogcraft-docs.php:108
 msgid "Read the documentation"
 msgstr ""
 
@@ -3896,7 +3896,7 @@ msgstr ""
 msgid "The brief every post is written to. Anything shown in monospace is measured on the finished draft, not merely requested."
 msgstr ""
 
-#: includes/class-blogcraft-docs.php:93
+#: includes/class-blogcraft-docs.php:99
 msgid "The documentation moved"
 msgstr ""
 
@@ -4887,7 +4887,7 @@ msgstr ""
 #: includes/class-blogcraft-blueprint-screen.php:273
 #: includes/class-blogcraft-calendar.php:100
 #: includes/class-blogcraft-connection.php:480
-#: includes/class-blogcraft-docs.php:85
+#: includes/class-blogcraft-docs.php:91
 #: includes/class-blogcraft-generate.php:360
 #: includes/class-blogcraft-overview.php:30
 #: includes/class-blogcraft-review.php:130

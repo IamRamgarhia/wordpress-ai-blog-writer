@@ -57,22 +57,28 @@ class Blogcraft_Docs {
 	 * capability failure, so it reads as an account problem rather than as a
 	 * page that moved, and offers nowhere to go.
 	 *
-	 * Registered and then removed from the menu: reachable by address,
-	 * absent from the navigation.
+	 * Registered under a parent that is not a displayed menu, so the entry
+	 * stays where WordPress looks for it and nothing draws a menu item.
+	 *
+	 * The obvious way round — register it properly and then call
+	 * remove_submenu_page — does not work, and fails in the way that looks
+	 * like success: the page hook survives, so it appears registered, but
+	 * user_can_access_admin_page() finds the capability by walking $submenu
+	 * and the entry it needs has just been taken out. WordPress then answers
+	 * the address with "Sorry, you are not allowed to access this page",
+	 * which is the exact message this exists to stop showing.
 	 *
 	 * @return void
 	 */
 	public static function register_moved() {
 		add_submenu_page(
-			Blogcraft_Admin::MENU_SLUG,
+			'options.php',
 			__( 'Documentation', 'dicecodes-ai-blog-writer' ),
 			__( 'Documentation', 'dicecodes-ai-blog-writer' ),
 			Blogcraft_Capabilities::MANAGE,
 			self::OLD_SLUG,
 			array( __CLASS__, 'render_moved' )
 		);
-
-		remove_submenu_page( Blogcraft_Admin::MENU_SLUG, self::OLD_SLUG );
 	}
 
 	/**

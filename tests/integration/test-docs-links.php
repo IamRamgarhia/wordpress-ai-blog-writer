@@ -112,18 +112,62 @@ class Test_Blogcraft_Docs_Links extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'not allowed', $html );
 	}
 
-	public function test_the_old_help_address_is_registered_but_not_in_the_menu() {
-		// Reachable by address, absent from the navigation.
-		$source = (string) file_get_contents( BLOGCRAFT_PATH . 'includes/class-blogcraft-docs.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+	public function test_the_old_help_address_can_actually_be_opened() {
+		// The first version of this test looked for add_submenu_page and
+		// remove_submenu_page in the source and passed while the page
+		// answered "Sorry, you are not allowed to access this page" on a
+		// real site. Removing the entry from the menu takes it out of
+		// $submenu, which is where WordPress looks up the capability, so the
+		// page hook survives and the page is still refused. So this asks the
+		// function that does the refusing.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$this->assertStringContainsString( 'add_submenu_page', $source );
-		$this->assertStringContainsString( 'remove_submenu_page', $source );
+		global $plugin_page, $pagenow;
+
+		Blogcraft_Admin::register_menu();
+		Blogcraft_Docs::register_moved();
+
+		$was_page  = $plugin_page;
+		$was_now   = $pagenow;
+
+		$plugin_page = Blogcraft_Docs::OLD_SLUG;
+		$pagenow     = 'admin.php';
+
+		$allowed = user_can_access_admin_page();
+
+		$plugin_page = $was_page;
+		$pagenow     = $was_now;
+
+		$this->assertTrue( $allowed, 'the old Help address is refused rather than saying where the documentation went' );
+	}
+
+	public function test_the_old_help_address_is_not_in_the_navigation() {
+		global $submenu;
+
+		Blogcraft_Admin::register_menu();
+		Blogcraft_Docs::register_moved();
+
+		$listed = array();
+
+		foreach ( (array) $submenu as $parent => $items ) {
+			foreach ( $items as $item ) {
+				if ( Blogcraft_Docs::OLD_SLUG === $item[2] ) {
+					$listed[] = $parent;
+				}
+			}
+		}
+
+		$this->assertNotContains(
+			Blogcraft_Admin::MENU_SLUG,
+			$listed,
+			'the removed screen is back in the plugin menu'
+		);
 
 		ob_start();
 		Blogcraft_Nav::render();
 		$nav = (string) ob_get_clean();
 
-		$this->assertStringNotContainsString( 'page=blogcraft-help', $nav, 'the old screen is back in the navigation' );
+		$this->assertStringNotContainsString( 'page=blogcraft-help', $nav );
 	}
 
 	public function test_the_section_switcher_says_it_controls_something() {
