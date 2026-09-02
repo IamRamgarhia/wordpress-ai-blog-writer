@@ -3,6 +3,9 @@
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 0.89.0 =
+* The connected apps list says whether each one is Active, Idle or Never used, with a dot beside the word. A date told you when something last called and left you to work out whether that meant it was still working
+
 = 0.88.0 =
 * You can pick the model for one post without changing the setting for every other one. It sits with the category and the publishing date, and offers whatever your site already knows about rather than asking you to type a name from memory
 * The strip at the top of Settings says what is actually in use — which provider and model, what it may read, where pictures come from, how often it writes — rather than only that something is set up

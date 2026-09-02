@@ -33,6 +33,15 @@ class Blogcraft_Mcp_Auth {
 	const BYTES = 32;
 
 	/**
+	 * How recently a connection must have been used to count as live.
+	 *
+	 * Somebody writing a post or two a week should not see their own
+	 * setup described as idle, and a fortnight of silence is long
+	 * enough to be worth noticing.
+	 */
+	const RECENTLY = 14 * DAY_IN_SECONDS;
+
+	/**
 	 * Issue a token for a user.
 	 *
 	 * Returns the secret exactly once. Nothing stores it, so a lost token is
@@ -112,7 +121,29 @@ class Blogcraft_Mcp_Auth {
 			$out[ $id ]['used']    = max( $out[ $id ]['used'], (int) $record['used'] );
 		}
 
+		// Whether it is working is the question. A date is a fact
+		// somebody then has to do arithmetic on.
+		foreach ( $out as $id => $one ) {
+			$out[ $id ]['state'] = self::state_of( $one['used'] );
+		}
+
 		return $out;
+	}
+
+	/**
+	 * Whether a connection counts as live, quiet or unused.
+	 *
+	 * @param int $used When it last called, or 0.
+	 * @return string One of never, idle, active.
+	 */
+	private static function state_of( $used ) {
+		$used = (int) $used;
+
+		if ( $used <= 0 ) {
+			return 'never';
+		}
+
+		return ( ( time() - $used ) <= self::RECENTLY ) ? 'active' : 'idle';
 	}
 
 	/**

@@ -2504,3 +2504,36 @@ body[class*="page_blogcraft"] #wpcontent {
 .bc-status-is {
 	font-weight: 600;
 }
+
+/* Whether a connection is live. The dot is the quick read and the word
+   is the one that survives not being able to tell the colours apart. */
+
+.bc-conn-state {
+	align-items: center;
+	display: inline-flex;
+	gap: 6px;
+}
+
+.bc-conn-state::before {
+	border-radius: 50%;
+	content: "";
+	height: 8px;
+	width: 8px;
+}
+
+.bc-conn-state.is-active::before {
+	background: var(--bc-ok);
+}
+
+.bc-conn-state.is-idle::before {
+	background: var(--bc-warn);
+}
+
+.bc-conn-state.is-never::before {
+	background: var(--bc-line);
+}
+
+.bc-conn-state.is-never,
+.bc-conn-state.is-idle {
+	color: var(--bc-muted);
+}

@@ -1635,6 +1635,7 @@ class Blogcraft_Connection {
 		} else {
 			echo '<table class="widefat striped bc-token-table"><thead><tr>';
 			printf( '<th>%s</th>', esc_html__( 'App', 'dicecodes-ai-blog-writer' ) );
+			printf( '<th>%s</th>', esc_html__( 'Status', 'dicecodes-ai-blog-writer' ) );
 			printf( '<th>%s</th>', esc_html__( 'How', 'dicecodes-ai-blog-writer' ) );
 			printf( '<th>%s</th>', esc_html__( 'Connected', 'dicecodes-ai-blog-writer' ) );
 			printf( '<th>%s</th>', esc_html__( 'Last used', 'dicecodes-ai-blog-writer' ) );
@@ -1646,6 +1647,14 @@ class Blogcraft_Connection {
 
 				echo '<tr>';
 				printf( '<td><strong>%s</strong></td>', esc_html( $label ) );
+
+				// The word as well as the colour: a green dot beside nothing
+				// is not something every reader can act on.
+				printf(
+					'<td><span class="bc-conn-state is-%1$s">%2$s</span></td>',
+					esc_attr( $one['state'] ),
+					esc_html( self::state_label( $one['state'] ) )
+				);
 
 				// Which way it got in. Somebody deciding whether to end a
 				// connection wants to know whether ending it means the app has
@@ -1698,6 +1707,24 @@ class Blogcraft_Connection {
 		echo ' ';
 		submit_button( __( 'Issue a token', 'dicecodes-ai-blog-writer' ), 'secondary', 'submit', false );
 		echo '</form>';
+	}
+
+	/**
+	 * How to describe the state of one connection.
+	 *
+	 * @param string $state One of never, idle, active.
+	 * @return string
+	 */
+	private static function state_label( $state ) {
+		if ( 'active' === $state ) {
+			return __( 'Active', 'dicecodes-ai-blog-writer' );
+		}
+
+		if ( 'idle' === $state ) {
+			return __( 'Idle', 'dicecodes-ai-blog-writer' );
+		}
+
+		return __( 'Never used', 'dicecodes-ai-blog-writer' );
 	}
 
 	/**

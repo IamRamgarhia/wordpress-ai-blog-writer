@@ -172,4 +172,56 @@ class Test_Blogcraft_Connections extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Nothing is connected yet', $html );
 		$this->assertStringNotContainsString( 'name="connection"', $html );
 	}
+
+	public function test_a_connection_says_whether_it_is_live() {
+		// "Last used: September 1" is a fact somebody then has to do
+		// arithmetic on. Whether it is working today is the question.
+		Blogcraft_Mcp_Auth::issue( $this->author, 'never called' );
+
+		$states = wp_list_pluck( Blogcraft_Mcp_Auth::connections(), 'state' );
+
+		$this->assertSame( array( 'never' ), array_values( $states ) );
+	}
+
+	public function test_a_connection_used_today_is_active() {
+		$secret = Blogcraft_Mcp_Auth::issue( $this->author, 'my laptop' );
+
+		$request = new WP_REST_Request( 'POST', '/' . Blogcraft_Mcp::REST_NAMESPACE . Blogcraft_Mcp::REST_ROUTE );
+		$request->set_header( 'authorization', 'Bearer ' . $secret );
+		Blogcraft_Mcp_Auth::user_for( $request );
+
+		$connections = Blogcraft_Mcp_Auth::connections();
+		$one         = reset( $connections );
+
+		$this->assertSame( 'active', $one['state'] );
+	}
+
+	public function test_a_connection_that_has_gone_quiet_is_idle() {
+		// Long enough to be worth noticing, and not so short that somebody
+		// writing a post a fortnight sees their own setup called idle.
+		Blogcraft_Mcp_Auth::issue( $this->author, 'an old one' );
+
+		$tokens = Blogcraft_Mcp_Auth::all();
+		$key    = array_key_first( $tokens );
+
+		$tokens[ $key ]['used'] = time() - ( Blogcraft_Mcp_Auth::RECENTLY + DAY_IN_SECONDS );
+		update_option( Blogcraft_Mcp_Auth::OPTION, $tokens, false );
+
+		$connections = Blogcraft_Mcp_Auth::connections();
+		$one         = reset( $connections );
+
+		$this->assertSame( 'idle', $one['state'] );
+	}
+
+	public function test_the_screen_says_which_connections_are_live() {
+		Blogcraft_Mcp_Auth::issue( $this->author, 'never called' );
+
+		ob_start();
+		Blogcraft_Connection::render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Status', $html );
+		$this->assertStringContainsString( 'Never used', $html );
+		$this->assertStringContainsString( 'bc-conn-state is-never', $html );
+	}
 }
