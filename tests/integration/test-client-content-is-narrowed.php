@@ -60,8 +60,24 @@ class Test_Blogcraft_Client_Content_Is_Narrowed extends WP_UnitTestCase {
 		$out = $this->stored( $sent );
 
 		$this->assertStringNotContainsString( '<script', $out );
-		$this->assertStringNotContainsString( 'alert(', $out );
 		$this->assertStringContainsString( 'Ordinary opening.', $out );
+
+		// The text inside the tag survives as text, which is what
+		// wp_kses_post does and what it should do: a post about writing
+		// JavaScript may quote alert() perfectly legitimately, and the
+		// tag is the part that made it run. Asserting the words were gone
+		// would be asking this plugin to censor its own subject matter.
+		$this->assertStringNotContainsString( '</script', $out );
+	}
+
+	public function test_the_block_delimiters_survive_the_narrowing() {
+		// Load-bearing for the round trip: read_draft hands an app the
+		// stored block markup, and an app that sends it back unchanged
+		// must not have its post rebuilt into something else. wp_kses_post
+		// keeps HTML comments, so the delimiters come through.
+		$original = "<!-- wp:paragraph -->\n<p>Already blocks.</p>\n<!-- /wp:paragraph -->";
+
+		$this->assertSame( $original, $this->stored( $original ) );
 	}
 
 	public function test_an_event_attribute_does_not_survive() {
