@@ -4,7 +4,7 @@ Tags: ai content generator, ai writer, autoblogging, seo content, blog automatio
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,11 @@ They are encrypted before being stored, shown only as a mask, and never written 
 The complete history. The most recent releases are also in readme.txt;
 everything is here, oldest at the bottom.
 
+= 1.3.3 =
+* A body sent by a connected app is narrowed before it becomes a post. The helper that turns HTML into blocks returns anything already carrying a block delimiter exactly as it arrived — right for markup this plugin wrote and reads back, wrong for markup that came from somewhere else, because a body merely beginning with one went into the post whole. The same helper was already being given narrowed input everywhere else it is used
+* This is not a way in that was otherwise shut: the account behind a connection token belongs to somebody who can already publish. It matters because of where the words come from. They are written by a language model, and this plugin hands that model pages it fetched off the open web — so trusting the connection is not the same as trusting the text arriving over it, and the page that renders it is every reader's
+* A test sends a script tag, an event attribute, a javascript: link and an iframe behind a block delimiter, and requires all four to be gone and the writing around them to survive
+
 = 1.3.2 =
 * Addresses the plugin did not choose are now fetched the careful way. Two were not: the research list typed into a settings field, and the results a search service hands back, which nobody on this site picked at all. Both went through the call that follows whatever it is handed — including to this server's own network, or to a cloud provider's metadata address. The voice reader had used the careful call for the same kind of input all along
 * A page fetched from outside is now read only up to two megabytes. All that is wanted from one is its headings and an excerpt, both of which arrive early, and without a cap a page answering with a gigabyte is read into memory in full — and the request that dies of it is somebody's post
@@ -182,13 +187,5 @@ everything is here, oldest at the bottom.
 * Giving every service its own links pushed the section past the 5,000 characters the readme parser keeps, which would have cut the last services back off. It is written tighter and fits, and a test holds it there
 * A test compares the readme against the code and the provider list: an address the plugin can reach and does not disclose fails, and so does a service named without either a policy link or a stated reason there is none
 * Said why the two base64 calls in the key encryption are there. Both were suppressed warnings with no explanation beside them, which reads worse than the thing it was hiding
-
-= 1.3.0 =
-* Fixed: on a site whose theme adds its own article structured data, every post went out carrying two copies of it that described the same page and disagreed with each other. Two is worth less to a search engine than one, and nothing on any screen said it was happening
-* The plugin already stood down for the SEO plugins it could name, because each announces itself. A theme announces nothing, so no list could ever have caught this. It is now answered by looking: the site reads one of its own published posts and counts what is actually in the page
-* The overview says so when it finds a second copy, and names the switch that stops it. If both copies come from elsewhere it says that too, rather than pointing at a switch that would not help
-* New setting, "Add search-engine structured data to each post", on by default. Off is for the sites whose theme already does it, which is the one case where adding ours makes the page worse
-* The stand-down list knows ten SEO plugins instead of four: The SEO Framework, Slim SEO, Squirrly, SEO Simple Pack, Schema Pro and Schema & Structured Data for WP have joined Yoast, Rank Math, All In One SEO and SEOPress
-* The form test introduced last release checked four screens because those were the four the bug was found on. It now checks all ten that draw a form, with rows on the screens that list things, so the forms drawn once per row are checked too
 Older releases are listed in changelog.txt, which ships with the plugin.
 
