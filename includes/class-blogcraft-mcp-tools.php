@@ -626,7 +626,15 @@ class Blogcraft_Mcp_Tools {
 		$post_id = wp_insert_post(
 			array(
 				'post_title'   => $title,
-				'post_content' => Blogcraft_Blocks::from_html( $html ),
+				// Narrowed before it is turned into blocks. from_html()
+				// hands back anything already carrying a block delimiter
+				// exactly as it arrived, which is right for markup this
+				// plugin wrote and wrong for markup an app sent: a body
+				// opening with a delimiter would have gone into the post
+				// whole. The words come out of a language model, and this
+				// plugin feeds that model pages it fetched off the web, so
+				// "the account is trusted" is not the same as "the text is".
+				'post_content' => Blogcraft_Blocks::from_html( wp_kses_post( $html ) ),
 				'post_status'  => 'draft',
 				'post_type'    => 'post',
 				'post_author'  => get_current_user_id(),
@@ -682,7 +690,8 @@ class Blogcraft_Mcp_Tools {
 		}
 
 		if ( isset( $args['html'] ) && '' !== trim( (string) $args['html'] ) ) {
-			$update['post_content'] = Blogcraft_Blocks::from_html( (string) $args['html'] );
+			// Same reasoning as create_draft: narrowed before it is blocked.
+			$update['post_content'] = Blogcraft_Blocks::from_html( wp_kses_post( (string) $args['html'] ) );
 		}
 
 		$done = wp_update_post( $update, true );
