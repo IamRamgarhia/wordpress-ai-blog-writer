@@ -8,15 +8,23 @@ Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI blog writer that researches first, writes in your voice, and checks its own work. Connect any provider with your own API key.
+AI blog writer that researches first, writes in your voice, and checks its own work. Bring your own API key, or drive it from Claude or ChatGPT.
 
 == Description ==
 
-Dicecodes AI Blog Writer writes blog posts for your WordPress site using an AI provider you choose and connect with your own API key.
+Dicecodes AI Blog Writer writes blog posts for your WordPress site. It researches the subject first, writes in a voice you describe, scores its own draft against twenty-five checks, and rewrites what it finds wrong before anything is published.
 
-Every feature is included. Nothing is locked, nothing expires, and there are no credits or quotas. Your only cost is whatever your chosen provider charges, and several offer free tiers.
+Every feature is included. Nothing is locked or expires, and there are no credits or quotas. Your only cost is what your provider charges, and several charge nothing.
 
-Full documentation, including a setup walkthrough and an explanation of every check it scores: https://dicecodes.com/
+Full documentation, including a setup walkthrough and an explanation of every check it scores: https://dicecodes.com/ai-blog-writer/
+
+**Two ways to run it**
+
+*With your own API key.* Choose a provider — OpenAI, Anthropic, Google Gemini, Groq, Mistral, DeepSeek, OpenRouter, xAI and more — paste a key, and the site does the writing. This is the way that can write on a schedule while you are away.
+
+*From Claude or ChatGPT.* If you already pay for one of those, connect it to your site and it does the writing on the subscription you already have. No API key, no second bill, and nothing leaves your site — the connection comes in. It speaks the Model Context Protocol (MCP), so it is not tied to one app. Your writing rules, the checks and the publishing all stay here: the app supplies the model, the plugin supplies the judgement.
+
+You can also run a model on your own machine with Ollama, LM Studio, Jan or llama.cpp, in which case nothing is sent anywhere at all.
 
 **How a post is written**
 
@@ -28,44 +36,39 @@ Full documentation, including a setup walkthrough and an explanation of every ch
 
 **It can match an article you admire**
 
-Paste the address of any published post and the plugin reads it: how long it runs, how many sections, how long its sentences and paragraphs are, whether it uses tables and lists, how heavily it links out, how many concrete figures it states, whether it says "I" or "you". Those measurements become your writing rules.
+Paste the address of any published post and the plugin reads its shape: how long it runs, how many sections, how long its sentences are, whether it uses tables and lists, how heavily it links out, how many figures it states, whether it says "I" or "you". Those measurements become your writing rules.
 
-Structure only. None of the wording is copied, kept, or shown to a model — what it takes is public form, which belongs to nobody. It is a truer answer than a preset named after a famous blog, because it stays right when that blog changes.
-
-There are also eight ready-made shapes to start from: definitive guide, numbered list, step by step, this against that, data study, argued opinion, quick explainer, hands-on review.
+Structure only. None of the wording is copied, kept, or shown to a model — what it takes is public form, which belongs to nobody. There are also eight ready-made shapes to start from, from definitive guide to hands-on review.
 
 **It measures what it was asked for**
 
 Twenty-five checks run on the finished draft, and every one that fails is written back into the rewrite as an instruction rather than a number. Among them:
 
 * Does the opening answer the question in its first two sentences, or clear its throat first?
-* Does every section that states a figure carry a link beside it? (It checks the link is there, not that the number is on the page at the other end.)
+* Does every section that states a figure carry a link beside it?
 * Does it say anything the sources it read do not already say?
 * Is the subject in the title, in a heading, and in the opening?
-* Are the title and meta description the length they need to be?
 
-The loop is the whole point: a score you have to act on yourself is a report card, and a rewrite that never gets measured is a guess.
+The loop is the point: a score you have to act on yourself is a report card, and a rewrite that never gets measured is a guess.
 
 **It writes in your voice**
 
-Describe your niche, your reader, your tone, your style rules, and the things you never write about. All of it is sent with every request. A list of common AI tells is blocked by default.
-
-You can also store your own anecdotes and experience, which is the one thing AI writing structurally lacks.
+Describe your niche, your reader, your tone, your style rules, and the things you never write about. All of it is sent with every request, and a list of common AI tells is blocked by default. You can also store your own anecdotes and experience, which is the one thing AI writing structurally lacks.
 
 **It looks after the rest of your site**
 
-* Links each new post to your existing ones from inside the sentences, not just a list at the bottom, and goes back to link older posts to the new one
+* Links each new post to your existing ones from inside the sentences, and goes back to link older posts to the new one
 * Refuses a topic too similar to something you have already published
-* Rewrites your older posts in place when they go stale, keeping the same URL
+* Rewrites older posts in place when they go stale, keeping the same URL
 * Adds a featured image, alt text, structured data and a contents outline
-* Publishes author, reviewer, organisation and breadcrumb markup, which is what search and answer engines read as an expertise signal
-* Adds a byline readers can see, with the author's own bio and profile links from their WordPress profile — the same signal in a form a person can read, rather than only a machine
-* Plans around what is already ranking: the pages covering a topic are opened, their section headings read, and the outline aimed at what they leave out
-* Fills in Yoast, Rank Math or SEOPress fields when one of those is active, and writes the description and sharing tags into the page itself when none of them is
+* Publishes author, reviewer, organisation and breadcrumb markup, an expertise signal search and answer engines read
+* Adds a byline readers can see, with the author's own bio and profile links
+* Plans around what is already ranking: the pages covering a topic are read, and the outline aimed at what they leave out
+* Fills in Yoast, Rank Math or SEOPress fields when one is active, and writes the description and sharing tags itself when none is
 
 **What it does not do**
 
-It does not find topics for you. Every tool in this category that does is reselling keyword-volume data, and that data cannot be had for free — so charging nothing and supplying topics are not both possible. You bring the subject; the plugin does the rest.
+It does not find topics for you. Every tool that does is reselling keyword-volume data, and that cannot be had for free — so charging nothing and supplying topics are not both possible. You bring the subject; the plugin does the rest.
 
 It does not invent evidence. There is a field for your own figures, results and prices, and they are used as fact and checked against the finished draft. Nothing fills that field for you, because nothing can.
 
@@ -124,6 +127,15 @@ Dicecodes AI Blog Writer has no server of its own. It collects no analytics and 
 
 The plugin also fetches any URL you add to its research list, to read as source material, and with a search provider configured it opens the first few results for a topic to see how they are organised.
 
+== Installation ==
+
+1. Install and activate the plugin.
+2. Open **AI Blog Writer** in the admin menu and choose how it should write:
+   * **With your own API key** — pick a provider, paste a key. Google Gemini and Groq both have free tiers large enough to write with, and Ollama runs a model on your own machine for nothing at all.
+   * **From Claude or ChatGPT** — switch on the AI client connection, copy the address it shows you, and paste that into your app. Approve the connection when your app sends you back. No API key.
+3. Describe who you write for under **How it writes**, or paste the address of an article whose shape you like and let the plugin measure it.
+4. Ask for a post. Drafts are the default, and anything scoring below your threshold is held for review rather than published.
+
 == Frequently Asked Questions ==
 
 = Where is the documentation? =
@@ -160,6 +172,15 @@ Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and 
 = What happens to my API keys? =
 
 They are encrypted before being stored, shown only as a mask, and never written to logs or error messages.
+
+== Screenshots ==
+
+1. The overview: what is set up, what has been written, and what is waiting for you.
+2. Asking for a post, with the brief it will be written to shown before anything runs.
+3. How it writes — start from a shape, or paste an article you admire and have its structure measured. The panel on the right is exactly what the model is told.
+4. Connecting Claude or ChatGPT over the Model Context Protocol, so the writing runs on a subscription you already pay for.
+5. Everything the plugin has written, with the score each post was measured at.
+6. Activity: every job, every step, and why anything stopped.
 
 == Changelog ==
 
