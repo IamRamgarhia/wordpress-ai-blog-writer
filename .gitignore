@@ -27,3 +27,9 @@ phpunit-out.txt
 ai-blog-plugin-research.md
 docs/*.md
 docs/superpowers/
+
+# The wordpress.org SVN working copy. It holds a second, complete copy of
+# the plugin — trunk plus every tagged release — checked out from a
+# different version control system entirely. Committing it to git would
+# put each release in the history twice and grow with every one.
+svn/
