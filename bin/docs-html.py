@@ -74,6 +74,11 @@ META_DESCRIPTION = (
 
 VERSION = _version()
 
+# Google reads dateModified as the freshness signal for an article, and a
+# date that moves every time the generator runs is a claim about content
+# that did not change. Taken from the source file instead.
+UPDATED = datetime.date.fromtimestamp(os.path.getmtime(CONTENT)).isoformat()
+
 LEAD = (
     'Your site talks to your provider and nothing sits in between. This is '
     'how every part of that works, and what each of it costs you.'
@@ -392,6 +397,37 @@ ol.steps strong {
 
 ol.steps span { color: var(--ink-2); }
 
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--verd);
+  border-radius: 0 0 3px 0;
+  font-family: var(--sans);
+  z-index: 50;
+}
+
+.skip:focus { left: 0; }
+
+.stamp {
+  margin: 20px 0 0;
+  font-family: var(--sans);
+  font-size: .84rem;
+  color: var(--muted);
+}
+
+code {
+  padding: .12em .38em;
+  background: var(--verd-wash);
+  border: 1px solid var(--rule-soft);
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .88em;
+  white-space: nowrap;
+}
+
 /* -------------------------------------------------------------- points. */
 
 ul.points { margin: 0 0 24px; padding: 0; list-style: none; }
@@ -601,8 +637,18 @@ JS = """
 """
 
 
+def inline(text):
+    """Escape, then give `code` spans real markup.
+
+    The backticks were being deleted, so a command written as code in the
+    source rendered as ordinary prose — which is the one place in a set of
+    instructions where the difference between prose and a literal matters.
+    """
+    return re.sub(r'`([^`]+)`', r'<code></code>', escape(text))
+
+
 def para(text):
-    return '<p>' + escape(text).replace('`', '') + '</p>'
+    return '<p>' + inline(text) + '</p>'
 
 
 def build(content):
@@ -720,6 +766,10 @@ def build(content):
                 'isPartOf': {'@id': SITE + '#website'},
                 'about': {'@id': CANONICAL + '#software'},
                 'publisher': {'@id': SITE + '#org'},
+                'author': {'@id': SITE + '#org'},
+                'image': SHARE_IMAGE,
+                'dateModified': UPDATED,
+                'datePublished': UPDATED,
                 'proficiencyLevel': 'Beginner',
             },
             {
@@ -746,12 +796,16 @@ def build(content):
                + json.dumps(schema, ensure_ascii=False) + '</script>')
     out.append('</head>')
     out.append('<body>')
+    out.append('<a class="skip" href="#quickstart">Skip to the documentation</a>')
 
     # Hero: what this is, and the three doors somebody actually comes in by.
     out.append('<header class="hero"><div class="wrap">')
     out.append('<p class="eyebrow">' + escape(NAME) + '</p>')
     out.append('<h1>' + escape(HEADING) + '</h1>')
     out.append('<p class="lead-in">' + escape(LEAD) + '</p>')
+    out.append('<p class="stamp">Version ' + escape(VERSION)
+               + ' &middot; last updated <time datetime="' + escape(UPDATED) + '">'
+               + escape(UPDATED) + '</time></p>')
 
     out.append('<ul class="doors">')
 
@@ -799,7 +853,7 @@ def build(content):
             out.append('<ul class="points">')
 
             for point in one['points']:
-                out.append('<li>' + escape(point) + '</li>')
+                out.append('<li>' + inline(point) + '</li>')
 
             out.append('</ul>')
 

@@ -329,6 +329,37 @@ ol.steps strong {
 
 ol.steps span { color: var(--ink-2); }
 
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--verd);
+  border-radius: 0 0 3px 0;
+  font-family: var(--sans);
+  z-index: 50;
+}
+
+.skip:focus { left: 0; }
+
+.stamp {
+  margin: 20px 0 0;
+  font-family: var(--sans);
+  font-size: .84rem;
+  color: var(--muted);
+}
+
+code {
+  padding: .12em .38em;
+  background: var(--verd-wash);
+  border: 1px solid var(--rule-soft);
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .88em;
+  white-space: nowrap;
+}
+
 /* -------------------------------------------------------------- points. */
 
 ul.points { margin: 0 0 24px; padding: 0; list-style: none; }
@@ -473,13 +504,15 @@ footer.foot p { margin: 0 0 6px; max-width: var(--measure); }
   * { transition: none !important; }
 }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "SoftwareApplication", "@id": "https://dicecodes.com/ai-blog-writer/#software", "name": "Dicecodes AI Blog Writer", "alternateName": "AI Blog Writer for WordPress", "description": "Set up Dicecodes AI Blog Writer for WordPress. Bring your own API key, or write straight from Claude or ChatGPT over MCP. Every feature free, no subscription.", "applicationCategory": "BusinessApplication", "applicationSubCategory": "WordPress Plugin", "operatingSystem": "WordPress 6.0 or later, PHP 7.4 or later", "url": "https://dicecodes.com/ai-blog-writer/", "downloadUrl": "https://downloads.wordpress.org/plugin/dicecodes-ai-blog-writer.zip", "installUrl": "https://wordpress.org/plugins/dicecodes-ai-blog-writer/", "softwareVersion": "1.3.3", "image": "https://ps.w.org/dicecodes-ai-blog-writer/assets/banner-1544x500.png", "screenshot": "https://ps.w.org/dicecodes-ai-blog-writer/assets/screenshot-1.png", "license": "https://www.gnu.org/licenses/gpl-2.0.html", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "featureList": ["Researches a subject before writing", "Writes in a voice you describe", "Scores every draft against twenty-five checks and rewrites what fails", "Works with your own API key, or from Claude or ChatGPT over the Model Context Protocol", "Runs a model on your own machine with Ollama, LM Studio, Jan or llama.cpp", "Adds internal links, structured data, a featured image and search metadata"], "publisher": {"@id": "https://dicecodes.com/#org"}}, {"@type": "Organization", "@id": "https://dicecodes.com/#org", "name": "Dice Codes", "url": "https://dicecodes.com/", "logo": "https://ps.w.org/dicecodes-ai-blog-writer/assets/icon-256x256.png"}, {"@type": "WebSite", "@id": "https://dicecodes.com/#website", "url": "https://dicecodes.com/", "name": "Dice Codes", "publisher": {"@id": "https://dicecodes.com/#org"}}, {"@type": "TechArticle", "@id": "https://dicecodes.com/ai-blog-writer/#docs", "headline": "Dicecodes AI Blog Writer for WordPress", "description": "Set up Dicecodes AI Blog Writer for WordPress. Bring your own API key, or write straight from Claude or ChatGPT over MCP. Every feature free, no subscription.", "inLanguage": "en", "url": "https://dicecodes.com/ai-blog-writer/", "isPartOf": {"@id": "https://dicecodes.com/#website"}, "about": {"@id": "https://dicecodes.com/ai-blog-writer/#software"}, "publisher": {"@id": "https://dicecodes.com/#org"}, "proficiencyLevel": "Beginner"}, {"@type": "BreadcrumbList", "@id": "https://dicecodes.com/ai-blog-writer/#crumbs", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Dice Codes", "item": "https://dicecodes.com/"}, {"@type": "ListItem", "position": 2, "name": "AI Blog Writer for WordPress", "item": "https://dicecodes.com/ai-blog-writer/"}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "SoftwareApplication", "@id": "https://dicecodes.com/ai-blog-writer/#software", "name": "Dicecodes AI Blog Writer", "alternateName": "AI Blog Writer for WordPress", "description": "Set up Dicecodes AI Blog Writer for WordPress. Bring your own API key, or write straight from Claude or ChatGPT over MCP. Every feature free, no subscription.", "applicationCategory": "BusinessApplication", "applicationSubCategory": "WordPress Plugin", "operatingSystem": "WordPress 6.0 or later, PHP 7.4 or later", "url": "https://dicecodes.com/ai-blog-writer/", "downloadUrl": "https://downloads.wordpress.org/plugin/dicecodes-ai-blog-writer.zip", "installUrl": "https://wordpress.org/plugins/dicecodes-ai-blog-writer/", "softwareVersion": "1.3.3", "image": "https://ps.w.org/dicecodes-ai-blog-writer/assets/banner-1544x500.png", "screenshot": "https://ps.w.org/dicecodes-ai-blog-writer/assets/screenshot-1.png", "license": "https://www.gnu.org/licenses/gpl-2.0.html", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "featureList": ["Researches a subject before writing", "Writes in a voice you describe", "Scores every draft against twenty-five checks and rewrites what fails", "Works with your own API key, or from Claude or ChatGPT over the Model Context Protocol", "Runs a model on your own machine with Ollama, LM Studio, Jan or llama.cpp", "Adds internal links, structured data, a featured image and search metadata"], "publisher": {"@id": "https://dicecodes.com/#org"}}, {"@type": "Organization", "@id": "https://dicecodes.com/#org", "name": "Dice Codes", "url": "https://dicecodes.com/", "logo": "https://ps.w.org/dicecodes-ai-blog-writer/assets/icon-256x256.png"}, {"@type": "WebSite", "@id": "https://dicecodes.com/#website", "url": "https://dicecodes.com/", "name": "Dice Codes", "publisher": {"@id": "https://dicecodes.com/#org"}}, {"@type": "TechArticle", "@id": "https://dicecodes.com/ai-blog-writer/#docs", "headline": "Dicecodes AI Blog Writer for WordPress", "description": "Set up Dicecodes AI Blog Writer for WordPress. Bring your own API key, or write straight from Claude or ChatGPT over MCP. Every feature free, no subscription.", "inLanguage": "en", "url": "https://dicecodes.com/ai-blog-writer/", "isPartOf": {"@id": "https://dicecodes.com/#website"}, "about": {"@id": "https://dicecodes.com/ai-blog-writer/#software"}, "publisher": {"@id": "https://dicecodes.com/#org"}, "author": {"@id": "https://dicecodes.com/#org"}, "image": "https://ps.w.org/dicecodes-ai-blog-writer/assets/banner-1544x500.png", "dateModified": "2026-09-08", "datePublished": "2026-09-08", "proficiencyLevel": "Beginner"}, {"@type": "BreadcrumbList", "@id": "https://dicecodes.com/ai-blog-writer/#crumbs", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Dice Codes", "item": "https://dicecodes.com/"}, {"@type": "ListItem", "position": 2, "name": "AI Blog Writer for WordPress", "item": "https://dicecodes.com/ai-blog-writer/"}]}]}</script>
 </head>
 <body>
+<a class="skip" href="#quickstart">Skip to the documentation</a>
 <header class="hero"><div class="wrap">
 <p class="eyebrow">Dicecodes AI Blog Writer</p>
 <h1>Dicecodes AI Blog Writer for WordPress</h1>
 <p class="lead-in">Your site talks to your provider and nothing sits in between. This is how every part of that works, and what each of it costs you.</p>
+<p class="stamp">Version 1.3.3 &middot; last updated <time datetime="2026-09-08">2026-09-08</time></p>
 <ul class="doors">
 <li><a href="#quickstart"><strong>Set it up</strong><span>Five steps, about ten minutes.</span></a></li>
 <li><a href="#providers"><strong>Use your own API key</strong><span>Your account, billed to you at their rates.</span></a></li>
@@ -769,7 +802,7 @@ footer.foot p { margin: 0 0 6px; max-width: var(--measure); }
 <h3 id="q-will-posts-publish-without-my-review">Will posts publish without my review?</h3>
 <p>Only if you turn that on. Drafts are the default, and any post scoring below your quality threshold is held for review even when you asked for immediate publication.</p>
 <h3 id="q-scheduled-posts-are-not-appearing-why">Scheduled posts are not appearing. Why?</h3>
-<p>WordPress only runs scheduled tasks when someone visits your site, so a quiet site may need a real system cron job. The plugin shows a notice when it detects this. You can also run wp dicecodes run from the command line.</p>
+<p>WordPress only runs scheduled tasks when someone visits your site, so a quiet site may need a real system cron job. The plugin shows a notice when it detects this. You can also run <code></code> from the command line.</p>
 <h3 id="q-can-i-use-a-local-model">Can I use a local model?</h3>
 <p>Yes, and it is the first group in the provider list. Ollama, LM Studio, Jan and llama.cpp each have an entry with the right address already filled in — pick one and leave the API key blank. Anything else that speaks the OpenAI protocol, vLLM included, works through the custom endpoint.</p>
 <h3 id="q-what-happens-to-my-api-keys">What happens to my API keys?</h3>
