@@ -8,21 +8,72 @@ you when one of them moves. The test suite checks them against each other.
 
     python bin/docs-html.py
 
-Writes docs/index.html. Upload that as the page the plugin links to.
+Writes three files into docs/:
+
+    index.html    the page itself, uploaded where the plugin links to
+    sitemap.xml   because the page is static, so the site's own sitemap
+                  (which WordPress generates) does not know it exists
+    llms.txt      a plain-text summary for assistants, uploaded to the
+                  site root rather than beside the page
 """
 
+import datetime
 import io
 import json
 import os
+import re
 import sys
 from html import escape
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONTENT = os.path.join(HERE, 'docs', 'content.json')
 TARGET = os.path.join(HERE, 'docs', 'index.html')
+SITEMAP = os.path.join(HERE, 'docs', 'sitemap.xml')
+LLMS = os.path.join(HERE, 'docs', 'llms.txt')
 
 NAME = 'Dicecodes AI Blog Writer'
-TITLE = NAME + ' - Documentation'
+
+# Where this page lives. Everything absolute — canonical, sharing tags and
+# the structured data all need a full address, and a relative one silently
+# resolves against whatever host is serving a copy.
+CANONICAL = 'https://dicecodes.com/ai-blog-writer/'
+SITE = 'https://dicecodes.com/'
+LISTING = 'https://wordpress.org/plugins/dicecodes-ai-blog-writer/'
+DOWNLOAD = 'https://downloads.wordpress.org/plugin/dicecodes-ai-blog-writer.zip'
+
+# Read from the plugin header rather than written twice. A version in the
+# structured data that lags the released one is a claim nobody checks and
+# everybody inherits.
+def _version():
+    header = io.open(os.path.join(HERE, 'blogcraft.php'), encoding='utf-8').read()
+    found = re.search(r'^ \* Version:\s*(\S+)', header, re.M)
+
+    return found.group(1) if found else ''
+
+
+# Served from the plugin directory, which hosts them permanently and is
+# already the canonical home for both.
+ASSETS = 'https://ps.w.org/dicecodes-ai-blog-writer/assets/'
+SHARE_IMAGE = ASSETS + 'banner-1544x500.png'
+ICON = ASSETS + 'icon-256x256.png'
+
+# What somebody types, not what we call ourselves. "Documentation" as the
+# whole title spends the most valuable string on the page saying nothing
+# about what the thing is or which platform it is for.
+TITLE = 'AI Blog Writer for WordPress - Setup and Docs | Dicecodes'
+HEADING = 'Dicecodes AI Blog Writer for WordPress'
+
+# 150-160 characters, and it has to name the two ways in: the readers who
+# search for this arrive either wanting a provider key or wanting to drive
+# it from an app they already pay for.
+META_DESCRIPTION = (
+    'Set up Dicecodes AI Blog Writer for WordPress. Bring your own API key, '
+    'or write straight from Claude or ChatGPT over MCP. Every feature free, '
+    'no subscription.'
+)
+
+VERSION = _version()
+
 LEAD = (
     'Your site talks to your provider and nothing sits in between. This is '
     'how every part of that works, and what each of it costs you.'
@@ -565,21 +616,131 @@ def build(content):
     out.append('<meta charset="utf-8">')
     out.append('<meta name="viewport" content="width=device-width, initial-scale=1">')
     out.append('<title>' + escape(TITLE) + '</title>')
-    out.append('<meta name="description" content="' + escape(LEAD) + '">')
+    out.append('<meta name="description" content="' + escape(META_DESCRIPTION) + '">')
     out.append('<meta name="color-scheme" content="light dark">')
+
+    # One address for this page, so a copy served with a query string or a
+    # missing slash does not compete with it.
+    out.append('<link rel="canonical" href="' + escape(CANONICAL) + '">')
+
+    # max-image-preview:large is what lets the banner appear at full size
+    # in a result rather than as a thumbnail, and it is off unless asked for.
+    out.append('<meta name="robots" content="index, follow, max-image-preview:large, '
+               'max-snippet:-1, max-video-preview:-1">')
+
+    # Without these, every share of this link in Slack, X, LinkedIn or a
+    # Discord channel renders as a bare grey URL.
+    out.append('<meta property="og:type" content="website">')
+    out.append('<meta property="og:site_name" content="' + escape(NAME) + '">')
+    out.append('<meta property="og:title" content="' + escape(TITLE) + '">')
+    out.append('<meta property="og:description" content="' + escape(META_DESCRIPTION) + '">')
+    out.append('<meta property="og:url" content="' + escape(CANONICAL) + '">')
+    out.append('<meta property="og:image" content="' + escape(SHARE_IMAGE) + '">')
+    out.append('<meta property="og:image:width" content="1544">')
+    out.append('<meta property="og:image:height" content="500">')
+    out.append('<meta property="og:image:alt" content="'
+               + escape(NAME + ' - researches first, writes in your voice, checks its own work') + '">')
+    out.append('<meta name="twitter:card" content="summary_large_image">')
+    out.append('<meta name="twitter:title" content="' + escape(TITLE) + '">')
+    out.append('<meta name="twitter:description" content="' + escape(META_DESCRIPTION) + '">')
+    out.append('<meta name="twitter:image" content="' + escape(SHARE_IMAGE) + '">')
+
+    out.append('<link rel="icon" href="' + escape(ICON) + '" type="image/png">')
+    out.append('<link rel="apple-touch-icon" href="' + escape(ICON) + '">')
+    out.append('<meta name="theme-color" content="#3858e9">')
+
     out.append('<style>' + CSS + '</style>')
 
+    # A graph rather than one nested object. The thing worth describing here
+    # is the plugin, and a SoftwareApplication buried in the "about" of an
+    # article is read as a property of the article rather than as an entity
+    # in its own right.
+    #
+    # No FAQPage: Google retired FAQ rich results for every site in May 2026,
+    # so the markup would earn nothing and still have to be maintained.
     schema = {
         '@context': 'https://schema.org',
-        '@type': 'TechArticle',
-        'headline': TITLE,
-        'description': LEAD,
-        'about': {
-            '@type': 'SoftwareApplication',
-            'name': NAME,
-            'applicationCategory': 'BrowserApplication',
-            'operatingSystem': 'WordPress',
-        },
+        '@graph': [
+            {
+                '@type': 'SoftwareApplication',
+                '@id': CANONICAL + '#software',
+                'name': NAME,
+                'alternateName': 'AI Blog Writer for WordPress',
+                'description': META_DESCRIPTION,
+                'applicationCategory': 'BusinessApplication',
+                'applicationSubCategory': 'WordPress Plugin',
+                'operatingSystem': 'WordPress 6.0 or later, PHP 7.4 or later',
+                'url': CANONICAL,
+                'downloadUrl': DOWNLOAD,
+                'installUrl': LISTING,
+                'softwareVersion': VERSION,
+                'image': SHARE_IMAGE,
+                'screenshot': ASSETS + 'screenshot-1.png',
+                'license': 'https://www.gnu.org/licenses/gpl-2.0.html',
+                'isAccessibleForFree': True,
+                # Free in the sense that matters: no tier, no trial, no
+                # credits. What a provider charges is theirs, not ours.
+                'offers': {
+                    '@type': 'Offer',
+                    'price': '0',
+                    'priceCurrency': 'USD',
+                    'availability': 'https://schema.org/InStock',
+                },
+                'featureList': [
+                    'Researches a subject before writing',
+                    'Writes in a voice you describe',
+                    'Scores every draft against twenty-five checks and rewrites what fails',
+                    'Works with your own API key, or from Claude or ChatGPT over the Model Context Protocol',
+                    'Runs a model on your own machine with Ollama, LM Studio, Jan or llama.cpp',
+                    'Adds internal links, structured data, a featured image and search metadata',
+                ],
+                'publisher': {'@id': SITE + '#org'},
+            },
+            {
+                '@type': 'Organization',
+                '@id': SITE + '#org',
+                'name': 'Dice Codes',
+                'url': SITE,
+                'logo': ICON,
+            },
+            {
+                '@type': 'WebSite',
+                '@id': SITE + '#website',
+                'url': SITE,
+                'name': 'Dice Codes',
+                'publisher': {'@id': SITE + '#org'},
+            },
+            {
+                '@type': 'TechArticle',
+                '@id': CANONICAL + '#docs',
+                'headline': HEADING,
+                'description': META_DESCRIPTION,
+                'inLanguage': 'en',
+                'url': CANONICAL,
+                'isPartOf': {'@id': SITE + '#website'},
+                'about': {'@id': CANONICAL + '#software'},
+                'publisher': {'@id': SITE + '#org'},
+                'proficiencyLevel': 'Beginner',
+            },
+            {
+                '@type': 'BreadcrumbList',
+                '@id': CANONICAL + '#crumbs',
+                'itemListElement': [
+                    {
+                        '@type': 'ListItem',
+                        'position': 1,
+                        'name': 'Dice Codes',
+                        'item': SITE,
+                    },
+                    {
+                        '@type': 'ListItem',
+                        'position': 2,
+                        'name': 'AI Blog Writer for WordPress',
+                        'item': CANONICAL,
+                    },
+                ],
+            },
+        ],
     }
     out.append('<script type="application/ld+json">'
                + json.dumps(schema, ensure_ascii=False) + '</script>')
@@ -589,7 +750,7 @@ def build(content):
     # Hero: what this is, and the three doors somebody actually comes in by.
     out.append('<header class="hero"><div class="wrap">')
     out.append('<p class="eyebrow">' + escape(NAME) + '</p>')
-    out.append('<h1>Documentation</h1>')
+    out.append('<h1>' + escape(HEADING) + '</h1>')
     out.append('<p class="lead-in">' + escape(LEAD) + '</p>')
 
     out.append('<ul class="doors">')
@@ -698,6 +859,81 @@ def build(content):
     return '\n'.join(out)
 
 
+def build_sitemap():
+    """A sitemap naming this page.
+
+    The page is a static file, so WordPress does not know it exists and it
+    is absent from the sitemap the site already publishes. A page nothing
+    links to and no sitemap names is one a crawler has no route to, which
+    makes every other thing on it academic.
+    """
+    today = datetime.date.today().isoformat()
+
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '  <url>\n'
+        '    <loc>' + CANONICAL + '</loc>\n'
+        '    <lastmod>' + today + '</lastmod>\n'
+        '    <changefreq>monthly</changefreq>\n'
+        '    <priority>0.8</priority>\n'
+        '  </url>\n'
+        '</urlset>\n'
+    )
+
+
+def build_llms(content):
+    """A plain-text summary for the assistants people ask instead of searching.
+
+    Not a Google ranking signal and not claimed as one. It is read by some
+    assistants when deciding what a site is, and the readers this plugin is
+    for are disproportionately the people who ask an assistant first.
+    """
+    out = [
+        '# ' + NAME,
+        '',
+        '> ' + META_DESCRIPTION,
+        '',
+        'A free WordPress plugin that writes blog posts. It researches the subject',
+        'first, writes to a voice you describe, scores every draft against',
+        'twenty-five checks, and rewrites what fails before anything is published.',
+        '',
+        'Two ways to run it:',
+        '',
+        '- **With your own API key.** OpenAI, Anthropic, Google Gemini, Groq,',
+        '  Mistral, DeepSeek, OpenRouter, xAI and others. Billed to you by that',
+        '  provider. This is the way that can write on a schedule.',
+        '- **From Claude or ChatGPT.** The app connects to the site over the Model',
+        '  Context Protocol and does the writing on the subscription you already',
+        '  pay for. No API key and no second bill.',
+        '',
+        'A model can also run on your own machine with Ollama, LM Studio, Jan or',
+        'llama.cpp, in which case nothing is sent to anyone.',
+        '',
+        'Every feature is included. There is no paid tier, no trial, no credits',
+        'and no quota. The plugin has no server of its own, collects no analytics',
+        'and sends nothing to its author.',
+        '',
+        '## Documentation',
+        '',
+    ]
+
+    for section in content['sections']:
+        out.append('- [' + section['title'] + '](' + CANONICAL + '#' + section['id'] + '): '
+                   + section.get('lead', '').rstrip('.') + '.')
+
+    out += [
+        '',
+        '## Elsewhere',
+        '',
+        '- [Plugin directory listing](' + LISTING + '): install it from here.',
+        '- [Download](' + DOWNLOAD + '): the current release, version ' + VERSION + '.',
+        '',
+    ]
+
+    return '\n'.join(out)
+
+
 def main():
     if not os.path.exists(CONTENT):
         sys.exit('no ' + CONTENT)
@@ -706,10 +942,14 @@ def main():
     html = build(content)
 
     io.open(TARGET, 'w', encoding='utf-8', newline='\n').write(html)
+    io.open(SITEMAP, 'w', encoding='utf-8', newline='\n').write(build_sitemap())
+    io.open(LLMS, 'w', encoding='utf-8', newline='\n').write(build_llms(content))
 
     ids = [s['id'] for s in content['sections']] + ['faq']
 
     print('wrote %s' % os.path.relpath(TARGET, HERE))
+    print('wrote %s' % os.path.relpath(SITEMAP, HERE))
+    print('wrote %s' % os.path.relpath(LLMS, HERE))
     print('%d sections, %d questions, %d bytes'
           % (len(content['sections']), len(content['faq']), len(html)))
     print('anchors: ' + ' '.join(ids))

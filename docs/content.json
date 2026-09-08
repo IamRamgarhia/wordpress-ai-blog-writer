@@ -231,7 +231,10 @@
         "Written as real blocks, so every paragraph and heading is editable in the editor.",
         "Saved as a draft by default. You will find it under Posts.",
         "Anything below your threshold is set to pending and listed under \"Needs review\".",
-        "Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates."
+        "Images are downloaded into your Media library, not hotlinked. Alt text comes from the heading each one illustrates.",
+        "Structured data is written into the page: an Article for the post, plus author, reviewer, organisation and breadcrumb markup. That is what a search or answer engine reads as an expertise signal.",
+        "If your theme already adds its own Article markup, the plugin says so on the Overview and offers to stand down — two copies describing the same page are worth less than one. The switch is Settings, \"Add search-engine structured data to each post\".",
+        "It stands down on its own for Yoast, Rank Math, All In One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly, SEO Simple Pack, Schema Pro and Schema & Structured Data for WP, and fills in their title and description fields instead."
       ],
       "table": null
     },
